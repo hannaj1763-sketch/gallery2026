@@ -58,7 +58,7 @@
 </head>
 <body>
 
-  <div id="loadingText">작품 보관함 동기화 및 연도별 정렬 중...</div>
+  <div id="loadingText">작품 보관함 동기화 및 큐레이팅 중...</div>
 
   <header>
     <div style="font-weight: 700; font-size: 16px; letter-spacing: -0.5px;">Atelier Archive</div>
@@ -66,7 +66,7 @@
       <button class="tab-btn active" onclick="switchView('3d')">3D 가상 갤러리</button>
       <button class="tab-btn" onclick="switchView('archive')">도록 (연대기)</button>
     </div>
-    <div style="font-size:12px; color:#8a99ad;">연대기 자동 정렬 활성</div>
+    <div style="font-size:12px; color:#8a99ad;">프로필 고정 & 연대기 정렬</div>
   </header>
 
   <!-- 3D 뷰 -->
@@ -77,7 +77,7 @@
 
   <!-- 도록 뷰 -->
   <div id="view-archive" class="view-container">
-    <h2 style="font-size: 20px; font-weight: 600;">작품 도록 & 아카이브 (연대기 순)</h2>
+    <h2 style="font-size: 20px; font-weight: 600;">작품 도록 & 아카이브 (작가 소개 및 연대기)</h2>
     <div id="artGrid" class="gallery-grid"></div>
   </div>
 
@@ -127,6 +127,7 @@
         const items = await res.json();
         
         const folders = items.filter(i => i.type === 'dir');
+        let tempArtworks = [];
         
         for (const folder of folders) {
           const folderRes = await fetch(folder.url);
@@ -139,10 +140,11 @@
             const noteRes = await fetch(noteFile.download_url);
             const noteData = await noteRes.json();
             
-            artworks.push({
+            tempArtworks.push({
               id: folder.name,
+              isProfile: folder.name === '01' || (noteData.title && noteData.title.includes('프로필')),
               title: noteData.title || folder.name,
-              date: noteData.date || "9999-99", // date가 없으면 맨 뒤로
+              date: noteData.date || "9999-99",
               meta: noteData.meta || '',
               src: imgFile.download_url,
               notes: noteData.notes || { ko: "작품 설명이 없습니다." }
@@ -150,8 +152,11 @@
           }
         }
 
-        // 연도 및 월 순서대로 오름차순(과거 -> 최신 성장순) 자동 정렬
-        artworks.sort((a, b) => a.date.localeCompare(b.date));
+        // 프로필(01번)을 무조건 맨 처음(0순위)에 두고, 나머지는 date(연대기 순) 오름차순 정렬
+        const profile = tempArtworks.filter(a => a.isProfile);
+        const works = tempArtworks.filter(a => !a.isProfile).sort((a, b) => a.date.localeCompare(b.date));
+        
+        artworks = [...profile, ...works];
 
       } catch (e) {
         console.log("폴더 로드 대기 중");
