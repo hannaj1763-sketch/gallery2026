@@ -1,0 +1,299 @@
+HTML
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>온라인 전시관 & 아카이브</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", sans-serif; background: #0f1115; color: #f0f2f5; overflow-x: hidden; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(15,17,21,0.9); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px); }
+    .nav-tabs { display: flex; gap: 8px; }
+    .tab-btn { background: #1a1e26; border: 1px solid rgba(255,255,255,0.1); color: #8a99ad; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+    .tab-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+    .btn-primary { background: #3b82f6; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 600; }
+    
+    .view-container { display: none; min-height: calc(100vh - 65px); }
+    .view-container.active { display: block; }
+
+    /* 3D 뷰 */
+    #view-3d { position: relative; height: calc(100vh - 65px); }
+    #canvas3d { width: 100%; height: 100%; display: block; }
+    .hint-3d { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 20px; font-size: 13px; color: #cbd5e1; pointer-events: none; }
+
+    /* 도록 뷰 */
+    #view-archive { max-width: 1200px; margin: 0 auto; padding: 32px 20px; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-top: 24px; }
+    .art-card { background: #161a22; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+    .art-card:hover { transform: translateY(-4px); }
+    .art-thumb { width: 100%; height: 260px; object-fit: cover; background: #0b0d11; display: block; }
+    .art-info { padding: 16px; }
+    .art-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .art-meta { font-size: 12px; color: #8a99ad; margin-bottom: 8px; }
+    .art-note { font-size: 13px; color: #cbd5e1; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* 모달 */
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
+    .modal.active { display: flex; }
+    .modal-content { background: #161a22; border-radius: 16px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 24px; border: 1px solid rgba(255,255,255,0.1); }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; color: #8a99ad; margin-bottom: 6px; }
+    .form-group input, .form-group textarea { width: 100%; background: #0f1115; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 14px; }
+
+    /* 심층 뷰어 모달 */
+    .viewer-modal { display: none; position: fixed; inset: 0; background: rgba(5,6,8,0.96); z-index: 100; flex-direction: column; }
+    .viewer-modal.active { display: flex; }
+    .viewer-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .viewer-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; overflow: hidden; }
+    .viewer-img { max-height: 75vh; max-width: 90vw; object-fit: contain; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+    .viewer-footer { padding: 16px 24px; background: rgba(0,0,0,0.4); text-align: center; font-size: 14px; color: #94a3b8; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="font-weight: 700; font-size: 16px; letter-spacing: -0.5px;">Atelier Archive</div>
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchView('3d')">3D 가상 갤러리</button>
+      <button class="tab-btn" onclick="switchView('archive')">도록 (연작)</button>
+    </div>
+    <button class="btn-primary" onclick="openUploadModal()">+ 종이 그림 등록</button>
+  </header>
+
+  <!-- 3D 뷰 -->
+  <div id="view-3d" class="view-container active">
+    <canvas id="canvas3d"></canvas>
+    <div class="hint-3d">마우스나 터치로 공간을 둘러보세요 (벽면 작품 클릭 시 확대)</div>
+  </div>
+
+  <!-- 도록 뷰 -->
+  <div id="view-archive" class="view-container">
+    <h2 style="font-size: 20px; font-weight: 600;">작품 도록 & 아카이브</h2>
+    <div id="artGrid" class="gallery-grid"></div>
+  </div>
+
+  <!-- 심층 뷰어 모달 -->
+  <div id="viewerModal" class="viewer-modal">
+    <div class="viewer-header">
+      <div id="viewerTitle" style="font-weight: 600;">작품명</div>
+      <button onclick="closeViewer()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">&times;</button>
+    </div>
+    <div class="viewer-body">
+      <img id="viewerImg" class="viewer-img" src="" alt="작품">
+    </div>
+    <div id="viewerDetails" class="viewer-footer"></div>
+  </div>
+
+  <!-- 작품 등록 모달 -->
+  <div id="uploadModal" class="modal">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h3 style="font-size: 18px;">종이 그림 등록</h3>
+        <button onclick="closeUploadModal()" style="background:none; border:none; color:#fff; font-size:20px; cursor:pointer;">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>종이 원화 사진 (스마트폰 촬영)</label>
+        <input type="file" id="fileInput" accept="image/*" onchange="previewImage(event)">
+      </div>
+      <div class="form-group">
+        <label>작품 제목</label>
+        <input type="text" id="artTitleInput" placeholder="예: 무제 (침묵의 결)">
+      </div>
+      <div class="form-group">
+        <label>사용 재료</label>
+        <input type="text" id="artMediumInput" placeholder="예: 한지 위 먹, 흑연, 오일파스텔">
+      </div>
+      <div class="form-group">
+        <label>규격 및 연도</label>
+        <input type="text" id="artSizeInput" placeholder="예: 210 x 297 mm, 2026">
+      </div>
+      <div class="form-group">
+        <label>작가 노트</label>
+        <textarea id="artNoteInput" rows="3" placeholder="작업 의도나 단상을 기록하세요."></textarea>
+      </div>
+      <button class="btn-primary" style="width:100%; padding:12px; margin-top:10px;" onclick="saveArtwork()">전시관에 걸기</button>
+    </div>
+  </div>
+
+  <script>
+    // 기본 샘플 데이터
+    let artworks = [
+      {
+        id: 1,
+        title: "새벽의 선 (Line of Dawn)",
+        medium: "코튼지 위 목탄, 흑연",
+        size: "180 x 260 mm, 2026",
+        note: "새벽빛이 종이 결 위로 번져나가는 순간의 호흡을 거친 목탄 가루로 뭉갰습니다.",
+        src: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1000&q=80"
+      },
+      {
+        id: 2,
+        title: "침묵의 잔향",
+        medium: "아르쉬 수채지 위 잉크",
+        size: "210 x 297 mm, 2026",
+        note: "물의 농담에 따라 번져가는 먹의 시간성을 기록한 소품 연작입니다.",
+        src: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1000&q=80"
+      }
+    ];
+
+    let currentImageData = null;
+
+    function renderArchive() {
+      const grid = document.getElementById('artGrid');
+      grid.innerHTML = artworks.map(art => `
+        <div class="art-card" onclick="openViewer('${art.src}', '${art.title}', '${art.medium} | ${art.size}', '${art.note}')">
+          <img src="${art.src}" class="art-thumb" alt="${art.title}">
+          <div class="art-info">
+            <div class="art-title">${art.title}</div>
+            <div class="art-meta">${art.medium} • ${art.size}</div>
+            <div class="art-note">${art.note}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function switchView(mode) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+      if(mode === '3d') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('view-3d').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('view-archive').classList.add('active');
+        renderArchive();
+      }
+    }
+
+    function openViewer(src, title, meta, note) {
+      document.getElementById('viewerImg').src = src;
+      document.getElementById('viewerTitle').innerText = title;
+      document.getElementById('viewerDetails').innerHTML = `<strong>${meta}</strong><br><p style="margin-top:6px; color:#cbd5e1;">${note}</p>`;
+      document.getElementById('viewerModal').classList.add('active');
+    }
+
+    function closeViewer() {
+      document.getElementById('viewerModal').classList.remove('active');
+    }
+
+    function openUploadModal() { document.getElementById('uploadModal').classList.add('active'); }
+    function closeUploadModal() { document.getElementById('uploadModal').classList.remove('active'); }
+
+    function previewImage(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => { currentImageData = event.target.result; };
+      reader.readAsDataURL(file);
+    }
+
+    function saveArtwork() {
+      const title = document.getElementById('artTitleInput').value || '무제';
+      const medium = document.getElementById('artMediumInput').value || '종이 위 복합 재료';
+      const size = document.getElementById('artSizeInput').value || '2026';
+      const note = document.getElementById('artNoteInput').value || '';
+      const src = currentImageData || 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1000&q=80';
+
+      const newArt = { id: Date.now(), title, medium, size, note, src };
+      artworks.unshift(newArt);
+      renderArchive();
+      closeUploadModal();
+      alert('전시관에 새 작품이 등록되었습니다.');
+    }
+
+    // 3D 갤러리 Three.js 씬 초기화
+    let scene, camera, renderer, paintings = [];
+    function init3D() {
+      const container = document.getElementById('view-3d');
+      const canvas = document.getElementById('canvas3d');
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0f1115);
+
+      camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+      camera.position.set(0, 1.6, 4);
+
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+
+      // 조명
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+      scene.add(ambientLight);
+      const pointLight = new THREE.PointLight(0xffffff, 0.8, 15);
+      pointLight.position.set(0, 3, 2);
+      scene.add(pointLight);
+
+      // 바닥
+      const floorGeo = new THREE.PlaneGeometry(12, 12);
+      const floorMat = new THREE.MeshStandardMaterial({ color: 0x161a22, roughness: 0.8 });
+      const floor = new THREE.Mesh(floorGeo, floorMat);
+      floor.rotation.x = -Math.PI / 2;
+      scene.add(floor);
+
+      // 벽면 액자 배치
+      const wallMat = new THREE.MeshStandardMaterial({ color: 0x1f242d });
+      const backWall = new THREE.Mesh(new THREE.PlaneGeometry(12, 4), wallMat);
+      backWall.position.set(0, 2, -4);
+      scene.add(backWall);
+
+      // 텍스처 로더로 액자 걸기
+      const loader = new THREE.TextureLoader();
+      artworks.forEach((art, index) => {
+        loader.load(art.src, (texture) => {
+          const frameGeo = new THREE.PlaneGeometry(1.6, 2.0);
+          const frameMat = new THREE.MeshBasicMaterial({ map: texture });
+          const mesh = new THREE.Mesh(frameGeo, frameMat);
+          mesh.position.set((index - 0.5) * 2.8, 2, -3.95);
+          mesh.userData = art;
+          paintings.push(mesh);
+          scene.add(mesh);
+        });
+      });
+
+      // 간단한 마우스 드래그 시선 이동
+      let isDragging = false, prevX = 0;
+      canvas.addEventListener('mousedown', (e) => { isDragging = true; prevX = e.clientX; });
+      window.addEventListener('mouseup', () => { isDragging = false; });
+      canvas.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const deltaX = e.clientX - prevX;
+        camera.rotation.y += deltaX * 0.003;
+        prevX = e.clientX;
+      });
+
+      // 액자 클릭 시 확대 뷰어 연결
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+      canvas.addEventListener('click', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / canvas.clientWidth) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / canvas.clientHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(paintings);
+        if (intersects.length > 0) {
+          const art = intersects[0].object.userData;
+          openViewer(art.src, art.title, `${art.medium} | ${art.size}`, art.note);
+        }
+      });
+
+      function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      });
+    }
+
+    window.onload = () => {
+      renderArchive();
+      init3D();
+    };
+  </script>
+</body>
+</html>
