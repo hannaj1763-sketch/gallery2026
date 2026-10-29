@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atelier Archive - 자동 연재 전시관</title>
+  <title>Atelier Archive - 아티스트 장예성 갤러리</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,7 +39,7 @@
     .viewer-counter { font-size: 12px; color: #3b82f6; font-weight: 600; margin-left: 8px; }
     
     .viewer-body { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; padding: 10px 20px; overflow: hidden; }
-    .viewer-img { max-height: 52vh; max-width: 85vw; object-fit: contain; box-shadow: 0 10px 40px rgba(0,0,0,0.8); transition: opacity 0.2s; }
+    .viewer-img { max-height: 52vh; max-width: 85vw; object-fit: contain; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
     
     /* 좌우 이동 버튼 */
     .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.12); color: #fff; border: none; width: 44px; height: 44px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: background 0.2s; z-index: 10; }
@@ -58,15 +58,15 @@
 </head>
 <body>
 
-  <div id="loadingText">작품 보관함 동기화 중...</div>
+  <div id="loadingText">작품 보관함 동기화 및 연도별 정렬 중...</div>
 
   <header>
     <div style="font-weight: 700; font-size: 16px; letter-spacing: -0.5px;">Atelier Archive</div>
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchView('3d')">3D 가상 갤러리</button>
-      <button class="tab-btn" onclick="switchView('archive')">도록 (연작)</button>
+      <button class="tab-btn" onclick="switchView('archive')">도록 (연대기)</button>
     </div>
-    <div style="font-size:12px; color:#8a99ad;">GitHub Auto Sync</div>
+    <div style="font-size:12px; color:#8a99ad;">연대기 자동 정렬 활성</div>
   </header>
 
   <!-- 3D 뷰 -->
@@ -77,7 +77,7 @@
 
   <!-- 도록 뷰 -->
   <div id="view-archive" class="view-container">
-    <h2 style="font-size: 20px; font-weight: 600;">작품 도록 & 아카이브</h2>
+    <h2 style="font-size: 20px; font-weight: 600;">작품 도록 & 아카이브 (연대기 순)</h2>
     <div id="artGrid" class="gallery-grid"></div>
   </div>
 
@@ -126,7 +126,7 @@
         if (!res.ok) throw new Error("artworks 폴더 미생성 상태");
         const items = await res.json();
         
-        const folders = items.filter(i => i.type === 'dir').sort((a,b) => a.name.localeCompare(b.name));
+        const folders = items.filter(i => i.type === 'dir');
         
         for (const folder of folders) {
           const folderRes = await fetch(folder.url);
@@ -142,12 +142,17 @@
             artworks.push({
               id: folder.name,
               title: noteData.title || folder.name,
+              date: noteData.date || "9999-99", // date가 없으면 맨 뒤로
               meta: noteData.meta || '',
               src: imgFile.download_url,
               notes: noteData.notes || { ko: "작품 설명이 없습니다." }
             });
           }
         }
+
+        // 연도 및 월 순서대로 오름차순(과거 -> 최신 성장순) 자동 정렬
+        artworks.sort((a, b) => a.date.localeCompare(b.date));
+
       } catch (e) {
         console.log("폴더 로드 대기 중");
       }
@@ -202,7 +207,6 @@
       changeLang(currentLang);
     }
 
-    // 좌우 이동 함수 (-1: 이전, +1: 다음)
     function navigateArt(direction) {
       if (artworks.length <= 1) return;
       currentIndex = (currentIndex + direction + artworks.length) % artworks.length;
@@ -225,7 +229,6 @@
       document.getElementById('viewerModal').classList.remove('active');
     }
 
-    // 키보드 좌우 방향키 및 ESC 닫기 지원
     window.addEventListener('keydown', (e) => {
       const modal = document.getElementById('viewerModal');
       if (!modal.classList.contains('active')) return;
@@ -234,19 +237,17 @@
       if (e.key === 'Escape') closeViewer();
     });
 
-    // 스마트폰 터치 스와이프(좌우 넘기기) 지원
     let touchStartX = 0;
     const swipeArea = document.getElementById('viewerSwipeArea');
     swipeArea.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, {passive: true});
     swipeArea.addEventListener('touchend', (e) => {
       const diffX = e.changedTouches[0].clientX - touchStartX;
       if (Math.abs(diffX) > 40) {
-        if (diffX > 0) navigateArt(-1); // 오른쪽으로 밀면 이전 작품
-        else navigateArt(1);            // 왼쪽으로 밀면 다음 작품
+        if (diffX > 0) navigateArt(-1);
+        else navigateArt(1);
       }
     });
 
-    // 3D 갤러리
     let scene, camera, renderer, paintings = [];
     function init3D() {
       const container = document.getElementById('view-3d');
