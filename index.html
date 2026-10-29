@@ -7,7 +7,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", sans-serif; background: #0f1115; color: #f0f2f5; overflow-x: hidden; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", sans-serif; background: #0f1115; color: #f0f2f5; overflow-x: hidden; user-select: none; }
     header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(15,17,21,0.9); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px); }
     .nav-tabs { display: flex; gap: 8px; }
     .tab-btn { background: #1a1e26; border: 1px solid rgba(255,255,255,0.1); color: #8a99ad; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
@@ -36,10 +36,18 @@
     .viewer-modal { display: none; position: fixed; inset: 0; background: rgba(5,6,8,0.97); z-index: 100; flex-direction: column; }
     .viewer-modal.active { display: flex; }
     .viewer-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .viewer-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; overflow: hidden; }
-    .viewer-img { max-height: 55vh; max-width: 90vw; object-fit: contain; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-    .viewer-footer { padding: 20px 24px; background: rgba(15,17,21,0.95); border-top: 1px solid rgba(255,255,255,0.08); max-height: 35vh; overflow-y: auto; }
+    .viewer-counter { font-size: 12px; color: #3b82f6; font-weight: 600; margin-left: 8px; }
     
+    .viewer-body { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; padding: 10px 20px; overflow: hidden; }
+    .viewer-img { max-height: 52vh; max-width: 85vw; object-fit: contain; box-shadow: 0 10px 40px rgba(0,0,0,0.8); transition: opacity 0.2s; }
+    
+    /* 좌우 이동 버튼 */
+    .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.12); color: #fff; border: none; width: 44px; height: 44px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); transition: background 0.2s; z-index: 10; }
+    .nav-arrow:hover { background: rgba(59,130,246,0.8); }
+    .nav-arrow.prev { left: 16px; }
+    .nav-arrow.next { right: 16px; }
+
+    .viewer-footer { padding: 16px 24px; background: rgba(15,17,21,0.95); border-top: 1px solid rgba(255,255,255,0.08); max-height: 38vh; overflow-y: auto; }
     .lang-switcher { display: flex; gap: 6px; margin-bottom: 12px; justify-content: center; flex-wrap: wrap; }
     .lang-btn { background: #222733; border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; }
     .lang-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
@@ -64,7 +72,7 @@
   <!-- 3D 뷰 -->
   <div id="view-3d" class="view-container active">
     <canvas id="canvas3d"></canvas>
-    <div class="hint-3d">벽면 작품을 클릭하면 5개 국어 작가 노트를 볼 수 있습니다</div>
+    <div class="hint-3d">벽면 작품을 클릭하면 크게 보고 좌우로 넘겨볼 수 있습니다</div>
   </div>
 
   <!-- 도록 뷰 -->
@@ -73,15 +81,22 @@
     <div id="artGrid" class="gallery-grid"></div>
   </div>
 
-  <!-- 다국어 지원 심층 뷰어 모달 -->
+  <!-- 다국어 + 좌우 연속 이동 뷰어 모달 -->
   <div id="viewerModal" class="viewer-modal">
     <div class="viewer-header">
-      <div id="viewerTitle" style="font-weight: 600; font-size: 16px;">작품명</div>
-      <button onclick="closeViewer()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">&times;</button>
+      <div style="display:flex; align-items:center;">
+        <span id="viewerTitle" style="font-weight: 600; font-size: 16px;">작품명</span>
+        <span id="viewerCounter" class="viewer-counter"></span>
+      </div>
+      <button onclick="closeViewer()" style="background:none; border:none; color:#fff; font-size:26px; cursor:pointer;">&times;</button>
     </div>
-    <div class="viewer-body">
+    
+    <div class="viewer-body" id="viewerSwipeArea">
+      <button class="nav-arrow prev" onclick="navigateArt(-1)" aria-label="이전 작품">&#10094;</button>
       <img id="viewerImg" class="viewer-img" src="" alt="작품">
+      <button class="nav-arrow next" onclick="navigateArt(1)" aria-label="다음 작품">&#10095;</button>
     </div>
+
     <div class="viewer-footer">
       <div id="viewerMeta" style="text-align:center; font-size:12px; color:#94a3b8; margin-bottom:12px;"></div>
       
@@ -101,9 +116,9 @@
     const USERNAME = 'hannaj1763-sketch';
     const REPO = 'gallery2026';
     let artworks = [];
-    let currentSelectedArt = null;
+    let currentIndex = 0;
+    let currentLang = 'ko';
 
-    // GitHub 저장소의 artworks 폴더를 자동 탐색하는 로더
     async function loadArtworksFromGitHub() {
       const apiUrl = `https://api.github.com/repos/${USERNAME}/${REPO}/contents/artworks`;
       try {
@@ -111,8 +126,7 @@
         if (!res.ok) throw new Error("artworks 폴더 미생성 상태");
         const items = await res.json();
         
-        // 폴더 단위(작품별) 필터링
-        const folders = items.filter(i => i.type === 'dir');
+        const folders = items.filter(i => i.type === 'dir').sort((a,b) => a.name.localeCompare(b.name));
         
         for (const folder of folders) {
           const folderRes = await fetch(folder.url);
@@ -130,31 +144,12 @@
               title: noteData.title || folder.name,
               meta: noteData.meta || '',
               src: imgFile.download_url,
-              notes: noteData.notes || { ko: "메모 없음" }
+              notes: noteData.notes || { ko: "작품 설명이 없습니다." }
             });
           }
         }
       } catch (e) {
-        console.log("폴더 로드 실패 또는 기본값 사용:", e);
-      }
-
-      // artworks 폴더가 비어있을 경우 보여줄 기본 샘플
-      if (artworks.length === 0) {
-        artworks = [
-          {
-            id: 'sample1',
-            title: "새벽의 선 (Line of Dawn)",
-            meta: "코튼지 위 목탄, 흑연 | 180 x 260 mm, 2026",
-            src: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1000&q=80",
-            notes: {
-              ko: "새벽빛이 종이 결 위로 번져나가는 순간의 호흡을 거친 목탄 가루로 기록했습니다.",
-              en: "Recorded the breath of dawn light spreading across paper texture.",
-              ja: "夜明けの光が紙のテクスチャに広がっていく瞬間を記録しました。",
-              zh: "记录了晨曦在纸面纹理上晕染开来的瞬间。",
-              es: "Capturé el momento en que la luz del alba se extiende sobre el papel."
-            }
-          }
-        ];
+        console.log("폴더 로드 대기 중");
       }
 
       document.getElementById('loadingText').style.display = 'none';
@@ -164,8 +159,8 @@
 
     function renderArchive() {
       const grid = document.getElementById('artGrid');
-      grid.innerHTML = artworks.map(art => `
-        <div class="art-card" onclick="openViewerById('${art.id}')">
+      grid.innerHTML = artworks.map((art, idx) => `
+        <div class="art-card" onclick="openViewerByIndex(${idx})">
           <img src="${art.src}" class="art-thumb" alt="${art.title}">
           <div class="art-info">
             <div class="art-title">${art.title}</div>
@@ -188,26 +183,41 @@
       }
     }
 
-    function openViewerById(id) {
-      const art = artworks.find(a => a.id === id);
+    function openViewerByIndex(index) {
+      if (!artworks || artworks.length === 0) return;
+      currentIndex = index;
+      updateViewerContent();
+      document.getElementById('viewerModal').classList.add('active');
+    }
+
+    function updateViewerContent() {
+      const art = artworks[currentIndex];
       if (!art) return;
-      currentSelectedArt = art;
 
       document.getElementById('viewerImg').src = art.src;
       document.getElementById('viewerTitle').innerText = art.title;
       document.getElementById('viewerMeta').innerText = art.meta;
+      document.getElementById('viewerCounter').innerText = `(${currentIndex + 1} / ${artworks.length})`;
       
-      changeLang('ko');
-      document.getElementById('viewerModal').classList.add('active');
+      changeLang(currentLang);
+    }
+
+    // 좌우 이동 함수 (-1: 이전, +1: 다음)
+    function navigateArt(direction) {
+      if (artworks.length <= 1) return;
+      currentIndex = (currentIndex + direction + artworks.length) % artworks.length;
+      updateViewerContent();
     }
 
     function changeLang(lang) {
+      currentLang = lang;
       document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
       const activeBtn = Array.from(document.querySelectorAll('.lang-btn')).find(b => b.innerText.toLowerCase().includes(lang) || (lang==='ko'&&b.innerText==='한국어') || (lang==='ja'&&b.innerText==='日本語') || (lang==='zh'&&b.innerText==='中文') || (lang==='es'&&b.innerText==='Español'));
       if (activeBtn) activeBtn.classList.add('active');
 
-      if (currentSelectedArt && currentSelectedArt.notes) {
-        document.getElementById('viewerNote').innerText = currentSelectedArt.notes[lang] || currentSelectedArt.notes.ko || '메모가 없습니다.';
+      const art = artworks[currentIndex];
+      if (art && art.notes) {
+        document.getElementById('viewerNote').innerText = art.notes[lang] || art.notes.ko || '설명이 없습니다.';
       }
     }
 
@@ -215,7 +225,28 @@
       document.getElementById('viewerModal').classList.remove('active');
     }
 
-    // 3D 가상 갤러리 렌더링
+    // 키보드 좌우 방향키 및 ESC 닫기 지원
+    window.addEventListener('keydown', (e) => {
+      const modal = document.getElementById('viewerModal');
+      if (!modal.classList.contains('active')) return;
+      if (e.key === 'ArrowLeft') navigateArt(-1);
+      if (e.key === 'ArrowRight') navigateArt(1);
+      if (e.key === 'Escape') closeViewer();
+    });
+
+    // 스마트폰 터치 스와이프(좌우 넘기기) 지원
+    let touchStartX = 0;
+    const swipeArea = document.getElementById('viewerSwipeArea');
+    swipeArea.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, {passive: true});
+    swipeArea.addEventListener('touchend', (e) => {
+      const diffX = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(diffX) > 40) {
+        if (diffX > 0) navigateArt(-1); // 오른쪽으로 밀면 이전 작품
+        else navigateArt(1);            // 왼쪽으로 밀면 다음 작품
+      }
+    });
+
+    // 3D 갤러리
     let scene, camera, renderer, paintings = [];
     function init3D() {
       const container = document.getElementById('view-3d');
@@ -251,7 +282,7 @@
         loader.load(art.src, (texture) => {
           const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 2.0), new THREE.MeshBasicMaterial({ map: texture }));
           mesh.position.set(startX + (index * 2.6), 2, -3.95);
-          mesh.userData = art;
+          mesh.userData = { index };
           paintings.push(mesh);
           scene.add(mesh);
         });
@@ -266,29 +297,26 @@
         prevX = e.clientX;
       });
 
-      // 모바일 터치 대응
-      canvas.addEventListener('touchstart', (e) => { isDragging = true; prevX = e.touches[0].clientX; });
+      canvas.addEventListener('touchstart', (e) => { isDragging = true; prevX = e.touches[0].clientX; }, {passive: true});
       window.addEventListener('touchend', () => { isDragging = false; });
       canvas.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
         camera.rotation.y += (e.touches[0].clientX - prevX) * 0.004;
         prevX = e.touches[0].clientX;
-      });
+      }, {passive: true});
 
       const raycaster = new THREE.Raycaster();
       const mouse = new THREE.Vector2();
-      function handlePick(clientX, clientY) {
+      canvas.addEventListener('click', (e) => {
         const rect = canvas.getBoundingClientRect();
-        mouse.x = ((clientX - rect.left) / canvas.clientWidth) * 2 - 1;
-        mouse.y = -((clientY - rect.top) / canvas.clientHeight) * 2 + 1;
+        mouse.x = ((e.clientX - rect.left) / canvas.clientWidth) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / canvas.clientHeight) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(paintings);
         if (intersects.length > 0) {
-          openViewerById(intersects[0].object.userData.id);
+          openViewerByIndex(intersects[0].object.userData.index);
         }
-      }
-
-      canvas.addEventListener('click', (e) => handlePick(e.clientX, e.clientY));
+      });
 
       function animate() {
         requestAnimationFrame(animate);
