@@ -69,6 +69,8 @@
     .art-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
     .art-meta { font-size: 12px; color: #9daec2; margin-bottom: 8px; }
     .art-note { font-size: 13px; color: #cbd5e1; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-reactions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .card-reactions span { font-size: 12px; color: #e2e8f0; background: rgba(255,255,255,0.06); padding: 3px 9px; border-radius: 12px; font-weight: 600; }
 
     /* 심층 뷰어 모달 */
     .viewer-modal { display: none; position: fixed; inset: 0; z-index: 100; flex-direction: column; transition: background 0.4s ease; }
@@ -348,6 +350,7 @@
             <div class="art-title">${art.title}</div>
             <div class="art-meta">${art.meta}</div>
             <div class="art-note">${art.notes.ko || art.notes.en || ''}</div>
+            <div class="card-reactions" id="card-react-${idx}">${reactionSummary(art.id)}</div>
           </div>
         </div>
       `).join('');
@@ -412,6 +415,15 @@
       data[type] = (data[type] || 0) + 1;
       localStorage.setItem(`art_reaction_${art.id}`, JSON.stringify(data));
       updateReactionsDisplay();
+      // 도록 카드의 숫자도 바로 갱신
+      const cardEl = document.getElementById(`card-react-${currentIndex}`);
+      if (cardEl) cardEl.innerHTML = reactionSummary(art.id);
+    }
+
+    // 도록 카드에 표시할 이모티콘 누적 숫자
+    function reactionSummary(artId) {
+      const d = getReactions(artId);
+      return `<span>❤️ ${d.heart || 0}</span><span>👍 ${d.thumb || 0}</span><span>👏 ${d.clap || 0}</span><span>🎨 ${d.art || 0}</span>`;
     }
 
     function navigateArt(direction) {
@@ -455,12 +467,12 @@
       }
     });
 
-    // 3D 2배 대형 액자 세로 스크롤 아틀리에
+    // 3D 대형 액자 세로 스크롤 아틀리에
     let scene, camera, renderer, frameClickTargets = [];
     let targetCameraY = 0;
-    const SPACING_Y = 5.2;
-    const MAX_W = 3.1, MAX_H = 3.9;     // 그림 최대 크기
-    const FRAME_PAD = 0.22;             // 액자 테두리 두께(양쪽 합)
+    const SPACING_Y = 7.8;              // 1.5배 커진 액자에 맞춘 세로 간격
+    const MAX_W = 4.65, MAX_H = 5.85;   // 그림 최대 크기 (기존 3.1 x 3.9의 1.5배)
+    const FRAME_PAD = 0.33;             // 액자 테두리 두께(양쪽 합)
     const TEX_MAX = 1024;               // [속도개선] 3D용 그림은 최대 1024px로 줄여서 사용
     const LOAD_AHEAD = 3;               // [속도개선] 현재 위치 앞뒤 3점만 먼저 로드
     const MAX_PARALLEL = 2;
@@ -546,7 +558,7 @@
       const spotTarget = new THREE.Object3D();
       scene.add(spotTarget);
       const spot = new THREE.SpotLight(0xfff6ea, 0.7, 12, Math.PI / 3.2, 0.45);
-      spot.position.set(0, 2.4, -0.6);
+      spot.position.set(0, 3.6, -0.6);
       spot.target = spotTarget;
       scene.add(spot);
 
@@ -589,7 +601,7 @@
       const maxY = 0;
 
       container.addEventListener('wheel', (e) => {
-        targetCameraY -= e.deltaY * 0.004;
+        targetCameraY -= e.deltaY * 0.006;
         targetCameraY = Math.max(minY, Math.min(maxY, targetCameraY));
       }, { passive: true });
 
@@ -603,7 +615,7 @@
       container.addEventListener('touchmove', (e) => {
         if (!isTouchDragging) return;
         const deltaY = e.touches[0].clientY - lastTouchY;
-        targetCameraY += deltaY * 0.01;
+        targetCameraY += deltaY * 0.015;
         targetCameraY = Math.max(minY, Math.min(maxY, targetCameraY));
         lastTouchY = e.touches[0].clientY;
       }, { passive: true });
@@ -624,7 +636,7 @@
       window.addEventListener('mousemove', (e) => {
         if (!isMouseDrag) return;
         const deltaY = e.clientY - lastMouseY;
-        targetCameraY += deltaY * 0.01;
+        targetCameraY += deltaY * 0.015;
         targetCameraY = Math.max(minY, Math.min(maxY, targetCameraY));
         lastMouseY = e.clientY;
       });
@@ -651,7 +663,7 @@
       function animate() {
         requestAnimationFrame(animate);
         camera.position.y += (targetCameraY - camera.position.y) * 0.1;
-        spot.position.y = camera.position.y + 2.4;
+        spot.position.y = camera.position.y + 3.6;
         spotTarget.position.set(0, camera.position.y, -3.76);
         pumpLoads();
         renderer.render(scene, camera);
