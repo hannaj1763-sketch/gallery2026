@@ -40,6 +40,8 @@
     /* 3D 세로 스크롤 아틀리에 */
     #view-3d { position: relative; height: calc(100vh - 65px); touch-action: none; overflow: hidden; }
     #canvas3d { width: 100%; height: 100%; display: block; }
+    .auto-btn { position: absolute; top: 14px; right: 14px; z-index: 11; background: rgba(0,0,0,0.6); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.18); padding: 7px 14px; border-radius: 18px; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); }
+    .auto-btn.paused { background: #3b82f6; border-color: #3b82f6; color: #fff; }
     .hint-3d { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.65); padding: 8px 18px; border-radius: 20px; font-size: 13px; color: #e2e8f0; pointer-events: none; text-align: center; backdrop-filter: blur(4px); z-index: 10; white-space: nowrap; }
 
     /* 도록 뷰 */
@@ -144,7 +146,8 @@
   <!-- 3D 뷰 -->
   <div id="view-3d" class="view-container active">
     <canvas id="canvas3d"></canvas>
-    <div class="hint-3d">화면을 위아래로 밀어 스크롤하고, 액자를 터치해 보세요</div>
+    <button id="autoBtn" class="auto-btn" onclick="toggleAutoScroll()" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation()">⏸ 자동 감상 멈춤</button>
+    <div class="hint-3d">작품이 천천히 내려가요 · 화면을 밀면 직접 볼 수 있어요</div>
   </div>
 
   <!-- 도록 뷰 -->
@@ -476,6 +479,21 @@
     const TEX_MAX = 1024;               // [속도개선] 3D용 그림은 최대 1024px로 줄여서 사용
     const LOAD_AHEAD = 3;               // [속도개선] 현재 위치 앞뒤 3점만 먼저 로드
     const MAX_PARALLEL = 2;
+    const AUTO_SPEED = 0.8;             // [자동 감상] 초당 이동 거리 (작품 1점당 약 10초)
+    const AUTO_RESUME_MS = 3000;        // [자동 감상] 손을 뗀 뒤 다시 움직이기까지 대기 시간
+
+    let autoScroll = true;
+    let userHolding = false;
+    let resumeAt = 0;
+
+    function toggleAutoScroll() {
+      autoScroll = !autoScroll;
+      const btn = document.getElementById('autoBtn');
+      btn.textContent = autoScroll ? '⏸ 자동 감상 멈춤' : '▶ 자동 감상';
+      btn.classList.toggle('paused', !autoScroll);
+      resumeAt = 0;
+    }
+    function pauseAutoBriefly() { resumeAt = Date.now() + AUTO_RESUME_MS; }
 
     let slots = [];
     let activeLoads = 0;
@@ -526,10 +544,13 @@
     // 현재 보고 있는 위치에서 가까운 작품부터 로드
     function pumpLoads() {
       if (activeLoads >= MAX_PARALLEL || !slots.length) return;
-      const cur = Math.round(-camera.position.y / SPACING_Y);
+      const n = slots.length;
+      const cur = ((Math.round(-camera.position.y / SPACING_Y) % n) + n) % n;
+      // 무한 반복이므로 마지막 작품 다음은 첫 작품 (원형 거리)
+      const dist = (i) => { const d = Math.abs(i - cur); return Math.min(d, n - d); };
       const candidates = slots
-        .filter(s => !s.loading && !s.loaded && !s.failed && Math.abs(s.index - cur) <= LOAD_AHEAD)
-        .sort((a, b) => Math.abs(a.index - cur) - Math.abs(b.index - cur));
+        .filter(s => !s.loading && !s.loaded && !s.failed && dist(s.index) <= LOAD_AHEAD)
+        .sort((a, b) => dist(a.index) - dist(b.index));
       for (const s of candidates) {
         if (activeLoads >= MAX_PARALLEL) break;
         loadSlotTexture(s);
@@ -562,11 +583,10 @@
       spot.target = spotTarget;
       scene.add(spot);
 
-      const count = Math.max(1, artworks.length);
-      const totalHeight = Math.max(20, count * SPACING_Y + 10);
+      // 벽은 카메라를 따라 움직여 끝없이 이어지는 것처럼 보이게 함
       const wallMat = new THREE.MeshStandardMaterial({ color: 0xd8d4cb, roughness: 0.95 });
-      const backWall = new THREE.Mesh(new THREE.PlaneGeometry(12, totalHeight), wallMat);
-      backWall.position.set(0, -((count - 1) * SPACING_Y) / 2, -3.88);
+      const backWall = new THREE.Mesh(new THREE.PlaneGeometry(14, 40), wallMat);
+      backWall.position.set(0, 0, -3.88);
       scene.add(backWall);
 
       // 같은 모양·재질은 한 번만 만들어 공유
@@ -597,12 +617,16 @@
         slots.push({ index, src: art.src, frameMesh, canvasMesh, loading: false, loaded: false, failed: false });
       });
 
-      const minY = Math.min(0, -((artworks.length - 1) * SPACING_Y));
-      const maxY = 0;
+      // 작품이 2점 이상이면 위아래 끝이 없는 무한 반복, 1점이면 고정
+      const N = artworks.length;
+      const LOOP = N > 1;
+      const TOTAL = N * SPACING_Y;
+      const clampY = (y) => LOOP ? y : 0;
 
       container.addEventListener('wheel', (e) => {
         targetCameraY -= e.deltaY * 0.006;
-        targetCameraY = Math.max(minY, Math.min(maxY, targetCameraY));
+        pauseAutoBriefly();
+        targetCameraY = clampY(targetCameraY);
       }, { passive: true });
 
       let touchStartY = 0, isTouchDragging = false, lastTouchY = 0;
@@ -610,18 +634,21 @@
         touchStartY = e.touches[0].clientY;
         lastTouchY = e.touches[0].clientY;
         isTouchDragging = true;
+        userHolding = true;
       }, { passive: true });
 
       container.addEventListener('touchmove', (e) => {
         if (!isTouchDragging) return;
         const deltaY = e.touches[0].clientY - lastTouchY;
         targetCameraY += deltaY * 0.015;
-        targetCameraY = Math.max(minY, Math.min(maxY, targetCameraY));
+        targetCameraY = clampY(targetCameraY);
         lastTouchY = e.touches[0].clientY;
       }, { passive: true });
 
       container.addEventListener('touchend', (e) => {
         isTouchDragging = false;
+        userHolding = false;
+        pauseAutoBriefly();
         if (Math.abs(e.changedTouches[0].clientY - touchStartY) < 10) {
           handleCanvasClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
         }
@@ -632,18 +659,20 @@
         isMouseDrag = true;
         mouseStartY = e.clientY;
         lastMouseY = e.clientY;
+        userHolding = true;
       });
       window.addEventListener('mousemove', (e) => {
         if (!isMouseDrag) return;
         const deltaY = e.clientY - lastMouseY;
         targetCameraY += deltaY * 0.015;
-        targetCameraY = Math.max(minY, Math.min(maxY, targetCameraY));
+        targetCameraY = clampY(targetCameraY);
         lastMouseY = e.clientY;
       });
       window.addEventListener('mouseup', (e) => {
         if (isMouseDrag && Math.abs(e.clientY - mouseStartY) < 8) {
           handleCanvasClick(e.clientX, e.clientY);
         }
+        if (isMouseDrag) { userHolding = false; pauseAutoBriefly(); }
         isMouseDrag = false;
       });
 
@@ -660,15 +689,41 @@
         }
       }
 
-      function animate() {
+      let lastTime = performance.now();
+      function animate(now) {
         requestAnimationFrame(animate);
+        now = now || performance.now();
+        const dt = Math.min(0.05, (now - lastTime) / 1000);
+        lastTime = now;
+
+        // [자동 감상] 아래로 천천히 이동 (작품 보기 창이 열려 있거나 손으로 조작 중이면 멈춤)
+        const modalOpen = document.getElementById('viewerModal').classList.contains('active');
+        if (LOOP && autoScroll && !userHolding && !modalOpen && Date.now() > resumeAt) {
+          targetCameraY -= AUTO_SPEED * dt;
+        }
+
         camera.position.y += (targetCameraY - camera.position.y) * 0.1;
+
+        if (LOOP) {
+          // 숫자가 끝없이 커지지 않도록 한 바퀴마다 위치를 되돌림 (화면 변화 없음)
+          if (camera.position.y < -TOTAL) { camera.position.y += TOTAL; targetCameraY += TOTAL; }
+          if (camera.position.y > TOTAL) { camera.position.y -= TOTAL; targetCameraY -= TOTAL; }
+          // 각 액자를 카메라에서 가장 가까운 반복 위치에 배치 → 마지막 다음에 첫 작품이 이어짐
+          slots.forEach(s => {
+            let y = -s.index * SPACING_Y;
+            y += Math.round((camera.position.y - y) / TOTAL) * TOTAL;
+            s.frameMesh.position.y = y;
+            s.canvasMesh.position.y = y;
+          });
+        }
+        backWall.position.y = camera.position.y;
+
         spot.position.y = camera.position.y + 3.6;
         spotTarget.position.set(0, camera.position.y, -3.76);
         pumpLoads();
         renderer.render(scene, camera);
       }
-      animate();
+      requestAnimationFrame(animate);
 
       window.addEventListener('resize', () => {
         camera.aspect = container.clientWidth / container.clientHeight;
