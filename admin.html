@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>예성이 갤러리 - 간편 업로드 스튜디오</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif; background: #0f1115; color: #f0f2f5; padding: 20px; line-height: 1.5; }
+    .card { background: #161a22; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; max-width: 480px; margin: 0 auto; }
+    h1 { font-size: 18px; font-weight: 700; margin-bottom: 20px; text-align: center; color: #3b82f6; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 13px; color: #8a99ad; margin-bottom: 6px; font-weight: 500; }
+    input[type="text"], input[type="password"], textarea, select { width: 100%; background: #0b0d11; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 12px; border-radius: 10px; font-size: 14px; outline: none; }
+    input:focus, textarea:focus { border-color: #3b82f6; }
+    .file-drop { border: 2px dashed rgba(59,130,246,0.4); background: rgba(59,130,246,0.03); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; }
+    .preview-img { width: 100%; max-height: 220px; object-fit: contain; margin-top: 10px; border-radius: 8px; display: none; }
+    .btn-submit { width: 100%; background: #3b82f6; color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+    .btn-submit:disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
+    .status-msg { margin-top: 15px; font-size: 13px; text-align: center; min-height: 20px; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h1>🎨 간편 작품 등록 스튜디오</h1>
+
+  <!-- 1회성 토큰 설정 (한 번 저장하면 스마트폰 브라우저에 기억됨) -->
+  <div class="form-group" id="tokenArea">
+    <label>GitHub 개인 토큰 (ghp_...)</label>
+    <input type="password" id="ghToken" placeholder="토큰을 입력하면 자동 저장됩니다">
+  </div>
+
+  <div class="form-group">
+    <label>그림 사진 선택 (스마트폰 촬영 / 갤러리)</label>
+    <div class="file-drop" onclick="document.getElementById('artFile').click()">
+      <span id="fileLabel">📷 여기를 눌러 사진을 선택하세요</span>
+      <input type="file" id="artFile" accept="image/*" style="display:none" onchange="handleFile(event)">
+      <img id="preview" class="preview-img" alt="미리보기">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>작품 제목</label>
+    <input type="text" id="artTitle" placeholder="예: 탁자 위의 요구르트">
+  </div>
+
+  <div class="form-group">
+    <label>제작 연월 (YYYY-MM)</label>
+    <input type="text" id="artDate" placeholder="예: 2023-01">
+  </div>
+
+  <div class="form-group">
+    <label>재료 및 정보</label>
+    <input type="text" id="artMeta" placeholder="예: 스케치북 위 색연필 | 2023년 1월">
+  </div>
+
+  <div class="form-group">
+    <label>예성이의 생각 및 메모 (한국어)</label>
+    <textarea id="artNoteKo" rows="3" placeholder="예성이가 그림을 그릴 때 한 말이나 생각을 편하게 적어주세요"></textarea>
+  </div>
+
+  <button class="btn-submit" id="submitBtn" onclick="uploadArtwork()">전시관에 즉시 발행</button>
+  <div class="status-msg" id="statusMsg"></div>
+</div>
+
+<script>
+  const OWNER = 'hannaj1763-sketch';
+  const REPO = 'gallery2026';
+  let selectedBase64 = null;
+  let fileExt = 'jpg';
+
+  // 저장된 토큰 자동 불러오기
+  window.onload = () => {
+    const savedToken = localStorage.getItem('gh_art_token');
+    if (savedToken) {
+      document.getElementById('ghToken').value = savedToken;
+      document.getElementById('tokenArea').style.opacity = '0.5';
+    }
+  };
+
+  function handleFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    fileExt = file.name.split('.').pop().toLowerCase() || 'jpg';
+    document.getElementById('fileLabel').innerText = `선택 완료: ${file.name}`;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target.result;
+      document.getElementById('preview').src = result;
+      document.getElementById('preview').style.display = 'block';
+      // base64 본문만 추출
+      selectedBase64 = result.split(',')[1];
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function uploadArtwork() {
+    const token = document.getElementById('ghToken').value.trim();
+    const title = document.getElementById('artTitle').value.trim();
+    const date = document.getElementById('artDate').value.trim() || '2026-01';
+    const meta = document.getElementById('artMeta').value.trim();
+    const noteKo = document.getElementById('artNoteKo').value.trim();
+
+    if (!token) return alert('GitHub 토큰을 입력해 주세요.');
+    if (!selectedBase64) return alert('그림 사진을 선택해 주세요.');
+    if (!title) return alert('작품 제목을 입력해 주세요.');
+
+    localStorage.setItem('gh_art_token', token);
+
+    const btn = document.getElementById('submitBtn');
+    const msg = document.getElementById('statusMsg');
+    btn.disabled = true;
+    btn.innerText = '전시관에 등록하는 중...';
+    msg.style.color = '#3b82f6';
+    msg.innerText = '깃허브 저장소와 통신 중입니다...';
+
+    try {
+      // 1. 기존 폴더 개수를 확인하여 새 폴더 번호 결정
+      const listRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/artworks`, {
+        headers: { 'Authorization': `token ${token}` }
+      });
+      let nextNum = '02';
+      if (listRes.ok) {
+        const items = await listRes.json();
+        const dirs = items.filter(i => i.type === 'dir');
+        nextNum = String(dirs.length + 1).padStart(2, '0');
+      }
+
+      const folderPath = `artworks/${nextNum}`;
+
+      // 2. note.json 데이터 구성 (기본 5개국어 템플릿 포함)
+      const noteData = {
+        title: title,
+        date: date,
+        meta: meta || `종이 위 원화 | ${date}`,
+        notes: {
+          ko: noteKo || "작품 설명이 등록되었습니다.",
+          en: `Artwork: ${title}. Created by artist Yesung Jang.`,
+          ja: `作品：${title}。作家チャン・イェソンの作品です。`,
+          zh: `作品：《${title}》。张艺成艺术家的画作。`,
+          es: `Obra: ${title}. Creada por el artista Yesung Jang.`
+        }
+      };
+
+      // 3. note.json 업로드 API 호출
+      msg.innerText = '작품 메모 생성 중...';
+      const noteContentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(noteData, null, 2))));
+      await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${folderPath}/note.json`, {
+        method: 'PUT',
+        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: `Add note for ${folderPath}`,
+          content: noteContentBase64
+        })
+      });
+
+      // 4. 이미지 파일 업로드 API 호출
+      msg.innerText = '원화 이미지 전송 중...';
+      await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${folderPath}/image.${fileExt}`, {
+        method: 'PUT',
+        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: `Add image for ${folderPath}`,
+          content: selectedBase64
+        })
+      });
+
+      msg.style.color = '#10b981';
+      msg.innerText = `🎉 [${title}] 작품이 ${nextNum}번 액자로 전시관에 등록되었습니다!`;
+      alert('성공적으로 등록되었습니다! 1~2분 뒤 전시관에 나타납니다.');
+
+      // 폼 초기화
+      document.getElementById('artTitle').value = '';
+      document.getElementById('artMeta').value = '';
+      document.getElementById('artNoteKo').value = '';
+      document.getElementById('preview').style.display = 'none';
+      document.getElementById('fileLabel').innerText = '📷 여기를 눌러 사진을 선택하세요';
+      selectedBase64 = null;
+
+    } catch (err) {
+      msg.style.color = '#ef4444';
+      msg.innerText = '등록 중 오류가 발생했습니다: ' + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.innerText = '전시관에 즉시 발행';
+    }
+  }
+</script>
+
+</body>
+</html>
