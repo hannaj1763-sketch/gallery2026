@@ -78,7 +78,7 @@
     
     /* 확대 뷰어 이미지 및 중앙 J.J 워터마크 */
     .viewer-img-container { position: relative; display: inline-flex; align-items: center; justify-content: center; }
-    .viewer-img { max-height: 52vh; max-width: 85vw; object-fit: contain; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+    .viewer-img { max-height: 48vh; max-width: 85vw; object-fit: contain; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
     .viewer-watermark {
       position: absolute;
       top: 50%;
@@ -99,7 +99,15 @@
     .nav-arrow.prev { left: 16px; }
     .nav-arrow.next { right: 16px; }
 
-    .viewer-footer { padding: 16px 24px; background: rgba(15,17,21,0.95); border-top: 1px solid rgba(255,255,255,0.08); max-height: 38vh; overflow-y: auto; }
+    .viewer-footer { padding: 14px 20px 20px; background: rgba(15,17,21,0.95); border-top: 1px solid rgba(255,255,255,0.08); max-height: 42vh; overflow-y: auto; }
+    
+    /* 이모티콘 응원 버튼 영역 */
+    .reaction-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 14px; }
+    .reaction-btn { background: #1c212c; border: 1px solid rgba(255,255,255,0.12); color: #e2e8f0; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: transform 0.15s, background 0.2s; }
+    .reaction-btn:hover { background: #283040; transform: translateY(-2px); }
+    .reaction-btn:active { transform: scale(0.92); }
+    .reaction-count { font-size: 12px; color: #3b82f6; font-weight: 700; min-width: 14px; }
+
     .lang-switcher { display: flex; gap: 6px; margin-bottom: 12px; justify-content: center; flex-wrap: wrap; }
     .lang-btn { background: #222733; border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; }
     .lang-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
@@ -115,4 +123,330 @@
   <header>
     <div style="font-weight: 700; font-size: 16px; letter-spacing: -0.5px;">Atelier Archive</div>
     <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchView
+      <button class="tab-btn active" onclick="switchView('3d')">3D 가상 갤러리</button>
+      <button class="tab-btn" onclick="switchView('archive')">도록 (연대기)</button>
+    </div>
+    <div style="font-size:12px; color:#8a99ad;">보호 모드 및 리액션 활성</div>
+  </header>
+
+  <!-- 3D 뷰 -->
+  <div id="view-3d" class="view-container active">
+    <canvas id="canvas3d"></canvas>
+    <div class="hint-3d">벽면 작품을 클릭하면 크게 보고 좌우로 넘겨볼 수 있습니다</div>
+  </div>
+
+  <!-- 도록 뷰 -->
+  <div id="view-archive" class="view-container">
+    <h2 style="font-size: 20px; font-weight: 600;">작품 도록 & 아카이브 (연대기 순)</h2>
+    <div id="artGrid" class="gallery-grid"></div>
+  </div>
+
+  <!-- 다국어 + 좌우 연속 이동 뷰어 모달 -->
+  <div id="viewerModal" class="viewer-modal">
+    <div class="viewer-header">
+      <div style="display:flex; align-items:center;">
+        <span id="viewerTitle" style="font-weight: 600; font-size: 16px;">작품명</span>
+        <span id="viewerCounter" class="viewer-counter"></span>
+      </div>
+      <button onclick="closeViewer()" style="background:none; border:none; color:#fff; font-size:26px; cursor:pointer;">&times;</button>
+    </div>
+    
+    <div class="viewer-body" id="viewerSwipeArea">
+      <button class="nav-arrow prev" onclick="navigateArt(-1)" aria-label="이전 작품">&#10094;</button>
+      <div class="viewer-img-container">
+        <img id="viewerImg" class="viewer-img" src="" alt="작품">
+        <div class="viewer-watermark">J.J</div>
+      </div>
+      <button class="nav-arrow next" onclick="navigateArt(1)" aria-label="다음 작품">&#10095;</button>
+    </div>
+
+    <div class="viewer-footer">
+      <div id="viewerMeta" style="text-align:center; font-size:12px; color:#94a3b8; margin-bottom:10px;"></div>
+      
+      <!-- 관람객 이모티콘 응원 버튼 -->
+      <div class="reaction-bar">
+        <button class="reaction-btn" onclick="addReaction('heart')">❤️ 하트 <span id="cnt-heart" class="reaction-count">0</span></button>
+        <button class="reaction-btn" onclick="addReaction('thumb')">👍 최고 <span id="cnt-thumb" class="reaction-count">0</span></button>
+        <button class="reaction-btn" onclick="addReaction('clap')">👏 감동 <span id="cnt-clap" class="reaction-count">0</span></button>
+        <button class="reaction-btn" onclick="addReaction('art')">🎨 멋져요 <span id="cnt-art" class="reaction-count">0</span></button>
+      </div>
+
+      <div class="lang-switcher">
+        <button class="lang-btn active" onclick="changeLang('ko')">한국어</button>
+        <button class="lang-btn" onclick="changeLang('en')">English</button>
+        <button class="lang-btn" onclick="changeLang('ja')">日本語</button>
+        <button class="lang-btn" onclick="changeLang('zh')">中文</button>
+        <button class="lang-btn" onclick="changeLang('es')">Español</button>
+      </div>
+
+      <div id="viewerNote" class="note-content"></div>
+    </div>
+  </div>
+
+  <script>
+    const USERNAME = 'hannaj1763-sketch';
+    const REPO = 'gallery2026';
+    let artworks = [];
+    let currentIndex = 0;
+    let currentLang = 'ko';
+
+    // 보안 방어
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+    document.addEventListener('dragstart', (e) => e.preventDefault());
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'PrintScreen') {
+        if (navigator.clipboard) navigator.clipboard.writeText('');
+      }
+      if (e.ctrlKey && (e.key === 's' || e.key === 'u' || e.key === 'p')) e.preventDefault();
+      if (e.key === 'F12') e.preventDefault();
+    });
+
+    async function loadArtworksFromGitHub() {
+      const apiUrl = `https://api.github.com/repos/${USERNAME}/${REPO}/contents/artworks`;
+      try {
+        const res = await fetch(apiUrl);
+        if (!res.ok) throw new Error("artworks 폴더 미생성 상태");
+        const items = await res.json();
+        
+        const folders = items.filter(i => i.type === 'dir');
+        let tempArtworks = [];
+        
+        for (const folder of folders) {
+          const folderRes = await fetch(folder.url);
+          const folderFiles = await folderRes.json();
+          
+          const imgFile = folderFiles.find(f => /\.(jpg|jpeg|png|webp)$/i.test(f.name));
+          const noteFile = folderFiles.find(f => f.name.toLowerCase() === 'note.json');
+
+          if (imgFile && noteFile) {
+            const noteRes = await fetch(noteFile.download_url);
+            const noteData = await noteRes.json();
+            
+            tempArtworks.push({
+              id: folder.name,
+              isProfile: folder.name === '01' || (noteData.title && noteData.title.includes('프로필')),
+              title: noteData.title || folder.name,
+              date: noteData.date || "9999-99",
+              meta: noteData.meta || '',
+              src: imgFile.download_url,
+              notes: noteData.notes || { ko: "작품 설명이 없습니다." }
+            });
+          }
+        }
+
+        const profile = tempArtworks.filter(a => a.isProfile);
+        const works = tempArtworks.filter(a => !a.isProfile).sort((a, b) => a.date.localeCompare(b.date));
+        artworks = [...profile, ...works];
+
+      } catch (e) {
+        console.log("폴더 로드 대기 중");
+      }
+
+      document.getElementById('loadingText').style.display = 'none';
+      renderArchive();
+      init3D();
+    }
+
+    function renderArchive() {
+      const grid = document.getElementById('artGrid');
+      grid.innerHTML = artworks.map((art, idx) => `
+        <div class="art-card" onclick="openViewerByIndex(${idx})">
+          <div class="thumb-wrapper">
+            <img src="${art.src}" class="art-thumb" alt="${art.title}">
+            <div class="thumb-watermark">J.J</div>
+          </div>
+          <div class="art-info">
+            <div class="art-title">${art.title}</div>
+            <div class="art-meta">${art.meta}</div>
+            <div class="art-note">${art.notes.ko || art.notes.en || ''}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function switchView(mode) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+      if(mode === '3d') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('view-3d').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('view-archive').classList.add('active');
+      }
+    }
+
+    function openViewerByIndex(index) {
+      if (!artworks || artworks.length === 0) return;
+      currentIndex = index;
+      updateViewerContent();
+      document.getElementById('viewerModal').classList.add('active');
+    }
+
+    function updateViewerContent() {
+      const art = artworks[currentIndex];
+      if (!art) return;
+
+      document.getElementById('viewerImg').src = art.src;
+      document.getElementById('viewerTitle').innerText = art.title;
+      document.getElementById('viewerMeta').innerText = art.meta;
+      document.getElementById('viewerCounter').innerText = `(${currentIndex + 1} / ${artworks.length})`;
+      
+      updateReactionsDisplay();
+      changeLang(currentLang);
+    }
+
+    // 이모티콘 반응 처리
+    function getReactions(artId) {
+      const saved = localStorage.getItem(`art_reaction_${artId}`);
+      return saved ? JSON.parse(saved) : { heart: 0, thumb: 0, clap: 0, art: 0 };
+    }
+
+    function updateReactionsDisplay() {
+      const art = artworks[currentIndex];
+      if (!art) return;
+      const data = getReactions(art.id);
+      document.getElementById('cnt-heart').innerText = data.heart || 0;
+      document.getElementById('cnt-thumb').innerText = data.thumb || 0;
+      document.getElementById('cnt-clap').innerText = data.clap || 0;
+      document.getElementById('cnt-art').innerText = data.art || 0;
+    }
+
+    function addReaction(type) {
+      const art = artworks[currentIndex];
+      if (!art) return;
+      const data = getReactions(art.id);
+      data[type] = (data[type] || 0) + 1;
+      localStorage.setItem(`art_reaction_${art.id}`, JSON.stringify(data));
+      updateReactionsDisplay();
+    }
+
+    function navigateArt(direction) {
+      if (artworks.length <= 1) return;
+      currentIndex = (currentIndex + direction + artworks.length) % artworks.length;
+      updateViewerContent();
+    }
+
+    function changeLang(lang) {
+      currentLang = lang;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.lang-btn')).find(b => b.innerText.toLowerCase().includes(lang) || (lang==='ko'&&b.innerText==='한국어') || (lang==='ja'&&b.innerText==='日本語') || (lang==='zh'&&b.innerText==='中文') || (lang==='es'&&b.innerText==='Español'));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const art = artworks[currentIndex];
+      if (art && art.notes) {
+        document.getElementById('viewerNote').innerText = art.notes[lang] || art.notes.ko || '설명이 없습니다.';
+      }
+    }
+
+    function closeViewer() {
+      document.getElementById('viewerModal').classList.remove('active');
+    }
+
+    window.addEventListener('keydown', (e) => {
+      const modal = document.getElementById('viewerModal');
+      if (!modal.classList.contains('active')) return;
+      if (e.key === 'ArrowLeft') navigateArt(-1);
+      if (e.key === 'ArrowRight') navigateArt(1);
+      if (e.key === 'Escape') closeViewer();
+    });
+
+    let touchStartX = 0;
+    const swipeArea = document.getElementById('viewerSwipeArea');
+    swipeArea.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, {passive: true});
+    swipeArea.addEventListener('touchend', (e) => {
+      const diffX = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(diffX) > 40) {
+        if (diffX > 0) navigateArt(-1);
+        else navigateArt(1);
+      }
+    });
+
+    let scene, camera, renderer, paintings = [];
+    function init3D() {
+      const container = document.getElementById('view-3d');
+      const canvas = document.getElementById('canvas3d');
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0f1115);
+
+      camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+      camera.position.set(0, 1.6, 4);
+
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+
+      scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+      const pointLight = new THREE.PointLight(0xffffff, 0.8, 20);
+      pointLight.position.set(0, 3, 2);
+      scene.add(pointLight);
+
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), new THREE.MeshStandardMaterial({ color: 0x161a22, roughness: 0.8 }));
+      floor.rotation.x = -Math.PI / 2;
+      scene.add(floor);
+
+      const wallWidth = Math.max(14, artworks.length * 3);
+      const backWall = new THREE.Mesh(new THREE.PlaneGeometry(wallWidth, 4), new THREE.MeshStandardMaterial({ color: 0x1f242d }));
+      backWall.position.set(0, 2, -4);
+      scene.add(backWall);
+
+      const loader = new THREE.TextureLoader();
+      paintings = [];
+      const startX = -((artworks.length - 1) * 2.6) / 2;
+
+      artworks.forEach((art, index) => {
+        loader.load(art.src, (texture) => {
+          const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 2.0), new THREE.MeshBasicMaterial({ map: texture }));
+          mesh.position.set(startX + (index * 2.6), 2, -3.95);
+          mesh.userData = { index };
+          paintings.push(mesh);
+          scene.add(mesh);
+        });
+      });
+
+      let isDragging = false, prevX = 0;
+      canvas.addEventListener('mousedown', (e) => { isDragging = true; prevX = e.clientX; });
+      window.addEventListener('mouseup', () => { isDragging = false; });
+      canvas.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        camera.rotation.y += (e.clientX - prevX) * 0.003;
+        prevX = e.clientX;
+      });
+
+      canvas.addEventListener('touchstart', (e) => { isDragging = true; prevX = e.touches[0].clientX; }, {passive: true});
+      window.addEventListener('touchend', () => { isDragging = false; });
+      canvas.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        camera.rotation.y += (e.touches[0].clientX - prevX) * 0.004;
+        prevX = e.touches[0].clientX;
+      }, {passive: true});
+
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+      canvas.addEventListener('click', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / canvas.clientWidth) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / canvas.clientHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(paintings);
+        if (intersects.length > 0) {
+          openViewerByIndex(intersects[0].object.userData.index);
+        }
+      });
+
+      function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      });
+    }
+
+    window.onload = loadArtworksFromGitHub;
+  </script>
+</body>
+</html>
