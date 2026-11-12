@@ -17,7 +17,10 @@
     .preview-img { width: 100%; max-height: 220px; object-fit: contain; margin-top: 10px; border-radius: 8px; display: none; }
     .btn-submit { width: 100%; background: #3b82f6; color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 10px; }
     .btn-submit:disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
-    .status-msg { margin-top: 15px; font-size: 13px; text-align: center; min-height: 20px; }
+    .status-msg { margin-top: 15px; font-size: 13px; text-align: center; min-height: 20px; white-space: pre-line; }
+    .hint { font-size: 12px; color: #6b7a8f; margin-top: 6px; }
+    .link-btn { background: none; border: none; color: #8a99ad; font-size: 12px; text-decoration: underline; cursor: pointer; margin-top: 6px; padding: 4px 0; }
+    .gallery-link { display: block; text-align: center; margin-top: 14px; color: #8a99ad; font-size: 13px; }
   </style>
 </head>
 <body>
@@ -25,10 +28,11 @@
 <div class="card">
   <h1>🎨 간편 작품 등록 스튜디오</h1>
 
-  <!-- 1회성 토큰 설정 (한 번 저장하면 스마트폰 브라우저에 기억됨) -->
+  <!-- 1회성 토큰 설정 (한 번 저장하면 이 휴대폰 브라우저에 기억됨) -->
   <div class="form-group" id="tokenArea">
-    <label>GitHub 개인 토큰 (ghp_...)</label>
-    <input type="password" id="ghToken" placeholder="토큰을 입력하면 자동 저장됩니다">
+    <label for="ghToken">GitHub 토큰 (github_pat_... 또는 ghp_...)</label>
+    <input type="password" id="ghToken" placeholder="토큰을 입력하면 이 기기에 저장됩니다" autocomplete="off">
+    <button type="button" class="link-btn" onclick="forgetToken()">이 기기에서 토큰 지우기</button>
   </div>
 
   <div class="form-group">
@@ -38,37 +42,49 @@
       <input type="file" id="artFile" accept="image/*" style="display:none" onchange="handleFile(event)">
       <img id="preview" class="preview-img" alt="미리보기">
     </div>
+    <div class="hint" id="sizeHint"></div>
   </div>
 
   <div class="form-group">
-    <label>작품 제목</label>
+    <label for="artTitle">작품 제목</label>
     <input type="text" id="artTitle" placeholder="예: 탁자 위의 요구르트">
   </div>
 
   <div class="form-group">
-    <label>제작 연월 (YYYY-MM)</label>
-    <input type="text" id="artDate" placeholder="예: 2023-01">
+    <label for="artDate">제작 연월 (YYYY-MM)</label>
+    <input type="text" id="artDate" placeholder="예: 2026-11" inputmode="numeric">
   </div>
 
   <div class="form-group">
-    <label>재료 및 정보</label>
-    <input type="text" id="artMeta" placeholder="예: 스케치북 위 색연필 | 2023년 1월">
+    <label for="artMeta">재료 및 정보</label>
+    <input type="text" id="artMeta" placeholder="예: 스케치북 위 색연필 | 2026년 11월">
   </div>
 
   <div class="form-group">
-    <label>예성이의 생각 및 메모 (한국어)</label>
+    <label for="artNoteKo">예성이의 생각 및 메모 (한국어)</label>
     <textarea id="artNoteKo" rows="3" placeholder="예성이가 그림을 그릴 때 한 말이나 생각을 편하게 적어주세요"></textarea>
   </div>
 
   <button class="btn-submit" id="submitBtn" onclick="uploadArtwork()">전시관에 즉시 발행</button>
   <div class="status-msg" id="statusMsg"></div>
+  <a class="gallery-link" href="./">← 전시관으로 가기</a>
 </div>
 
 <script>
   const OWNER = 'hannaj1763-sketch';
   const REPO = 'gallery2026';
+  const MAX_SIDE = 1600;          // [개선] 사진 긴 변을 1600px로 줄여서 올림 (전시관 로딩이 빨라짐)
+  const JPEG_QUALITY = 0.86;
+  const GALLERY_CACHE_KEY = 'atelier_artworks_v2';  // 전시관이 작품 목록을 10분간 기억하는 저장 이름
+
   let selectedBase64 = null;
   let fileExt = 'jpg';
+
+  // 오늘 연월을 기본값으로
+  function thisMonth() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
 
   // 저장된 토큰 자동 불러오기
   window.onload = () => {
@@ -77,35 +93,97 @@
       document.getElementById('ghToken').value = savedToken;
       document.getElementById('tokenArea').style.opacity = '0.5';
     }
+    document.getElementById('artDate').value = thisMonth();
   };
+
+  function forgetToken() {
+    localStorage.removeItem('gh_art_token');
+    document.getElementById('ghToken').value = '';
+    document.getElementById('tokenArea').style.opacity = '1';
+    alert('이 기기에 저장된 토큰을 지웠어요.');
+  }
+
+  // [개선] 사진을 1600px JPG로 줄이기. 줄이지 못하는 형식이면 원본 그대로 사용
+  function shrinkImage(dataUrl) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const w = img.naturalWidth, h = img.naturalHeight;
+        const s = Math.min(1, MAX_SIDE / Math.max(w, h));
+        const c = document.createElement('canvas');
+        c.width = Math.round(w * s);
+        c.height = Math.round(h * s);
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#ffffff';            // 투명 PNG도 흰 종이 배경으로
+        ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        resolve({ dataUrl: c.toDataURL('image/jpeg', JPEG_QUALITY), ext: 'jpg', w: c.width, h: c.height });
+      };
+      img.onerror = () => resolve(null);
+      img.src = dataUrl;
+    });
+  }
 
   function handleFile(e) {
     const file = e.target.files[0];
     if (!file) return;
-    fileExt = file.name.split('.').pop().toLowerCase() || 'jpg';
     document.getElementById('fileLabel').innerText = `선택 완료: ${file.name}`;
-    
+    const hint = document.getElementById('sizeHint');
+    hint.innerText = '사진 크기를 줄이는 중...';
+
     const reader = new FileReader();
-    reader.onload = (event) => {
-      const result = event.target.result;
-      document.getElementById('preview').src = result;
+    reader.onload = async (event) => {
+      const original = event.target.result;
+      const small = await shrinkImage(original);
+      const finalUrl = small ? small.dataUrl : original;
+      fileExt = small ? small.ext : ((file.name.split('.').pop() || 'jpg').toLowerCase());
+      document.getElementById('preview').src = finalUrl;
       document.getElementById('preview').style.display = 'block';
-      // base64 본문만 추출
-      selectedBase64 = result.split(',')[1];
+      selectedBase64 = finalUrl.split(',')[1];   // base64 본문만 추출
+      const kb = Math.round(selectedBase64.length * 3 / 4 / 1024);
+      hint.innerText = small
+        ? `올릴 크기: ${small.w}×${small.h}px, 약 ${kb}KB (원본 ${Math.round(file.size / 1024)}KB)`
+        : `이 형식은 줄이지 못해 원본 그대로 올려요 (약 ${kb}KB)`;
     };
     reader.readAsDataURL(file);
+  }
+
+  // GitHub 응답을 이해하기 쉬운 말로
+  async function explainError(res, step) {
+    let detail = '';
+    try { detail = (await res.json()).message || ''; } catch (e) {}
+    const map = {
+      401: '토큰이 맞지 않거나 만료됐어요. GitHub에서 토큰을 새로 만들어 넣어 주세요.',
+      403: '토큰에 이 저장소 쓰기 권한이 없어요. 토큰 권한(Contents: Read and write)을 확인해 주세요.',
+      404: '저장소를 찾지 못했어요. 토큰이 gallery2026 저장소를 선택했는지 확인해 주세요.',
+      409: '저장소가 잠시 바빠요. 1분 뒤 다시 시도해 주세요.',
+      422: '같은 이름의 파일이 이미 있어요. 다시 시도하면 새 번호로 올라가요.'
+    };
+    return `${step} 실패 (${res.status})\n${map[res.status] || detail || '잠시 뒤 다시 시도해 주세요.'}`;
+  }
+
+  async function putFile(token, path, base64, message) {
+    return fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`, {
+      method: 'PUT',
+      headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' },
+      body: JSON.stringify({ message, content: base64 })
+    });
   }
 
   async function uploadArtwork() {
     const token = document.getElementById('ghToken').value.trim();
     const title = document.getElementById('artTitle').value.trim();
-    const date = document.getElementById('artDate').value.trim() || '2026-01';
+    let date = document.getElementById('artDate').value.trim() || thisMonth();
     const meta = document.getElementById('artMeta').value.trim();
     const noteKo = document.getElementById('artNoteKo').value.trim();
 
     if (!token) return alert('GitHub 토큰을 입력해 주세요.');
     if (!selectedBase64) return alert('그림 사진을 선택해 주세요.');
     if (!title) return alert('작품 제목을 입력해 주세요.');
+    // [개선] 2026.11, 2026-1 같은 입력도 2026-11, 2026-01로 맞춤 (전시 순서가 날짜로 정해지기 때문)
+    const m = date.match(/^(\d{4})\D*(\d{1,2})$/);
+    if (!m || +m[2] < 1 || +m[2] > 12) return alert('제작 연월을 2026-11 형식으로 적어 주세요.');
+    date = `${m[1]}-${m[2].padStart(2, '0')}`;
 
     localStorage.setItem('gh_art_token', token);
 
@@ -117,20 +195,22 @@
     msg.innerText = '깃허브 저장소와 통신 중입니다...';
 
     try {
-      // 1. 기존 폴더 개수를 확인하여 새 폴더 번호 결정
+      // 1. [개선] 새 번호 = 지금 있는 가장 큰 번호 + 1 (중간 폴더를 지워도 번호가 겹치지 않음)
       const listRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/artworks`, {
-        headers: { 'Authorization': `token ${token}` }
+        headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' }
       });
-      let nextNum = '02';
-      if (listRes.ok) {
-        const items = await listRes.json();
-        const dirs = items.filter(i => i.type === 'dir');
-        nextNum = String(dirs.length + 1).padStart(2, '0');
-      }
-
+      if (!listRes.ok) throw new Error(await explainError(listRes, '작품 목록 확인'));
+      const items = await listRes.json();
+      const nums = items.filter(i => i.type === 'dir').map(i => parseInt(i.name, 10)).filter(n => !isNaN(n));
+      const nextNum = String((nums.length ? Math.max(...nums) : 1) + 1).padStart(2, '0');
       const folderPath = `artworks/${nextNum}`;
 
-      // 2. note.json 데이터 구성 (기본 5개국어 템플릿 포함)
+      // 2. 이미지 먼저 올리기 (실패하면 메모도 올리지 않아 빈 폴더가 생기지 않음)
+      msg.innerText = '원화 이미지 전송 중...';
+      const imgRes = await putFile(token, `${folderPath}/image.${fileExt}`, selectedBase64, `Add image for ${folderPath}`);
+      if (!imgRes.ok) throw new Error(await explainError(imgRes, '이미지 올리기'));
+
+      // 3. note.json 구성 (기본 5개국어 템플릿 포함)
       const noteData = {
         title: title,
         date: date,
@@ -143,45 +223,31 @@
           es: `Obra: ${title}. Creada por el artista Yesung Jang.`
         }
       };
-
-      // 3. note.json 업로드 API 호출
       msg.innerText = '작품 메모 생성 중...';
       const noteContentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(noteData, null, 2))));
-      await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${folderPath}/note.json`, {
-        method: 'PUT',
-        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: `Add note for ${folderPath}`,
-          content: noteContentBase64
-        })
-      });
+      const noteRes = await putFile(token, `${folderPath}/note.json`, noteContentBase64, `Add note for ${folderPath}`);
+      if (!noteRes.ok) throw new Error(await explainError(noteRes, '작품 메모 올리기'));
 
-      // 4. 이미지 파일 업로드 API 호출
-      msg.innerText = '원화 이미지 전송 중...';
-      await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${folderPath}/image.${fileExt}`, {
-        method: 'PUT',
-        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: `Add image for ${folderPath}`,
-          content: selectedBase64
-        })
-      });
+      // 4. [개선] 이 휴대폰의 전시관 기억(10분)을 지워서 새 작품이 바로 보이게
+      try { localStorage.removeItem(GALLERY_CACHE_KEY); } catch (e) {}
 
       msg.style.color = '#10b981';
-      msg.innerText = `🎉 [${title}] 작품이 ${nextNum}번 액자로 전시관에 등록되었습니다!`;
+      msg.innerText = `🎉 [${title}] 작품이 ${nextNum}번 액자로 전시관에 등록되었습니다!\n1~2분 뒤 전시관과 숏폼에 나타나요.`;
       alert('성공적으로 등록되었습니다! 1~2분 뒤 전시관에 나타납니다.');
 
       // 폼 초기화
       document.getElementById('artTitle').value = '';
       document.getElementById('artMeta').value = '';
       document.getElementById('artNoteKo').value = '';
+      document.getElementById('artFile').value = '';
       document.getElementById('preview').style.display = 'none';
       document.getElementById('fileLabel').innerText = '📷 여기를 눌러 사진을 선택하세요';
+      document.getElementById('sizeHint').innerText = '';
       selectedBase64 = null;
 
     } catch (err) {
       msg.style.color = '#ef4444';
-      msg.innerText = '등록 중 오류가 발생했습니다: ' + err.message;
+      msg.innerText = '등록하지 못했어요.\n' + err.message;
     } finally {
       btn.disabled = false;
       btn.innerText = '전시관에 즉시 발행';
