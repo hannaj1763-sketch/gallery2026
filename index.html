@@ -59,13 +59,14 @@
       transform: translate(-50%, -50%) rotate(-20deg);
       font-size: 26px;
       font-weight: 800;
-      color: rgba(255, 255, 255, 0.40);
+      color: rgba(255, 255, 255, 0.22);
       pointer-events: none;
       white-space: nowrap;
-      -webkit-text-stroke: 0.6px rgba(0, 0, 0, 0.25);
-      text-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+      -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.12);
+      text-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
       letter-spacing: 3px;
     }
+
     .art-info { padding: 16px; }
     .art-theme-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-bottom: 6px; font-weight: 600; background: rgba(59,130,246,0.15); color: #60a5fa; }
     .art-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
@@ -102,10 +103,11 @@
       transform: translate(-50%, -50%) rotate(-25deg);
       font-size: clamp(36px, 8vw, 64px);
       font-weight: 900;
-      color: rgba(255, 255, 255, 0.28);
+      color: rgba(255, 255, 255, 0.22);
       pointer-events: none;
       white-space: nowrap;
-      text-shadow: 0 0 14px rgba(0, 0, 0, 0.9);
+      -webkit-text-stroke: 0.8px rgba(0, 0, 0, 0.12);
+      text-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
       letter-spacing: 6px;
     }
     
@@ -559,8 +561,7 @@
       return new THREE.CanvasTexture(c);
     }
 
-    function loadSlotTexture(slot) {
-          // 그림 한가운데 비스듬한 J.J (숏폼과 같은 모양)
+    // 그림 한가운데 비스듬한 J.J (숏폼과 같은 모양)
     function drawWatermark(g, w, h) {
       g.save();
       g.translate(w / 2, h / 2);
@@ -568,16 +569,18 @@
       g.textAlign = 'center';
       g.textBaseline = 'middle';
       g.font = `900 ${Math.min(w, h) * 0.14}px -apple-system, "Helvetica Neue", Arial, sans-serif`;
-      g.shadowColor = 'rgba(0,0,0,0.6)';
-      g.shadowBlur = Math.min(w, h) * 0.02;
-      g.fillStyle = 'rgba(255,255,255,0.40)';
+      g.shadowColor = 'rgba(0,0,0,0.15)';
+      g.shadowBlur = Math.min(w, h) * 0.006;
+      g.fillStyle = 'rgba(255,255,255,0.22)';
       g.fillText('J.J', 0, 0);
       g.shadowColor = 'transparent';
-      g.lineWidth = Math.max(1, Math.min(w, h) * 0.003);
-      g.strokeStyle = 'rgba(0,0,0,0.25)';
+      g.lineWidth = Math.max(1, Math.min(w, h) * 0.0025);
+      g.strokeStyle = 'rgba(0,0,0,0.12)';
       g.strokeText('J.J', 0, 0);
       g.restore();
     }
+
+    function loadSlotTexture(slot) {
       slot.loading = true;
       activeLoads++;
       const img = new Image();
@@ -588,11 +591,10 @@
         const c = document.createElement('canvas');
         c.width = Math.max(1, Math.round(w * s));
         c.height = Math.max(1, Math.round(h * s));
-       
         const g2 = c.getContext('2d');
         g2.drawImage(img, 0, 0, c.width, c.height);
         drawWatermark(g2, c.width, c.height);   // 3D 액자 그림에도 J.J 워터마크
-        
+
         const tex = new THREE.CanvasTexture(c);
         tex.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
 
@@ -1023,13 +1025,13 @@
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.font = `900 ${Math.min(fw, fh) * 0.14}px -apple-system, "Helvetica Neue", Arial, sans-serif`;
-      ctx.shadowColor = 'rgba(0,0,0,0.6)';
-      ctx.shadowBlur = 10 * u;
-      ctx.fillStyle = 'rgba(255,255,255,0.40)';
+      ctx.shadowColor = 'rgba(0,0,0,0.15)';
+      ctx.shadowBlur = 3 * u;
+      ctx.fillStyle = 'rgba(255,255,255,0.22)';
       ctx.fillText('J.J', 0, 0);
       ctx.shadowColor = 'transparent';
-      ctx.lineWidth = 1.2 * u;
-      ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+      ctx.lineWidth = 1 * u;
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
       ctx.strokeText('J.J', 0, 0);
       ctx.restore();
 
