@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
   <style>
+    /* 한나체1: 엄마 손글씨로 만든 글씨체 (저장소의 hanna1.woff) */
+    @font-face { font-family: 'Hanna1'; src: url('hanna1.woff') format('woff'); font-display: swap; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif; background: #0f1115; color: #f0f2f5; padding: 16px; line-height: 1.5; }
     .wrap { max-width: 520px; margin: 0 auto; }
@@ -122,6 +124,8 @@
   <!-- 4. 문구 -->
   <div class="card">
     <div class="step"><b>4</b>문구 고르기</div>
+    <span class="opt-label" style="margin-top:0">글씨체</span>
+    <div class="seg" id="fontSeg" style="margin-bottom:10px"><button data-v="Hanna1" class="on">✍️ 한나체1</button><button data-v="Jua">주아체</button></div>
     <div class="chips" id="chips"></div>
     <input type="text" id="customText" placeholder="직접 쓰기 (예: 예성이 최고)" maxlength="12">
     <span class="opt-label">글자 위치</span>
@@ -175,6 +179,8 @@
   // 배경색: 첫 칸은 투명 (카톡 사진으로 보내면 흰색이 됨)
   const BG_COLORS = ['transparent', '#FFF1C9', '#FFE0E6', '#DDEEFF', '#E3F6DF', '#EDE4FF', '#FFE7D1'];
   let phrase = '', textPos = 'bottom', textColor = COLORS[0], outlineR = 9, bgColor = BG_COLORS[0];
+  let fontName = 'Hanna1';   // 한나체1에 없는 글자는 주아체로 자동 대체
+  const fontStack = () => fontName === 'Hanna1' ? 'Hanna1, Jua, sans-serif' : 'Jua, sans-serif';
   const fxLayers = [];       // 붙인 효과들 {img, cx, cy, size, rot}
   let fxSel = -1;
   const made = [];
@@ -464,6 +470,11 @@
   }
   segment('outlineSeg', v => { outlineR = +v; render(); drawFxMini(); });
   segment('posSeg', v => { textPos = v; render(); });
+  segment('fontSeg', v => { fontName = v; applyChipFont(); render(); });
+  function applyChipFont() {
+    document.querySelectorAll('#chips .chip').forEach((c, i) => { if (i > 0) c.style.fontFamily = fontStack(); });   // '글자 없음'은 그대로
+  }
+  applyChipFont();
   const colorsEl = document.getElementById('colors');
   COLORS.forEach((c, i) => {
     const s = document.createElement('div');
@@ -648,8 +659,8 @@
     // 문구
     if (phrase) {
       let size = 58;
-      g.font = `${size}px Jua, sans-serif`;
-      while (g.measureText(phrase).width > OUT - 30 && size > 22) { size -= 2; g.font = `${size}px Jua, sans-serif`; }
+      g.font = `${size}px ${fontStack()}`;
+      while (g.measureText(phrase).width > OUT - 30 && size > 22) { size -= 2; g.font = `${size}px ${fontStack()}`; }
       const ty = textPos === 'top' ? 14 + textH / 2 : OUT - 14 - textH / 2;
       g.textAlign = 'center'; g.textBaseline = 'middle';
       g.lineJoin = 'round';
@@ -671,7 +682,7 @@
     g.fillStyle = 'rgba(60,60,60,0.8)';
     g.fillText(SIGN, sigX, sigY);
   }
-  if (document.fonts) document.fonts.load('40px Jua').then(() => render()).catch(() => render()); else render();
+  if (document.fonts) Promise.allSettled([document.fonts.load('40px Jua'), document.fonts.load('40px Hanna1', '안녕')]).then(() => render()); else render();
 
   // ================= 저장 (한 장씩) =================
   function fileName(i) { return `yesung_emoticon_${String(i + 1).padStart(2, '0')}.png`; }
