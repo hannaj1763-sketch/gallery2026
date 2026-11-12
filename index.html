@@ -41,7 +41,9 @@
     #view-3d { position: relative; height: calc(100vh - 65px); touch-action: none; overflow: hidden; }
     #canvas3d { width: 100%; height: 100%; display: block; }
     .auto-btn { position: absolute; top: 14px; right: 14px; z-index: 11; background: rgba(0,0,0,0.6); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.18); padding: 7px 14px; border-radius: 18px; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); }
-    .auto-btn.paused { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+    .auto-btn.paused { 
+          .studio-btn { position: absolute; top: 14px; left: 14px; z-index: 11; background: rgba(0,0,0,0.6); color: #fbbf24; border: 1px solid rgba(251,191,36,0.45); padding: 7px 14px; border-radius: 18px; font-size: 13px; font-weight: 600; text-decoration: none; backdrop-filter: blur(4px); }
+      background: #3b82f6; border-color: #3b82f6; color: #fff; }
     .hint-3d { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.65); padding: 8px 18px; border-radius: 20px; font-size: 13px; color: #e2e8f0; pointer-events: none; text-align: center; backdrop-filter: blur(4px); z-index: 10; white-space: nowrap; }
 
     /* 도록 뷰 */
@@ -171,6 +173,7 @@
   <!-- 3D 뷰 -->
   <div id="view-3d" class="view-container active">
     <canvas id="canvas3d"></canvas>
+        <a class="studio-btn" href="emoticon.html" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation()">🎨 이모티콘 공방</a>
     <button id="autoBtn" class="auto-btn" onclick="toggleAutoScroll()" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation()">⏸ 자동 감상 멈춤</button>
     <div class="hint-3d">작품이 천천히 내려가요 · 화면을 밀면 직접 볼 수 있어요</div>
   </div>
