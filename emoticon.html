@@ -7,8 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
   <style>
-    /* 한나체1: 엄마 손글씨로 만든 글씨체 (저장소의 hanna1.woff) */
-    @font-face { font-family: 'Hanna1'; src: url('hanna1.woff') format('woff'); font-display: swap; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif; background: #0f1115; color: #f0f2f5; padding: 16px; line-height: 1.5; }
     .wrap { max-width: 520px; margin: 0 auto; }
@@ -125,7 +123,9 @@
   <div class="card">
     <div class="step"><b>4</b>문구 고르기</div>
     <span class="opt-label" style="margin-top:0">글씨체</span>
-    <div class="seg" id="fontSeg" style="margin-bottom:10px"><button data-v="Hanna1" class="on">✍️ 한나체1</button><button data-v="Jua">주아체</button></div>
+    <div class="chips" id="fontChips" style="margin:4px 0 4px"></div>
+    <div class="hint" style="margin:0 0 12px">저장소에 글씨체 파일(.woff, .ttf)을 올리면 여기에 자동으로 생겨요. 파일 이름이 글씨체 이름이 돼요. (예: 예성체.woff)</div>
+    <span class="opt-label" style="margin-top:0">문구</span>
     <div class="chips" id="chips"></div>
     <input type="text" id="customText" placeholder="직접 쓰기 (예: 예성이 최고)" maxlength="12">
     <span class="opt-label">글자 위치</span>
@@ -179,8 +179,11 @@
   // 배경색: 첫 칸은 투명 (카톡 사진으로 보내면 흰색이 됨)
   const BG_COLORS = ['transparent', '#FFF1C9', '#FFE0E6', '#DDEEFF', '#E3F6DF', '#EDE4FF', '#FFE7D1'];
   let phrase = '', textPos = 'bottom', textColor = COLORS[0], outlineR = 9, bgColor = BG_COLORS[0];
-  let fontName = 'Hanna1';   // 한나체1에 없는 글자는 주아체로 자동 대체
-  const fontStack = () => fontName === 'Hanna1' ? 'Hanna1, Jua, sans-serif' : 'Jua, sans-serif';
+  // 글씨체 목록: 주아체 + 저장소에 올린 글씨체 파일들(자동으로 찾음). 글씨체에 없는 글자는 주아체로 대신 보여요.
+  const FONT_ALIAS = { hanna1: '한나체1' };   // 영어 파일 이름을 한글 이름으로 보여 주기
+  const fonts = [{ label: '주아체', family: 'Jua' }];
+  let fontFamily = 'Jua';
+  const fontStack = () => fontFamily === 'Jua' ? 'Jua, sans-serif' : `"${fontFamily}", Jua, sans-serif`;
   const fxLayers = [];       // 붙인 효과들 {img, cx, cy, size, rot}
   let fxSel = -1;
   const made = [];
@@ -470,7 +473,39 @@
   }
   segment('outlineSeg', v => { outlineR = +v; render(); drawFxMini(); });
   segment('posSeg', v => { textPos = v; render(); });
-  segment('fontSeg', v => { fontName = v; applyChipFont(); render(); });
+  function renderFontChips() {
+    const box = document.getElementById('fontChips');
+    box.innerHTML = '';
+    fonts.forEach(f => {
+      const b = document.createElement('button');
+      b.className = 'chip' + (f.family === fontFamily ? ' on' : '');
+      b.textContent = (f.family === 'Jua' ? '' : '✍️ ') + f.label;
+      b.style.fontFamily = f.family === 'Jua' ? 'Jua, sans-serif' : `"${f.family}", Jua, sans-serif`;
+      b.onclick = () => { fontFamily = f.family; renderFontChips(); applyChipFont(); render(); };
+      box.appendChild(b);
+    });
+  }
+  // 저장소(맨 위 또는 fonts 폴더)에 있는 .woff/.woff2/.ttf/.otf 파일을 찾아 글씨체로 등록
+  async function loadRepoFonts() {
+    renderFontChips();
+    try {
+      const { tree } = await fetchTree();
+      const files = tree.filter(t => t.type === 'blob' && /^(fonts\/)?[^/]+\.(woff2?|ttf|otf)$/i.test(t.path)).map(t => t.path).sort();
+      for (const [i, path] of files.entries()) {
+        const base = path.split('/').pop().replace(/\.[^.]+$/, '');
+        const family = 'UserFont' + i;
+        try {
+          const face = new FontFace(family, `url("${path.split('/').map(encodeURIComponent).join('/')}")`);
+          await face.load();
+          document.fonts.add(face);
+          fonts.push({ label: FONT_ALIAS[base.toLowerCase()] || base, family });
+        } catch (e) { console.log('글씨체를 불러오지 못했어요:', path, e); }
+      }
+      const first = fonts.find(f => f.family !== 'Jua');
+      if (first) fontFamily = first.family;   // 직접 만든 글씨체가 있으면 그걸 먼저 골라 둠
+    } catch (e) { console.log('글씨체 목록을 불러오지 못했어요:', e); }
+    renderFontChips(); applyChipFont(); render();
+  }
   function applyChipFont() {
     document.querySelectorAll('#chips .chip').forEach((c, i) => { if (i > 0) c.style.fontFamily = fontStack(); });   // '글자 없음'은 그대로
   }
@@ -682,7 +717,8 @@
     g.fillStyle = 'rgba(60,60,60,0.8)';
     g.fillText(SIGN, sigX, sigY);
   }
-  if (document.fonts) Promise.allSettled([document.fonts.load('40px Jua'), document.fonts.load('40px Hanna1', '안녕')]).then(() => render()); else render();
+  if (document.fonts) document.fonts.load('40px Jua').then(() => render()).catch(() => render()); else render();
+  loadRepoFonts();
 
   // ================= 저장 (한 장씩) =================
   function fileName(i) { return `yesung_emoticon_${String(i + 1).padStart(2, '0')}.png`; }
