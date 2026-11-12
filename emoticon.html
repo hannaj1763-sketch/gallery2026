@@ -37,6 +37,7 @@
     .seg button.on { background: #fbbf24; color: #1a1a1a; font-weight: 700; }
     .swatch { width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; }
     .swatch.on { box-shadow: 0 0 0 3px #fbbf24; }
+    .swatch.clear { background-color: #fff !important; background-image: linear-gradient(45deg,#d1d5db 25%,transparent 25%),linear-gradient(-45deg,#d1d5db 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#d1d5db 75%),linear-gradient(-45deg,transparent 75%,#d1d5db 75%); background-size: 10px 10px; background-position: 0 0,0 5px,5px -5px,-5px 0; }
     .checker { background-color: #fff;
       background-image: linear-gradient(45deg,#e5e7eb 25%,transparent 25%),linear-gradient(-45deg,#e5e7eb 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e5e7eb 75%),linear-gradient(-45deg,transparent 75%,#e5e7eb 75%);
       background-size: 20px 20px; background-position: 0 0,0 10px,10px -10px,-10px 0; }
@@ -88,6 +89,8 @@
     <span class="opt-label">종이 배경 지우는 정도 <span id="tolVal">40</span></span>
     <input type="range" id="tol" min="0" max="100" value="40">
     <div class="hint">종이가 남으면 오른쪽으로, 그림까지 지워지면 왼쪽으로 옮겨요. 0이면 지우지 않아요.</div>
+    <span class="opt-label">배경색 <span style="color:#8a99ad;font-weight:400">(카톡은 투명한 곳을 흰색으로 채워요)</span></span>
+    <div class="row" id="bgColors" style="margin-top:4px"></div>
     <span class="opt-label">흰 테두리 (스티커 느낌)</span>
     <div class="seg" id="outlineSeg">
       <button data-v="0">없음</button><button data-v="5">얇게</button><button data-v="9" class="on">보통</button><button data-v="14">두껍게</button>
@@ -169,7 +172,9 @@
   ];
   const COLORS = ['#2b2b2b', '#e8453c', '#f59e0b', '#22a35a', '#2f7de1', '#9b5de5', '#ff6fae', '#ffffff'];
 
-  let phrase = '', textPos = 'bottom', textColor = COLORS[0], outlineR = 9;
+  // 배경색: 첫 칸은 투명 (카톡 사진으로 보내면 흰색이 됨)
+  const BG_COLORS = ['transparent', '#FFF1C9', '#FFE0E6', '#DDEEFF', '#E3F6DF', '#EDE4FF', '#FFE7D1'];
+  let phrase = '', textPos = 'bottom', textColor = COLORS[0], outlineR = 9, bgColor = BG_COLORS[0];
   const fxLayers = [];       // 붙인 효과들 {img, cx, cy, size, rot}
   let fxSel = -1;
   const made = [];
@@ -473,6 +478,21 @@
     colorsEl.appendChild(s);
   });
 
+  const bgEl = document.getElementById('bgColors');
+  BG_COLORS.forEach(c => {
+    const s = document.createElement('div');
+    s.className = 'swatch' + (c === 'transparent' ? ' clear' : '') + (c === bgColor ? ' on' : '');
+    if (c !== 'transparent') s.style.background = c;
+    s.title = c === 'transparent' ? '투명' : c;
+    s.onclick = () => {
+      bgEl.querySelectorAll('.swatch').forEach(x => x.classList.remove('on'));
+      s.classList.add('on');
+      bgColor = c;
+      render();
+    };
+    bgEl.appendChild(s);
+  });
+
   // ================= 효과 붙이기 =================
   const fxR = () => outlineR ? Math.max(3, Math.round(outlineR * 0.6)) : 0;   // 효과는 테두리를 조금 얇게
 
@@ -596,10 +616,14 @@
       g.fillText(charCutter.work ? '캐릭터 둘레를 그려 주세요' : '도록에서 작품을 먼저 골라 주세요', OUT / 2, OUT / 2);
       return;
     }
-    // 캐릭터
+    // 배경색 (투명이 아니면 전체를 칠함)
+    if (bgColor !== 'transparent') { g.fillStyle = bgColor; g.fillRect(0, 0, OUT, OUT); }
+
+    // 캐릭터 (아래쪽에 © J.J 서명 자리 16px 남김)
     const pad = 14 + outlineR;
     const textH = phrase ? 84 : 0;
-    const areaW = OUT - pad * 2, areaH = OUT - pad * 2 - textH;
+    const SIGN_H = 16;
+    const areaW = OUT - pad * 2, areaH = OUT - pad * 2 - textH - SIGN_H;
     const s = Math.min(areaW / cut.width, areaH / cut.height);
     const dw = cut.width * s, dh = cut.height * s;
     const x = (OUT - dw) / 2;
@@ -636,15 +660,16 @@
       g.fillText(phrase, OUT / 2, ty);
     }
 
-    // 저작권 서명 (글자와 겹치지 않는 쪽 구석)
-    const sigY = (phrase && textPos === 'bottom') ? 16 : OUT - 12;
-    g.font = '700 13px "Helvetica Neue", Arial, sans-serif';
+    // 저작권 서명: 캐릭터 바로 아래 오른쪽에 붙임
+    const sigX = Math.min(OUT - 8, Math.max(60, x + dw + outlineR));
+    const sigY = Math.min(OUT - 9, y + dh + outlineR + 9);
+    g.font = '700 12px "Helvetica Neue", Arial, sans-serif';
     g.textAlign = 'right'; g.textBaseline = 'middle';
     g.lineJoin = 'round'; g.lineWidth = 3;
     g.strokeStyle = 'rgba(255,255,255,0.85)';
-    g.strokeText(SIGN, OUT - 10, sigY);
-    g.fillStyle = 'rgba(60,60,60,0.75)';
-    g.fillText(SIGN, OUT - 10, sigY);
+    g.strokeText(SIGN, sigX, sigY);
+    g.fillStyle = 'rgba(60,60,60,0.8)';
+    g.fillText(SIGN, sigX, sigY);
   }
   if (document.fonts) document.fonts.load('40px Jua').then(() => render()).catch(() => render()); else render();
 
