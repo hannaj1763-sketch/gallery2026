@@ -560,6 +560,24 @@
     }
 
     function loadSlotTexture(slot) {
+          // 그림 한가운데 비스듬한 J.J (숏폼과 같은 모양)
+    function drawWatermark(g, w, h) {
+      g.save();
+      g.translate(w / 2, h / 2);
+      g.rotate(-25 * Math.PI / 180);
+      g.textAlign = 'center';
+      g.textBaseline = 'middle';
+      g.font = `900 ${Math.min(w, h) * 0.14}px -apple-system, "Helvetica Neue", Arial, sans-serif`;
+      g.shadowColor = 'rgba(0,0,0,0.6)';
+      g.shadowBlur = Math.min(w, h) * 0.02;
+      g.fillStyle = 'rgba(255,255,255,0.40)';
+      g.fillText('J.J', 0, 0);
+      g.shadowColor = 'transparent';
+      g.lineWidth = Math.max(1, Math.min(w, h) * 0.003);
+      g.strokeStyle = 'rgba(0,0,0,0.25)';
+      g.strokeText('J.J', 0, 0);
+      g.restore();
+    }
       slot.loading = true;
       activeLoads++;
       const img = new Image();
@@ -570,8 +588,11 @@
         const c = document.createElement('canvas');
         c.width = Math.max(1, Math.round(w * s));
         c.height = Math.max(1, Math.round(h * s));
-        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-
+       
+        const g2 = c.getContext('2d');
+        g2.drawImage(img, 0, 0, c.width, c.height);
+        drawWatermark(g2, c.width, c.height);   // 3D 액자 그림에도 J.J 워터마크
+        
         const tex = new THREE.CanvasTexture(c);
         tex.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
 
@@ -1001,7 +1022,7 @@
       ctx.rotate(-25 * Math.PI / 180);
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.font = `900 ${Math.min(fw, fh) * 0.26}px -apple-system, "Helvetica Neue", Arial, sans-serif`;
+      ctx.font = `900 ${Math.min(fw, fh) * 0.14}px -apple-system, "Helvetica Neue", Arial, sans-serif`;
       ctx.shadowColor = 'rgba(0,0,0,0.6)';
       ctx.shadowBlur = 10 * u;
       ctx.fillStyle = 'rgba(255,255,255,0.40)';
