@@ -291,6 +291,10 @@
       };
     }
 
+    function cleanMeta(meta) {
+      return String(meta || '').replace(/^\s*종이\s*위\s*(원화|그림)\s*\|?\s*/, '').trim();
+    }
+
     function readCache() {
       try {
         const raw = localStorage.getItem(CACHE_KEY);
@@ -371,6 +375,9 @@
           artworks = cached ? cached.list : [];
         }
       }
+
+      // '종이 위 원화 |' 같은 반복 문구는 빼고 날짜 등만 보여주기
+      artworks.forEach(a => { a.meta = cleanMeta(a.meta); });
 
       document.getElementById('loadingText').style.display = 'none';
       renderArchive();
@@ -808,7 +815,10 @@
     const imgReady = img => img && img.complete && img.naturalWidth > 0;
 
     function buildShortsList() {
-      shorts.list = shuffleArr(artworks.slice());
+      // 화가 소개(프로필)는 항상 맨 처음, 나머지 작품만 무작위로 섞기
+      const profile = artworks.filter(a => a.isProfile);
+      const works = artworks.filter(a => !a.isProfile);
+      shorts.list = [...profile, ...shuffleArr(works.slice())];
       shorts.kb = shorts.list.map(randomKenBurns);
       shorts.idx = 0;
     }
@@ -985,6 +995,23 @@
       ctx.drawImage(img, fx + ox, fy + oy, dw, dh);
       ctx.restore();
 
+      // 워터마크: 그림 한가운데 비스듬히 (도록·뷰어와 같은 J.J)
+      ctx.save();
+      ctx.translate(fx + fw / 2, fy + fh / 2);
+      ctx.rotate(-25 * Math.PI / 180);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `900 ${Math.min(fw, fh) * 0.26}px -apple-system, "Helvetica Neue", Arial, sans-serif`;
+      ctx.shadowColor = 'rgba(0,0,0,0.6)';
+      ctx.shadowBlur = 10 * u;
+      ctx.fillStyle = 'rgba(255,255,255,0.40)';
+      ctx.fillText('J.J', 0, 0);
+      ctx.shadowColor = 'transparent';
+      ctx.lineWidth = 1.2 * u;
+      ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+      ctx.strokeText('J.J', 0, 0);
+      ctx.restore();
+
       // 아래쪽: 제목 + 정보
       const ty = Math.min(H - 110 * u, fy + fh + pad + 44 * u);
       ctx.textAlign = 'center';
@@ -994,9 +1021,6 @@
       ctx.fillStyle = 'rgba(255,255,255,0.72)';
       ctx.font = `500 ${13 * u}px -apple-system, "Pretendard", "Noto Sans KR", sans-serif`;
       ctx.fillText(art.meta || art.date || '', W / 2, ty + 24 * u, W - 40 * u);
-      ctx.fillStyle = 'rgba(255,255,255,0.35)';
-      ctx.font = `800 ${14 * u}px -apple-system, sans-serif`;
-      ctx.fillText('J.J', W / 2, H - 74 * u);
       ctx.restore();
     }
 
