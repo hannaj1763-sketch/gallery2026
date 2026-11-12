@@ -180,7 +180,8 @@
   const BG_COLORS = ['transparent', '#FFF1C9', '#FFE0E6', '#DDEEFF', '#E3F6DF', '#EDE4FF', '#FFE7D1'];
   let phrase = '', textPos = 'bottom', textColor = COLORS[0], outlineR = 9, bgColor = BG_COLORS[0];
   // 글씨체 목록: 주아체 + 저장소에 올린 글씨체 파일들(자동으로 찾음). 글씨체에 없는 글자는 주아체로 대신 보여요.
-  const FONT_ALIAS = { hanna1: '한나체1' };   // 영어 파일 이름을 한글 이름으로 보여 주기
+  
+    const FONT_ALIAS = { hanna1: '한나체1', yesung: '예성체', yesung2: '예성체2' };   // 영어 파일 이름을 한글 이름으로 보여 주기// 영어 파일 이름을 한글 이름으로 보여 주기
   const fonts = [{ label: '주아체', family: 'Jua' }];
   let fontFamily = 'Jua';
   const fontStack = () => fontFamily === 'Jua' ? 'Jua, sans-serif' : `"${fontFamily}", Jua, sans-serif`;
