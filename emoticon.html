@@ -2,288 +2,740 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>예성이 갤러리 - 간편 업로드 스튜디오</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>예성이 이모티콘 공방</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif; background: #0f1115; color: #f0f2f5; padding: 20px; line-height: 1.5; }
-    .card { background: #161a22; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; max-width: 480px; margin: 0 auto; }
-    h1 { font-size: 18px; font-weight: 700; margin-bottom: 20px; text-align: center; color: #3b82f6; }
-    .form-group { margin-bottom: 16px; }
-    label { display: block; font-size: 13px; color: #8a99ad; margin-bottom: 6px; font-weight: 500; }
-    input[type="text"], input[type="password"], textarea, select { width: 100%; background: #0b0d11; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 12px; border-radius: 10px; font-size: 14px; outline: none; }
-    input:focus, textarea:focus { border-color: #3b82f6; }
-    .file-drop { border: 2px dashed rgba(59,130,246,0.4); background: rgba(59,130,246,0.03); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; }
-    .preview-img { width: 100%; max-height: 220px; object-fit: contain; margin-top: 10px; border-radius: 8px; display: none; }
-    .btn-submit { width: 100%; background: #3b82f6; color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 10px; }
-    .btn-submit:disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
-    .status-msg { margin-top: 15px; font-size: 13px; text-align: center; min-height: 20px; white-space: pre-line; }
-    .hint { font-size: 12px; color: #6b7a8f; margin-top: 6px; }
-    .link-btn { background: none; border: none; color: #8a99ad; font-size: 12px; text-decoration: underline; cursor: pointer; margin-top: 6px; padding: 4px 0; }
-    .seg { display: flex; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; overflow: hidden; }
-    .seg button { flex: 1; background: #0b0d11; color: #8a99ad; border: none; padding: 11px 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .seg button.on { background: #3b82f6; color: #fff; }
-    .gallery-link { display: block; text-align: center; margin-top: 14px; color: #8a99ad; font-size: 13px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif; background: #0f1115; color: #f0f2f5; padding: 16px; line-height: 1.5; }
+    .wrap { max-width: 520px; margin: 0 auto; }
+    h1 { font-size: 19px; text-align: center; color: #fbbf24; margin-bottom: 2px; font-family: 'Jua', sans-serif; font-weight: 400; }
+    .sub { text-align: center; font-size: 12px; color: #8a99ad; margin-bottom: 16px; }
+    .card { background: #161a22; border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+    .step { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .step b { color: #fbbf24; margin-right: 6px; }
+    .step small { font-weight: 500; color: #8a99ad; font-size: 12px; }
+    .hint { font-size: 12px; color: #8a99ad; margin-top: 8px; }
+    .btn { background: #222733; color: #e2e8f0; border: 1px solid rgba(255,255,255,0.15); padding: 9px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn.primary { background: #3b82f6; border-color: #3b82f6; color: #fff; width: 100%; padding: 15px; font-size: 15px; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn.store-btn { width: 100%; padding: 13px; font-size: 14px; color: #fbbf24; border-color: rgba(251,191,36,0.45); }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+    .pick-btn { width: 100%; padding: 18px; border: 2px dashed rgba(251,191,36,0.5); background: rgba(251,191,36,0.05); color: #fbbf24; font-size: 14px; }
+    .lasso { width: 100%; display: none; border-radius: 8px; touch-action: none; background: #000; margin-top: 10px; cursor: crosshair; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { background: #222733; border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; padding: 6px 11px; border-radius: 16px; font-size: 14px; cursor: pointer; font-family: 'Jua', sans-serif; }
+    .chip.on { background: #fbbf24; color: #1a1a1a; border-color: #fbbf24; }
+    .chip .x { margin-left: 6px; opacity: 0.7; }
+    input[type=text] { width: 100%; background: #0b0d11; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px; border-radius: 10px; font-size: 14px; margin-top: 10px; }
+    input[type=range] { width: 100%; margin-top: 4px; }
+    .opt-label { font-size: 13px; color: #cbd5e1; margin-top: 12px; display: block; }
+    .opt-label span { color: #fbbf24; }
+    .seg { display: inline-flex; border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; overflow: hidden; }
+    .seg button { background: #222733; color: #cbd5e1; border: none; padding: 7px 14px; font-size: 13px; cursor: pointer; }
+    .seg button.on { background: #fbbf24; color: #1a1a1a; font-weight: 700; }
+    .swatch { width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); cursor: pointer; }
+    .swatch.on { box-shadow: 0 0 0 3px #fbbf24; }
+    .checker { background-color: #fff;
+      background-image: linear-gradient(45deg,#e5e7eb 25%,transparent 25%),linear-gradient(-45deg,#e5e7eb 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e5e7eb 75%),linear-gradient(-45deg,transparent 75%,#e5e7eb 75%);
+      background-size: 20px 20px; background-position: 0 0,0 10px,10px -10px,-10px 0; }
+    .preview-box { width: 280px; height: 280px; margin: 0 auto; border-radius: 12px; overflow: hidden; }
+    #preview { width: 100%; height: 100%; display: block; touch-action: none; }
+    #fxMini { width: 120px; height: 120px; border-radius: 10px; display: none; margin: 10px auto 0; }
+    .count { text-align: center; font-size: 13px; color: #fbbf24; margin-top: 10px; font-weight: 700; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .item { position: relative; background: #fff; border-radius: 8px; overflow: hidden; aspect-ratio: 1; cursor: pointer; }
+    .item img { width: 100%; height: 100%; display: block; }
+    .item .no { position: absolute; left: 5px; top: 2px; font-size: 11px; color: #666; font-weight: 700; }
+    .item .del { position: absolute; right: 3px; top: 3px; background: rgba(0,0,0,0.55); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; cursor: pointer; }
+    .empty { font-size: 13px; color: #6b7a8f; text-align: center; padding: 10px 0; }
+    .gallery-pick { display: none; margin-top: 12px; }
+    .gallery-pick.open { display: block; }
+    .gp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-height: 360px; overflow-y: auto; padding-right: 2px; }
+    .gp-item { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: #0b0d11; cursor: pointer; border: 2px solid transparent; }
+    .gp-item:hover { border-color: #fbbf24; }
+    .gp-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .gp-item span { position: absolute; left: 0; right: 0; bottom: 0; font-size: 10px; padding: 2px 4px; background: rgba(0,0,0,0.6); color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gp-msg { font-size: 13px; color: #8a99ad; text-align: center; padding: 14px 0; }
+    .back { display: block; text-align: center; color: #8a99ad; font-size: 13px; margin: 8px 0 20px; }
   </style>
 </head>
 <body>
+<div class="wrap">
+  <h1>예성이 이모티콘 공방</h1>
+  <div class="sub">도록 작품에서 캐릭터를 오려 카카오톡 이모티콘(360×360)으로 만들어요</div>
 
-<div class="card">
-  <h1>🎨 간편 작품 등록 스튜디오</h1>
-
-  <!-- 1회성 토큰 설정 (한 번 저장하면 이 휴대폰 브라우저에 기억됨) -->
-  <div class="form-group" id="tokenArea">
-    <label for="ghToken">GitHub 토큰 (github_pat_... 또는 ghp_...)</label>
-    <input type="password" id="ghToken" placeholder="토큰을 입력하면 이 기기에 저장됩니다" autocomplete="off">
-    <button type="button" class="link-btn" onclick="forgetToken()">이 기기에서 토큰 지우기</button>
-  </div>
-
-  <div class="form-group">
-    <label>올릴 곳</label>
-    <div class="seg" id="targetSeg">
-      <button type="button" class="on" onclick="setTarget('art')">🖼️ 전시 작품</button>
-      <button type="button" onclick="setTarget('sticker')">🌟 이모티콘 재료 (전시 안 함)</button>
+  <!-- 1. 캐릭터 고르기 -->
+  <div class="card">
+    <div class="step"><b>1</b>도록에서 캐릭터 고르기</div>
+    <button class="btn pick-btn" id="pickBtn" onclick="toggleArtPick()">🖼️ 전시관 작품에서 고르기</button>
+    <div class="gallery-pick" id="artPick">
+      <div class="gp-grid" id="artGrid"></div>
+      <div class="gp-msg" id="artMsg">작품을 불러오는 중…</div>
     </div>
-    <div class="hint" id="targetHint">전시관 · 도록 · 숏폼에 나와요.</div>
-  </div>
-
-  <div class="form-group">
-    <label>그림 사진 선택 (스마트폰 촬영 / 갤러리)</label>
-    <div class="file-drop" onclick="document.getElementById('artFile').click()">
-      <span id="fileLabel">📷 여기를 눌러 사진을 선택하세요</span>
-      <input type="file" id="artFile" accept="image/*" style="display:none" onchange="handleFile(event)">
-      <img id="preview" class="preview-img" alt="미리보기">
+    <canvas id="charLasso" class="lasso"></canvas>
+    <div class="hint" id="charHint" style="display:none">✏️ 캐릭터 둘레를 손가락으로 한 바퀴 그려 주세요. 손을 떼면 바로 오려져요.</div>
+    <div class="row" id="charBtns" style="display:none">
+      <button class="btn" onclick="charCutter.clear()">다시 그리기</button>
+      <button class="btn" onclick="charCutter.whole()">작품 전체 쓰기</button>
     </div>
-    <div class="hint" id="sizeHint"></div>
   </div>
 
-  <div class="form-group">
-    <label for="artTitle" id="titleLabel">작품 제목</label>
-    <input type="text" id="artTitle" placeholder="예: 탁자 위의 요구르트">
+  <!-- 2. 다듬기 -->
+  <div class="card">
+    <div class="step"><b>2</b>배경 지우기 · 테두리</div>
+    <span class="opt-label">종이 배경 지우는 정도 <span id="tolVal">40</span></span>
+    <input type="range" id="tol" min="0" max="100" value="40">
+    <div class="hint">종이가 남으면 오른쪽으로, 그림까지 지워지면 왼쪽으로 옮겨요. 0이면 지우지 않아요.</div>
+    <span class="opt-label">흰 테두리 (스티커 느낌)</span>
+    <div class="seg" id="outlineSeg">
+      <button data-v="0">없음</button><button data-v="5">얇게</button><button data-v="9" class="on">보통</button><button data-v="14">두껍게</button>
+    </div>
   </div>
 
-  <div class="form-group art-only">
-    <label for="artDate">제작 연월 (YYYY-MM)</label>
-    <input type="text" id="artDate" placeholder="예: 2026-11" inputmode="numeric">
+  <!-- 3. 효과 붙이기 -->
+  <div class="card">
+    <div class="step"><b>3</b>효과 붙이기 <small>(하고 싶을 때만)</small></div>
+    <div class="hint" style="margin:0 0 10px">도록 작품 속 하트, 반짝이, 별, 꽃 같은 작은 그림을 오려서 캐릭터 옆에 붙여요.</div>
+    <button class="btn pick-btn" id="fxPickBtn" onclick="toggleFxPick()">🌟 도록에서 효과 고르기</button>
+    <div class="gallery-pick" id="fxPick">
+      <div class="gp-grid" id="fxGrid"></div>
+      <div class="gp-msg" id="fxMsg">작품을 불러오는 중…</div>
+    </div>
+    <canvas id="fxLasso" class="lasso"></canvas>
+    <div class="hint" id="fxHint" style="display:none">✏️ 붙일 효과(하트, 반짝이, ㅋ 등) 둘레를 손가락으로 그려 주세요.</div>
+    <div class="row" id="fxBtns" style="display:none">
+      <button class="btn" onclick="fxCutter.clear()">다시 그리기</button>
+    </div>
+    <div id="fxTolBox" style="display:none">
+      <span class="opt-label">종이 배경 지우는 정도 <span id="fxTolVal">40</span></span>
+      <input type="range" id="fxTol" min="0" max="100" value="40">
+    </div>
+    <canvas id="fxMini" class="checker" width="240" height="240"></canvas>
+    <div class="row"><button class="btn primary" id="fxAddBtn" onclick="addFx()" disabled>✨ 미리보기에 붙이기</button></div>
   </div>
 
-  <div class="form-group art-only">
-    <label for="artMeta">재료 및 정보</label>
-    <input type="text" id="artMeta" placeholder="비워 두면 날짜만 표시돼요 (예: 스케치북 위 색연필)">
+  <!-- 4. 문구 -->
+  <div class="card">
+    <div class="step"><b>4</b>문구 고르기</div>
+    <div class="chips" id="chips"></div>
+    <input type="text" id="customText" placeholder="직접 쓰기 (예: 예성이 최고)" maxlength="12">
+    <span class="opt-label">글자 위치</span>
+    <div class="seg" id="posSeg"><button data-v="top">위</button><button data-v="bottom" class="on">아래</button></div>
+    <span class="opt-label">글자 색</span>
+    <div class="row" id="colors" style="margin-top:4px"></div>
   </div>
 
-  <div class="form-group art-only">
-    <label for="artNoteKo">예성이의 생각 및 메모 (한국어)</label>
-    <textarea id="artNoteKo" rows="3" placeholder="예성이가 그림을 그릴 때 한 말이나 생각을 편하게 적어주세요"></textarea>
+  <!-- 5. 미리보기 + 저장 -->
+  <div class="card" id="previewCard">
+    <div class="step"><b>5</b>미리보기 · 저장</div>
+    <div class="preview-box checker"><canvas id="preview" width="360" height="360"></canvas></div>
+    <div id="fxCtrl" style="display:none">
+      <div class="hint">붙인 효과를 손가락으로 끌어서 옮겨요. 아래에서 고른 효과의 크기와 기울기를 바꿔요.</div>
+      <div class="chips" id="fxList" style="margin-top:8px"></div>
+      <span class="opt-label">효과 크기</span>
+      <input type="range" id="fxSize" min="30" max="300" value="110">
+      <span class="opt-label">효과 기울기</span>
+      <input type="range" id="fxRot" min="-180" max="180" value="0">
+    </div>
+    <div class="row"><button class="btn primary" id="saveBtn" onclick="saveCurrent()" disabled>이 이모티콘 저장하기</button></div>
+    <div class="hint" id="saveHint"></div>
+    <div class="row"><button class="btn store-btn" id="storeBtn" onclick="uploadToStore()" disabled>📦 전시관 이모티콘 창고에 올리기</button></div>
+    <div class="hint" id="storeMsg">창고에 올리면 전시관의 "이모티콘 창고"에서 누구나 받아 갈 수 있어요. (작품 등록 스튜디오에 토큰을 저장한 기기에서만 올릴 수 있어요)</div>
+    <div class="count" id="count">만든 이모티콘 0 / 32</div>
   </div>
 
-  <button class="btn-submit" id="submitBtn" onclick="uploadArtwork()">전시관에 즉시 발행</button>
-  <div class="status-msg" id="statusMsg"></div>
-  <a class="gallery-link" href="./">← 전시관으로 가기</a>
+  <!-- 6. 만든 이모티콘 -->
+  <div class="card">
+    <div class="step"><b>6</b>만든 이모티콘</div>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="emptyMsg">아직 없어요. 저장하면 여기에 모여요.</div>
+    <div class="hint">그림을 누르면 다시 저장돼요. 이 페이지를 닫거나 새로고침하면 목록이 사라지니, 만들 때마다 저장해 두세요.</div>
+  </div>
+
+  <a class="back" href="./">← 전시관으로 가기</a>
 </div>
 
 <script>
-  const OWNER = 'hannaj1763-sketch';
-  const REPO = 'gallery2026';
-  const MAX_SIDE = 1600;          // [개선] 사진 긴 변을 1600px로 줄여서 올림 (전시관 로딩이 빨라짐)
-  const JPEG_QUALITY = 0.86;
-  const GALLERY_CACHE_KEY = 'atelier_artworks_v2';  // 전시관이 작품 목록을 10분간 기억하는 저장 이름
+  const OUT = 360;           // 카카오 이모티콘 크기
+  const WORK_MAX = 1800;     // 처리할 그림 최대 크기(긴 변)
+  const SIGN = '© J.J';      // 저작권 서명
+  const PHRASES = [
+    '안녕!', '고마워', '사랑해', '최고!', '좋아요', '축하해', '미안해', '괜찮아?',
+    '화이팅!', '잘자', '굿모닝', '배고파', '맛있겠다', '헐...', '대박!', 'ㅋㅋㅋ',
+    '응응', '아니야', '알겠어!', '기다려', '보고싶어', '힘내!', '수고했어', '놀자!',
+    '졸려', '심쿵', '감동이야', '부탁해', '오케이!', '출발!', '집에 갈래', '궁금해'
+  ];
+  const COLORS = ['#2b2b2b', '#e8453c', '#f59e0b', '#22a35a', '#2f7de1', '#9b5de5', '#ff6fae', '#ffffff'];
 
-  let selectedBase64 = null;
-  let fileExt = 'jpg';
-  let target = 'art';   // 'art' = 전시 작품(artworks/), 'sticker' = 이모티콘 재료(stickers/, 전시 안 함)
+  let phrase = '', textPos = 'bottom', textColor = COLORS[0], outlineR = 9;
+  const fxLayers = [];       // 붙인 효과들 {img, cx, cy, size, rot}
+  let fxSel = -1;
+  const made = [];
 
-  function setTarget(t) {
-    target = t;
-    document.querySelectorAll('#targetSeg button').forEach((b, i) => b.classList.toggle('on', (i === 0) === (t === 'art')));
-    document.querySelectorAll('.art-only').forEach(el => el.style.display = t === 'art' ? '' : 'none');
-    document.getElementById('titleLabel').innerText = t === 'art' ? '작품 제목' : '재료 이름';
-    document.getElementById('artTitle').placeholder = t === 'art' ? '예: 탁자 위의 요구르트' : '예: 하트·반짝이 모음';
-    document.getElementById('targetHint').innerText = t === 'art'
-      ? '전시관 · 도록 · 숏폼에 나와요.'
-      : '전시관에는 안 나오고, 이모티콘 공방의 "효과 재료"에만 나와요. 흰 종이에 띄엄띄엄 그린 하트·반짝이·ㅋ 같은 그림을 올려요.';
-    document.getElementById('submitBtn').innerText = t === 'art' ? '전시관에 즉시 발행' : '이모티콘 재료로 올리기';
-  }
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+                   (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform));
+  document.getElementById('saveHint').innerText = isMobile
+    ? '저장을 누르고 나오는 창에서 "이미지 저장"을 고르면 사진첩에 들어가요.'
+    : '누르면 PNG 파일이 하나씩 내려받아져요.';
 
-  // 오늘 연월을 기본값으로
-  function thisMonth() {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-  }
-
-  // 저장된 토큰 자동 불러오기
-  window.onload = () => {
-    const savedToken = localStorage.getItem('gh_art_token');
-    if (savedToken) {
-      document.getElementById('ghToken').value = savedToken;
-      document.getElementById('tokenArea').style.opacity = '0.5';
-    }
-    document.getElementById('artDate').value = thisMonth();
-  };
-
-  function forgetToken() {
-    localStorage.removeItem('gh_art_token');
-    document.getElementById('ghToken').value = '';
-    document.getElementById('tokenArea').style.opacity = '1';
-    alert('이 기기에 저장된 토큰을 지웠어요.');
-  }
-
-  // [개선] 사진을 1600px JPG로 줄이기. 줄이지 못하는 형식이면 원본 그대로 사용
-  function shrinkImage(dataUrl) {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        const w = img.naturalWidth, h = img.naturalHeight;
-        const s = Math.min(1, MAX_SIDE / Math.max(w, h));
-        const c = document.createElement('canvas');
-        c.width = Math.round(w * s);
-        c.height = Math.round(h * s);
-        const ctx = c.getContext('2d');
-        ctx.fillStyle = '#ffffff';            // 투명 PNG도 흰 종이 배경으로
-        ctx.fillRect(0, 0, c.width, c.height);
-        ctx.drawImage(img, 0, 0, c.width, c.height);
-        resolve({ dataUrl: c.toDataURL('image/jpeg', JPEG_QUALITY), ext: 'jpg', w: c.width, h: c.height });
-      };
-      img.onerror = () => resolve(null);
-      img.src = dataUrl;
-    });
-  }
-
-  function handleFile(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    document.getElementById('fileLabel').innerText = `선택 완료: ${file.name}`;
-    const hint = document.getElementById('sizeHint');
-    hint.innerText = '사진 크기를 줄이는 중...';
-
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const original = event.target.result;
-      const small = await shrinkImage(original);
-      const finalUrl = small ? small.dataUrl : original;
-      fileExt = small ? small.ext : ((file.name.split('.').pop() || 'jpg').toLowerCase());
-      document.getElementById('preview').src = finalUrl;
-      document.getElementById('preview').style.display = 'block';
-      selectedBase64 = finalUrl.split(',')[1];   // base64 본문만 추출
-      const kb = Math.round(selectedBase64.length * 3 / 4 / 1024);
-      hint.innerText = small
-        ? `올릴 크기: ${small.w}×${small.h}px, 약 ${kb}KB (원본 ${Math.round(file.size / 1024)}KB)`
-        : `이 형식은 줄이지 못해 원본 그대로 올려요 (약 ${kb}KB)`;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  // GitHub 응답을 이해하기 쉬운 말로
-  async function explainError(res, step) {
-    let detail = '';
-    try { detail = (await res.json()).message || ''; } catch (e) {}
-    const map = {
-      401: '토큰이 맞지 않거나 만료됐어요. GitHub에서 토큰을 새로 만들어 넣어 주세요.',
-      403: '토큰에 이 저장소 쓰기 권한이 없어요. 토큰 권한(Contents: Read and write)을 확인해 주세요.',
-      404: '저장소를 찾지 못했어요. 토큰이 gallery2026 저장소를 선택했는지 확인해 주세요.',
-      409: '저장소가 잠시 바빠요. 1분 뒤 다시 시도해 주세요.',
-      422: '같은 이름의 파일이 이미 있어요. 다시 시도하면 새 번호로 올라가요.'
-    };
-    return `${step} 실패 (${res.status})\n${map[res.status] || detail || '잠시 뒤 다시 시도해 주세요.'}`;
-  }
-
-  async function putFile(token, path, base64, message) {
-    return fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`, {
-      method: 'PUT',
-      headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' },
-      body: JSON.stringify({ message, content: base64 })
-    });
-  }
-
-  async function uploadArtwork() {
-    const token = document.getElementById('ghToken').value.trim();
-    const title = document.getElementById('artTitle').value.trim();
-    let date = document.getElementById('artDate').value.trim() || thisMonth();
-    const meta = document.getElementById('artMeta').value.trim();
-    const noteKo = document.getElementById('artNoteKo').value.trim();
-
-    if (!token) return alert('GitHub 토큰을 입력해 주세요.');
-    if (!selectedBase64) return alert('그림 사진을 선택해 주세요.');
-    if (!title) return alert(target === 'art' ? '작품 제목을 입력해 주세요.' : '재료 이름을 입력해 주세요.');
-    // [개선] 2026.11, 2026-1 같은 입력도 2026-11, 2026-01로 맞춤 (전시 순서가 날짜로 정해지기 때문)
-    const m = date.match(/^(\d{4})\D*(\d{1,2})$/);
-    if (!m || +m[2] < 1 || +m[2] > 12) return alert('제작 연월을 2026-11 형식으로 적어 주세요.');
-    date = `${m[1]}-${m[2].padStart(2, '0')}`;
-
-    localStorage.setItem('gh_art_token', token);
-
-    const btn = document.getElementById('submitBtn');
-    const msg = document.getElementById('statusMsg');
-    btn.disabled = true;
-    btn.innerText = '전시관에 등록하는 중...';
-    msg.style.color = '#3b82f6';
-    msg.innerText = '깃허브 저장소와 통신 중입니다...';
-
-    try {
-      // 1. [개선] 새 번호 = 지금 있는 가장 큰 번호 + 1 (중간 폴더를 지워도 번호가 겹치지 않음)
-      const isArt = target === 'art';
-      const topDir = isArt ? 'artworks' : 'stickers';
-      const listRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${topDir}`, {
-        headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' }
+  // ================= 오리기 도구 (캐릭터용 · 효과용 두 개를 따로 씀) =================
+  class Cutter {
+    constructor(o) {
+      Object.assign(this, o);
+      this.work = null; this.workData = null; this.lasso = []; this.drawing = false; this.base = null; this.cut = null;
+      const c = this.canvas;
+      c.addEventListener('pointerdown', ev => {
+        if (!this.work) return;
+        ev.preventDefault();
+        c.setPointerCapture(ev.pointerId);
+        this.drawing = true; this.lasso = [this.toWork(ev)];
+        this.draw();
       });
-      let items = [];
-      if (listRes.ok) items = await listRes.json();
-      else if (!(listRes.status === 404 && !isArt)) throw new Error(await explainError(listRes, '목록 확인'));  // 재료 폴더가 처음이면 404가 정상
-      const nums = items.filter(i => i.type === 'dir').map(i => parseInt(i.name, 10)).filter(n => !isNaN(n));
-      const nextNum = String(nums.length ? Math.max(...nums) + 1 : (isArt ? 2 : 1)).padStart(2, '0');
-      const folderPath = `${topDir}/${nextNum}`;
-
-      // 2. 이미지 먼저 올리기 (실패하면 메모도 올리지 않아 빈 폴더가 생기지 않음)
-      msg.innerText = '원화 이미지 전송 중...';
-      const imgRes = await putFile(token, `${folderPath}/image.${fileExt}`, selectedBase64, `Add image for ${folderPath}`);
-      if (!imgRes.ok) throw new Error(await explainError(imgRes, '이미지 올리기'));
-
-      // 3. note.json 구성 (기본 5개국어 템플릿 포함)
-      const noteData = !isArt ? { title: title, type: 'sticker', date: date } : {
-        title: title,
-        date: date,
-        meta: meta || date,
-        notes: {
-          ko: noteKo || "작품 설명이 등록되었습니다.",
-          en: `Artwork: ${title}. Created by artist Yesung Jang.`,
-          ja: `作品：${title}。作家チャン・イェソンの作品です。`,
-          zh: `作品：《${title}》。张艺成艺术家的画作。`,
-          es: `Obra: ${title}. Creada por el artista Yesung Jang.`
-        }
+      c.addEventListener('pointermove', ev => {
+        if (!this.drawing) return;
+        const p = this.toWork(ev), q = this.lasso[this.lasso.length - 1];
+        if (Math.hypot(p[0] - q[0], p[1] - q[1]) > this.work.width / 300) { this.lasso.push(p); this.draw(); }
+      });
+      const end = () => {
+        if (!this.drawing) return;
+        this.drawing = false;
+        if (this.lasso.length < 8) { this.lasso = []; this.draw(); return; }
+        this.draw(); this.buildBase();
       };
-      msg.innerText = '작품 메모 생성 중...';
-      const noteContentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(noteData, null, 2))));
-      const noteRes = await putFile(token, `${folderPath}/note.json`, noteContentBase64, `Add note for ${folderPath}`);
-      if (!noteRes.ok) throw new Error(await explainError(noteRes, '작품 메모 올리기'));
-
-      // 4. [개선] 이 휴대폰의 전시관 기억(10분)을 지워서 새 작품이 바로 보이게
-      if (isArt) { try { localStorage.removeItem(GALLERY_CACHE_KEY); } catch (e) {} }
-
-      msg.style.color = '#10b981';
-      msg.innerText = isArt
-        ? `🎉 [${title}] 작품이 ${nextNum}번 액자로 전시관에 등록되었습니다!\n1~2분 뒤 전시관과 숏폼에 나타나요.`
-        : `🌟 [${title}] 재료가 ${nextNum}번으로 올라갔어요!\n1~2분 뒤 이모티콘 공방의 "효과 재료"에 나타나요.`;
-      alert(isArt ? '성공적으로 등록되었습니다! 1~2분 뒤 전시관에 나타납니다.' : '이모티콘 재료로 올라갔어요! 1~2분 뒤 공방에 나타납니다.');
-
-      // 폼 초기화
-      document.getElementById('artTitle').value = '';
-      document.getElementById('artMeta').value = '';
-      document.getElementById('artNoteKo').value = '';
-      document.getElementById('artFile').value = '';
-      document.getElementById('preview').style.display = 'none';
-      document.getElementById('fileLabel').innerText = '📷 여기를 눌러 사진을 선택하세요';
-      document.getElementById('sizeHint').innerText = '';
-      selectedBase64 = null;
-
-    } catch (err) {
-      msg.style.color = '#ef4444';
-      msg.innerText = '등록하지 못했어요.\n' + err.message;
-    } finally {
-      btn.disabled = false;
-      btn.innerText = target === 'art' ? '전시관에 즉시 발행' : '이모티콘 재료로 올리기';
+      c.addEventListener('pointerup', end);
+      c.addEventListener('pointercancel', end);
+      this.tolEl.addEventListener('input', () => { this.tolValEl.innerText = this.tolEl.value; this.applyBackground(); });
+    }
+    load(src) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onerror = () => alert('그림을 불러오지 못했어요. 잠시 뒤 다시 시도해 주세요.');
+      img.onload = () => {
+        const s = Math.min(1, WORK_MAX / Math.max(img.naturalWidth, img.naturalHeight));
+        this.work = document.createElement('canvas');
+        this.work.width = Math.round(img.naturalWidth * s);
+        this.work.height = Math.round(img.naturalHeight * s);
+        const g = this.work.getContext('2d', { willReadFrequently: true });
+        g.drawImage(img, 0, 0, this.work.width, this.work.height);
+        this.workData = g.getImageData(0, 0, this.work.width, this.work.height);
+        const ls = Math.min(1, 1000 / Math.max(this.work.width, this.work.height));
+        this.canvas.width = Math.round(this.work.width * ls);
+        this.canvas.height = Math.round(this.work.height * ls);
+        this.canvas.style.display = 'block';
+        this.lasso = []; this.base = null; this.cut = null;
+        this.draw();
+        if (this.onLoad) this.onLoad();
+        this.onChange();
+        this.canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      };
+      img.src = src;
+    }
+    toWork(ev) {
+      const r = this.canvas.getBoundingClientRect();
+      return [(ev.clientX - r.left) / r.width * this.work.width, (ev.clientY - r.top) / r.height * this.work.height];
+    }
+    draw() {
+      const c = this.canvas, g = c.getContext('2d'), s = c.width / this.work.width, L = this.lasso;
+      g.clearRect(0, 0, c.width, c.height);
+      g.drawImage(this.work, 0, 0, c.width, c.height);
+      if (L.length < 2) return;
+      const path = () => { g.beginPath(); L.forEach(([x, y], i) => i ? g.lineTo(x * s, y * s) : g.moveTo(x * s, y * s)); };
+      g.save();
+      path();
+      if (!this.drawing) {
+        g.closePath();
+        g.rect(c.width, 0, -c.width, c.height);   // 바깥쪽은 어둡게
+        g.fillStyle = 'rgba(0,0,0,0.55)';
+        g.fill('evenodd');
+        path(); g.closePath();
+      }
+      g.lineWidth = 3; g.strokeStyle = '#fbbf24'; g.setLineDash([8, 6]);
+      g.stroke();
+      g.restore();
+    }
+    clear() { this.lasso = []; this.base = null; this.cut = null; if (this.work) this.draw(); this.onChange(); }
+    whole() {
+      if (!this.work) return;
+      const w = this.work.width, h = this.work.height;
+      this.lasso = [[0, 0], [w, 0], [w, h], [0, h]];
+      this.draw(); this.buildBase();
+    }
+    // 올가미 안쪽만 잘라내고, 올가미 선 위의 색으로 종이 색을 알아냄
+    buildBase() {
+      const W = this.work.width, H = this.work.height, L = this.lasso;
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      L.forEach(([x, y]) => { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); });
+      x0 = Math.max(0, Math.floor(x0)); y0 = Math.max(0, Math.floor(y0));
+      x1 = Math.min(W, Math.ceil(x1)); y1 = Math.min(H, Math.ceil(y1));
+      const w = x1 - x0, h = y1 - y0;
+      if (w < 4 || h < 4) return;
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const g = c.getContext('2d', { willReadFrequently: true });
+      g.beginPath();
+      L.forEach(([x, y], i) => i ? g.lineTo(x - x0, y - y0) : g.moveTo(x - x0, y - y0));
+      g.closePath(); g.clip();
+      g.drawImage(this.work, -x0, -y0);
+      const rs = [], gs = [], bs = [], D = this.workData.data;
+      const step = Math.max(1, Math.floor(L.length / 400));
+      for (let i = 0; i < L.length; i += step) {
+        const px = Math.min(W - 1, Math.max(0, Math.round(L[i][0])));
+        const py = Math.min(H - 1, Math.max(0, Math.round(L[i][1])));
+        const k = (py * W + px) * 4;
+        rs.push(D[k]); gs.push(D[k + 1]); bs.push(D[k + 2]);
+      }
+      const med = a => a.sort((p, q) => p - q)[Math.floor(a.length / 2)] ?? 255;
+      this.base = { data: g.getImageData(0, 0, w, h), w, h, paper: [med(rs), med(gs), med(bs)] };
+      this.applyBackground();
+    }
+    // 종이 색과 비슷한 부분을 투명하게
+    applyBackground() {
+      const b = this.base;
+      if (!b) return;
+      const tol = +this.tolEl.value, T = tol * 1.3, F = 28;
+      const [pr, pg, pb] = b.paper, src = b.data.data;
+      const out = new ImageData(b.w, b.h), d = out.data;
+      let x0 = b.w, y0 = b.h, x1 = -1, y1 = -1;
+      for (let i = 0, p = 0; i < src.length; i += 4, p++) {
+        let a = src[i + 3];
+        if (a && tol > 0) {
+          const dist = Math.hypot(src[i] - pr, src[i + 1] - pg, src[i + 2] - pb);
+          a = dist <= T ? 0 : dist >= T + F ? a : Math.round(a * (dist - T) / F);
+        }
+        d[i] = src[i]; d[i + 1] = src[i + 1]; d[i + 2] = src[i + 2]; d[i + 3] = a;
+        if (a > 24) {
+          const x = p % b.w, y = (p / b.w) | 0;
+          if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+        }
+      }
+      if (x1 < 0) { this.cut = null; this.onChange(); return; }
+      const full = document.createElement('canvas');
+      full.width = b.w; full.height = b.h;
+      full.getContext('2d').putImageData(out, 0, 0);
+      this.cut = document.createElement('canvas');
+      this.cut.width = x1 - x0 + 1; this.cut.height = y1 - y0 + 1;
+      this.cut.getContext('2d').drawImage(full, -x0, -y0);
+      this.onChange();
     }
   }
-</script>
 
+  const charCutter = new Cutter({
+    canvas: document.getElementById('charLasso'),
+    tolEl: document.getElementById('tol'), tolValEl: document.getElementById('tolVal'),
+    onLoad: () => {
+      document.getElementById('charHint').style.display = 'block';
+      document.getElementById('charBtns').style.display = 'flex';
+      document.getElementById('artPick').classList.remove('open');
+      document.getElementById('pickBtn').innerText = '🖼️ 다른 작품 고르기';
+    },
+    onChange: () => render()
+  });
+  const fxCutter = new Cutter({
+    canvas: document.getElementById('fxLasso'),
+    tolEl: document.getElementById('fxTol'), tolValEl: document.getElementById('fxTolVal'),
+    onLoad: () => {
+      document.getElementById('fxHint').style.display = 'block';
+      document.getElementById('fxBtns').style.display = 'flex';
+      document.getElementById('fxTolBox').style.display = 'block';
+      document.getElementById('fxPick').classList.remove('open');
+      document.getElementById('fxPickBtn').innerText = '🌟 다른 작품에서 고르기';
+    },
+    onChange: () => drawFxMini()
+  });
+
+  // ================= 저장소에서 도록 작품 목록 가져오기 =================
+  const OWNER = 'hannaj1763-sketch', REPO = 'gallery2026';
+  const GALLERY_CACHE_KEY = 'atelier_artworks_v2';   // 전시관이 저장해 둔 작품 목록을 같이 씀
+  let treePromise = null;
+
+  function rawUrl(branch, path) {
+    return `https://raw.githubusercontent.com/${OWNER}/${REPO}/${branch}/` + path.split('/').map(encodeURIComponent).join('/');
+  }
+  function fetchTree() {
+    if (!treePromise) {
+      treePromise = (async () => {
+        for (const branch of ['main', 'master']) {
+          const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${branch}?recursive=1`);
+          if (res.ok) return { branch, tree: (await res.json()).tree || [] };
+        }
+        throw new Error('목록을 불러오지 못했어요');
+      })();
+      treePromise.catch(() => { treePromise = null; });
+    }
+    return treePromise;
+  }
+  // artworks/ 아래 폴더별로 그림 + note.json 제목 모으기
+  async function listFolder(top) {
+    const { branch, tree } = await fetchTree();
+    const folders = {};
+    tree.forEach(it => {
+      const parts = it.path.split('/');
+      if (it.type !== 'blob' || parts.length !== 3 || parts[0] !== top) return;
+      const f = folders[parts[1]] = folders[parts[1]] || {};
+      if (/\.(jpg|jpeg|png|webp)$/i.test(parts[2]) && !f.img) f.img = it.path;
+      if (parts[2].toLowerCase() === 'note.json') f.note = it.path;
+    });
+    const list = await Promise.all(Object.entries(folders).filter(([, f]) => f.img).map(async ([id, f]) => {
+      let title = id, date = '9999-99';
+      try { if (f.note) { const n = await (await fetch(rawUrl(branch, f.note))).json(); title = n.title || id; date = n.date || date; } } catch (e) {}
+      return { id, title, date, src: rawUrl(branch, f.img) };
+    }));
+    return list.sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+  }
+  async function artList() {
+    try {
+      const c = JSON.parse(localStorage.getItem(GALLERY_CACHE_KEY) || 'null');
+      if (c && c.list && c.list.length) return c.list;
+    } catch (e) {}
+    return listFolder('artworks');
+  }
+
+  function fillGrid(gridId, list, onPick) {
+    const grid = document.getElementById(gridId);
+    grid.innerHTML = '';
+    list.forEach(a => {
+      const it = document.createElement('div');
+      it.className = 'gp-item';
+      it.innerHTML = `<img src="${a.src}" alt="" loading="lazy"><span></span>`;
+      it.querySelector('span').textContent = a.title;
+      it.onclick = () => onPick(a.src);
+      grid.appendChild(it);
+    });
+  }
+
+  let artLoaded = false, fxLoaded = false;
+  async function toggleArtPick() {
+    const box = document.getElementById('artPick');
+    box.classList.toggle('open');
+    if (artLoaded || !box.classList.contains('open')) return;
+    const msg = document.getElementById('artMsg');
+    try {
+      fillGrid('artGrid', await artList(), src => charCutter.load(src));
+      msg.style.display = 'none';
+      artLoaded = true;
+    } catch (e) { msg.innerText = '작품 목록을 불러오지 못했어요. 잠시 뒤 새로고침해 주세요.'; }
+  }
+  async function toggleFxPick() {
+    const box = document.getElementById('fxPick');
+    box.classList.toggle('open');
+    if (fxLoaded || !box.classList.contains('open')) return;
+    const msg = document.getElementById('fxMsg');
+    try {
+      fillGrid('fxGrid', await artList(), src => fxCutter.load(src));
+      msg.style.display = 'none';
+      fxLoaded = true;
+    } catch (e) { msg.innerText = '작품 목록을 불러오지 못했어요. 잠시 뒤 새로고침해 주세요.'; }
+  }
+
+  // ================= 문구 · 옵션 버튼 =================
+  const chips = document.getElementById('chips');
+  ['글자 없음', ...PHRASES].forEach((p, i) => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (i === 0 ? ' on' : '');
+    b.textContent = p;
+    b.onclick = () => {
+      chips.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+      b.classList.add('on');
+      phrase = i === 0 ? '' : p;
+      document.getElementById('customText').value = '';
+      render();
+    };
+    chips.appendChild(b);
+  });
+  document.getElementById('customText').addEventListener('input', (e) => {
+    phrase = e.target.value.trim();
+    chips.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+    render();
+  });
+  function segment(id, onPick) {
+    const seg = document.getElementById(id);
+    seg.querySelectorAll('button').forEach(b => b.onclick = () => {
+      seg.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      onPick(b.dataset.v);
+    });
+  }
+  segment('outlineSeg', v => { outlineR = +v; render(); drawFxMini(); });
+  segment('posSeg', v => { textPos = v; render(); });
+  const colorsEl = document.getElementById('colors');
+  COLORS.forEach((c, i) => {
+    const s = document.createElement('div');
+    s.className = 'swatch' + (i === 0 ? ' on' : '');
+    s.style.background = c;
+    s.onclick = () => {
+      colorsEl.querySelectorAll('.swatch').forEach(x => x.classList.remove('on'));
+      s.classList.add('on');
+      textColor = c;
+      render();
+    };
+    colorsEl.appendChild(s);
+  });
+
+  // ================= 효과 붙이기 =================
+  const fxR = () => outlineR ? Math.max(3, Math.round(outlineR * 0.6)) : 0;   // 효과는 테두리를 조금 얇게
+
+  function drawFxMini() {
+    const m = document.getElementById('fxMini'), g = m.getContext('2d');
+    const cut = fxCutter.cut;
+    document.getElementById('fxAddBtn').disabled = !cut;
+    m.style.display = fxCutter.work ? 'block' : 'none';
+    g.clearRect(0, 0, m.width, m.height);
+    if (!cut) return;
+    const r = fxR();
+    const s = Math.min((m.width - 20 - 2 * r) / cut.width, (m.height - 20 - 2 * r) / cut.height);
+    const st = makeSticker(cut, cut.width * s, cut.height * s, r);
+    g.drawImage(st, (m.width - st.width) / 2, (m.height - st.height) / 2);
+  }
+  function addFx() {
+    const cut = fxCutter.cut;
+    if (!cut) return;
+    const copy = document.createElement('canvas');
+    copy.width = cut.width; copy.height = cut.height;
+    copy.getContext('2d').drawImage(cut, 0, 0);
+    const n = fxLayers.length;
+    fxLayers.push({ img: copy, cx: [280, 80, 285, 75][n % 4], cy: [80, 85, 230, 230][n % 4], size: 110, rot: 0 });
+    fxSel = fxLayers.length - 1;
+    renderFxList(); render();
+    document.getElementById('previewCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function renderFxList() {
+    const box = document.getElementById('fxList');
+    box.innerHTML = '';
+    fxLayers.forEach((L, i) => {
+      const b = document.createElement('button');
+      b.className = 'chip' + (i === fxSel ? ' on' : '');
+      b.innerHTML = `효과 ${i + 1}<span class="x">✕</span>`;
+      b.onclick = (e) => {
+        if (e.target.classList.contains('x')) {
+          fxLayers.splice(i, 1);
+          fxSel = Math.min(fxSel, fxLayers.length - 1);
+        } else fxSel = i;
+        renderFxList(); render();
+      };
+      box.appendChild(b);
+    });
+    document.getElementById('fxCtrl').style.display = fxLayers.length ? 'block' : 'none';
+    const L = fxLayers[fxSel];
+    if (L) {
+      document.getElementById('fxSize').value = L.size;
+      document.getElementById('fxRot').value = L.rot;
+    }
+  }
+  document.getElementById('fxSize').addEventListener('input', e => { const L = fxLayers[fxSel]; if (L) { L.size = +e.target.value; render(); } });
+  document.getElementById('fxRot').addEventListener('input', e => { const L = fxLayers[fxSel]; if (L) { L.rot = +e.target.value; render(); } });
+
+  // 미리보기에서 효과를 손가락으로 끌어 옮기기
+  const pv = document.getElementById('preview');
+  let dragging = null;
+  function pvPoint(ev) {
+    const r = pv.getBoundingClientRect();
+    return [(ev.clientX - r.left) / r.width * OUT, (ev.clientY - r.top) / r.height * OUT];
+  }
+  function fxBox(L) {
+    const s = L.size / Math.max(L.img.width, L.img.height);
+    return [L.img.width * s, L.img.height * s];
+  }
+  pv.addEventListener('pointerdown', ev => {
+    if (!fxLayers.length) return;
+    const [px, py] = pvPoint(ev);
+    let hit = -1;
+    for (let i = fxLayers.length - 1; i >= 0; i--) {
+      const L = fxLayers[i], [w, h] = fxBox(L), pad = 12;
+      if (Math.abs(px - L.cx) < w / 2 + pad && Math.abs(py - L.cy) < h / 2 + pad) { hit = i; break; }
+    }
+    if (hit < 0) return;
+    ev.preventDefault();
+    pv.setPointerCapture(ev.pointerId);
+    fxSel = hit;
+    dragging = { dx: px - fxLayers[hit].cx, dy: py - fxLayers[hit].cy };
+    renderFxList(); render();
+  });
+  pv.addEventListener('pointermove', ev => {
+    if (!dragging) return;
+    const [px, py] = pvPoint(ev), L = fxLayers[fxSel];
+    L.cx = Math.max(0, Math.min(OUT, px - dragging.dx));
+    L.cy = Math.max(0, Math.min(OUT, py - dragging.dy));
+    render();
+  });
+  const stopDrag = () => { dragging = null; };
+  pv.addEventListener('pointerup', stopDrag);
+  pv.addEventListener('pointercancel', stopDrag);
+
+  // ================= 그리기 =================
+  // 그림 둘레에 흰 테두리를 두른 스티커 만들기
+  function makeSticker(img, w, h, r) {
+    const c = document.createElement('canvas');
+    c.width = Math.ceil(w + r * 2); c.height = Math.ceil(h + r * 2);
+    const g = c.getContext('2d');
+    if (r > 0) {
+      const sil = document.createElement('canvas');
+      sil.width = Math.ceil(w); sil.height = Math.ceil(h);
+      const sg = sil.getContext('2d');
+      sg.drawImage(img, 0, 0, w, h);
+      sg.globalCompositeOperation = 'source-in';
+      sg.fillStyle = '#ffffff';
+      sg.fillRect(0, 0, sil.width, sil.height);
+      for (let k = 0; k < 32; k++) { const t = k / 32 * Math.PI * 2; g.drawImage(sil, r + Math.cos(t) * r, r + Math.sin(t) * r); }
+      for (let k = 0; k < 16; k++) { const t = k / 16 * Math.PI * 2; g.drawImage(sil, r + Math.cos(t) * r / 2, r + Math.sin(t) * r / 2); }
+    }
+    g.drawImage(img, r, r, w, h);
+    return c;
+  }
+
+  // forExport = true 이면 저장용 (선택 표시 없이)
+  function render(forExport) {
+    const g = pv.getContext('2d');
+    g.clearRect(0, 0, OUT, OUT);
+    const cut = charCutter.cut;
+    document.getElementById('saveBtn').disabled = !cut;
+    document.getElementById('storeBtn').disabled = !cut;
+    if (!cut) {
+      g.fillStyle = '#9ca3af'; g.font = '22px Jua, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(charCutter.work ? '캐릭터 둘레를 그려 주세요' : '도록에서 작품을 먼저 골라 주세요', OUT / 2, OUT / 2);
+      return;
+    }
+    // 캐릭터
+    const pad = 14 + outlineR;
+    const textH = phrase ? 84 : 0;
+    const areaW = OUT - pad * 2, areaH = OUT - pad * 2 - textH;
+    const s = Math.min(areaW / cut.width, areaH / cut.height);
+    const dw = cut.width * s, dh = cut.height * s;
+    const x = (OUT - dw) / 2;
+    const y = pad + (textPos === 'top' ? textH : 0) + (areaH - dh) / 2;
+    g.drawImage(makeSticker(cut, dw, dh, outlineR), x - outlineR, y - outlineR);
+
+    // 효과
+    fxLayers.forEach((L, i) => {
+      const [w, h] = fxBox(L), r = fxR();
+      const st = makeSticker(L.img, w, h, r);
+      g.save();
+      g.translate(L.cx, L.cy);
+      g.rotate(L.rot * Math.PI / 180);
+      g.drawImage(st, -st.width / 2, -st.height / 2);
+      if (!forExport && i === fxSel) {
+        g.setLineDash([6, 5]); g.lineWidth = 2; g.strokeStyle = '#3b82f6';
+        g.strokeRect(-st.width / 2 - 3, -st.height / 2 - 3, st.width + 6, st.height + 6);
+      }
+      g.restore();
+    });
+
+    // 문구
+    if (phrase) {
+      let size = 58;
+      g.font = `${size}px Jua, sans-serif`;
+      while (g.measureText(phrase).width > OUT - 30 && size > 22) { size -= 2; g.font = `${size}px Jua, sans-serif`; }
+      const ty = textPos === 'top' ? 14 + textH / 2 : OUT - 14 - textH / 2;
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.lineJoin = 'round';
+      g.lineWidth = Math.max(8, size * 0.2);
+      g.strokeStyle = textColor === '#ffffff' ? '#2b2b2b' : '#ffffff';
+      g.strokeText(phrase, OUT / 2, ty);
+      g.fillStyle = textColor;
+      g.fillText(phrase, OUT / 2, ty);
+    }
+
+    // 저작권 서명 (글자와 겹치지 않는 쪽 구석)
+    const sigY = (phrase && textPos === 'bottom') ? 16 : OUT - 12;
+    g.font = '700 13px "Helvetica Neue", Arial, sans-serif';
+    g.textAlign = 'right'; g.textBaseline = 'middle';
+    g.lineJoin = 'round'; g.lineWidth = 3;
+    g.strokeStyle = 'rgba(255,255,255,0.85)';
+    g.strokeText(SIGN, OUT - 10, sigY);
+    g.fillStyle = 'rgba(60,60,60,0.75)';
+    g.fillText(SIGN, OUT - 10, sigY);
+  }
+  if (document.fonts) document.fonts.load('40px Jua').then(() => render()).catch(() => render()); else render();
+
+  // ================= 저장 (한 장씩) =================
+  function fileName(i) { return `yesung_emoticon_${String(i + 1).padStart(2, '0')}.png`; }
+  function dataUrlToFile(url, name) {
+    const bin = atob(url.split(',')[1]);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return new File([arr], name, { type: 'image/png' });
+  }
+  async function saveImage(url, name) {
+    if (isMobile && navigator.canShare) {
+      const file = dataUrlToFile(url, name);
+      if (navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file] }); return; }
+        catch (e) { if (e.name === 'AbortError') return; }
+      }
+    }
+    const a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+  function saveCurrent() {
+    if (!charCutter.cut) return;
+    render(true);
+    const url = pv.toDataURL('image/png');
+    render();
+    made.push(url);
+    renderGrid();
+    saveImage(url, fileName(made.length - 1));
+  }
+
+  // 전시관 이모티콘 창고(저장소 emoticons/ 폴더)에 올리기
+  async function uploadToStore() {
+    if (!charCutter.cut) return;
+    let token = '';
+    try { token = localStorage.getItem('gh_art_token') || ''; } catch (e) {}
+    if (!token) {
+      token = (prompt('GitHub 토큰을 넣어 주세요. (작품 등록 스튜디오와 같은 토큰)') || '').trim();
+      if (!token) return;
+      try { localStorage.setItem('gh_art_token', token); } catch (e) {}
+    }
+    if (!confirm('이 이모티콘을 전시관 창고에 올릴까요?\n누구나 받아 갈 수 있게 돼요.')) return;
+    render(true);
+    const url = pv.toDataURL('image/png');
+    render();
+    const d = new Date(), p2 = n => String(n).padStart(2, '0');
+    const name = `${d.getFullYear()}${p2(d.getMonth() + 1)}${p2(d.getDate())}_${p2(d.getHours())}${p2(d.getMinutes())}${p2(d.getSeconds())}.png`;
+    const btn = document.getElementById('storeBtn'), msg = document.getElementById('storeMsg');
+    btn.disabled = true; btn.innerText = '창고에 올리는 중…';
+    try {
+      const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/emoticons/${name}`, {
+        method: 'PUT',
+        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github+json' },
+        body: JSON.stringify({ message: `Add emoticon ${name}`, content: url.split(',')[1] })
+      });
+      if (!res.ok) {
+        const why = { 401: '토큰이 맞지 않거나 만료됐어요.', 403: '토큰에 저장소 쓰기 권한이 없어요.', 404: '저장소를 찾지 못했어요.' }[res.status] || '잠시 뒤 다시 시도해 주세요.';
+        if (res.status === 401) { try { localStorage.removeItem('gh_art_token'); } catch (e) {} }
+        throw new Error(`(${res.status}) ${why}`);
+      }
+      msg.style.color = '#10b981';
+      msg.innerText = '📦 창고에 올렸어요! 1~2분 뒤 전시관 "이모티콘 창고"에 나타나요.';
+    } catch (e) {
+      msg.style.color = '#ef4444';
+      msg.innerText = '창고에 올리지 못했어요. ' + e.message;
+    } finally {
+      btn.disabled = false; btn.innerText = '📦 전시관 이모티콘 창고에 올리기';
+    }
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    made.forEach((url, i) => {
+      const it = document.createElement('div');
+      it.className = 'item';
+      it.innerHTML = `<img src="${url}" alt="이모티콘 ${i + 1}"><span class="no">${i + 1}</span><button class="del" aria-label="지우기">✕</button>`;
+      it.onclick = () => saveImage(url, fileName(i));
+      it.querySelector('.del').onclick = (e) => {
+        e.stopPropagation();
+        if (confirm(`${i + 1}번 이모티콘을 목록에서 지울까요?`)) { made.splice(i, 1); renderGrid(); }
+      };
+      grid.appendChild(it);
+    });
+    document.getElementById('emptyMsg').style.display = made.length ? 'none' : 'block';
+    document.getElementById('count').innerText = `만든 이모티콘 ${made.length} / 32` + (made.length >= 32 ? ' 🎉 한 세트 완성!' : '');
+  }
+  renderGrid();
+  toggleArtPick();   // 페이지를 열면 도록 작품 목록이 바로 보이게
+</script>
 </body>
 </html>
