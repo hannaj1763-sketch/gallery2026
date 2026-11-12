@@ -130,6 +130,23 @@
     .lang-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
     .note-content { font-size: 14px; color: #e2e8f0; line-height: 1.6; max-width: 720px; margin: 0 auto; text-align: center; }
 
+    /* 이모티콘 창고 */
+    #view-store { max-width: 900px; margin: 0 auto; padding: 28px 16px 40px; }
+    .store-note { font-size: 13px; color: #9daec2; margin-top: 8px; line-height: 1.6; }
+    .store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; margin-top: 18px; }
+    .store-item { position: relative; background: #fff; border-radius: 12px; aspect-ratio: 1; overflow: hidden; cursor: pointer; transition: transform 0.15s; }
+    .store-item:hover { transform: translateY(-3px); }
+    .store-item img { width: 100%; height: 100%; display: block; }
+    .store-msg { color: #8a99ad; font-size: 14px; text-align: center; padding: 40px 0; }
+    .store-modal { display: none; position: fixed; inset: 0; z-index: 120; background: rgba(8,10,14,0.88); align-items: center; justify-content: center; padding: 20px; }
+    .store-modal.active { display: flex; }
+    .store-box { background: #161a22; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 18px; width: 100%; max-width: 340px; text-align: center; }
+    .store-box .pic { width: 240px; height: 240px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; }
+    .store-box .pic img { width: 100%; height: 100%; display: block; }
+    .store-save { width: 100%; margin-top: 14px; background: #3b82f6; color: #fff; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .store-save:disabled { background: #374151; color: #9ca3af; }
+    .store-close { margin-top: 8px; background: none; border: none; color: #8a99ad; font-size: 13px; cursor: pointer; padding: 6px; }
+
     /* 숏폼 디스플레이 */
     #view-shorts { height: calc(100vh - 65px); overflow: hidden; background: #07080b; }
     .shorts-wrap { height: 100%; display: flex; align-items: center; justify-content: center; }
@@ -149,7 +166,12 @@
       .lbl-short { display: inline; }
       .header-note { display: none; }
       .nav-tabs { gap: 6px; }
-      .tab-btn { padding: 7px 11px; font-size: 12px; }
+      .tab-btn { padding: 7px 10px; font-size: 12px; }
+    }
+    @media (max-width: 440px) {
+      header > div:first-child { display: none; }   /* 좁은 휴대폰에서는 메뉴 5개가 한 줄에 들어가도록 제목 숨김 */
+      header { justify-content: center; }
+      .nav-tabs { gap: 5px; }
     }
 
     #loadingText { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #8a99ad; font-size: 14px; z-index: 200; pointer-events: none; }
@@ -162,9 +184,10 @@
   <header>
     <div style="font-weight: 700; font-size: 16px; letter-spacing: -0.5px;">Atelier Archive</div>
     <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchView('3d')"><span class="lbl-long">3D 세로 아틀리에</span><span class="lbl-short">3D 아틀리에</span></button>
+      <button class="tab-btn active" onclick="switchView('3d')"><span class="lbl-long">3D 세로 아틀리에</span><span class="lbl-short">3D</span></button>
       <button class="tab-btn" onclick="switchView('archive')"><span class="lbl-long">도록 (연대기)</span><span class="lbl-short">도록</span></button>
       <button class="tab-btn" onclick="switchView('shorts')">숏폼</button>
+      <button class="tab-btn" onclick="switchView('store')"><span class="lbl-long">📦 이모티콘 창고</span><span class="lbl-short">📦 창고</span></button>
       <a class="tab-btn studio-tab" href="emoticon.html"><span class="lbl-long">🎨 이모티콘 공방</span><span class="lbl-short">🎨 공방</span></a>
     </div>
     <div class="header-note" style="font-size:12px; color:#8a99ad;">대형 액자 모드 활성</div>
@@ -196,6 +219,23 @@
   <div id="view-archive" class="view-container">
     <h2 style="font-size: 20px; font-weight: 600;">작품 도록 & 아카이브</h2>
     <div id="artGrid" class="gallery-grid"></div>
+  </div>
+
+  <!-- 이모티콘 창고: 공방에서 올린 이모티콘을 누구나 받아 가기 -->
+  <div id="view-store" class="view-container">
+    <h2 style="font-size: 20px; font-weight: 600;">📦 예성이 이모티콘 창고</h2>
+    <div class="store-note">마음에 드는 이모티콘을 눌러 저장한 뒤 카카오톡 대화에서 사진처럼 보내 보세요.<br>개인 대화용으로 자유롭게 쓸 수 있어요. 상업적 이용과 재배포는 할 수 없어요. © J.J</div>
+    <div id="storeGrid" class="store-grid"></div>
+    <div id="storeMsg" class="store-msg">이모티콘을 불러오는 중…</div>
+  </div>
+
+  <div id="storeModal" class="store-modal" onclick="if (event.target === this) closeStore()">
+    <div class="store-box">
+      <div class="pic"><img id="storeImg" src="" alt="이모티콘"></div>
+      <button id="storeSaveBtn" class="store-save" onclick="saveStoreItem()">저장하기</button>
+      <div id="storeHint" class="store-note" style="font-size:12px"></div>
+      <button class="store-close" onclick="closeStore()">닫기</button>
+    </div>
   </div>
 
   <!-- 다국어 + 리액션 + 무드 배경 모달 -->
@@ -418,6 +458,10 @@
       } else if (mode === 'shorts') {
         document.querySelectorAll('.tab-btn')[2].classList.add('active');
         document.getElementById('view-shorts').classList.add('active');
+      } else if (mode === 'store') {
+        document.querySelectorAll('.tab-btn')[3].classList.add('active');
+        document.getElementById('view-store').classList.add('active');
+        loadStore();
       } else {
         document.querySelectorAll('.tab-btn')[1].classList.add('active');
         document.getElementById('view-archive').classList.add('active');
@@ -806,6 +850,71 @@
         renderer.setSize(container.clientWidth, container.clientHeight);
       });
     }
+
+    // ===== 이모티콘 창고 =====
+    // 공방에서 "창고에 올리기"를 누르면 저장소 emoticons/ 폴더에 들어가고, 여기에 자동으로 보여요.
+    const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+                           (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform));
+    let storeLoaded = false, storeFile = null;
+
+    async function loadStore() {
+      if (storeLoaded) return;
+      const msg = document.getElementById('storeMsg');
+      try {
+        const { branch, tree } = await fetchRepoTree();
+        const items = tree
+          .filter(t => t.type === 'blob' && /^emoticons\/[^/]+\.png$/i.test(t.path))
+          .map(t => t.path)
+          .sort().reverse();   // 최근에 올린 것부터
+        const grid = document.getElementById('storeGrid');
+        grid.innerHTML = '';
+        items.forEach(path => {
+          const src = rawUrl(branch, path);
+          const div = document.createElement('div');
+          div.className = 'store-item';
+          div.innerHTML = `<img src="${src}" alt="이모티콘" loading="lazy">`;
+          div.onclick = () => openStore(src, path.split('/').pop());
+          grid.appendChild(div);
+        });
+        msg.style.display = items.length ? 'none' : 'block';
+        if (!items.length) msg.innerText = '아직 창고에 이모티콘이 없어요. 곧 채워질 거예요!';
+        storeLoaded = true;
+      } catch (e) {
+        msg.innerText = '이모티콘을 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.';
+      }
+    }
+
+    // 크게 보여 주면서 미리 파일을 받아 둠 (휴대폰 공유창이 바로 뜨게)
+    async function openStore(src, name) {
+      storeFile = null;
+      document.getElementById('storeImg').src = src;
+      document.getElementById('storeModal').classList.add('active');
+      const btn = document.getElementById('storeSaveBtn');
+      btn.disabled = true; btn.innerText = '준비 중…';
+      document.getElementById('storeHint').innerText = isMobileDevice
+        ? '저장을 누르고 "이미지 저장"을 고르면 사진첩에 들어가요.'
+        : '누르면 PNG 파일로 내려받아져요.';
+      try {
+        const blob = await (await fetch(src)).blob();
+        storeFile = new File([blob], `yesung_${name}`, { type: 'image/png' });
+        btn.disabled = false; btn.innerText = '저장하기';
+      } catch (e) {
+        btn.innerText = '불러오지 못했어요';
+      }
+    }
+    async function saveStoreItem() {
+      if (!storeFile) return;
+      if (isMobileDevice && navigator.canShare && navigator.canShare({ files: [storeFile] })) {
+        try { await navigator.share({ files: [storeFile] }); return; }
+        catch (e) { if (e.name === 'AbortError') return; }
+      }
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(storeFile);
+      a.download = storeFile.name;
+      document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 3000);
+    }
+    function closeStore() { document.getElementById('storeModal').classList.remove('active'); }
 
     // ===== 숏폼 디스플레이 =====
     // 전시관과 같은 작품 목록(artworks)을 쓰기 때문에, 작품을 새로 올리면 숏폼에도 자동으로 들어가요.
