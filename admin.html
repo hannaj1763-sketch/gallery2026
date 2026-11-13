@@ -14,12 +14,16 @@
     input[type="text"], input[type="password"], textarea, select { width: 100%; background: #0b0d11; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 12px; border-radius: 10px; font-size: 14px; outline: none; }
     input:focus, textarea:focus { border-color: #3b82f6; }
     .file-drop { border: 2px dashed rgba(59,130,246,0.4); background: rgba(59,130,246,0.03); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; }
-    .preview-img { width: 100%; max-height: 220px; object-fit: contain; margin-top: 10px; border-radius: 8px; display: none; }
     .btn-submit { width: 100%; background: #3b82f6; color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 10px; }
     .btn-submit:disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
     .status-msg { margin-top: 15px; font-size: 13px; text-align: center; min-height: 20px; white-space: pre-line; }
     .hint { font-size: 12px; color: #6b7a8f; margin-top: 6px; }
     .link-btn { background: none; border: none; color: #8a99ad; font-size: 12px; text-decoration: underline; cursor: pointer; margin-top: 6px; padding: 4px 0; }
+    .editor { display: none; margin-top: 12px; }
+    .editor canvas { display: block; width: 100%; border-radius: 10px; background: #0b0d11; touch-action: none; }
+    .tool-row { display: flex; gap: 8px; margin-top: 10px; }
+    .tool-btn { flex: 1; background: #232a36; color: #e5e9f0; border: 1px solid rgba(255,255,255,0.12); padding: 10px 4px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .tool-btn:active { background: #2f3a4b; }
     .gallery-link { display: block; text-align: center; margin-top: 14px; color: #8a99ad; font-size: 13px; }
   </style>
 </head>
@@ -40,7 +44,16 @@
     <div class="file-drop" onclick="document.getElementById('artFile').click()">
       <span id="fileLabel">📷 여기를 눌러 사진을 선택하세요</span>
       <input type="file" id="artFile" accept="image/*" style="display:none" onchange="handleFile(event)">
-      <img id="preview" class="preview-img" alt="미리보기">
+    </div>
+    <!-- [추가] 사진 돌리기·자르기 -->
+    <div class="editor" id="editor">
+      <canvas id="editCanvas"></canvas>
+      <div class="tool-row">
+        <button type="button" class="tool-btn" onclick="rotateBy(-90)">↺ 왼쪽으로</button>
+        <button type="button" class="tool-btn" onclick="rotateBy(90)">↻ 오른쪽으로</button>
+        <button type="button" class="tool-btn" onclick="resetCrop()">⤢ 자르기 취소</button>
+      </div>
+      <div class="hint">네 모서리의 동그라미를 끌어서 자를 곳을 정하세요. 네모 안을 끌면 위치가 옮겨져요.</div>
     </div>
     <div class="hint" id="sizeHint"></div>
   </div>
@@ -77,8 +90,6 @@
   const JPEG_QUALITY = 0.86;
   const GALLERY_CACHE_KEY = 'atelier_artworks_v2';  // 전시관이 작품 목록을 10분간 기억하는 저장 이름
 
-  let selectedBase64 = null;
-  let fileExt = 'jpg';
 
   // 오늘 연월을 기본값으로
   function thisMonth() {
@@ -103,50 +114,183 @@
     alert('이 기기에 저장된 토큰을 지웠어요.');
   }
 
-  // [개선] 사진을 1600px JPG로 줄이기. 줄이지 못하는 형식이면 원본 그대로 사용
-  function shrinkImage(dataUrl) {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        const w = img.naturalWidth, h = img.naturalHeight;
-        const s = Math.min(1, MAX_SIDE / Math.max(w, h));
-        const c = document.createElement('canvas');
-        c.width = Math.round(w * s);
-        c.height = Math.round(h * s);
-        const ctx = c.getContext('2d');
-        ctx.fillStyle = '#ffffff';            // 투명 PNG도 흰 종이 배경으로
-        ctx.fillRect(0, 0, c.width, c.height);
-        ctx.drawImage(img, 0, 0, c.width, c.height);
-        resolve({ dataUrl: c.toDataURL('image/jpeg', JPEG_QUALITY), ext: 'jpg', w: c.width, h: c.height });
-      };
-      img.onerror = () => resolve(null);
-      img.src = dataUrl;
+  // ===== [추가] 사진 돌리기·자르기 =====
+  let srcImg = null;            // 원본 사진
+  let rot = 0;                  // 돌린 각도 0, 90, 180, 270
+  let crop = { x: 0, y: 0, w: 1, h: 1 };   // 돌린 사진 기준 자를 영역 (0~1 비율)
+  let drag = null;
+  const MIN_CROP = 0.08;
+
+  const rotW = () => (rot % 180 === 0 ? srcImg.naturalWidth : srcImg.naturalHeight);
+  const rotH = () => (rot % 180 === 0 ? srcImg.naturalHeight : srcImg.naturalWidth);
+
+  // 사진을 돌린 상태로 그리기 (scale: 화면 크기에 맞춘 배율)
+  function drawRotated(ctx, scale) {
+    const W = srcImg.naturalWidth, H = srcImg.naturalHeight;
+    ctx.save();
+    ctx.scale(scale, scale);
+    if (rot === 90) { ctx.translate(H, 0); ctx.rotate(Math.PI / 2); }
+    else if (rot === 180) { ctx.translate(W, H); ctx.rotate(Math.PI); }
+    else if (rot === 270) { ctx.translate(0, W); ctx.rotate(-Math.PI / 2); }
+    ctx.drawImage(srcImg, 0, 0);
+    ctx.restore();
+  }
+
+  // 편집 화면 그리기
+  function drawEditor() {
+    if (!srcImg) return;
+    const cv = document.getElementById('editCanvas');
+    const boxW = cv.parentElement.clientWidth;
+    const maxH = Math.round(window.innerHeight * 0.6);
+    const s = Math.min(boxW / rotW(), maxH / rotH());
+    const dpr = window.devicePixelRatio || 1;
+    const cw = Math.round(rotW() * s), ch = Math.round(rotH() * s);
+    cv.style.width = cw + 'px'; cv.style.height = ch + 'px'; cv.style.margin = '0 auto';
+    cv.width = Math.round(cw * dpr); cv.height = Math.round(ch * dpr);
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawRotated(ctx, s);
+    // 잘려 나갈 부분은 어둡게
+    const x = crop.x * cw, y = crop.y * ch, w = crop.w * cw, h = crop.h * ch;
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    ctx.fillRect(0, 0, cw, y);
+    ctx.fillRect(0, y + h, cw, ch - y - h);
+    ctx.fillRect(0, y, x, h);
+    ctx.fillRect(x + w, y, cw - x - w, h);
+    // 테두리와 3등분 선
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.strokeRect(x, y, w, h);
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = 1; i < 3; i++) {
+      ctx.moveTo(x + w * i / 3, y); ctx.lineTo(x + w * i / 3, y + h);
+      ctx.moveTo(x, y + h * i / 3); ctx.lineTo(x + w, y + h * i / 3);
+    }
+    ctx.stroke();
+    // 모서리 손잡이
+    ctx.fillStyle = '#3b82f6'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+    [[x, y], [x + w, y], [x, y + h], [x + w, y + h]].forEach(([px, py]) => {
+      ctx.beginPath(); ctx.arc(px, py, 9, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     });
+  }
+
+  // 손가락 위치 → 0~1 비율
+  function pointerPos(e) {
+    const r = document.getElementById('editCanvas').getBoundingClientRect();
+    return { px: e.clientX - r.left, py: e.clientY - r.top, u: (e.clientX - r.left) / r.width, v: (e.clientY - r.top) / r.height, W: r.width, H: r.height };
+  }
+
+  function onDown(e) {
+    if (!srcImg) return;
+    const p = pointerPos(e);
+    const corners = { tl: [crop.x, crop.y], tr: [crop.x + crop.w, crop.y], bl: [crop.x, crop.y + crop.h], br: [crop.x + crop.w, crop.y + crop.h] };
+    let hit = null, best = 30;   // 손가락으로 잡기 쉽게 30px 안이면 모서리로 인정
+    for (const k in corners) {
+      const d = Math.hypot(corners[k][0] * p.W - p.px, corners[k][1] * p.H - p.py);
+      if (d < best) { best = d; hit = k; }
+    }
+    if (!hit && p.u > crop.x && p.u < crop.x + crop.w && p.v > crop.y && p.v < crop.y + crop.h) hit = 'move';
+    if (!hit) return;
+    drag = { mode: hit, u: p.u, v: p.v, start: { ...crop } };
+    e.target.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  }
+
+  function onMove(e) {
+    if (!drag) return;
+    const p = pointerPos(e);
+    const du = p.u - drag.u, dv = p.v - drag.v, s0 = drag.start;
+    const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+    let x0 = s0.x, y0 = s0.y, x1 = s0.x + s0.w, y1 = s0.y + s0.h;
+    if (drag.mode === 'move') {
+      const nx = clamp(s0.x + du, 0, 1 - s0.w), ny = clamp(s0.y + dv, 0, 1 - s0.h);
+      crop = { x: nx, y: ny, w: s0.w, h: s0.h };
+    } else {
+      if (drag.mode[1] === 'l') x0 = clamp(s0.x + du, 0, x1 - MIN_CROP);
+      if (drag.mode[1] === 'r') x1 = clamp(x1 + du, x0 + MIN_CROP, 1);
+      if (drag.mode[0] === 't') y0 = clamp(s0.y + dv, 0, y1 - MIN_CROP);
+      if (drag.mode[0] === 'b') y1 = clamp(y1 + dv, y0 + MIN_CROP, 1);
+      crop = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+    }
+    drawEditor();
+  }
+
+  function onUp() {
+    if (!drag) return;
+    drag = null;
+    updateSizeHint();
+  }
+
+  // 90도씩 돌리기 (자를 영역도 같이 돌아감)
+  function rotateBy(deg) {
+    if (!srcImg) return;
+    const c = crop;
+    if (deg === 90) crop = { x: 1 - (c.y + c.h), y: c.x, w: c.h, h: c.w };
+    else crop = { x: c.y, y: 1 - (c.x + c.w), w: c.h, h: c.w };
+    rot = (rot + deg + 360) % 360;
+    drawEditor();
+    updateSizeHint();
+  }
+
+  function resetCrop() {
+    crop = { x: 0, y: 0, w: 1, h: 1 };
+    drawEditor();
+    updateSizeHint();
+  }
+
+  // 돌리고 자른 결과를 긴 변 1600px JPG로 만들기
+  function renderFinal() {
+    const cx = crop.x * rotW(), cy = crop.y * rotH();
+    const cw = crop.w * rotW(), chh = crop.h * rotH();
+    const s = Math.min(1, MAX_SIDE / Math.max(cw, chh));
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(cw * s));
+    c.height = Math.max(1, Math.round(chh * s));
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#ffffff';            // 투명 PNG도 흰 종이 배경으로
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.translate(-cx * s, -cy * s);
+    drawRotated(ctx, s);
+    return { dataUrl: c.toDataURL('image/jpeg', JPEG_QUALITY), w: c.width, h: c.height };
+  }
+
+  let originalKB = 0;
+  function updateSizeHint() {
+    const hint = document.getElementById('sizeHint');
+    if (!srcImg) { hint.innerText = ''; return; }
+    const w = Math.round(crop.w * rotW()), h = Math.round(crop.h * rotH());
+    const s = Math.min(1, MAX_SIDE / Math.max(w, h));
+    hint.innerText = `올릴 크기: ${Math.round(w * s)}×${Math.round(h * s)}px (원본 ${originalKB}KB)`;
   }
 
   function handleFile(e) {
     const file = e.target.files[0];
     if (!file) return;
-    document.getElementById('fileLabel').innerText = `선택 완료: ${file.name}`;
-    const hint = document.getElementById('sizeHint');
-    hint.innerText = '사진 크기를 줄이는 중...';
-
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const original = event.target.result;
-      const small = await shrinkImage(original);
-      const finalUrl = small ? small.dataUrl : original;
-      fileExt = small ? small.ext : ((file.name.split('.').pop() || 'jpg').toLowerCase());
-      document.getElementById('preview').src = finalUrl;
-      document.getElementById('preview').style.display = 'block';
-      selectedBase64 = finalUrl.split(',')[1];   // base64 본문만 추출
-      const kb = Math.round(selectedBase64.length * 3 / 4 / 1024);
-      hint.innerText = small
-        ? `올릴 크기: ${small.w}×${small.h}px, 약 ${kb}KB (원본 ${Math.round(file.size / 1024)}KB)`
-        : `이 형식은 줄이지 못해 원본 그대로 올려요 (약 ${kb}KB)`;
+    document.getElementById('fileLabel').innerText = `선택 완료: ${file.name} (다시 누르면 다른 사진 선택)`;
+    originalKB = Math.round(file.size / 1024);
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      srcImg = img; rot = 0; crop = { x: 0, y: 0, w: 1, h: 1 };
+      document.getElementById('editor').style.display = 'block';
+      drawEditor();
+      updateSizeHint();
     };
-    reader.readAsDataURL(file);
+    img.onerror = () => {
+      srcImg = null;
+      document.getElementById('editor').style.display = 'none';
+      document.getElementById('sizeHint').innerText = '이 사진 형식은 열 수 없어요. 다른 사진(JPG/PNG)을 골라 주세요.';
+    };
+    img.src = url;
   }
+
+  (function setupEditor() {
+    const cv = document.getElementById('editCanvas');
+    cv.addEventListener('pointerdown', onDown);
+    cv.addEventListener('pointermove', onMove);
+    cv.addEventListener('pointerup', onUp);
+    cv.addEventListener('pointercancel', onUp);
+    window.addEventListener('resize', drawEditor);
+  })();
 
   // GitHub 응답을 이해하기 쉬운 말로
   async function explainError(res, step) {
@@ -178,7 +322,7 @@
     const noteKo = document.getElementById('artNoteKo').value.trim();
 
     if (!token) return alert('GitHub 토큰을 입력해 주세요.');
-    if (!selectedBase64) return alert('그림 사진을 선택해 주세요.');
+    if (!srcImg) return alert('그림 사진을 선택해 주세요.');
     if (!title) return alert('작품 제목을 입력해 주세요.');
     // [개선] 2026.11, 2026-1 같은 입력도 2026-11, 2026-01로 맞춤 (전시 순서가 날짜로 정해지기 때문)
     const m = date.match(/^(\d{4})\D*(\d{1,2})$/);
@@ -186,6 +330,9 @@
     date = `${m[1]}-${m[2].padStart(2, '0')}`;
 
     localStorage.setItem('gh_art_token', token);
+    const finalImg = renderFinal();                 // [추가] 돌리고 자른 그림으로 올림
+    const selectedBase64 = finalImg.dataUrl.split(',')[1];
+    const fileExt = 'jpg';
 
     const btn = document.getElementById('submitBtn');
     const msg = document.getElementById('statusMsg');
@@ -214,7 +361,7 @@
       const noteData = {
         title: title,
         date: date,
-        meta: meta || `종이 위 원화 | ${date}`,
+        meta: meta || date,
         notes: {
           ko: noteKo || "작품 설명이 등록되었습니다.",
           en: `Artwork: ${title}. Created by artist Yesung Jang.`,
@@ -240,10 +387,10 @@
       document.getElementById('artMeta').value = '';
       document.getElementById('artNoteKo').value = '';
       document.getElementById('artFile').value = '';
-      document.getElementById('preview').style.display = 'none';
+      document.getElementById('editor').style.display = 'none';
       document.getElementById('fileLabel').innerText = '📷 여기를 눌러 사진을 선택하세요';
       document.getElementById('sizeHint').innerText = '';
-      selectedBase64 = null;
+      srcImg = null;
 
     } catch (err) {
       msg.style.color = '#ef4444';
