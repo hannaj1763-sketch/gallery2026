@@ -395,10 +395,20 @@
   function fetchTree() {
     if (!treePromise) {
       treePromise = (async () => {
-        for (const branch of ['main', 'master']) {
-          const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${branch}?recursive=1`);
-          if (res.ok) return { branch, tree: (await res.json()).tree || [] };
-        }
+        try {
+          const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/git/trees/main?recursive=1`);
+          if (res.ok) return { branch: 'main', tree: (await res.json()).tree || [] };
+        } catch (e) {}
+        // GitHub 목록 API는 같은 인터넷(집 와이파이 등)에서 1시간에 60번까지만 돼요.
+        // 막히면 jsDelivr 목록으로 대신 받아요.
+        try {
+          const r = await fetch(`https://data.jsdelivr.com/v1/packages/gh/${OWNER}/${REPO}@main?structure=flat`);
+          if (r.ok) {
+            const d = await r.json();
+            const tree = (d.files || []).map(f => ({ path: String(f.name).replace(/^\//, ''), type: 'blob' }));
+            if (tree.length) return { branch: 'main', tree };
+          }
+        } catch (e) {}
         throw new Error('목록을 불러오지 못했어요');
       })();
       treePromise.catch(() => { treePromise = null; });
