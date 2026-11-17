@@ -191,6 +191,18 @@
 </div>
 
 <script>
+  // [앱] 앱이 처음 화면을 열 때 저장·광고 기능(AtelierApp)이 아직 연결 안 됐으면 한 번만 새로고침
+    (function () {
+      try {
+        const cap = window.Capacitor;
+        const native = cap && (cap.isNativePlatform ? cap.isNativePlatform() : cap.platform === 'android');
+        if (native && !window.AtelierApp && !sessionStorage.getItem('agjj_reload_once')) {
+          sessionStorage.setItem('agjj_reload_once', '1');
+          location.reload();
+        }
+      } catch (e) {}
+    })();
+
   const OUT = 360;           // 카카오 이모티콘 크기
   const WORK_MAX = 1800;     // 처리할 그림 최대 크기(긴 변)
   const SIGN = '© J.J';      // 저작권 서명
