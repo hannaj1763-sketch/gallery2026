@@ -174,6 +174,42 @@
       .nav-tabs { gap: 5px; }
     }
 
+    /* ===== 입장권·소장함 (AGJJ) ===== */
+    .visit-bar { position: fixed; left: 12px; top: 74px; z-index: 60; display: flex; gap: 6px; flex-wrap: wrap; max-width: calc(100vw - 150px); }
+    .visit-pill { background: rgba(0,0,0,0.62); color: #f0f2f5; border: 1px solid rgba(255,255,255,0.2); padding: 7px 12px; border-radius: 18px; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); white-space: nowrap; }
+    .visit-pill.enter { background: #f59e0b; border-color: #f59e0b; color: #1a1a1a; }
+    .visit-pill.live { background: rgba(16,94,60,0.85); border-color: #34d399; }
+    .visit-pill.info { cursor: default; font-weight: 500; color: #cbd5e1; }
+    .visit-pill.exit { background: rgba(127,29,29,0.85); border-color: #f87171; }
+    .tk-modal { display: none; position: fixed; inset: 0; z-index: 130; background: rgba(8,10,14,0.88); align-items: center; justify-content: center; padding: 20px; }
+    .tk-modal.active { display: flex; }
+    .tk-box { background: #161a22; border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; padding: 22px 20px; width: 100%; max-width: 360px; text-align: center; }
+    .tk-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .tk-sub { font-size: 13px; color: #94a3b8; margin-bottom: 14px; line-height: 1.5; }
+    .tk-rules { text-align: left; font-size: 13px; color: #cbd5e1; background: #0f1218; border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; line-height: 1.7; }
+    .tk-btn { width: 100%; background: #f59e0b; color: #1a1a1a; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .tk-btn.blue { background: #3b82f6; color: #fff; }
+    .tk-btn.red { background: #b91c1c; color: #fff; }
+    .tk-btn:disabled { background: #374151; color: #9ca3af; }
+    .tk-cancel { margin-top: 8px; background: none; border: none; color: #8a99ad; font-size: 13px; cursor: pointer; padding: 6px; }
+    .ex-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 6px; max-height: 52vh; overflow-y: auto; }
+    .ex-item { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; background: #0f1218; border: 1px solid rgba(245,158,11,0.45); color: #f0f2f5; border-radius: 12px; padding: 11px 14px; cursor: pointer; }
+    .ex-item .ex-name { font-size: 14px; font-weight: 700; }
+    .ex-item .ex-meta { font-size: 12px; color: #fbbf24; }
+    .ex-item.done { border-color: rgba(255,255,255,0.1); opacity: 0.55; }
+    .ex-item.done .ex-meta { color: #94a3b8; }
+    .collect-btn { display: none; margin: 0 auto 12px; background: #be185d; color: #fff; border: none; padding: 10px 18px; border-radius: 20px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .collect-btn.done { background: #374151; color: #fbcfe8; }
+    #view-box { max-width: 1200px; margin: 0 auto; padding: 104px 20px 32px; }
+    body.has-visit #view-archive, body.has-visit #view-store { padding-top: 96px; }
+    .box-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin-top: 18px; }
+    .box-card { background: #1b2029; border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,0.06); }
+    .box-card .thumb { position: relative; aspect-ratio: 1 / 1; background: #0f1218; }
+    .box-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .box-card .t { padding: 8px 10px; font-size: 13px; font-weight: 600; }
+    .box-card.empty { display: flex; align-items: center; justify-content: center; aspect-ratio: 1 / 1; color: #64748b; font-size: 13px; border: 2px dashed #334155; background: none; }
+    .box-view-img { max-width: 100%; max-height: 52vh; display: block; margin: 0 auto 10px; border-radius: 8px; }
+
     #loadingText { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #8a99ad; font-size: 14px; z-index: 200; pointer-events: none; }
   </style>
 </head>
@@ -192,6 +228,91 @@
     </div>
     <div class="header-note" style="font-size:12px; color:#8a99ad;">대형 액자 모드 활성</div>
   </header>
+
+  <!-- 입장권 상태 줄 (AGJJ) -->
+  <div class="visit-bar" id="visitBar"></div>
+
+  <!-- 갤러리 입장권 (앱을 열 때, 하루 동안 자유 입장) -->
+  <div id="gateModal" class="tk-modal" style="background:#0b0d12; z-index:140">
+    <div class="tk-box">
+      <div style="font-size:40px; margin-bottom:6px">🖼️</div>
+      <div class="tk-title">AGJJ 아그짜에 오신 걸 환영해요</div>
+      <div class="tk-sub">Art Gallery of Jane Jang<br>작가 J.J(장예성)의 그림 갤러리예요.</div>
+      <div class="tk-rules">· 광고를 끝까지 보면 <b>오늘 하루</b> 갤러리에 자유롭게 들어올 수 있어요.<br>· 특별전은 갤러리 안에서 전시마다 입장권이 따로 필요해요.</div>
+      <button class="tk-btn" id="gateGo" onclick="enterGalleryWithAd()">▶ 광고 보고 갤러리 입장</button>
+      <div class="tk-sub" id="gateMsg" style="margin:10px 0 0"></div>
+    </div>
+  </div>
+
+  <!-- 특별전 목록 -->
+  <div id="exListModal" class="tk-modal" onclick="if (event.target === this) closeModal('exListModal')">
+    <div class="tk-box">
+      <div class="tk-title">🎟 특별전</div>
+      <div class="tk-sub">특별전은 언제든 열려 있어요. 전시마다 입장권 1장이 필요하고,<br>한 번 퇴장한 전시는 다시 볼 수 없어요.</div>
+      <div id="exList" class="ex-list"></div>
+      <button class="tk-cancel" onclick="closeModal('exListModal')">닫기</button>
+    </div>
+  </div>
+
+  <!-- 입장 안내 -->
+  <div id="tkModal" class="tk-modal">
+    <div class="tk-box">
+      <div class="tk-title" id="tkTitle">특별전</div>
+      <div class="tk-sub" id="tkSub"></div>
+      <div class="tk-rules" id="tkRules"></div>
+      <button class="tk-btn" id="tkGo" onclick="enterWithAd()">▶ 광고 보고 입장하기</button>
+      <button class="tk-cancel" onclick="closeModal('tkModal')">다음에 볼게요</button>
+    </div>
+  </div>
+
+  <!-- 퇴장 확인 -->
+  <div id="exitModal" class="tk-modal">
+    <div class="tk-box">
+      <div class="tk-title">퇴장할까요?</div>
+      <div class="tk-sub">퇴장하면 이 특별전은 <b>다시 볼 수 없어요.</b><br>마음에 든 작품은 ♡ 소장하기로 남겨 두셨나요?</div>
+      <button class="tk-btn red" onclick="exitExhibition()">퇴장하기</button>
+      <button class="tk-cancel" onclick="closeModal('exitModal')">계속 볼게요</button>
+    </div>
+  </div>
+
+  <!-- 소장함이 가득 찼을 때 -->
+  <div id="slotModal" class="tk-modal">
+    <div class="tk-box">
+      <div class="tk-title">소장함이 가득 찼어요</div>
+      <div class="tk-sub" id="slotSub"></div>
+      <button class="tk-btn" onclick="addSlotWithAd()">▶ 광고 보고 1칸 늘리기</button>
+      <button class="tk-cancel" onclick="closeModal('slotModal')">닫기</button>
+    </div>
+  </div>
+
+  <!-- 알림 (입장 완료 등) -->
+  <div id="msgModal" class="tk-modal">
+    <div class="tk-box">
+      <div class="tk-title" id="msgTitle"></div>
+      <div class="tk-sub" id="msgSub"></div>
+      <button class="tk-btn blue" id="msgBtn" onclick="closeModal('msgModal')">확인</button>
+    </div>
+  </div>
+
+  <!-- 내 소장함 -->
+  <div id="view-box" class="view-container">
+    <h2 style="font-size: 20px; font-weight: 600;">♡ 내 소장함</h2>
+    <div class="store-note" id="boxNote"></div>
+    <div id="boxGrid" class="box-grid"></div>
+  </div>
+
+  <div id="boxModal" class="tk-modal" onclick="if (event.target === this) closeModal('boxModal')">
+    <div class="tk-box" style="max-width:520px">
+      <div style="position:relative">
+        <img id="boxImg" class="box-view-img" src="" alt="소장 작품">
+        <div class="viewer-watermark">J.J</div>
+      </div>
+      <div class="tk-title" id="boxTitle"></div>
+      <div class="tk-sub" id="boxText" style="text-align:left; max-height:22vh; overflow-y:auto"></div>
+      <button class="tk-cancel" id="boxRemove" style="color:#f87171">소장함에서 빼기</button>
+      <button class="tk-cancel" onclick="closeModal('boxModal')">닫기</button>
+    </div>
+  </div>
 
   <!-- 3D 뷰 -->
   <div id="view-3d" class="view-container active">
@@ -259,6 +380,7 @@
 
     <div class="viewer-footer">
       <div id="viewerMeta" style="text-align:center; font-size:12px; color:#94a3b8; margin-bottom:10px;"></div>
+      <div style="text-align:center"><button id="collectBtn" class="collect-btn" onclick="collectCurrent()">♡ 소장하기</button></div>
       
       <div class="reaction-bar">
         <button class="reaction-btn" onclick="addReaction('heart')">❤️ 하트 <span id="cnt-heart" class="reaction-count">0</span></button>
@@ -416,6 +538,286 @@
       return [...profile, ...works];
     }
 
+
+    // =====================================================================
+    // AGJJ 입장권 · 퇴장 · 소장함
+    //  - 웹(브라우저): 무료 로비 작품만 보여요. 특별전은 앱에서만.
+    //  - 앱: 광고를 보면 입장권 1장 → 2시간 관람. 퇴장하거나 시간이 지나면 끝.
+    //        앱이 꺼져도 10분 안에 다시 열면 이어서 볼 수 있어요.
+    //        한 번 관람이 끝난 특별전은 다시 들어갈 수 없어요.
+    //  - 소장함: 무료 1칸, 광고 1번에 1칸씩 늘리기. 소장한 작품은 언제든 다시 보기.
+    //  - 전시 설정은 저장소의 exhibitions.json 에서 바꿔요.
+    // =====================================================================
+    const NativeApp = window.AtelierApp || null;
+    const IS_APP = !!NativeApp;
+    const VISIT_MS = 2 * 60 * 60 * 1000;   // 관람 시간 2시간
+    const GRACE_MS = 10 * 60 * 1000;       // 앱이 꺼져도 10분 안에는 이어서 보기
+    const FREE_SLOTS = 1;                  // 소장함 무료 칸
+    const K_TICKET = 'agjj_ticket_v1', K_VISITED = 'agjj_visited_v1', K_BOX = 'agjj_box_v1', K_PASS = 'agjj_pass_v1';
+    let EXCFG = null;                      // exhibitions.json 내용
+    let allArtworks = [];                  // 저장소의 모든 작품
+    let currentEx = null;                  // 지금(또는 곧) 열리는 특별전
+
+    function lsGet(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
+    function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+    function todayStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+    function fmtDate(s) { const [y, m, d] = s.split('-'); return `${Number(y)}.${Number(m)}.${Number(d)}`; }
+
+    async function loadExhibitions() {
+      try {
+        const r = await fetch('exhibitions.json?v=' + Math.floor(Date.now() / 300000), { cache: 'no-store' });
+        if (!r.ok) throw new Error(r.status);
+        EXCFG = await r.json();
+      } catch (e) { EXCFG = null; }     // 설정 파일이 없으면 예전처럼 모든 작품을 보여 줘요
+      if (!EXCFG) return;
+      // 특별전은 항상 열려 있어요. 입장권이 있으면 그 특별전이 '지금 관람 중인 전시'
+      const tk = lsGet(K_TICKET, null);
+      currentEx = tk ? findEx(tk.exId) : null;
+    }
+    function findEx(id) { return (EXCFG && (EXCFG.exhibitions || []).find(e => e.id === id)) || null; }
+
+    // 입장권 상태 확인 (시간 지남 / 10분 넘게 꺼져 있었음 → 관람 끝)
+    function activeTicket() {
+      const tk = lsGet(K_TICKET, null);
+      if (!tk) return null;
+      const now = Date.now();
+      if (now - tk.enteredAt > VISIT_MS || now - tk.lastSeen > GRACE_MS || !findEx(tk.exId)) {
+        finishTicket(tk);
+        return null;
+      }
+      return tk;
+    }
+    function finishTicket(tk) {
+      const v = lsGet(K_VISITED, {});
+      v[tk.exId] = Date.now();
+      lsSet(K_VISITED, v);
+      lsDel(K_TICKET);
+    }
+    function hasVisited(exId) { return !!lsGet(K_VISITED, {})[exId]; }
+    function touchTicket() {
+      const tk = lsGet(K_TICKET, null);
+      if (tk) { tk.lastSeen = Date.now(); lsSet(K_TICKET, tk); }
+    }
+
+    // 지금 볼 수 있는 작품 고르기
+    function assignedIds() {
+      const ids = new Set(EXCFG.lobby || []);
+      (EXCFG.exhibitions || []).forEach(e => (e.works || []).forEach(id => ids.add(id)));
+      return ids;
+    }
+    function visibleArtworks(list) {
+      if (!EXCFG) return list;
+      const lobby = new Set(EXCFG.lobby || []);
+      const show = new Set(lobby);
+      const tk = IS_APP ? activeTicket() : null;
+      if (tk) {
+        (findEx(tk.exId).works || []).forEach(id => show.add(id));
+        const known = assignedIds();                 // 아직 어느 전시에도 안 넣은 새 작품 = 지금 특별전의 신작
+        list.forEach(a => { if (!a.isProfile && !known.has(a.id)) show.add(a.id); });
+      }
+      return list.filter(a => a.isProfile || show.has(a.id));
+    }
+
+    // ----- 상태 줄 -----
+    function renderVisitBar() {
+      const bar = document.getElementById('visitBar');
+      const head = document.querySelector('header');
+      if (head) bar.style.top = (head.offsetHeight + 8) + 'px';
+      document.body.classList.toggle('has-visit', !!EXCFG);
+      if (!EXCFG) { bar.innerHTML = ''; return; }
+      if (!IS_APP) {
+        bar.innerHTML = `<span class="visit-pill info">무료 로비 · 특별전은 AGJJ 앱에서</span>`;
+        return;
+      }
+      const tk = activeTicket();
+      const box = lsGet(K_BOX, { slots: FREE_SLOTS, ids: [] });
+      let html = '';
+      if (tk) {
+        const left = Math.max(0, VISIT_MS - (Date.now() - tk.enteredAt));
+        const h = Math.floor(left / 3600000), m = Math.floor(left / 60000) % 60;
+        const ex = findEx(tk.exId);
+        html += `<span class="visit-pill live">🎟 ${ex.short || ex.title} · ${h}:${String(m).padStart(2, '0')} 남음</span>`;
+        html += `<button class="visit-pill exit" onclick="openModal('exitModal')">퇴장</button>`;
+      } else {
+        html += `<button class="visit-pill enter" onclick="openExList()">🎟 특별전</button>`;
+      }
+      html += `<button class="visit-pill" onclick="openBox()">♡ 소장함 ${box.ids.length}/${box.slots}</button>`;
+      bar.innerHTML = html;
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function showMsg(title, sub, onOk) {
+      document.getElementById('msgTitle').innerText = title;
+      document.getElementById('msgSub').innerHTML = sub;
+      document.getElementById('msgBtn').onclick = () => { closeModal('msgModal'); if (onOk) onOk(); };
+      openModal('msgModal');
+    }
+
+    // ----- 입장 -----
+    // 특별전 목록 (항상 열려 있음, 전시마다 입장권 1장)
+    function openExList() {
+      const list = EXCFG.exhibitions || [];
+      document.getElementById('exList').innerHTML = list.map(e => {
+        const done = hasVisited(e.id);
+        return `<button class="ex-item${done ? ' done' : ''}" onclick="closeModal('exListModal'); openTicket('${e.id}')">
+          <span class="ex-name">${e.title}</span><span class="ex-meta">작품 ${(e.works || []).length}점 · ${done ? '관람 완료' : '입장권 필요'}</span></button>`;
+      }).join('');
+      openModal('exListModal');
+    }
+
+    let pickedEx = null;
+    function openTicket(exId) {
+      const ex = findEx(exId);
+      if (!ex) return;
+      pickedEx = ex;
+      const n = (ex.works || []).length;
+      document.getElementById('tkTitle').innerText = ex.title;
+      document.getElementById('tkSub').innerHTML = `특별전 · 작품 ${n}점`;
+      const go = document.getElementById('tkGo');
+      if (hasVisited(ex.id)) {
+        document.getElementById('tkRules').innerHTML = '이미 관람을 마친 특별전이에요.<br>다른 특별전을 둘러보세요!';
+        go.disabled = true; go.innerText = '관람 완료';
+      } else {
+        document.getElementById('tkRules').innerHTML =
+          '· 광고를 끝까지 보면 입장권 1장을 받아요.<br>' +
+          '· 입장 후 <b>2시간</b> 동안 볼 수 있어요.<br>' +
+          '· <b>퇴장하면 이 전시는 다시 볼 수 없어요.</b><br>' +
+          '· 앱이 꺼져도 10분 안에 다시 열면 이어서 볼 수 있어요.<br>' +
+          '· 마음에 드는 작품은 ♡ 소장하기로 남겨 두세요.';
+        go.disabled = false; go.innerText = '▶ 광고 보고 입장하기';
+      }
+      openModal('tkModal');
+    }
+
+    // 광고 보여 주기 → 결과는 window.onAtelierAd(tag, result) 로 돌아와요
+    const adWaiters = {};
+    window.onAtelierAd = (tag, result) => { const f = adWaiters[tag]; delete adWaiters[tag]; if (f) f(result); };
+    function showAd(tag) {
+      return new Promise(resolve => {
+        if (NativeApp && NativeApp.showRewardedAd) { adWaiters[tag] = resolve; NativeApp.showRewardedAd(tag); }
+        else resolve('noad');           // 광고 기능이 없는 옛 앱: 그냥 통과
+      });
+    }
+
+    async function enterWithAd() {
+      const go = document.getElementById('tkGo');
+      go.disabled = true; go.innerText = '광고 불러오는 중…';
+      const r = await showAd('ticket');
+      if (r === 'closed') { go.disabled = false; go.innerText = '▶ 광고 보고 입장하기'; showMsg('입장권을 받지 못했어요', '광고를 끝까지 보면 입장권을 받을 수 있어요.'); return; }
+      // reward(끝까지 봄), error/noad(광고를 못 불러옴) → 입장
+      const now = Date.now();
+      lsSet(K_TICKET, { exId: pickedEx.id, enteredAt: now, lastSeen: now });
+      closeModal('tkModal');
+      showMsg('입장했어요 🎟', `${pickedEx.title}<br>2시간 동안 천천히 둘러보세요.` + (r === 'reward' ? '' : '<br><span style="color:#64748b">(광고를 불러오지 못해 바로 입장했어요)</span>'), () => location.reload());
+    }
+
+    function exitExhibition() {
+      const tk = lsGet(K_TICKET, null);
+      if (tk) finishTicket(tk);
+      closeModal('exitModal');
+      location.reload();
+    }
+
+    // 관람 중 시간 기록 + 시간이 다 되면 자동 퇴장
+    function visitTick() {
+      if (!IS_APP || !EXCFG) return;
+      const before = !!lsGet(K_TICKET, null);
+      if (before && document.visibilityState === 'visible') touchTicket();
+      const tk = activeTicket();
+      if (before && !tk) { showMsg('관람 시간이 끝났어요', '특별전 관람을 마쳤어요. 와 주셔서 고마워요!', () => location.reload()); }
+      if (NativeApp && NativeApp.setSecure) NativeApp.setSecure(!!tk);   // 관람 중에는 화면 캡처 막기
+      renderVisitBar();
+    }
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') touchTicket(); else visitTick(); });
+
+    // ----- 갤러리 입장권: 앱을 열 때 광고 1번 → 오늘 하루 자유 입장 -----
+    function hasGalleryPass() { return lsGet(K_PASS, '') === todayStr(); }
+    function checkGalleryGate() {
+      if (!IS_APP || !EXCFG) return;
+      if (hasGalleryPass() || lsGet(K_TICKET, null)) return;   // 특별전 관람 중이면 그대로
+      openModal('gateModal');
+    }
+    async function enterGalleryWithAd() {
+      const go = document.getElementById('gateGo');
+      go.disabled = true; go.innerText = '광고 불러오는 중…';
+      const r = await showAd('gallery');
+      if (r === 'closed') {
+        go.disabled = false; go.innerText = '▶ 광고 보고 갤러리 입장';
+        document.getElementById('gateMsg').innerText = '광고를 끝까지 보면 입장할 수 있어요.';
+        return;
+      }
+      lsSet(K_PASS, todayStr());
+      closeModal('gateModal');
+    }
+
+    // ----- 소장함 -----
+    function getBox() { return lsGet(K_BOX, { slots: FREE_SLOTS, ids: [] }); }
+    function updateCollectBtn() {
+      const btn = document.getElementById('collectBtn');
+      const art = artworks[currentIndex];
+      if (!IS_APP || !EXCFG || !art || art.isProfile) { btn.style.display = 'none'; return; }
+      btn.style.display = 'inline-block';
+      const has = getBox().ids.includes(art.id);
+      btn.classList.toggle('done', has);
+      btn.innerText = has ? '♥ 소장함에 있어요' : '♡ 소장하기';
+    }
+    function collectCurrent() {
+      const art = artworks[currentIndex];
+      if (!art) return;
+      const box = getBox();
+      if (box.ids.includes(art.id)) { openBox(); closeViewer(); return; }
+      if (box.ids.length >= box.slots) {
+        document.getElementById('slotSub').innerHTML = `지금 ${box.slots}칸이 모두 찼어요.<br>광고를 1번 보면 1칸이 늘어나요.`;
+        openModal('slotModal');
+        return;
+      }
+      box.ids.push(art.id); lsSet(K_BOX, box);
+      updateCollectBtn(); renderVisitBar();
+    }
+    async function addSlotWithAd() {
+      const r = await showAd('slot');
+      closeModal('slotModal');
+      if (r === 'closed') { showMsg('칸을 늘리지 못했어요', '광고를 끝까지 보면 1칸이 늘어나요.'); return; }
+      const box = getBox(); box.slots += 1; lsSet(K_BOX, box);
+      collectCurrent();
+      showMsg('소장함이 1칸 늘었어요', `이제 ${box.slots}칸이에요.`);
+    }
+    function openBox() {
+      closeViewer();
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-box').classList.add('active');
+      stopShorts();
+      renderBox();
+    }
+    function renderBox() {
+      const box = getBox();
+      const byId = Object.fromEntries(allArtworks.map(a => [a.id, a]));
+      document.getElementById('boxNote').innerHTML = `${box.ids.length} / ${box.slots}칸 · 소장한 작품은 전시가 끝나도 언제든 다시 볼 수 있어요. 감상용이며 복제·상업적 이용은 할 수 없어요. © J.J`;
+      let html = box.ids.map(id => byId[id]).filter(Boolean).map(a => `
+        <div class="box-card" onclick="openBoxItem('${a.id}')">
+          <div class="thumb"><img src="${a.src}" alt="${a.title}" loading="lazy"><div class="thumb-watermark">J.J</div></div>
+          <div class="t">${a.title}</div>
+        </div>`).join('');
+      for (let i = box.ids.length; i < box.slots; i++) html += `<div class="box-card empty">빈 칸</div>`;
+      document.getElementById('boxGrid').innerHTML = html;
+    }
+    function openBoxItem(id) {
+      const a = allArtworks.find(x => x.id === id);
+      if (!a) return;
+      document.getElementById('boxImg').src = a.src;
+      document.getElementById('boxTitle').innerText = a.title;
+      document.getElementById('boxText').innerText = (a.notes && (a.notes[currentLang] || a.notes.ko)) || '';
+      document.getElementById('boxRemove').onclick = () => {
+        const box = getBox(); box.ids = box.ids.filter(x => x !== id); lsSet(K_BOX, box);
+        closeModal('boxModal'); renderBox(); renderVisitBar();
+      };
+      openModal('boxModal');
+      if (NativeApp && NativeApp.setSecure) NativeApp.setSecure(true);
+    }
+
     async function loadArtworksFromGitHub() {
       const cached = readCache();
       if (cached && Date.now() - cached.t < CACHE_TTL) {
@@ -432,6 +834,15 @@
 
       // '종이 위 원화 |' 같은 반복 문구는 빼고 날짜 등만 보여주기
       artworks.forEach(a => { a.meta = cleanMeta(a.meta); });
+
+      // 입장권 규칙에 따라 지금 볼 수 있는 작품만 남기기
+      allArtworks = artworks;
+      await loadExhibitions();
+      artworks = visibleArtworks(allArtworks);
+      renderVisitBar();
+      visitTick();
+      checkGalleryGate();
+      setInterval(visitTick, 20000);
 
       document.getElementById('loadingText').style.display = 'none';
       renderArchive();
@@ -502,6 +913,7 @@
       
       updateReactionsDisplay();
       changeLang(currentLang);
+      updateCollectBtn();
     }
 
     function getReactions(artId) {
@@ -894,8 +1306,7 @@
       }
     }
 
-    // ===== 앱(안드로이드)에서 열렸을 때: 앱의 저장·보내기 기능 사용 =====
-    const NativeApp = window.AtelierApp || null;
+    // ===== 앱(안드로이드)에서 열렸을 때: 앱의 저장·보내기 기능 사용 (NativeApp은 위에서 정의) =====
     function blobToDataUrl(blob) {
       return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); });
     }
