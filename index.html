@@ -402,6 +402,17 @@
   </div>
 
   <script>
+    // [앱] 앱이 처음 화면을 열 때 저장·광고 기능(AtelierApp)이 아직 연결 안 됐으면 한 번만 새로고침
+    (function () {
+      try {
+        const cap = window.Capacitor;
+        const native = cap && (cap.isNativePlatform ? cap.isNativePlatform() : cap.platform === 'android');
+        if (native && !window.AtelierApp && !sessionStorage.getItem('agjj_reload_once')) {
+          sessionStorage.setItem('agjj_reload_once', '1');
+          location.reload();
+        }
+      } catch (e) {}
+    })();
     const USERNAME = 'hannaj1763-sketch';
     const REPO = 'gallery2026';
     let artworks = [];
