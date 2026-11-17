@@ -64,17 +64,20 @@
     .gp-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .gp-item span { position: absolute; left: 0; right: 0; bottom: 0; font-size: 10px; padding: 2px 4px; background: rgba(0,0,0,0.6); color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .gp-msg { font-size: 13px; color: #8a99ad; text-align: center; padding: 14px 0; }
+    .topbar { position: sticky; top: 0; z-index: 60; margin: -16px -16px 10px; padding: 10px 16px; background: rgba(15,17,21,0.94); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .topbar a { display: inline-block; color: #f0f2f5; text-decoration: none; font-size: 14px; font-weight: 700; padding: 7px 14px; border-radius: 18px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
     .back { display: block; text-align: center; color: #8a99ad; font-size: 13px; margin: 8px 0 20px; }
   </style>
 </head>
 <body>
+<div class="topbar"><a href="./">← Gallery</a></div>
 <div class="wrap">
-  <h1>예성이 이모티콘 공방</h1>
-  <div class="sub">도록 작품에서 캐릭터를 오려 카카오톡 이모티콘(360×360)으로 만들어요</div>
+  <h1>Yesung's Emoticon Studio</h1>
+  <div class="sub">작품에서 캐릭터를 오려 카카오톡 이모티콘(360×360)으로 만들어요</div>
 
   <!-- 1. 캐릭터 고르기 -->
   <div class="card">
-    <div class="step"><b>1</b>도록에서 캐릭터 고르기</div>
+    <div class="step"><b>1</b>작품에서 캐릭터 고르기</div>
     <button class="btn pick-btn" id="pickBtn" onclick="toggleArtPick()">🖼️ 전시관 작품에서 고르기</button>
     <div class="gallery-pick" id="artPick">
       <div class="gp-grid" id="artGrid"></div>
@@ -105,10 +108,10 @@
   <!-- 3. 효과 붙이기 -->
   <div class="card">
     <div class="step"><b>3</b>효과 붙이기 <small>(하고 싶을 때만)</small></div>
-    <div class="hint" style="margin:0 0 10px">아래 효과를 누르면 바로 붙고, 도록 작품 속 하트·반짝이·별 같은 그림을 오려 붙일 수도 있어요.</div>
+    <div class="hint" style="margin:0 0 10px">아래 효과를 누르면 바로 붙고, 작품 속 하트·반짝이·별 같은 그림을 오려 붙일 수도 있어요.</div>
     <span class="opt-label" style="margin-top:0">바로 붙이는 효과</span>
     <div class="fx-ready" id="fxReady"></div>
-    <button class="btn pick-btn" id="fxPickBtn" onclick="toggleFxPick()">🌟 도록에서 효과 고르기</button>
+    <button class="btn pick-btn" id="fxPickBtn" onclick="toggleFxPick()">🌟 작품에서 효과 고르기</button>
     <div class="gallery-pick" id="fxPick">
       <div class="gp-grid" id="fxGrid"></div>
       <div class="gp-msg" id="fxMsg">작품을 불러오는 중…</div>
@@ -174,8 +177,8 @@
     <div class="row"><button class="btn primary" id="saveBtn" onclick="saveCurrent()" disabled>이 이모티콘 저장하기</button></div>
     <div class="row" id="appShareRow" style="display:none"><button class="btn" id="shareBtn" onclick="shareCurrent()" disabled>📤 카톡 등으로 바로 보내기</button></div>
     <div class="hint" id="saveHint"></div>
-    <div class="row"><button class="btn store-btn" id="storeBtn" onclick="uploadToStore()" disabled>📦 전시관 이모티콘 창고에 올리기</button></div>
-    <div class="hint" id="storeMsg">창고에 올리면 전시관의 "이모티콘 창고"에서 누구나 받아 갈 수 있어요. (작품 등록 스튜디오에 토큰을 저장한 기기에서만 올릴 수 있어요)</div>
+    <div class="row"><button class="btn store-btn" id="storeBtn" onclick="uploadToStore()" disabled>📦 Emoticon Library에 올리기</button></div>
+    <div class="hint" id="storeMsg">Library에 올리면 전시관의 "Emoticon Library"에서 누구나 받아 갈 수 있어요. (작품 등록 스튜디오에 토큰을 저장한 기기에서만 올릴 수 있어요)</div>
     <div class="count" id="count">만든 이모티콘 0 / 32</div>
   </div>
 
@@ -187,7 +190,7 @@
     <div class="hint">그림을 누르면 다시 저장돼요. 이 페이지를 닫거나 새로고침하면 목록이 사라지니, 만들 때마다 저장해 두세요.</div>
   </div>
 
-  <a class="back" href="./">← 전시관으로 가기</a>
+  <a class="back" href="./">← Back to Gallery</a>
 </div>
 
 <script>
@@ -446,7 +449,7 @@
     }));
     return list.sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
   }
-  // AGJJ 입장권 규칙: 무료 로비 + 내 소장함 + (앱에서 관람 중이면) 지금 특별전 작품만 오릴 수 있어요
+  // AGJJ 입장권 규칙: 무료 로비 + 내 나만의 도록 + (앱에서 관람 중이면) 지금 특별전 작품만 오릴 수 있어요
   const K_TICKET = 'agjj_ticket_v1', K_BOX = 'agjj_box_v1';
   function lsGetJ(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
   async function allowedIds() {
@@ -809,7 +812,7 @@
     if (!cut) {
       document.getElementById('charCtrl').style.display = 'none';
       g.fillStyle = '#9ca3af'; g.font = '22px Jua, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-      g.fillText(charCutter.work ? '캐릭터 둘레를 그려 주세요' : '도록에서 작품을 먼저 골라 주세요', OUT / 2, OUT / 2);
+      g.fillText(charCutter.work ? '캐릭터 둘레를 그려 주세요' : '작품을 먼저 골라 주세요', OUT / 2, OUT / 2);
       return;
     }
     // 배경색 (투명이 아니면 전체를 칠함)
@@ -931,14 +934,14 @@
       if (!token) return;
       try { localStorage.setItem('gh_art_token', token); } catch (e) {}
     }
-    if (!confirm('이 이모티콘을 전시관 창고에 올릴까요?\n누구나 받아 갈 수 있게 돼요.')) return;
+    if (!confirm('이 이모티콘을 Emoticon Library에 올릴까요?\n누구나 받아 갈 수 있게 돼요.')) return;
     render(true);
     const url = pv.toDataURL('image/png');
     render();
     const d = new Date(), p2 = n => String(n).padStart(2, '0');
     const name = `${d.getFullYear()}${p2(d.getMonth() + 1)}${p2(d.getDate())}_${p2(d.getHours())}${p2(d.getMinutes())}${p2(d.getSeconds())}.png`;
     const btn = document.getElementById('storeBtn'), msg = document.getElementById('storeMsg');
-    btn.disabled = true; btn.innerText = '창고에 올리는 중…';
+    btn.disabled = true; btn.innerText = 'Library에 올리는 중…';
     try {
       const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/emoticons/${name}`, {
         method: 'PUT',
@@ -951,12 +954,12 @@
         throw new Error(`(${res.status}) ${why}`);
       }
       msg.style.color = '#10b981';
-      msg.innerText = '📦 창고에 올렸어요! 1~2분 뒤 전시관 "이모티콘 창고"에 나타나요.';
+      msg.innerText = '📦 올렸어요! 1~2분 뒤 전시관 "Emoticon Library"에 나타나요.';
     } catch (e) {
       msg.style.color = '#ef4444';
-      msg.innerText = '창고에 올리지 못했어요. ' + e.message;
+      msg.innerText = 'Library에 올리지 못했어요. ' + e.message;
     } finally {
-      btn.disabled = false; btn.innerText = '📦 전시관 이모티콘 창고에 올리기';
+      btn.disabled = false; btn.innerText = '📦 Emoticon Library에 올리기';
     }
   }
 
