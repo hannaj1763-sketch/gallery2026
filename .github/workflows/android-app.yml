@@ -79,7 +79,7 @@ jobs:
               bg.save(p)
           PY
 
-      - name: 앱 안에서 저장·보내기·뒤로 가기·광고·캡처 막기 넣기
+      - name: 앱 안에서 저장·보내기·뒤로 가기·광고·캡처 막기·구글 로그인 넣기
         run: |
           cat > app-build/android/app/src/main/java/io/github/hannaj1763/gallery/MainActivity.java <<'JAVA'
           package io.github.hannaj1763.gallery;
@@ -89,6 +89,7 @@ jobs:
           import android.net.Uri;
           import android.os.Build;
           import android.os.Bundle;
+          import android.os.CancellationSignal;
           import android.provider.MediaStore;
           import android.util.Base64;
           import android.webkit.JavascriptInterface;
@@ -105,7 +106,20 @@ jobs:
           import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
           import org.json.JSONObject;
           import androidx.activity.OnBackPressedCallback;
+          import androidx.core.content.ContextCompat;
           import androidx.core.content.FileProvider;
+          import androidx.credentials.ClearCredentialStateRequest;
+          import androidx.credentials.Credential;
+          import androidx.credentials.CredentialManager;
+          import androidx.credentials.CredentialManagerCallback;
+          import androidx.credentials.CustomCredential;
+          import androidx.credentials.GetCredentialRequest;
+          import androidx.credentials.GetCredentialResponse;
+          import androidx.credentials.exceptions.ClearCredentialException;
+          import androidx.credentials.exceptions.GetCredentialCancellationException;
+          import androidx.credentials.exceptions.GetCredentialException;
+          import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption;
+          import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
           import com.getcapacitor.BridgeActivity;
           import java.io.File;
           import java.io.FileOutputStream;
@@ -209,6 +223,23 @@ jobs:
                       });
                   }
 
+                  // 구글 로그인 → 끝나면 웹의 window.onAtelierLogin("ok", 신분증토큰) / ("cancel" | "error", 이유)
+                  @JavascriptInterface
+                  public void googleSignIn(String webClientId) {
+                      runOnUiThread(() -> startGoogleSignIn(webClientId));
+                  }
+
+                  // 로그아웃: 다음 로그인 때 계정을 다시 고를 수 있게
+                  @JavascriptInterface
+                  public void googleSignOut() {
+                      runOnUiThread(() -> CredentialManager.create(MainActivity.this).clearCredentialStateAsync(
+                              new ClearCredentialStateRequest(), new CancellationSignal(), ContextCompat.getMainExecutor(MainActivity.this),
+                              new CredentialManagerCallback<Void, ClearCredentialException>() {
+                                  @Override public void onResult(Void v) {}
+                                  @Override public void onError(ClearCredentialException e) {}
+                              }));
+                  }
+
                   // 카카오톡 등으로 보내기 창 띄우기
                   @JavascriptInterface
                   public String shareFile(String data, String name) {
@@ -240,6 +271,32 @@ jobs:
                   });
               }
 
+              private void startGoogleSignIn(String webClientId) {
+                  GetSignInWithGoogleOption opt = new GetSignInWithGoogleOption.Builder(webClientId).build();
+                  GetCredentialRequest req = new GetCredentialRequest.Builder().addCredentialOption(opt).build();
+                  CredentialManager.create(this).getCredentialAsync(this, req, new CancellationSignal(), ContextCompat.getMainExecutor(this),
+                          new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
+                              @Override
+                              public void onResult(GetCredentialResponse r) {
+                                  Credential c = r.getCredential();
+                                  if (c instanceof CustomCredential && GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL.equals(c.getType())) {
+                                      try {
+                                          loginResult("ok", GoogleIdTokenCredential.createFrom(((CustomCredential) c).getData()).getIdToken());
+                                      } catch (Exception e) { loginResult("error", "token"); }
+                                  } else loginResult("error", "type");
+                              }
+                              @Override
+                              public void onError(GetCredentialException e) {
+                                  loginResult(e instanceof GetCredentialCancellationException ? "cancel" : "error", e.getClass().getSimpleName());
+                              }
+                          });
+              }
+
+              private void loginResult(String result, String value) {
+                  runOnUiThread(() -> getBridge().getWebView().evaluateJavascript(
+                          "window.onAtelierLogin && window.onAtelierLogin(" + JSONObject.quote(result) + "," + JSONObject.quote(value) + ")", null));
+              }
+
               private void adResult(String tag, String result) {
                   runOnUiThread(() -> getBridge().getWebView().evaluateJavascript(
                           "window.onAtelierAd && window.onAtelierAd(" + JSONObject.quote(tag) + "," + JSONObject.quote(result) + ")", null));
@@ -266,7 +323,7 @@ jobs:
           }
           JAVA
           # 구글 광고(AdMob) 도구 추가
-          printf '\ndependencies {\n    implementation "com.google.android.gms:play-services-ads:24.+"\n}\n' >> app-build/android/app/build.gradle
+          printf '\ndependencies {\n    implementation "com.google.android.gms:play-services-ads:24.+"\n    implementation "androidx.credentials:credentials:1.3.0"\n    implementation "androidx.credentials:credentials-play-services-auth:1.3.0"\n    implementation "com.google.android.libraries.identity.googleid:googleid:1.1.1"\n}\n' >> app-build/android/app/build.gradle
           # AdMob 앱 ID (지금은 구글 시험용 ID). 출시할 때 진짜 ID로 바꿔요.
           sed -i 's#</application>#    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-3940256099942544~3347511713"/>\n    </application>#' app-build/android/app/src/main/AndroidManifest.xml
           cat app-build/android/app/src/main/AndroidManifest.xml
