@@ -434,12 +434,40 @@
     }));
     return list.sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
   }
+  // AGJJ 입장권 규칙: 무료 로비 + 내 소장함 + (앱에서 관람 중이면) 지금 특별전 작품만 오릴 수 있어요
+  const K_TICKET = 'agjj_ticket_v1', K_BOX = 'agjj_box_v1';
+  function lsGetJ(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
+  async function allowedIds() {
+    let cfg = null;
+    try { const r = await fetch('exhibitions.json?v=' + Math.floor(Date.now() / 300000), { cache: 'no-store' }); if (r.ok) cfg = await r.json(); } catch (e) {}
+    if (!cfg) return null;                       // 설정 파일이 없으면 모든 작품
+    const ids = new Set(['01', ...(cfg.lobby || []), ...lsGetJ(K_BOX, { ids: [] }).ids]);
+    const tk = lsGetJ(K_TICKET, null), now = Date.now();
+    if (window.AtelierApp && tk && now - tk.enteredAt < 2 * 3600000 && now - tk.lastSeen < 600000) {
+      const ex = (cfg.exhibitions || []).find(e => e.id === tk.exId);
+      if (ex) {
+        (ex.works || []).forEach(id => ids.add(id));
+        const known = new Set([...(cfg.lobby || [])]);
+        (cfg.exhibitions || []).forEach(e => (e.works || []).forEach(id => known.add(id)));
+        ids.add('__new__');                      // 어느 전시에도 없는 신작
+        ids.known = known;
+      }
+    }
+    return ids;
+  }
+  // 공방에 있는 동안에도 관람 시간 기록 (10분 규칙)
+  setInterval(() => { const tk = lsGetJ(K_TICKET, null); if (tk && document.visibilityState === 'visible') { tk.lastSeen = Date.now(); try { localStorage.setItem(K_TICKET, JSON.stringify(tk)); } catch (e) {} } }, 20000);
+
   async function artList() {
+    let list = null;
     try {
       const c = JSON.parse(localStorage.getItem(GALLERY_CACHE_KEY) || 'null');
-      if (c && c.list && c.list.length) return c.list;
+      if (c && c.list && c.list.length) list = c.list;
     } catch (e) {}
-    return listFolder('artworks');
+    if (!list) list = await listFolder('artworks');
+    const ok = await allowedIds();
+    if (!ok) return list;
+    return list.filter(a => ok.has(a.id) || (ok.has('__new__') && ok.known && !ok.known.has(a.id)));
   }
 
   function fillGrid(gridId, list, onPick) {
