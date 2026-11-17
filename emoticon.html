@@ -172,6 +172,7 @@
       <div class="row"><button class="btn" type="button" onclick="resetFxTurn()">효과 처음 방향으로</button></div>
     </div>
     <div class="row"><button class="btn primary" id="saveBtn" onclick="saveCurrent()" disabled>이 이모티콘 저장하기</button></div>
+    <div class="row" id="appShareRow" style="display:none"><button class="btn" id="shareBtn" onclick="shareCurrent()" disabled>📤 카톡 등으로 바로 보내기</button></div>
     <div class="hint" id="saveHint"></div>
     <div class="row"><button class="btn store-btn" id="storeBtn" onclick="uploadToStore()" disabled>📦 전시관 이모티콘 창고에 올리기</button></div>
     <div class="hint" id="storeMsg">창고에 올리면 전시관의 "이모티콘 창고"에서 누구나 받아 갈 수 있어요. (작품 등록 스튜디오에 토큰을 저장한 기기에서만 올릴 수 있어요)</div>
@@ -763,6 +764,7 @@
     g.clearRect(0, 0, OUT, OUT);
     const cut = charCutter.cut;
     document.getElementById('saveBtn').disabled = !cut;
+    document.getElementById('shareBtn').disabled = !cut;
     document.getElementById('storeBtn').disabled = !cut;
     if (!cut) {
       document.getElementById('charCtrl').style.display = 'none';
@@ -847,7 +849,10 @@
     for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
     return new File([arr], name, { type: 'image/png' });
   }
+  // 앱(안드로이드)에서 열렸으면 앱의 저장·보내기 기능을 씀
+  const NativeApp = window.AtelierApp || null;
   async function saveImage(url, name) {
+    if (NativeApp) { NativeApp.saveFile(url, name); return; }
     if (isMobile && navigator.canShare) {
       const file = dataUrlToFile(url, name);
       if (navigator.canShare({ files: [file] })) {
@@ -859,6 +864,14 @@
     a.href = url; a.download = name;
     document.body.appendChild(a); a.click(); a.remove();
   }
+  function shareCurrent() {
+    if (!NativeApp || !charCutter.cut) return;
+    render(true);
+    const url = pv.toDataURL('image/png');
+    render();
+    NativeApp.shareFile(url, 'yesung_emoticon.png');
+  }
+  if (NativeApp) document.getElementById('appShareRow').style.display = '';
   function saveCurrent() {
     if (!charCutter.cut) return;
     render(true);
