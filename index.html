@@ -894,6 +894,12 @@
       }
     }
 
+    // ===== 앱(안드로이드)에서 열렸을 때: 앱의 저장·보내기 기능 사용 =====
+    const NativeApp = window.AtelierApp || null;
+    function blobToDataUrl(blob) {
+      return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); });
+    }
+
     // 크게 보여 주면서 미리 파일을 받아 둠 (휴대폰 공유창이 바로 뜨게)
     async function openStore(src, name) {
       storeFile = null;
@@ -901,7 +907,9 @@
       document.getElementById('storeModal').classList.add('active');
       const btn = document.getElementById('storeSaveBtn');
       btn.disabled = true; btn.innerText = '준비 중…';
-      document.getElementById('storeHint').innerText = isMobileDevice
+      document.getElementById('storeHint').innerText = NativeApp
+        ? '저장을 누르면 사진첩의 Atelier Archive 앨범에 들어가요.'
+        : isMobileDevice
         ? '저장을 누르고 "이미지 저장"을 고르면 사진첩에 들어가요.'
         : '누르면 PNG 파일로 내려받아져요.';
       try {
@@ -914,6 +922,7 @@
     }
     async function saveStoreItem() {
       if (!storeFile) return;
+      if (NativeApp) { NativeApp.saveFile(await blobToDataUrl(storeFile), storeFile.name); return; }
       if (isMobileDevice && navigator.canShare && navigator.canShare({ files: [storeFile] })) {
         try { await navigator.share({ files: [storeFile] }); return; }
         catch (e) { if (e.name === 'AbortError') return; }
@@ -1209,10 +1218,12 @@
         const type = rec.mimeType || mime || 'video/webm';
         const ext = type.includes('mp4') ? 'mp4' : 'webm';
         const blob = new Blob(chunks, { type });
-        const a = document.createElement('a');
         const d = new Date();
+        const vname = `atelier-shorts-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}.${ext}`;
+        if (NativeApp) { blobToDataUrl(blob).then(u => NativeApp.saveFile(u, vname)); return; }
+        const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `atelier-shorts-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}.${ext}`;
+        a.download = vname;
         document.body.appendChild(a);
         a.click();
         setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
