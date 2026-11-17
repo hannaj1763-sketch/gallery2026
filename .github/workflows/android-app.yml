@@ -1,0 +1,99 @@
+# 예성이 갤러리 안드로이드 앱(APK) 자동 만들기
+# - 이 파일을 저장소의 .github/workflows/android-app.yml 로 올리면 GitHub이 앱을 만들어요.
+# - 다시 만들고 싶으면: 저장소 > Actions > "Android 앱 만들기" > Run workflow
+# - 완성된 앱: https://github.com/hannaj1763-sketch/gallery2026/releases/latest/download/atelier-archive.apk
+name: Android 앱 만들기
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/android-app.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: android-actions/setup-android@v3
+
+      - name: 앱 뼈대 만들기 (Capacitor)
+        run: |
+          mkdir app-build && cd app-build
+          npm init -y > /dev/null
+          npm install @capacitor/core@8.6.2 @capacitor/cli@8.6.2 @capacitor/android@8.6.2
+          mkdir www
+          echo '<!doctype html><meta charset="utf-8"><title>Atelier Archive</title>' > www/index.html
+          cat > capacitor.config.json <<'JSON'
+          {
+            "appId": "io.github.hannaj1763.gallery",
+            "appName": "Atelier Archive",
+            "webDir": "www",
+            "server": { "url": "https://hannaj1763-sketch.github.io/gallery2026/", "cleartext": false },
+            "android": { "allowMixedContent": false }
+          }
+          JSON
+          npx cap add android
+
+      - name: 앱 아이콘 만들기 (Robo Bird 작품)
+        run: |
+          pip install pillow > /dev/null
+          python3 - <<'PY'
+          from PIL import Image, ImageDraw
+          import os, shutil
+          im = Image.open('artworks/25/image.jpg').convert('RGB')
+          w, h = im.size
+          s = int(min(w, h) * 0.72); cx, cy = int(w * 0.47), int(h * 0.47)
+          icon = im.crop((cx - s // 2, cy - s // 2, cx + s // 2, cy + s // 2)).resize((512, 512), Image.LANCZOS)
+          res = 'app-build/android/app/src/main/res'
+          for d, px in {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}.items():
+              sq = icon.resize((px, px), Image.LANCZOS)
+              sq.save(f'{res}/mipmap-{d}/ic_launcher.png')
+              mask = Image.new('L', (px, px), 0); ImageDraw.Draw(mask).ellipse((0, 0, px - 1, px - 1), fill=255)
+              rd = Image.new('RGBA', (px, px), (0, 0, 0, 0)); rd.paste(sq, (0, 0), mask)
+              rd.save(f'{res}/mipmap-{d}/ic_launcher_round.png')
+          shutil.rmtree(f'{res}/mipmap-anydpi-v26', ignore_errors=True)
+          # 시작 화면: 흰 바탕 가운데에 아이콘
+          for d in os.listdir(res):
+              p = f'{res}/{d}/splash.png'
+              if not os.path.exists(p): continue
+              W, H = Image.open(p).size
+              k = int(min(W, H) * 0.35)
+              bg = Image.new('RGB', (W, H), (255, 255, 255))
+              bg.paste(icon.resize((k, k), Image.LANCZOS), ((W - k) // 2, (H - k) // 2))
+              bg.save(p)
+          PY
+
+      - name: 같은 서명 키 쓰기 (업데이트 설치가 되도록)
+        run: |
+          mkdir -p ~/.android
+          echo "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" | base64 -d > ~/.android/debug.keystore
+
+      - name: APK 만들기
+        run: |
+          cd app-build/android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/atelier-archive.apk"
+
+      - name: 다운로드 페이지(Releases)에 올리기
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: app-v${{ github.run_number }}
+          name: 안드로이드 시험판 ${{ github.run_number }}
+          body: 예성이 갤러리 안드로이드 시험판이에요. atelier-archive.apk 를 휴대폰에서 받아 설치하세요.
+          files: atelier-archive.apk
+          make_latest: true
