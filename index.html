@@ -174,8 +174,9 @@
       .nav-tabs { gap: 5px; }
     }
 
-    /* ===== 입장권·소장함 (AGJJ) ===== */
+    /* ===== 입장권·My Collection (AGJJ) ===== */
     .visit-bar { position: fixed; left: 12px; top: 74px; z-index: 60; display: flex; gap: 6px; flex-wrap: wrap; max-width: calc(100vw - 150px); }
+.back-gallery { display: inline-block; margin-bottom: 12px; color: #f0f2f5; font-size: 14px; font-weight: 700; padding: 7px 14px; border-radius: 18px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
     .visit-pill { background: rgba(0,0,0,0.62); color: #f0f2f5; border: 1px solid rgba(255,255,255,0.2); padding: 7px 12px; border-radius: 18px; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); white-space: nowrap; }
     .visit-pill.enter { background: #f59e0b; border-color: #f59e0b; color: #1a1a1a; }
     .visit-pill.live { background: rgba(16,94,60,0.85); border-color: #34d399; }
@@ -198,8 +199,8 @@
     .ex-item .ex-meta { font-size: 12px; color: #fbbf24; }
     .ex-item.done { border-color: rgba(255,255,255,0.1); opacity: 0.55; }
     .ex-item.done .ex-meta { color: #94a3b8; }
-    .collect-btn { display: none; margin: 0 auto 12px; background: #be185d; color: #fff; border: none; padding: 10px 18px; border-radius: 20px; font-size: 14px; font-weight: 700; cursor: pointer; }
-    .collect-btn.done { background: #374151; color: #fbcfe8; }
+    .collect-btn { display: none; margin: 0; background: #0ea5e9; color: #fff; border: none; padding: 8px 14px; border-radius: 18px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .collect-btn.done { background: #374151; color: #bae6fd; }
     #view-box { max-width: 1200px; margin: 0 auto; padding: 104px 20px 32px; }
     body.has-visit #view-archive, body.has-visit #view-store { padding-top: 96px; }
     .box-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin-top: 18px; }
@@ -220,13 +221,13 @@
   <header>
     <div style="font-weight: 700; font-size: 16px; letter-spacing: -0.5px;">Atelier Archive</div>
     <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchView('3d')"><span class="lbl-long">3D 세로 아틀리에</span><span class="lbl-short">3D</span></button>
-      <button class="tab-btn" onclick="switchView('archive')"><span class="lbl-long">도록 (연대기)</span><span class="lbl-short">도록</span></button>
-      <button class="tab-btn" onclick="switchView('shorts')">숏폼</button>
-      <button class="tab-btn" onclick="switchView('store')"><span class="lbl-long">📦 이모티콘 창고</span><span class="lbl-short">📦 창고</span></button>
-      <a class="tab-btn studio-tab" href="emoticon.html"><span class="lbl-long">🎨 이모티콘 공방</span><span class="lbl-short">🎨 공방</span></a>
+      <button class="tab-btn active" onclick="switchView('3d')"><span class="lbl-long">3D Atelier</span><span class="lbl-short">3D</span></button>
+      <button class="tab-btn" onclick="switchView('archive')"><span class="lbl-long">All Works</span><span class="lbl-short">All Works</span></button>
+      <button class="tab-btn" onclick="switchView('shorts')">Shorts</button>
+      <button class="tab-btn" onclick="switchView('store')"><span class="lbl-long">📦 Emoticon Library</span><span class="lbl-short">📦 Library</span></button>
+      <a class="tab-btn studio-tab" href="emoticon.html"><span class="lbl-long">🎨 Emoticon Studio</span><span class="lbl-short">🎨 Studio</span></a>
     </div>
-    <div class="header-note" style="font-size:12px; color:#8a99ad;">대형 액자 모드 활성</div>
+    <div class="header-note" style="font-size:12px; color:#8a99ad;">Large Frame Mode</div>
   </header>
 
   <!-- 입장권 상태 줄 (AGJJ) -->
@@ -269,16 +270,16 @@
   <div id="exitModal" class="tk-modal">
     <div class="tk-box">
       <div class="tk-title">퇴장할까요?</div>
-      <div class="tk-sub">퇴장하면 이 특별전은 <b>다시 볼 수 없어요.</b><br>마음에 든 작품은 ♡ 소장하기로 남겨 두셨나요?</div>
+      <div class="tk-sub">퇴장하면 이 특별전은 <b>다시 볼 수 없어요.</b><br>마음에 든 작품은 📥 Add to Collection으로 남겨 두셨나요?</div>
       <button class="tk-btn red" onclick="exitExhibition()">퇴장하기</button>
       <button class="tk-cancel" onclick="closeModal('exitModal')">계속 볼게요</button>
     </div>
   </div>
 
-  <!-- 소장함이 가득 찼을 때 -->
+  <!-- My Collection이 가득 찼을 때 -->
   <div id="slotModal" class="tk-modal">
     <div class="tk-box">
-      <div class="tk-title">소장함이 가득 찼어요</div>
+      <div class="tk-title">My Collection이 가득 찼어요</div>
       <div class="tk-sub" id="slotSub"></div>
       <button class="tk-btn" onclick="addSlotWithAd()">▶ 광고 보고 1칸 늘리기</button>
       <button class="tk-cancel" onclick="closeModal('slotModal')">닫기</button>
@@ -294,9 +295,9 @@
     </div>
   </div>
 
-  <!-- 내 소장함 -->
+  <!-- My Collection -->
   <div id="view-box" class="view-container">
-    <h2 style="font-size: 20px; font-weight: 600;">♡ 내 소장함</h2>
+    <h2 style="font-size: 20px; font-weight: 600;">📖 My Collection</h2>
     <div class="store-note" id="boxNote"></div>
     <div id="boxGrid" class="box-grid"></div>
   </div>
@@ -304,12 +305,12 @@
   <div id="boxModal" class="tk-modal" onclick="if (event.target === this) closeModal('boxModal')">
     <div class="tk-box" style="max-width:520px">
       <div style="position:relative">
-        <img id="boxImg" class="box-view-img" src="" alt="소장 작품">
+        <img id="boxImg" class="box-view-img" src="" alt="보관한 작품">
         <div class="viewer-watermark">J.J</div>
       </div>
       <div class="tk-title" id="boxTitle"></div>
       <div class="tk-sub" id="boxText" style="text-align:left; max-height:22vh; overflow-y:auto"></div>
-      <button class="tk-cancel" id="boxRemove" style="color:#f87171">소장함에서 빼기</button>
+      <button class="tk-cancel" id="boxRemove" style="color:#f87171">My Collection에서 빼기</button>
       <button class="tk-cancel" onclick="closeModal('boxModal')">닫기</button>
     </div>
   </div>
@@ -317,7 +318,7 @@
   <!-- 3D 뷰 -->
   <div id="view-3d" class="view-container active">
     <canvas id="canvas3d"></canvas>
-    <button id="autoBtn" class="auto-btn" onclick="toggleAutoScroll()" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation()">⏸ 자동 감상 멈춤</button>
+    <button id="autoBtn" class="auto-btn" onclick="toggleAutoScroll()" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation()">⏸ Auto Tour Pause</button>
     <div class="hint-3d">작품이 천천히 내려가요 · 화면을 밀면 직접 볼 수 있어요</div>
   </div>
 
@@ -338,13 +339,14 @@
 
   <!-- 도록 뷰 -->
   <div id="view-archive" class="view-container">
-    <h2 style="font-size: 20px; font-weight: 600;">작품 도록 & 아카이브</h2>
+    <h2 style="font-size: 20px; font-weight: 600;">All Works</h2>
     <div id="artGrid" class="gallery-grid"></div>
   </div>
 
   <!-- 이모티콘 창고: 공방에서 올린 이모티콘을 누구나 받아 가기 -->
   <div id="view-store" class="view-container">
-    <h2 style="font-size: 20px; font-weight: 600;">📦 예성이 이모티콘 창고</h2>
+    <button class="back-gallery" onclick="switchView('3d')">← Gallery</button>
+    <h2 style="font-size: 20px; font-weight: 600;">📦 Yesung's Emoticon Library</h2>
     <div class="store-note">마음에 드는 이모티콘을 눌러 저장한 뒤 카카오톡 대화에서 사진처럼 보내 보세요.<br>개인 대화용으로 자유롭게 쓸 수 있어요. 상업적 이용과 재배포는 할 수 없어요. © J.J</div>
     <div id="storeGrid" class="store-grid"></div>
     <div id="storeMsg" class="store-msg">이모티콘을 불러오는 중…</div>
@@ -366,7 +368,10 @@
         <span id="viewerTitle" style="font-weight: 600; font-size: 16px;">작품명</span>
         <span id="viewerCounter" class="viewer-counter"></span>
       </div>
-      <button onclick="closeViewer()" style="background:none; border:none; color:#fff; font-size:26px; cursor:pointer;">&times;</button>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button id="collectBtn" class="collect-btn" onclick="collectCurrent()">📥 Add to Collection</button>
+        <button onclick="closeViewer()" style="background:none; border:none; color:#fff; font-size:26px; cursor:pointer;">&times;</button>
+      </div>
     </div>
     
     <div class="viewer-body" id="viewerSwipeArea">
@@ -380,8 +385,7 @@
 
     <div class="viewer-footer">
       <div id="viewerMeta" style="text-align:center; font-size:12px; color:#94a3b8; margin-bottom:10px;"></div>
-      <div style="text-align:center"><button id="collectBtn" class="collect-btn" onclick="collectCurrent()">♡ 소장하기</button></div>
-      
+            
       <div class="reaction-bar">
         <button class="reaction-btn" onclick="addReaction('heart')">❤️ 하트 <span id="cnt-heart" class="reaction-count">0</span></button>
         <button class="reaction-btn" onclick="addReaction('thumb')">👍 최고 <span id="cnt-thumb" class="reaction-count">0</span></button>
@@ -551,19 +555,19 @@
 
 
     // =====================================================================
-    // AGJJ 입장권 · 퇴장 · 소장함
+    // AGJJ 입장권 · 퇴장 · My Collection
     //  - 웹(브라우저): 무료 로비 작품만 보여요. 특별전은 앱에서만.
     //  - 앱: 광고를 보면 입장권 1장 → 2시간 관람. 퇴장하거나 시간이 지나면 끝.
     //        앱이 꺼져도 10분 안에 다시 열면 이어서 볼 수 있어요.
     //        한 번 관람이 끝난 특별전은 다시 들어갈 수 없어요.
-    //  - 소장함: 무료 1칸, 광고 1번에 1칸씩 늘리기. 소장한 작품은 언제든 다시 보기.
+    //  - My Collection: 무료 1칸, 광고 1번에 1칸씩 늘리기. 담아 둔 작품은 언제든 다시 보기.
     //  - 전시 설정은 저장소의 exhibitions.json 에서 바꿔요.
     // =====================================================================
     const NativeApp = window.AtelierApp || null;
     const IS_APP = !!NativeApp;
     const VISIT_MS = 2 * 60 * 60 * 1000;   // 관람 시간 2시간
     const GRACE_MS = 10 * 60 * 1000;       // 앱이 꺼져도 10분 안에는 이어서 보기
-    const FREE_SLOTS = 1;                  // 소장함 무료 칸
+    const FREE_SLOTS = 1;                  // My Collection 무료 칸
     const K_TICKET = 'agjj_ticket_v1', K_VISITED = 'agjj_visited_v1', K_BOX = 'agjj_box_v1', K_PASS = 'agjj_pass_v1';
     let EXCFG = null;                      // exhibitions.json 내용
     let allArtworks = [];                  // 저장소의 모든 작품
@@ -638,7 +642,7 @@
       document.body.classList.toggle('has-visit', !!EXCFG);
       if (!EXCFG) { bar.innerHTML = ''; return; }
       if (!IS_APP) {
-        bar.innerHTML = `<span class="visit-pill info">무료 로비 · 특별전은 AGJJ 앱에서</span>`;
+        bar.innerHTML = `<span class="visit-pill info">Free Lobby · Exhibitions in the AGJJ app</span>`;
         return;
       }
       const tk = activeTicket();
@@ -648,12 +652,12 @@
         const left = Math.max(0, VISIT_MS - (Date.now() - tk.enteredAt));
         const h = Math.floor(left / 3600000), m = Math.floor(left / 60000) % 60;
         const ex = findEx(tk.exId);
-        html += `<span class="visit-pill live">🎟 ${ex.short || ex.title} · ${h}:${String(m).padStart(2, '0')} 남음</span>`;
-        html += `<button class="visit-pill exit" onclick="openModal('exitModal')">퇴장</button>`;
+        html += `<span class="visit-pill live">🎟 ${ex.short || ex.title} · ${h}:${String(m).padStart(2, '0')} left</span>`;
+        html += `<button class="visit-pill exit" onclick="openModal('exitModal')">Exit</button>`;
       } else {
-        html += `<button class="visit-pill enter" onclick="openExList()">🎟 특별전</button>`;
+        html += `<button class="visit-pill enter" onclick="openExList()">🎟 Exhibitions</button>`;
       }
-      html += `<button class="visit-pill" onclick="openBox()">♡ 소장함 ${box.ids.length}/${box.slots}</button>`;
+      html += `<button class="visit-pill" onclick="openBox()">📖 My Collection ${box.ids.length}/${box.slots}</button>`;
       bar.innerHTML = html;
     }
 
@@ -696,7 +700,7 @@
           '· 입장 후 <b>2시간</b> 동안 볼 수 있어요.<br>' +
           '· <b>퇴장하면 이 전시는 다시 볼 수 없어요.</b><br>' +
           '· 앱이 꺼져도 10분 안에 다시 열면 이어서 볼 수 있어요.<br>' +
-          '· 마음에 드는 작품은 ♡ 소장하기로 남겨 두세요.';
+          '· 마음에 드는 작품은 📥 Add to Collection으로 남겨 두세요.';
         go.disabled = false; go.innerText = '▶ 광고 보고 입장하기';
       }
       openModal('tkModal');
@@ -763,7 +767,7 @@
       closeModal('gateModal');
     }
 
-    // ----- 소장함 -----
+    // ----- My Collection -----
     function getBox() { return lsGet(K_BOX, { slots: FREE_SLOTS, ids: [] }); }
     function updateCollectBtn() {
       const btn = document.getElementById('collectBtn');
@@ -772,7 +776,7 @@
       btn.style.display = 'inline-block';
       const has = getBox().ids.includes(art.id);
       btn.classList.toggle('done', has);
-      btn.innerText = has ? '♥ 소장함에 있어요' : '♡ 소장하기';
+      btn.innerText = has ? '✓ In My Collection' : '📥 Add to Collection';
     }
     function collectCurrent() {
       const art = artworks[currentIndex];
@@ -793,7 +797,7 @@
       if (r === 'closed') { showMsg('칸을 늘리지 못했어요', '광고를 끝까지 보면 1칸이 늘어나요.'); return; }
       const box = getBox(); box.slots += 1; lsSet(K_BOX, box);
       collectCurrent();
-      showMsg('소장함이 1칸 늘었어요', `이제 ${box.slots}칸이에요.`);
+      showMsg('My Collection이 1칸 늘었어요', `이제 ${box.slots}칸이에요.`);
     }
     function openBox() {
       closeViewer();
@@ -806,7 +810,7 @@
     function renderBox() {
       const box = getBox();
       const byId = Object.fromEntries(allArtworks.map(a => [a.id, a]));
-      document.getElementById('boxNote').innerHTML = `${box.ids.length} / ${box.slots}칸 · 소장한 작품은 전시가 끝나도 언제든 다시 볼 수 있어요. 감상용이며 복제·상업적 이용은 할 수 없어요. © J.J`;
+      document.getElementById('boxNote').innerHTML = `${box.ids.length} / ${box.slots}칸 · 담아 둔 작품은 전시가 끝나도 언제든 다시 볼 수 있어요. 감상용이며 복제·상업적 이용은 할 수 없어요. © J.J`;
       let html = box.ids.map(id => byId[id]).filter(Boolean).map(a => `
         <div class="box-card" onclick="openBoxItem('${a.id}')">
           <div class="thumb"><img src="${a.src}" alt="${a.title}" loading="lazy"><div class="thumb-watermark">J.J</div></div>
@@ -1020,7 +1024,7 @@
     function toggleAutoScroll() {
       autoScroll = !autoScroll;
       const btn = document.getElementById('autoBtn');
-      btn.textContent = autoScroll ? '⏸ 자동 감상 멈춤' : '▶ 자동 감상';
+      btn.textContent = autoScroll ? '⏸ Auto Tour Pause' : '▶ Auto Tour';
       btn.classList.toggle('paused', !autoScroll);
       resumeAt = 0;
     }
