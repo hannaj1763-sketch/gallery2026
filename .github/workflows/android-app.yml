@@ -28,6 +28,10 @@ jobs:
           distribution: temurin
           java-version: 21
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - uses: android-actions/setup-android@v3
 
       - name: 앱 뼈대 만들기 (Capacitor)
@@ -50,7 +54,7 @@ jobs:
 
       - name: 앱 아이콘 만들기 (Robo Bird 작품)
         run: |
-          pip install pillow > /dev/null
+          python3 -m pip install --quiet pillow
           python3 - <<'PY'
           from PIL import Image, ImageDraw
           import os, shutil
