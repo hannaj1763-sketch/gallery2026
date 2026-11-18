@@ -524,7 +524,7 @@
   <!-- 🎮 Art Pang: 예성이 그림 보석 퍼즐 (한 판 = 💧 1개) -->
   <div id="view-pang" class="view-container">
     <button class="back-gallery" onclick="openPlay()">← Play</button>
-    <h2 style="font-size: 20px; font-weight: 600;">🎮 J.J 아트팡</h2>
+    <h2 style="font-size: 20px; font-weight: 600;">🎮 J.J 아트퐁</h2>
     <div class="store-note">같은 그림 보석을 3개 이상 맞추는 60초 퍼즐이에요. <b>한 판에 💧 1개</b>, 목표 점수를 넘기면 💧 1개를 돌려받아요.<br>
       🪣 My Collection에 작품을 담을수록 <b>✨레어 보석</b>이 늘어나서 다음 단계가 열려요. (레어 보석은 점수 2배)</div>
     <div id="pangStages"></div>
@@ -1236,7 +1236,7 @@
     }
 
     // =====================================================================
-    // 🎮 J.J 아트팡: 단계 고르기 → 💧 1개 → 입장권 → game.html
+    // 🎮 J.J 아트퐁: 단계 고르기 → 💧 1개 → 입장권 → game.html
     //  - 1단계 = 무료 로비 작품 6점, My Collection 작품(로비 밖)이 늘수록 ✨레어 보석이 추가된 2·3·4단계
     //  - 게임에서 목표를 넘기면 agjj_pending_paint 로 💧 를 돌려줌 → 갤러리로 돌아오면 받기
     // =====================================================================
@@ -1277,7 +1277,7 @@
       const st = PANG_STAGES.find(x => x.n === n);
       const { lobby, rare } = pangPools();
       if (!st || rare.length < st.rare) return;
-      if (!await payPaintFor(null, '아트팡 한 판')) return;
+      if (!await payPaintFor(null, '아트퐁 한 판')) return;
       lsSet('agjj_pang_ticket', { stage: st.n, mult: st.mult, target: st.target, ids: { lobby, rare: rare.slice(0, st.rare) }, t: Date.now() }, true);
       location.href = 'game.html';
     }
@@ -1314,7 +1314,7 @@
 
         <div class="pl-cat">🎮 게임</div>
         <div class="pl-grid">
-          <button class="pl-tile wide" onclick="openPang()"><div class="i">💎</div>${n(best ? '최고 ' + best.toLocaleString() : '')}<div class="t">J.J 아트팡</div><div class="d">예성이 그림 보석 맞추기 60초 퍼즐 · 한 판 💧 1 · 목표를 넘기면 💧 돌려받기</div></button>
+          <button class="pl-tile wide" onclick="openPang()"><div class="i">💎</div>${n(best ? '최고 ' + best.toLocaleString() : '')}<div class="t">J.J 아트퐁</div><div class="d">예성이 그림 보석 맞추기 60초 퍼즐 · 한 판 💧 1 · 목표를 넘기면 💧 돌려받기</div></button>
         </div>
 
         <div class="pl-cat">🗞 바깥 전시</div>
@@ -1411,7 +1411,7 @@
           <button onclick="openArtCards()"><b>${artCards}</b><span>아트카드</span></button>
           <button onclick="openArtOut('log')"><b>${logs}</b><span>관람 기록</span></button>
         </div>
-        ${best ? `<div class="acc-sub" style="margin-top:8px; text-align:center">🎮 아트팡 최고 점수 ${best.toLocaleString()}점</div>` : ''}
+        ${best ? `<div class="acc-sub" style="margin-top:8px; text-align:center">🎮 아트퐁 최고 점수 ${best.toLocaleString()}점</div>` : ''}
         <div class="acc-list">
           <button onclick="openFontPicker()"><span>🔤 글씨체 · 글자 크기</span><span>›</span></button>
           <button onclick="openModal('copyModal')"><span>© 저작권 안내</span><span>›</span></button>
@@ -1457,7 +1457,7 @@
       if (!n) return;
       try { localStorage.removeItem('agjj_pending_paint'); } catch (e) {}
       setPaint(getPaint() + n);
-      showMsg('💧 페인트를 받았어요', `아트팡 목표 점수를 넘겨서 💧 ${n}개가 들어왔어요.`);
+      showMsg('💧 페인트를 받았어요', `아트퐁 목표 점수를 넘겨서 💧 ${n}개가 들어왔어요.`);
     }
 
     // =====================================================================
