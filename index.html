@@ -373,6 +373,8 @@
     .wc-cats button span { color: #94a3b8; font-size: 11px; }
     .wc-cats button.on { background: #f59e0b; border-color: #f59e0b; color: #1a1a1a; font-weight: 700; }
     .wc-cats button.on span { color: #3b2a07; }
+    .easel { display: inline-block; width: 1.15em; height: 1.15em; vertical-align: -0.2em; background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cg%20stroke-linecap%3D%22round%22%20stroke-width%3D%224.5%22%20stroke%3D%22%23b7793f%22%3E%3Cline%20x1%3D%2232%22%20y1%3D%224%22%20x2%3D%2232%22%20y2%3D%2210%22/%3E%3Cline%20x1%3D%2224%22%20y1%3D%2240%22%20x2%3D%2213%22%20y2%3D%2261%22/%3E%3Cline%20x1%3D%2240%22%20y1%3D%2240%22%20x2%3D%2251%22%20y2%3D%2261%22/%3E%3Cline%20x1%3D%2232%22%20y1%3D%2240%22%20x2%3D%2232%22%20y2%3D%2257%22/%3E%3C/g%3E%3Crect%20x%3D%2212%22%20y%3D%229%22%20width%3D%2240%22%20height%3D%2230%22%20rx%3D%222.5%22%20fill%3D%22%23fffaf0%22%20stroke%3D%22%238a5a2b%22%20stroke-width%3D%223%22/%3E%3Ccircle%20cx%3D%2223%22%20cy%3D%2220%22%20r%3D%224.2%22%20fill%3D%22%23f59e0b%22/%3E%3Cpath%20d%3D%22M15%2036%20L27%2024%20L35%2031%20L41%2026%20L50%2036%20Z%22%20fill%3D%22%2334d399%22/%3E%3Cpath%20d%3D%22M15%2036%20L27%2024%20L33%2030%20Z%22%20fill%3D%22%233b82f6%22%20opacity%3D%22.85%22/%3E%3Crect%20x%3D%229%22%20y%3D%2238%22%20width%3D%2246%22%20height%3D%225%22%20rx%3D%222%22%20fill%3D%22%238a5a2b%22/%3E%3C/svg%3E") center / contain no-repeat; }
+    .acc-col .i .easel { width: 36px; height: 36px; vertical-align: middle; }
     .tk-btn { width: 100%; background: #f59e0b; color: #1a1a1a; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
     .tk-btn.blue { background: #3b82f6; color: #fff; }
     .tk-btn.red { background: #b91c1c; color: #fff; }
@@ -511,7 +513,7 @@
   <!-- My Collection -->
   <div id="view-box" class="view-container">
     <button class="back-gallery" onclick="openAccount()">← My</button>
-    <h2 style="font-size: 20px; font-weight: 600;">🪣 My Collection</h2>
+    <h2 style="font-size: 20px; font-weight: 600;"><span class="easel"></span> My Collection</h2>
     <div class="store-note" id="boxNote"></div>
     <div id="boxGrid" class="box-grid"></div>
     <div id="boxAccount" class="store-note" style="margin-top:16px; text-align:center"></div>
@@ -580,7 +582,7 @@
     <button class="back-gallery" onclick="openPlay()">← Play</button>
     <h2 style="font-size: 20px; font-weight: 600;">🎮 J.J 아트퐁</h2>
     <div class="store-note">같은 그림 보석을 3개 이상 맞추는 60초 퍼즐이에요. <b>한 판에 💧 1개</b>, 목표 점수를 넘기면 💧 1개를 돌려받아요.<br>
-      🪣 My Collection에 작품을 담을수록 <b>✨레어 보석</b>이 늘어나서 다음 단계가 열려요. (레어 보석은 점수 2배)</div>
+      <span class="easel"></span> My Collection에 작품을 담을수록 <b>✨레어 보석</b>이 늘어나서 다음 단계가 열려요. (레어 보석은 점수 2배)</div>
     <button class="pg-rank" onclick="location.href='game.html?rank=1'">🏆 아트퐁 순위 보기 (이번 주 · 역대)</button>
     <div id="pangStages"></div>
   </div>
@@ -653,7 +655,7 @@
   <div id="view-word" class="view-container">
     <button class="back-gallery" onclick="openPlay()">← Play</button>
     <h2 style="font-size: 20px; font-weight: 600;">📜 Word Card</h2>
-    <div class="store-note">BBB 주제별 성경암송 말씀 한 구절과 J.J의 그림이 담긴 카드를 뽑아요. 주제를 고르면 그 주제에서만 나와요.<br>카드 1장 = 💧 페인트 1개 · 페인트는 광고 1번에 1개씩 모여요.<br>카드 배경은 🪣 My Collection에 담은 작품 중에서 골라져요.</div>
+    <div class="store-note">BBB 주제별 성경암송 말씀 한 구절과 J.J의 그림이 담긴 카드를 뽑아요. 주제를 고르면 그 주제에서만 나와요.<br>카드 1장 = 💧 페인트 1개 · 페인트는 광고 1번에 1개씩 모여요.<br>카드 배경은 <span class="easel"></span> My Collection에 담은 작품 중에서 골라져요.</div>
     <div class="wc-cats" id="wcCats"></div>
     <div class="wc-top">
       <div class="wc-paint">💧 <span id="paintCnt">0</span></div>
@@ -1400,7 +1402,7 @@
             ${open ? `<button class="pg-go" onclick="startPang(${st.n})">💧 1개로 시작</button>` : ''}</div>
           <div class="pg-gems">${lobby.map(id => `<img src="${src(id)}" alt="">`).join('')}
             ${Array.from({ length: st.rare }, (_, i) => rare[i] ? `<img class="rare" src="${src(rare[i])}" alt="">` : '<div class="slot">✨</div>').join('')}</div>
-          ${open ? '' : `<div class="pg-info">🪣 My Collection에 로비 밖 작품을 ${st.rare}점 담으면 열려요 (지금 ${rare.length}점)</div>`}
+          ${open ? '' : `<div class="pg-info"><span class="easel"></span> My Collection에 로비 밖 작품을 ${st.rare}점 담으면 열려요 (지금 ${rare.length}점)</div>`}
         </div>`;
       }).join('');
     }
@@ -1533,7 +1535,7 @@
             <div class="acc-sub">${u ? esc(u.email || '') + ' · Google 로그인' : '로그인하면 기록이 계정에 저장돼요'}</div>
             ${joined ? `<div class="acc-sub">가입일 ${joined}</div>` : ''}</div>
         </div>
-        <button class="acc-col" onclick="openBox()"><span class="i">🪣</span><div><b>My Collection ${box.ids.length}/${box.slots}</b><span>담아 둔 예성이 작품 보기 · 칸 늘리기</span></div></button>
+        <button class="acc-col" onclick="openBox()"><span class="i"><span class="easel"></span></span><div><b>My Collection ${box.ids.length}/${box.slots}</b><span>담아 둔 예성이 작품 보기 · 칸 늘리기</span></div></button>
         <div class="acc-stats">
           <button onclick="openWord()"><b>💧 ${getPaint()}</b><span>페인트</span></button>
           <button onclick="openBox()"><b>${box.ids.length}/${box.slots}</b><span>My Collection</span></button>
@@ -2192,7 +2194,7 @@
       const verses = await loadVerses();
       const pool = cardArtPool();
       if (!pool.length) {
-        showMsg('🪣 작품 모으러 갈까요?', '말씀카드 배경은 <b>My Collection</b>에 모은 예성이 작품으로 만들어요.<br>아직 모은 작품이 없어요.', () => switchView('archive'));
+        showMsg('🖼️ 작품 모으러 갈까요?', '말씀카드 배경은 <b>My Collection</b>에 모은 예성이 작품으로 만들어요.<br>아직 모은 작품이 없어요.', () => switchView('archive'));
         document.getElementById('msgBtn').innerText = 'OK, 갤러리로 가기';
         const note = document.getElementById('msgNote');
         note.innerHTML = '💡 <b>이렇게 모아요</b><br>① 갤러리에서 마음에 드는 작품을 눌러요<br>② 위쪽 <b>📥 Add to Collection</b>을 누르면 My Collection에 저장돼요<br>③ ✨ Play → 말씀카드로 돌아와서 카드를 뽑아요';
