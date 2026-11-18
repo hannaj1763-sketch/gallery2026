@@ -350,5 +350,23 @@
   else load();
   if (LOOP) setTimeout(() => { if (!started && EX) begin(); }, OPEN_MS + 3000);
 </script>
+<script type="module">
+  // 💌 친구 초대: 아트카드 링크(&r=보낸 사람)로 처음 들어온 사람이면 보낸 사람에게 💧 3 (보낸 사람 앱이 다음에 열릴 때 받아요)
+  (async () => {
+    const q = new URLSearchParams(location.search), ref = q.get('r'), ex = q.get('ex');
+    if (!ref || !/^[A-Za-z0-9]{10,40}$/.test(ref)) return;
+    try {
+      if (localStorage.getItem('agjj_uid_v1') === ref) return;                 // 내 링크를 내가 열면 X
+      const seenKey = 'agjj_ref_seen_' + ref;
+      if (localStorage.getItem(seenKey)) return;                                // 이 폰에서 이미 한 번 들어옴
+      const V = '10.14.1', base = `https://www.gstatic.com/firebasejs/${V}/`;
+      const [appM, fsM] = await Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-firestore.js')]);
+      const app = appM.initializeApp({ apiKey: "AIzaSyBwlcopOmwqdoZZcXwVIDOPtds85xTJfRM", authDomain: "agjj-adb63.firebaseapp.com", projectId: "agjj-adb63",
+        storageBucket: "agjj-adb63.firebasestorage.app", messagingSenderId: "83235290466", appId: "1:83235290466:web:56aec1eebc3eae0a11403b" }, 'ref');
+      await fsM.addDoc(fsM.collection(fsM.getFirestore(app), 'referrals'), { ref, ex: String(ex || '').slice(0, 20), at: Date.now() });
+      localStorage.setItem(seenKey, '1');
+    } catch (e) { console.log('친구 입장 기록을 남기지 못했어요:', e); }
+  })();
+</script>
 </body>
 </html>
