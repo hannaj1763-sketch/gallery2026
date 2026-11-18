@@ -326,7 +326,10 @@
     .copy-sec h4 { font-size: 14px; color: #e2e8f0; margin-bottom: 6px; }
     .copy-sec p { font-size: 13px; color: #cbd5e1; line-height: 1.7; word-break: keep-all; }
     .copy-sec .c { font-size: 12px; color: #94a3b8; margin-top: 4px; }
-    .visit-pill.exit { background: rgba(127,29,29,0.85); border-color: #f87171; }
+    .visit-pill.exit { background: rgba(127,29,29,0.85); border-color: #f87171; margin-left: auto; }
+    .visit-bar.has-exit { width: calc(100vw - 24px); flex-wrap: nowrap; }      /* 한 줄로: 전시 이름이 길면 … 로 줄임 */
+    .visit-bar.has-exit .visit-pill { flex-shrink: 0; padding: 7px 10px; }
+    .visit-bar.has-exit .visit-pill.live { flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
     .tk-modal { display: none; position: fixed; inset: 0; z-index: 130; background: rgba(8,10,14,0.88); align-items: center; justify-content: center; padding: 20px; }
     .tk-modal.active { display: flex; }
     .tk-box { background: #161a22; border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; padding: 22px 20px; width: 100%; max-width: 360px; text-align: center; }
@@ -1029,14 +1032,16 @@
         const left = Math.max(0, VISIT_MS - (Date.now() - tk.enteredAt));
         const h = Math.floor(left / 3600000), m = Math.floor(left / 60000) % 60;
         const ex = findEx(tk.exId);
-        html += `<span class="visit-pill live">🎟 ${ex.short || ex.title} · ${h}:${String(m).padStart(2, '0')} left</span>`;
-        html += `<button class="visit-pill exit" onclick="openModal('exitModal')">Exit</button>`;
+        html += `<span class="visit-pill live">🎟 ${h}:${String(m).padStart(2, '0')} · ${ex.short || ex.title}</span>`;
       } else {
         html += `<button class="visit-pill enter" onclick="openExList()">🎟 Exhibitions</button>`;
       }
       // 메뉴는 3개만: 특별전 · ✨ Play(카드·게임·바깥 전시) · 👤 My(내 계정·My Collection)
       html += `<button class="visit-pill paint" onclick="openPlay()">✨ Play · 💧 ${getPaint()}</button>`;
       html += `<button class="visit-pill me" onclick="openAccount()">👤 My</button>`;
+      // 전시 관람 중이면 Exit는 맨 오른쪽 끝에 따로
+      if (tk) html += `<button class="visit-pill exit" onclick="openModal('exitModal')">✕ Exit</button>`;
+      bar.classList.toggle('has-exit', !!tk);
       bar.innerHTML = html;
     }
 
