@@ -181,6 +181,83 @@
     .visit-pill.enter { background: #f59e0b; border-color: #f59e0b; color: #1a1a1a; }
     .visit-pill.live { background: rgba(16,94,60,0.85); border-color: #34d399; }
     .visit-pill.info { cursor: default; font-weight: 500; color: #cbd5e1; }
+    .visit-pill.paint { background: rgba(88,28,135,0.85); border-color: #c084fc; }
+    #view-word { max-width: 900px; margin: 0 auto; padding: 104px 16px 40px; }
+    .wc-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 16px 0 6px; }
+    .wc-paint { font-size: 22px; font-weight: 800; background: #1f2430; border: 1px solid #3b3f4a; border-radius: 14px; padding: 8px 16px; }
+    .wc-btn { background: #9333ea; color: #fff; border: none; border-radius: 14px; padding: 12px 18px; font-size: 15px; font-weight: 800; cursor: pointer; }
+    .wc-btn.ad { background: #1f2430; border: 1px solid #c084fc; color: #e9d5ff; }
+    .wc-btn:disabled { opacity: .5; }
+    .wc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 14px; }
+    .wc-item { background: #fbf7ef; color: #3b2f22; border-radius: 12px; overflow: hidden; cursor: pointer; }
+    .wc-item img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
+    .wc-item div { padding: 8px 10px; font-size: 12px; font-weight: 700; }
+.wc-tone { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
+    .wc-tone button { flex: 1; padding: 9px 0; border-radius: 12px; border: 1px solid #3b3f4a; background: #1f2430; color: #cbd5e1; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .wc-tone button.on { background: #f8fafc; color: #111827; border-color: #f8fafc; }
+.wc-box-pick { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+    .wc-box-pick button { width: 34px; height: 34px; flex: none; border-radius: 50%; border: 2px solid #3b3f4a; cursor: pointer; font-size: 11px; font-weight: 800; color: #475569; padding: 0; }
+    .wc-box-pick button.on { border-color: #fff; box-shadow: 0 0 0 3px #9333ea; }
+    .wc-card-img { width: 100%; max-height: 62vh; object-fit: contain; border-radius: 12px; display: block; margin: 0 auto 12px; }
+    .wc-flip { animation: wcflip .7s ease; }
+    @keyframes wcflip { 0% { transform: perspective(800px) rotateY(90deg) scale(.8); opacity: 0; } 100% { transform: perspective(800px) rotateY(0) scale(1); opacity: 1; } }
+    #msgModal { z-index: 160; }   /* 안내창은 다른 창(아트카드·말씀카드) 위에 */
+    .visit-pill.art { background: rgba(120,83,32,0.88); border-color: #d8b679; }
+    #view-artcard { max-width: 900px; margin: 0 auto; padding: 104px 16px 40px; }
+    body.has-visit #view-artcard { padding-top: var(--vb, 96px); }
+    .ac-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin-top: 16px; }
+    .ac-item { background: #f6f0e4; color: #2b2119; border-radius: 12px; overflow: hidden; cursor: pointer; position: relative; }
+    .ac-item img { width: 100%; aspect-ratio: 5/7; object-fit: cover; display: block; }
+    .ac-item .cap { padding: 8px 10px; font-size: 13px; font-weight: 800; }
+    .ac-item .own { position: absolute; top: 8px; right: 8px; background: #d8b679; color: #1b1510; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 999px; }
+    .ac-sides { display: flex; gap: 10px; margin-bottom: 12px; }
+    .ac-sides img { flex: 1; min-width: 0; width: 50%; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.4); }
+    .visit-pill.out { background: rgba(13,110,94,0.88); border-color: #5eead4; }
+    /* 전시 소식 배너 (갤러리 아래쪽) */
+    .out-banner { position: absolute; left: 12px; right: 12px; bottom: 14px; z-index: 12; display: none; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 14px; background: rgba(12,16,22,0.88); border: 1px solid rgba(94,234,212,0.35); backdrop-filter: blur(8px); cursor: pointer; }
+    .out-banner.on { display: flex; }
+    .out-banner img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; flex: none; background: #1f2430; }
+    .out-banner .ob-t { flex: 1; min-width: 0; }
+    .out-banner .ob-k { font-size: 10px; color: #5eead4; font-weight: 800; letter-spacing: .05em; }
+    .out-banner .ob-n { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .out-banner .ob-p { font-size: 11px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .out-banner .ob-x { color: #64748b; font-size: 16px; padding: 4px; }
+    #view-3d.has-banner .hint-3d { bottom: 86px; }
+    #view-out { max-width: 900px; margin: 0 auto; padding: 104px 16px 40px; }
+    body.has-visit #view-out { padding-top: var(--vb, 96px); }
+    .out-tabs { display: flex; gap: 8px; margin: 12px 0; }
+    .out-tabs button { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid #334155; background: #161b24; color: #cbd5e1; font-weight: 800; cursor: pointer; }
+    .out-tabs button.on { background: #0d6e5e; border-color: #5eead4; color: #fff; }
+    .out-areas { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; }
+    .out-areas button { flex: none; padding: 6px 12px; border-radius: 999px; border: 1px solid #334155; background: transparent; color: #cbd5e1; font-size: 12px; cursor: pointer; }
+    .out-areas button.on { background: #e2e8f0; color: #0f172a; }
+    .out-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+    .out-item { display: flex; gap: 12px; padding: 10px; border-radius: 14px; background: #161b24; border: 1px solid #262d3a; cursor: pointer; }
+    .out-item img { width: 72px; height: 96px; object-fit: cover; border-radius: 8px; flex: none; background: #1f2430; }
+    .out-item .oi-t { font-size: 14px; font-weight: 800; line-height: 1.35; }
+    .out-item .oi-m { font-size: 12px; color: #94a3b8; margin-top: 4px; line-height: 1.5; }
+    .out-item .oi-s { font-size: 13px; color: #fbbf24; margin-top: 4px; }
+    .out-detail-img { width: 100%; max-height: 40vh; object-fit: contain; border-radius: 10px; background: #0f1218; }
+    .out-src { font-size: 10px; color: #64748b; text-align: right; margin: 4px 0 10px; }
+    .out-form label { display: block; text-align: left; font-size: 12px; color: #94a3b8; margin: 10px 0 4px; }
+    .out-form input, .out-form textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #334155; background: #0f1218; color: #f1f5f9; font-size: 14px; font-family: inherit; }
+    .out-form textarea { min-height: 80px; resize: vertical; }
+    .stars { display: flex; gap: 4px; justify-content: center; font-size: 30px; cursor: pointer; user-select: none; }
+    .stars span { color: #334155; } .stars span.on { color: #fbbf24; }
+    .visit-pill.pang { background: rgba(124,58,237,0.9); border-color: #ffd86b; }
+    #view-pang { max-width: 900px; margin: 0 auto; padding: 104px 16px 40px; }
+    body.has-visit #view-pang { padding-top: var(--vb, 96px); }
+    .pg-stage { background: linear-gradient(180deg, #3b2468, #24163f); border: 2px solid rgba(255,216,107,.35); border-radius: 18px; padding: 14px; margin-top: 12px; }
+    .pg-stage.lock { opacity: .55; filter: grayscale(.4); }
+    .pg-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .pg-name { font-size: 17px; font-weight: 800; color: #ffd86b; }
+    .pg-info { font-size: 12px; color: #c9b8f0; margin-top: 2px; }
+    .pg-gems { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
+    .pg-gems img { width: 38px; height: 38px; border-radius: 10px; object-fit: cover; border: 2px solid rgba(255,255,255,.4); }
+    .pg-gems img.rare { border-color: #ffd86b; box-shadow: 0 0 8px rgba(255,216,107,.8); }
+    .pg-gems .slot { width: 38px; height: 38px; border-radius: 10px; border: 2px dashed rgba(255,216,107,.5); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .pg-go { background: linear-gradient(180deg, #ffe27a, #ffb347); color: #3a1d00; border: none; border-radius: 12px; padding: 10px 14px; font-weight: 800; font-size: 14px; cursor: pointer; white-space: nowrap; }
     .visit-pill.exit { background: rgba(127,29,29,0.85); border-color: #f87171; }
     .tk-modal { display: none; position: fixed; inset: 0; z-index: 130; background: rgba(8,10,14,0.88); align-items: center; justify-content: center; padding: 20px; }
     .tk-modal.active { display: flex; }
@@ -202,7 +279,7 @@
     .collect-btn { display: none; margin: 0; background: #0ea5e9; color: #fff; border: none; padding: 8px 14px; border-radius: 18px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
     .collect-btn.done { background: #374151; color: #bae6fd; }
     #view-box { max-width: 1200px; margin: 0 auto; padding: 104px 20px 32px; }
-    body.has-visit #view-archive, body.has-visit #view-store { padding-top: 96px; }
+    body.has-visit #view-archive, body.has-visit #view-store, body.has-visit #view-box, body.has-visit #view-word { padding-top: var(--vb, 96px); }
     .box-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin-top: 18px; }
     .box-card { background: #1b2029; border-radius: 12px; overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,0.06); }
     .box-card .thumb { position: relative; aspect-ratio: 1 / 1; background: #0f1218; }
@@ -250,7 +327,7 @@
       <div style="font-size:40px; margin-bottom:6px">🖼️</div>
       <div class="tk-title">AGJJ 아그짜에 오신 걸 환영해요</div>
       <div class="tk-sub">Art Gallery of Jane Jang<br>작가 J.J(장예성)의 그림 갤러리예요.</div>
-      <div class="tk-rules">· 광고를 끝까지 보면 <b>오늘 하루</b> 갤러리에 자유롭게 들어올 수 있어요.<br>· 특별전은 갤러리 안에서 전시마다 입장권이 따로 필요해요.</div>
+      <div class="tk-rules">· 광고 1번을 보면 <b>오늘 하루</b> 갤러리에 자유롭게 들어올 수 있어요.<br>· 특별전은 갤러리 안에서 전시마다 입장권이 따로 필요해요.</div>
       <button class="tk-btn" id="gateGo" onclick="enterGalleryWithAd()">▶ 광고 보고 갤러리 입장</button>
       <div class="tk-sub" id="gateMsg" style="margin:10px 0 0"></div>
     </div>
@@ -308,10 +385,107 @@
 
   <!-- My Collection -->
   <div id="view-box" class="view-container">
-    <h2 style="font-size: 20px; font-weight: 600;">📖 My Collection</h2>
+    <h2 style="font-size: 20px; font-weight: 600;">🪣 My Collection</h2>
     <div class="store-note" id="boxNote"></div>
     <div id="boxGrid" class="box-grid"></div>
     <div id="boxAccount" class="store-note" style="margin-top:16px; text-align:center"></div>
+  </div>
+
+  <!-- 🎮 Art Pang: 예성이 그림 보석 퍼즐 (한 판 = 💧 1개) -->
+  <div id="view-pang" class="view-container">
+    <button class="back-gallery" onclick="switchView('3d')">← Gallery</button>
+    <h2 style="font-size: 20px; font-weight: 600;">🎮 J.J 아트팡</h2>
+    <div class="store-note">같은 그림 보석을 3개 이상 맞추는 60초 퍼즐이에요. <b>한 판에 💧 1개</b>, 목표 점수를 넘기면 💧 1개를 돌려받아요.<br>
+      🪣 My Collection에 작품을 담을수록 <b>✨레어 보석</b>이 늘어나서 다음 단계가 열려요. (레어 보석은 점수 2배)</div>
+    <div id="pangStages"></div>
+  </div>
+
+  <!-- 🗞 Art Out: 바깥 전시 소식(문화포털) + 나의 관람 기록 -->
+  <div id="view-out" class="view-container">
+    <button class="back-gallery" onclick="switchView('3d')">← Gallery</button>
+    <h2 style="font-size: 20px; font-weight: 600;">🗞 Art Out</h2>
+    <div class="store-note">지금 열리는 전시를 둘러보고, 다녀온 전시는 <b>My Art Log</b>에 남겨 두세요. 처음 남기는 전시마다 💧 1개를 드려요.</div>
+    <div class="out-tabs"><button id="otNews" class="on" onclick="outTab('news')">전시 소식</button><button id="otLog" onclick="outTab('log')">📒 My Art Log</button></div>
+    <div id="outNews">
+      <div class="out-areas" id="outAreas"></div>
+      <div class="out-list" id="outList"></div>
+      <div class="store-note" id="outSrc" style="margin-top:14px; font-size:11px"></div>
+    </div>
+    <div id="outLog" style="display:none">
+      <button class="wc-btn ad" style="width:100%" onclick="openLogForm(null)">✍ 다른 전시 직접 기록하기</button>
+      <div class="out-list" id="logList"></div>
+    </div>
+  </div>
+
+  <div id="outModal" class="tk-modal" onclick="if (event.target === this) closeModal('outModal')">
+    <div class="tk-box" style="max-width:480px; max-height:92vh; overflow-y:auto">
+      <div id="outDetail"></div>
+      <button class="tk-cancel" onclick="closeModal('outModal')">닫기</button>
+    </div>
+  </div>
+
+  <div id="logModal" class="tk-modal">
+    <div class="tk-box out-form" style="max-width:480px; max-height:92vh; overflow-y:auto">
+      <div class="tk-title">✍ 관람 기록</div>
+      <div id="logHead" class="tk-sub" style="margin-bottom:4px"></div>
+      <div id="logFree">
+        <label>전시 이름</label><input id="lgTitle" maxlength="80" placeholder="예) 모네와 친구들">
+        <label>장소</label><input id="lgPlace" maxlength="60" placeholder="예) 국립현대미술관 서울">
+      </div>
+      <label>다녀온 날</label><input id="lgDate" type="date">
+      <label>별점</label><div class="stars" id="lgStars"></div>
+      <label>함께 간 사람</label><input id="lgWith" maxlength="40" placeholder="예) 예성이랑">
+      <label>한 줄 감상</label><textarea id="lgMemo" maxlength="500" placeholder="가장 기억에 남는 작품, 느낌…"></textarea>
+      <button class="tk-btn" style="margin-top:14px" onclick="saveLog()">저장하기</button>
+      <button class="tk-cancel" id="lgDel" style="color:#f87171" onclick="deleteLog()">이 기록 지우기</button>
+      <button class="tk-cancel" onclick="closeModal('logModal')">취소</button>
+    </div>
+  </div>
+
+  <!-- 아트카드 (특별전 카드, 💧 1개로 받기 → 앞·뒤 이미지 저장, QR로 전시 모드) -->
+  <div id="view-artcard" class="view-container">
+    <button class="back-gallery" onclick="switchView('3d')">← Gallery</button>
+    <h2 style="font-size: 20px; font-weight: 600;">🎴 Art Card</h2>
+    <div class="store-note">특별전마다 한 장씩 있는 작품 카드예요. 💧 페인트 1개로 받으면 앞면·뒷면 이미지를 저장할 수 있어요.<br>
+      인쇄해서 뒷면 QR을 휴대폰 카메라로 찍으면, 그 특별전이 미술관처럼 열려요. (한 번 받은 카드는 다시 저장해도 무료)</div>
+    <div id="acGrid" class="ac-grid"></div>
+  </div>
+
+  <div id="acModal" class="tk-modal" onclick="if (event.target === this) closeModal('acModal')">
+    <div class="tk-box" style="max-width:520px">
+      <div class="tk-title" id="acTitle" style="margin-bottom:10px"></div>
+      <div class="ac-sides"><img id="acFront" alt="앞면"><img id="acBack" alt="뒷면"></div>
+      <div id="acBtns"></div>
+      <button class="tk-cancel" onclick="closeModal('acModal')">닫기</button>
+    </div>
+  </div>
+
+  <!-- 말씀카드 뽑기 (페인트 1개) -->
+  <div id="view-word" class="view-container">
+    <button class="back-gallery" onclick="switchView('3d')">← Gallery</button>
+    <h2 style="font-size: 20px; font-weight: 600;">📜 Word Card</h2>
+    <div class="store-note">말씀 한 구절과 J.J의 그림이 담긴 카드를 뽑아요.<br>카드 1장 = 💧 페인트 1개 · 페인트는 광고 1번에 1개씩 모여요.<br>카드 배경은 🪣 My Collection에 담은 작품 중에서 골라져요.</div>
+    <div class="wc-top">
+      <div class="wc-paint">💧 <span id="paintCnt">0</span></div>
+      <button class="wc-btn" id="wcDraw" onclick="drawWordCard()">🃏 카드 뽑기 (💧 1)</button>
+      <button class="wc-btn ad" id="wcAd" onclick="earnPaint()">📺 광고 보고 💧 +1</button>
+    </div>
+    <h3 style="font-size:16px; margin-top:26px">My Cards <span id="wcCount" style="color:#94a3b8; font-weight:500"></span></h3>
+    <div id="wcGrid" class="wc-grid"></div>
+  </div>
+
+  <div id="wcModal" class="tk-modal" onclick="if (event.target === this) closeModal('wcModal')">
+    <div class="tk-box" style="max-width:480px">
+      <img id="wcImg" class="wc-card-img" src="" alt="말씀카드">
+      <div class="wc-tone">
+        <button id="wcColor" onclick="setCardTone(false)">🌈 컬러(원본)</button>
+        <button id="wcGray" onclick="setCardTone(true)">⚫ 흑백</button>
+      </div>
+      <div class="wc-box-pick" id="wcBoxPick"></div>
+      <button class="tk-btn" onclick="saveWordCard()">사진첩에 저장</button>
+      <button class="tk-cancel" onclick="shareWordCard()">📤 카톡 등으로 보내기</button>
+      <button class="tk-cancel" onclick="closeModal('wcModal')">닫기</button>
+    </div>
   </div>
 
   <div id="boxModal" class="tk-modal" onclick="if (event.target === this) closeModal('boxModal')">
@@ -332,6 +506,10 @@
     <canvas id="canvas3d"></canvas>
     <button id="autoBtn" class="auto-btn" onclick="toggleAutoScroll()" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation()">⏸ Auto Tour Pause</button>
     <div class="hint-3d">작품이 천천히 내려가요 · 화면을 밀면 직접 볼 수 있어요</div>
+    <div class="out-banner" id="outBanner" onclick="openOutDetail(outBannerItem)" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" ontouchend="event.stopPropagation()">
+      <img id="obImg" alt=""><div class="ob-t"><div class="ob-k">🗞 지금 열리는 전시</div><div class="ob-n" id="obName"></div><div class="ob-p" id="obPlace"></div></div>
+      <span class="ob-x" onclick="event.stopPropagation(); hideOutBanner()">✕</span>
+    </div>
   </div>
 
   <!-- 숏폼 뷰: 작품이 무작위 순서로 자동 재생 -->
@@ -581,6 +759,7 @@
     const GRACE_MS = 10 * 60 * 1000;       // 앱이 꺼져도 10분 안에는 이어서 보기
     const FREE_SLOTS = 1;                  // My Collection 무료 칸
     const K_TICKET = 'agjj_ticket_v1', K_VISITED = 'agjj_visited_v1', K_BOX = 'agjj_box_v1', K_PASS = 'agjj_pass_v1';
+    const K_PAINT = 'agjj_paint_v1', K_CARDS = 'agjj_cards_v1', K_EMO = 'agjj_emo_v1', K_LOG = 'agjj_artlog_v1';   // + 관람 기록   // 페인트 · 뽑은 말씀카드 · 페인트로 받은 것(이모티콘·아트카드)
     let EXCFG = null;                      // exhibitions.json 내용
     let allArtworks = [];                  // 저장소의 모든 작품
     let currentEx = null;                  // 지금(또는 곧) 열리는 특별전
@@ -651,6 +830,7 @@
       const bar = document.getElementById('visitBar');
       const head = document.querySelector('header');
       if (head) bar.style.top = (head.offsetHeight + 8) + 'px';
+      requestAnimationFrame(() => { if (bar.offsetHeight && head) document.body.style.setProperty('--vb', Math.max(60, bar.getBoundingClientRect().bottom - head.getBoundingClientRect().bottom + 18) + 'px'); });   // 알약이 여러 줄이 돼도 화면 내용이 가려지지 않게
       document.body.classList.toggle('has-visit', !!EXCFG);
       if (!EXCFG) { bar.innerHTML = ''; return; }
       if (!IS_APP) {
@@ -669,7 +849,11 @@
       } else {
         html += `<button class="visit-pill enter" onclick="openExList()">🎟 Exhibitions</button>`;
       }
-      html += `<button class="visit-pill" onclick="openBox()">📖 My Collection ${box.ids.length}/${box.slots}</button>`;
+      html += `<button class="visit-pill" onclick="openBox()">🪣 My Collection ${box.ids.length}/${box.slots}</button>`;
+      html += `<button class="visit-pill paint" onclick="openWord()">📜 Word Card · 💧 ${getPaint()}</button>`;
+      html += `<button class="visit-pill art" onclick="openArtCards()">🎴 Art Card</button>`;
+      html += `<button class="visit-pill out" onclick="openArtOut()">🗞 Art Out</button>`;
+      html += `<button class="visit-pill pang" onclick="openPang()">🎮 Art Pang</button>`;
       bar.innerHTML = html;
     }
 
@@ -708,7 +892,7 @@
         go.disabled = true; go.innerText = '관람 완료';
       } else {
         document.getElementById('tkRules').innerHTML =
-          '· 광고를 끝까지 보면 입장권 1장을 받아요.<br>' +
+          '· 광고 1번을 보면 입장권 1장을 받아요.<br>' +
           '· 입장 후 <b>2시간</b> 동안 볼 수 있어요.<br>' +
           '· <b>퇴장하면 이 전시는 다시 볼 수 없어요.</b><br>' +
           '· 앱이 꺼져도 10분 안에 다시 열면 이어서 볼 수 있어요.<br>' +
@@ -732,12 +916,11 @@
       const go = document.getElementById('tkGo');
       go.disabled = true; go.innerText = '광고 불러오는 중…';
       const r = await showAd('ticket');
-      if (r === 'closed') { go.disabled = false; go.innerText = '▶ 광고 보고 입장하기'; showMsg('입장권을 받지 못했어요', '광고를 끝까지 보면 입장권을 받을 수 있어요.'); return; }
-      // reward(끝까지 봄), error/noad(광고를 못 불러옴) → 입장
+      // 광고를 끝까지 보든 중간에 닫든(closed), 못 불러오든(error) 입장 — 끝까지 보기는 강제하지 않아요
       const now = Date.now();
       lsSet(K_TICKET, { exId: pickedEx.id, enteredAt: now, lastSeen: now });
       closeModal('tkModal');
-      showMsg('입장했어요 🎟', `${pickedEx.title}<br>2시간 동안 천천히 둘러보세요.` + (r === 'reward' ? '' : '<br><span style="color:#64748b">(광고를 불러오지 못해 바로 입장했어요)</span>'), saveThenReload);
+      showMsg('입장했어요 🎟', `${pickedEx.title}<br>2시간 동안 천천히 둘러보세요.` + (r === 'reward' || r === 'closed' ? '' : '<br><span style="color:#64748b">(광고를 불러오지 못해 바로 입장했어요)</span>'), saveThenReload);
     }
 
     function exitExhibition() {
@@ -770,11 +953,6 @@
       const go = document.getElementById('gateGo');
       go.disabled = true; go.innerText = '광고 불러오는 중…';
       const r = await showAd('gallery');
-      if (r === 'closed') {
-        go.disabled = false; go.innerText = '▶ 광고 보고 갤러리 입장';
-        document.getElementById('gateMsg').innerText = '광고를 끝까지 보면 입장할 수 있어요.';
-        return;
-      }
       lsSet(K_PASS, todayStr());
       closeModal('gateModal');
     }
@@ -796,12 +974,13 @@
     const GOOGLE_WEB_CLIENT_ID = '83235290466-phg2k92809cr7rp7qqtrbib4tev4bqku.apps.googleusercontent.com';       // ← Authentication > Google > 웹 SDK 구성의 '웹 클라이언트 ID'
     const FB_VER = '10.14.1';
     var K_UID = 'agjj_uid_v1';
-    var SYNC_KEYS = [K_TICKET, K_VISITED, K_BOX, K_PASS];
+    var SYNC_KEYS = [K_TICKET, K_VISITED, K_BOX, K_PASS, K_PAINT, K_CARDS, K_EMO, K_LOG];
     var fb = null, cloudUser = null, cloudTimer = null;   // var: 위쪽 함수에서 먼저 불러도 괜찮게
 
     function cloudOn() { return IS_APP && !!FIREBASE_CONFIG && !!EXCFG; }
     function localState() {
-      return { ticket: lsGet(K_TICKET, null), visited: lsGet(K_VISITED, {}), box: lsGet(K_BOX, { slots: FREE_SLOTS, ids: [] }), pass: lsGet(K_PASS, '') };
+      return { ticket: lsGet(K_TICKET, null), visited: lsGet(K_VISITED, {}), box: lsGet(K_BOX, { slots: FREE_SLOTS, ids: [] }), pass: lsGet(K_PASS, ''),
+               paint: lsGet(K_PAINT, 0), cards: lsGet(K_CARDS, []), emo: lsGet(K_EMO, []), log: lsGet(K_LOG, []) };
     }
     async function saveThenReload() { clearTimeout(cloudTimer); await cloudSaveNow(); location.reload(); }
     function cloudSaveSoon() {
@@ -827,11 +1006,21 @@
       let ticket = [srv.ticket, loc.ticket].filter(Boolean).sort((a, b) => b.enteredAt - a.enteredAt)[0] || null;
       if (ticket && visited[ticket.exId]) ticket = null;          // 이미 끝난 전시 입장권은 버림
       if (ticket && loc.ticket && loc.ticket.exId === ticket.exId) ticket.lastSeen = Math.max(ticket.lastSeen || 0, loc.ticket.lastSeen || 0);
-      return { ticket, visited, box, pass };
+      // 페인트: 서버 기록이 있으면 서버 값(다른 폰에서 쓴 것도 반영), 처음 로그인이면 이 폰 값
+      const paint = typeof srv.paint === 'number' ? srv.paint : (loc.paint || 0);
+      const seen = new Set(); const cards = [];
+      [...(srv.cards || []), ...(loc.cards || [])].forEach(c => { const k = c.t + '|' + c.ref; if (!seen.has(k)) { seen.add(k); cards.push(c); } });
+      cards.sort((a, b) => b.t - a.t);
+      const emo = [...new Set([...(srv.emo || []), ...(loc.emo || [])])];
+      const lseen = new Set(); const log = [];
+      [...(loc.log || []), ...(srv.log || [])].forEach(r => { if (!lseen.has(r.id)) { lseen.add(r.id); log.push(r); } });
+      log.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+      return { ticket, visited, box, pass, paint, cards, emo, log };
     }
     function applyState(st) {
       if (st.ticket) lsSet(K_TICKET, st.ticket, true); else { try { localStorage.removeItem(K_TICKET); } catch (e) {} }
       lsSet(K_VISITED, st.visited, true); lsSet(K_BOX, st.box, true); lsSet(K_PASS, st.pass, true);
+      lsSet(K_PAINT, st.paint, true); lsSet(K_CARDS, st.cards, true); lsSet(K_EMO, st.emo, true); lsSet(K_LOG, st.log, true);
     }
 
     async function loadFirebase() {
@@ -865,10 +1054,11 @@
     // 로그인 창: 구글 계정 고르기 → 앱이 받은 신분증(ID 토큰)으로 Firebase 로그인
     let loginResolve = null;
     window.onAtelierLogin = async (result, token) => {
+      clearTimeout(window.__loginTimer);
       const msg = document.getElementById('loginMsg'), go = document.getElementById('loginGo');
       if (result !== 'ok') {
         go.disabled = false; go.innerText = 'Google로 로그인';
-        msg.innerText = result === 'cancel' ? '로그인을 취소했어요. 다시 눌러 주세요.' : '로그인하지 못했어요. 잠시 뒤 다시 해 주세요. (' + (token || '') + ')';
+        msg.innerHTML = (result === 'cancel' ? '로그인을 취소했어요. 다시 눌러 주세요.' : '로그인하지 못했어요. 잠시 뒤 다시 해 주세요.') + '<br><span style="font-size:11px;color:#64748b">' + String(token || '').replace(/</g, '&lt;') + '</span>';
         return;
       }
       try {
@@ -893,6 +1083,11 @@
       go.disabled = true; go.innerText = '구글 계정 여는 중…';
       document.getElementById('loginMsg').innerText = '';
       NativeApp.googleSignIn(GOOGLE_WEB_CLIENT_ID);
+      // 1분이 지나도 답이 없으면 다시 누를 수 있게
+      clearTimeout(window.__loginTimer);
+      window.__loginTimer = setTimeout(() => {
+        if (go.disabled) { go.disabled = false; go.innerText = 'Google로 로그인'; document.getElementById('loginMsg').innerText = '구글 응답이 없어요. 다시 눌러 주세요.'; }
+      }, 60000);
     }
     async function logout() {
       if (!fb) return;
@@ -901,6 +1096,632 @@
       if (NativeApp && NativeApp.googleSignOut) NativeApp.googleSignOut();
       SYNC_KEYS.concat([K_UID]).forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
       location.reload();
+    }
+
+    // =====================================================================
+    // 🎮 J.J 아트팡: 단계 고르기 → 💧 1개 → 입장권 → game.html
+    //  - 1단계 = 무료 로비 작품 6점, My Collection 작품(로비 밖)이 늘수록 ✨레어 보석이 추가된 2·3·4단계
+    //  - 게임에서 목표를 넘기면 agjj_pending_paint 로 💧 를 돌려줌 → 갤러리로 돌아오면 받기
+    // =====================================================================
+    const PANG_STAGES = [
+      { n: 1, name: '1단계 · 로비', rare: 0, mult: 1, target: 3000 },
+      { n: 2, name: '2단계 · 첫 컬렉션', rare: 1, mult: 1.5, target: 3500 },
+      { n: 3, name: '3단계 · 수집가', rare: 2, mult: 2, target: 4200 },
+      { n: 4, name: '4단계 · 큐레이터', rare: 3, mult: 3, target: 5000 },
+    ];
+    function pangPools() {
+      const lobby = ((EXCFG && EXCFG.lobby) || []).filter(id => allArtworks.some(a => a.id === id)).slice(0, 6);
+      const rare = (lsGet(K_BOX, { ids: [] }).ids || []).filter(id => !lobby.includes(id) && allArtworks.some(a => a.id === id && !a.isProfile));
+      return { lobby, rare };
+    }
+    function openPang() {
+      closeViewer();
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-pang').classList.add('active');
+      window.scrollTo(0, 0);
+      stopShorts();
+      const { lobby, rare } = pangPools();
+      const src = id => (allArtworks.find(a => a.id === id) || {}).src || '';
+      document.getElementById('pangStages').innerHTML = PANG_STAGES.map(st => {
+        const open = rare.length >= st.rare;
+        const best = lsGet('agjj_pang_best_' + st.n, 0);
+        return `<div class="pg-stage ${open ? '' : 'lock'}">
+          <div class="pg-head"><div><div class="pg-name">${open ? '' : '🔒 '}${st.name}</div>
+            <div class="pg-info">보석 ${6 + st.rare}종 · 점수 ×${st.mult} · 목표 ${st.target.toLocaleString()}점${best ? ' · 최고 ' + best.toLocaleString() : ''}</div></div>
+            ${open ? `<button class="pg-go" onclick="startPang(${st.n})">💧 1개로 시작</button>` : ''}</div>
+          <div class="pg-gems">${lobby.map(id => `<img src="${src(id)}" alt="">`).join('')}
+            ${Array.from({ length: st.rare }, (_, i) => rare[i] ? `<img class="rare" src="${src(rare[i])}" alt="">` : '<div class="slot">✨</div>').join('')}</div>
+          ${open ? '' : `<div class="pg-info">🪣 My Collection에 로비 밖 작품을 ${st.rare}점 담으면 열려요 (지금 ${rare.length}점)</div>`}
+        </div>`;
+      }).join('');
+    }
+    async function startPang(n) {
+      const st = PANG_STAGES.find(x => x.n === n);
+      const { lobby, rare } = pangPools();
+      if (!st || rare.length < st.rare) return;
+      if (!await payPaintFor(null, '아트팡 한 판')) return;
+      lsSet('agjj_pang_ticket', { stage: st.n, mult: st.mult, target: st.target, ids: { lobby, rare: rare.slice(0, st.rare) }, t: Date.now() }, true);
+      location.href = 'game.html';
+    }
+    // 게임에서 돌려받은 💧 를 계정 페인트에 넣기
+    function collectPendingPaint() {
+      const n = lsGet('agjj_pending_paint', 0);
+      if (!n) return;
+      try { localStorage.removeItem('agjj_pending_paint'); } catch (e) {}
+      setPaint(getPaint() + n);
+      showMsg('💧 페인트를 받았어요', `아트팡 목표 점수를 넘겨서 💧 ${n}개가 들어왔어요.`);
+    }
+
+    // =====================================================================
+    // 🗞 Art Out: 문화포털 전시 소식(culture/exhibits.json, 매일 자동 업데이트) + 📒 My Art Log
+    //  - 갤러리 아래 배너(전시 광고) → 누르면 상세 → "다녀왔어요" 관람 기록
+    //  - 처음 기록하는 전시마다 💧 1개
+    // =====================================================================
+    let OUT_FEED = null, outArea = '전체', outBannerItem = null, outBannerTimer = null, logEditing = null, logStars = 0;
+    const https = u => String(u || '').replace(/^http:\/\//, 'https://');
+    const esc = t => String(t || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const shortDate = d => { const m = String(d || '').match(/^\d{4}-(\d{2})-(\d{2})/); return m ? `${+m[1]}.${+m[2]}` : ''; };
+    async function loadOutFeed() {
+      if (OUT_FEED) return OUT_FEED;
+      try { OUT_FEED = await (await fetch('culture/exhibits.json?v=' + Math.floor(Date.now() / 600000), { cache: 'no-store' })).json(); }
+      catch (e) { OUT_FEED = { items: [] }; }
+      const today = new Date().toISOString().slice(0, 10);
+      OUT_FEED.items = (OUT_FEED.items || []).filter(x => !x.end || x.end >= today);
+      return OUT_FEED;
+    }
+    // 갤러리 배너: 6초마다 다른 전시
+    async function startOutBanner() {
+      if (!IS_APP || !EXCFG) return;
+      try { if (sessionStorage.getItem('agjj_banner_off')) return; } catch (e) {}
+      const f = await loadOutFeed();
+      if (!f.items.length) return;
+      const list = f.items.filter(x => x.thumb).concat(f.items.filter(x => !x.thumb)).slice(0, 30);
+      let k = Math.floor(Math.random() * list.length);
+      const showOne = () => {
+        outBannerItem = list[k++ % list.length];
+        document.getElementById('obImg').src = https(outBannerItem.thumb);
+        document.getElementById('obImg').style.visibility = outBannerItem.thumb ? 'visible' : 'hidden';
+        document.getElementById('obName').innerText = outBannerItem.title;
+        document.getElementById('obPlace').innerText = [outBannerItem.place, outBannerItem.end ? '~' + shortDate(outBannerItem.end) : ''].filter(Boolean).join(' · ');
+      };
+      showOne();
+      document.getElementById('outBanner').classList.add('on');
+      document.getElementById('view-3d').classList.add('has-banner');
+      clearInterval(outBannerTimer); outBannerTimer = setInterval(showOne, 6000);
+    }
+    function hideOutBanner() {
+      clearInterval(outBannerTimer);
+      document.getElementById('outBanner').classList.remove('on');
+      document.getElementById('view-3d').classList.remove('has-banner');
+      try { sessionStorage.setItem('agjj_banner_off', '1'); } catch (e) {}
+    }
+
+    function openArtOut(tab) {
+      closeViewer();
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-out').classList.add('active');
+      window.scrollTo(0, 0);
+      stopShorts();
+      outTab(tab || 'news');
+    }
+    async function outTab(t) {
+      document.getElementById('otNews').classList.toggle('on', t === 'news');
+      document.getElementById('otLog').classList.toggle('on', t === 'log');
+      document.getElementById('outNews').style.display = t === 'news' ? '' : 'none';
+      document.getElementById('outLog').style.display = t === 'log' ? '' : 'none';
+      if (t === 'log') { renderLog(); return; }
+      const f = await loadOutFeed();
+      const areas = ['전체', ...[...new Set(f.items.map(x => x.area).filter(Boolean))].sort()];
+      document.getElementById('outAreas').innerHTML = areas.map(a => `<button class="${a === outArea ? 'on' : ''}" onclick="outArea='${esc(a)}'; outTab('news')">${esc(a)}</button>`).join('');
+      const list = f.items.filter(x => outArea === '전체' || x.area === outArea);
+      window.__outList = list;
+      document.getElementById('outList').innerHTML = list.length ? list.slice(0, 200).map((x, i) => `
+        <div class="out-item" onclick="openOutDetail(window.__outList[${i}])">
+          ${x.thumb ? `<img src="${esc(https(x.thumb))}" alt="" loading="lazy">` : '<img alt="">'}
+          <div><div class="oi-t">${esc(x.title)}</div>
+          <div class="oi-m">📍 ${esc([x.area, x.place].filter(Boolean).join(' · '))}<br>🗓 ${esc(x.start)} ~ ${esc(x.end)}</div>
+          ${logOf(x.seq) ? '<div class="oi-s">✓ 다녀왔어요</div>' : ''}</div>
+        </div>`).join('') : '<div class="store-note">전시 소식을 준비하고 있어요. 매일 아침 새로 받아 와요.</div>';
+      document.getElementById('outSrc').innerText = f.items.length ? `전시 정보·이미지 출처: ${f.source || '한국문화정보원 문화포털'} · ${String(f.updated || '').slice(0, 10)} 기준` : '';
+    }
+    function logOf(seq) { return seq && lsGet(K_LOG, []).find(r => r.seq === seq); }
+
+    function openOutDetail(x) {
+      if (!x) return;
+      const mine = logOf(x.seq);
+      const q = encodeURIComponent(x.title);
+      document.getElementById('outDetail').innerHTML = `
+        ${x.thumb ? `<img class="out-detail-img" src="${esc(https(x.thumb))}" alt=""><div class="out-src">이미지 출처: 문화포털</div>` : ''}
+        <div class="tk-title" style="text-align:left">${esc(x.title)}</div>
+        <div class="tk-rules">📍 ${esc([x.area, x.sigungu, x.place].filter(Boolean).join(' · '))}<br>🗓 ${esc(x.start)} ~ ${esc(x.end)}${x.realm ? '<br>🎨 ' + esc(x.realm) : ''}</div>
+        ${mine ? `<div class="tk-sub">✓ ${esc(mine.date)}에 다녀왔어요 ${'★'.repeat(mine.stars || 0)}</div>` : ''}
+        <button class="tk-btn" onclick="closeModal('outModal'); openLogForm(${esc(JSON.stringify(x))})">${mine ? '✍ 관람 기록 고치기' : '✍ 다녀왔어요 · 기록 남기기'}</button>
+        <button class="tk-btn blue" onclick="window.open('https://map.naver.com/p/search/${encodeURIComponent(x.place || x.title)}', '_blank')">🗺 지도에서 보기</button>
+        <button class="tk-cancel" onclick="window.open('https://search.naver.com/search.naver?query=${q}', '_blank')">🔎 전시 자세히 찾아보기</button>`;
+      openModal('outModal');
+    }
+
+    // ----- 관람 기록 -----
+    function drawStars() {
+      document.getElementById('lgStars').innerHTML = [1, 2, 3, 4, 5].map(n => `<span class="${n <= logStars ? 'on' : ''}" onclick="logStars=${n}; drawStars()">★</span>`).join('');
+    }
+    function openLogForm(x) {
+      const old = x && x.seq ? logOf(x.seq) : (x && x.id ? x : null);
+      logEditing = { x: x && x.seq ? x : null, old };
+      const free = !logEditing.x && !(old && old.seq);
+      document.getElementById('logFree').style.display = free ? '' : 'none';
+      document.getElementById('logHead').innerText = free ? '목록에 없는 전시도 직접 남길 수 있어요.' : (x || old).title + ' · ' + ((x || old).place || '');
+      document.getElementById('lgTitle').value = old ? old.title : '';
+      document.getElementById('lgPlace').value = old ? (old.place || '') : '';
+      document.getElementById('lgDate').value = old ? old.date : new Date().toISOString().slice(0, 10);
+      document.getElementById('lgWith').value = old ? (old.with || '') : '';
+      document.getElementById('lgMemo').value = old ? (old.memo || '') : '';
+      document.getElementById('lgDel').style.display = old ? '' : 'none';
+      logStars = old ? (old.stars || 0) : 0; drawStars();
+      openModal('logModal');
+    }
+    function saveLog() {
+      const e = logEditing; if (!e) return;
+      const src = e.x || e.old || {};
+      const title = (e.x ? e.x.title : (document.getElementById('lgTitle').value.trim() || src.title || '')).slice(0, 80);
+      if (!title) { document.getElementById('lgTitle').focus(); return; }
+      const rec = {
+        id: e.old ? e.old.id : 'L' + Date.now(), seq: src.seq || '', title,
+        place: e.x ? (e.x.place || '') : (document.getElementById('lgPlace').value.trim() || src.place || ''),
+        area: src.area || '', thumb: src.thumb || '', start: src.start || '', end: src.end || '',
+        date: document.getElementById('lgDate').value || new Date().toISOString().slice(0, 10),
+        stars: logStars, with: document.getElementById('lgWith').value.trim().slice(0, 40),
+        memo: document.getElementById('lgMemo').value.trim().slice(0, 500), t: Date.now()
+      };
+      const log = lsGet(K_LOG, []).filter(r => r.id !== rec.id);
+      log.unshift(rec); log.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+      lsSet(K_LOG, log);
+      closeModal('logModal');
+      // 처음 기록하는 전시마다 💧 1개 (같은 전시는 한 번만)
+      const key = 'log:' + (rec.seq || rec.title);
+      const got = lsGet(K_EMO, []);
+      if (!e.old && IS_APP && !got.includes(key)) {
+        lsSet(K_EMO, [...got, key]); setPaint(getPaint() + 1);
+        showMsg('📒 기록했어요!', '처음 남긴 관람 기록이라 💧 페인트 1개를 드렸어요.');
+      }
+      openArtOut('log');
+    }
+    function deleteLog() {
+      const e = logEditing; if (!e || !e.old) return;
+      lsSet(K_LOG, lsGet(K_LOG, []).filter(r => r.id !== e.old.id));
+      closeModal('logModal'); renderLog();
+    }
+    function renderLog() {
+      const log = lsGet(K_LOG, []);
+      window.__logList = log;
+      document.getElementById('logList').innerHTML = log.length ? log.map((r, i) => `
+        <div class="out-item" onclick="openLogForm(window.__logList[${i}])">
+          ${r.thumb ? `<img src="${esc(https(r.thumb))}" alt="" loading="lazy">` : '<img alt="" style="display:flex">'}
+          <div><div class="oi-t">${esc(r.title)}</div>
+          <div class="oi-m">🗓 ${esc(r.date)}${r.place ? ' · 📍 ' + esc(r.place) : ''}${r.with ? '<br>👥 ' + esc(r.with) : ''}</div>
+          ${r.stars ? `<div class="oi-s">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>` : ''}
+          ${r.memo ? `<div class="oi-m" style="color:#e2e8f0">“${esc(r.memo)}”</div>` : ''}</div>
+        </div>`).join('') : '<div class="store-note" style="margin-top:12px">아직 기록이 없어요. 전시 소식에서 다녀온 전시를 골라 "다녀왔어요"를 눌러 보세요.</div>';
+    }
+
+    // =====================================================================
+    // 🎴 아트카드: 특별전 카드 (앞면 = 대표작 포스터, 뒷면 = 전시 모드 QR)
+    //  - 💧 1개로 받기(한 번 받으면 계속 무료) → 앞면·뒷면 이미지 저장
+    //  - QR 주소: exhibit.html?ex=전시&c=카드암호  (암호는 exhibitions.json 의 card)
+    // =====================================================================
+    const SITE_URL = 'https://hannaj1763-sketch.github.io/gallery2026/';
+    const AC_W = 1050, AC_H = 1470;
+    let acCurrent = null, qrLibReady = null;
+    function exNo(ex) { const m = String(ex.title).match(/제(\d+)회/); return m ? +m[1] : (EXCFG.exhibitions.indexOf(ex) + 1); }
+    function exCover(ex) { return allArtworks.find(a => a.id === (ex.cover || ex.works[0])); }
+    function exUrl(ex) { return `${SITE_URL}exhibit.html?ex=${encodeURIComponent(ex.id)}&c=${encodeURIComponent(ex.card || '')}`; }
+    function ownsCard(ex) { return lsGet(K_EMO, []).includes('card:' + ex.id); }
+
+    function openArtCards() {
+      closeViewer();
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-artcard').classList.add('active');
+      window.scrollTo(0, 0);
+      stopShorts();
+      renderArtGrid();
+    }
+    function renderArtGrid() {
+      const exs = (EXCFG && EXCFG.exhibitions) || [];
+      document.getElementById('acGrid').innerHTML = exs.map(ex => {
+        const c = exCover(ex);
+        return `<div class="ac-item" onclick="openArtCard('${ex.id}')">
+          ${c ? `<img src="${c.src}" alt="" loading="lazy">` : ''}
+          ${ownsCard(ex) ? '<span class="own">받음</span>' : ''}
+          <div class="cap">No.${String(exNo(ex)).padStart(2, '0')} ${ex.short || ex.title}</div></div>`;
+      }).join('') || '<div class="store-note">특별전 정보를 불러오지 못했어요.</div>';
+    }
+
+    async function openArtCard(id) {
+      const ex = EXCFG.exhibitions.find(e => e.id === id);
+      if (!ex) return;
+      document.getElementById('acTitle').innerText = `🎴 No.${String(exNo(ex)).padStart(2, '0')} ${ex.short || ex.title}`;
+      document.getElementById('acFront').src = ''; document.getElementById('acBack').src = '';
+      document.getElementById('acBtns').innerHTML = '<div class="tk-sub">카드를 만드는 중…</div>';
+      openModal('acModal');
+      const [front, back] = await Promise.all([renderArtFront(ex), renderArtBack(ex)]);
+      acCurrent = { ex, front, back };
+      document.getElementById('acFront').src = front;
+      document.getElementById('acBack').src = back;
+      renderAcBtns();
+    }
+    function renderAcBtns() {
+      const { ex } = acCurrent;
+      document.getElementById('acBtns').innerHTML = ownsCard(ex)
+        ? `<button class="tk-btn" onclick="saveArtCard()">앞면·뒷면 이미지 저장</button>
+           <button class="tk-btn blue" onclick="location.href='${exUrl(ex)}'">▶ 전시 모드로 보기</button>`
+        : `<button class="tk-btn" onclick="buyArtCard()">💧 1개로 아트카드 받기</button>`;
+    }
+    async function buyArtCard() {
+      if (!acCurrent) return;
+      if (!await payPaintFor('card:' + acCurrent.ex.id, '아트카드 받기')) return;
+      renderAcBtns(); renderArtGrid();
+      if (!document.getElementById('acModal').classList.contains('active')) openModal('acModal');
+    }
+    function saveArtCard() {
+      if (!acCurrent) return;
+      const base = `AGJJ_artcard_${String(exNo(acCurrent.ex)).padStart(2, '0')}`;
+      const save = (url, name) => {
+        if (NativeApp) { NativeApp.saveFile(url, name); return; }
+        const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+      };
+      save(acCurrent.front, base + '_front.png');
+      setTimeout(() => save(acCurrent.back, base + '_back.png'), 700);
+    }
+
+    // ----- 카드 그리기 -----
+    function fitText(g, text, maxW, size, weight, font) {
+      for (; size > 20; size -= 2) { g.font = `${weight} ${size}px ${font}`; if (g.measureText(text).width <= maxW) break; }
+      return size;
+    }
+    function spaced(g, text, x, y, gap) {          // 글자 사이를 띄워 쓰기 (가운데 정렬)
+      const w = [...text].reduce((s, ch) => s + g.measureText(ch).width + gap, -gap);
+      let cx = x - w / 2; g.textAlign = 'left';
+      [...text].forEach(ch => { g.fillText(ch, cx, y); cx += g.measureText(ch).width + gap; });
+      g.textAlign = 'center';
+    }
+    async function renderArtFront(ex) {
+      const cv = document.createElement('canvas'); cv.width = AC_W; cv.height = AC_H;
+      const g = cv.getContext('2d'); const font = await loadCardFont();
+      g.fillStyle = '#f6f0e4'; g.fillRect(0, 0, AC_W, AC_H);
+      g.strokeStyle = '#c9a463'; g.lineWidth = 3; g.strokeRect(34, 34, AC_W - 68, AC_H - 68);
+      g.lineWidth = 1; g.strokeRect(46, 46, AC_W - 92, AC_H - 92);
+      g.textAlign = 'center'; g.fillStyle = '#a8844a'; g.font = `bold 26px ${font}`;
+      spaced(g, 'AGJJ SPECIAL EXHIBITION', AC_W / 2, 122, 7);
+      // 대표작 (액자)
+      const c = exCover(ex);
+      if (c) {
+        try {
+          const img = await loadImg(c.src);
+          const bw = 780, bh = 800, s = Math.min(bw / img.width, bh / img.height);
+          const w = img.width * s, h = img.height * s, x = (AC_W - w) / 2, y = 170 + (bh - h) / 2;
+          g.save(); g.shadowColor = 'rgba(40,25,10,.35)'; g.shadowBlur = 30; g.shadowOffsetY = 12;
+          g.fillStyle = '#3a2b1f'; g.fillRect(x - 34, y - 34, w + 68, h + 68); g.restore();
+          g.fillStyle = '#fbf8f2'; g.fillRect(x - 24, y - 24, w + 48, h + 48);
+          g.drawImage(img, x, y, w, h);
+        } catch (e) {}
+      }
+      // 전시 제목
+      const title = ex.short || ex.title;
+      const ts = fitText(g, title, 860, 78, 'bold', font);
+      g.fillStyle = '#2b2119'; g.font = `bold ${ts}px ${font}`; g.fillText(title, AC_W / 2, 1122);
+      g.fillStyle = '#8a7660'; g.font = `32px ${font}`;
+      g.fillText(`제${exNo(ex)}회 특별전  ·  J.J 장예성`, AC_W / 2, 1186);
+      g.fillStyle = '#c9a463'; g.fillRect(AC_W / 2 - 60, 1228, 120, 2);
+      g.fillStyle = '#8a7660'; g.font = `bold 26px ${font}`;
+      g.textAlign = 'left'; spaced(g, `ART CARD  No.${String(exNo(ex)).padStart(2, '0')}`, 250, 1372, 4);
+      g.textAlign = 'right'; g.font = 'bold 28px sans-serif'; g.fillText('© jj', AC_W - 92, 1372);
+      return cv.toDataURL('image/png');
+    }
+    function loadQrLib() {
+      if (window.qrcode) return Promise.resolve();
+      if (!qrLibReady) qrLibReady = new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
+        s.onload = res; s.onerror = rej; document.head.appendChild(s);
+      });
+      return qrLibReady;
+    }
+    async function renderArtBack(ex) {
+      const cv = document.createElement('canvas'); cv.width = AC_W; cv.height = AC_H;
+      const g = cv.getContext('2d'); const font = await loadCardFont();
+      const bg = g.createRadialGradient(AC_W / 2, 420, 50, AC_W / 2, 700, 900);
+      bg.addColorStop(0, '#3a3029'); bg.addColorStop(1, '#16120f');
+      g.fillStyle = bg; g.fillRect(0, 0, AC_W, AC_H);
+      g.strokeStyle = '#c9a463'; g.lineWidth = 3; g.strokeRect(34, 34, AC_W - 68, AC_H - 68);
+      g.lineWidth = 1; g.strokeRect(46, 46, AC_W - 92, AC_H - 92);
+      g.textAlign = 'center'; g.fillStyle = '#d8b679'; g.font = `bold 64px ${font}`;
+      spaced(g, 'AGJJ', AC_W / 2, 190, 22);
+      g.fillStyle = '#b9a993'; g.font = `26px ${font}`; g.fillText('Art Gallery of Jane Jang', AC_W / 2, 240);
+      // QR
+      const box = 600, bx = (AC_W - box) / 2, by = 320;
+      g.fillStyle = '#fbf8f2'; g.beginPath(); if (g.roundRect) g.roundRect(bx, by, box, box, 28); else g.rect(bx, by, box, box); g.fill();
+      try {
+        await loadQrLib();
+        const q = qrcode(0, 'M'); q.addData(exUrl(ex)); q.make();
+        const n = q.getModuleCount(), cell = Math.floor((box - 80) / n), off = (box - cell * n) / 2;
+        g.fillStyle = '#1b1510';
+        for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) g.fillRect(bx + off + c * cell, by + off + r * cell, cell, cell);
+      } catch (e) { g.fillStyle = '#1b1510'; g.font = `28px ${font}`; g.fillText('QR을 만들지 못했어요', AC_W / 2, by + box / 2); }
+      g.fillStyle = '#f5ede1'; g.font = `bold 40px ${font}`;
+      g.fillText(`「${ex.short || ex.title}」`, AC_W / 2, 1040);
+      g.fillStyle = '#b9a993'; g.font = `30px ${font}`;
+      g.fillText('휴대폰 카메라로 QR을 찍으면', AC_W / 2, 1110);
+      g.fillText('이 특별전이 미술관처럼 열려요', AC_W / 2, 1156);
+      g.fillStyle = '#8a7660'; g.font = `24px ${font}`;
+      g.fillText('가로로 눕히거나 TV·프로젝터로 보내면 더 크게 볼 수 있어요', AC_W / 2, 1222);
+      g.fillStyle = '#c9a463'; g.font = `bold 24px ${font}`;
+      spaced(g, `ART CARD  No.${String(exNo(ex)).padStart(2, '0')}`, AC_W / 2, 1372, 4);
+      return cv.toDataURL('image/png');
+    }
+
+    // ----- 💧 페인트(앱 화폐) · 📜 말씀카드 -----
+    // =====================================================================
+    // 💧 페인트(앱 화폐) · 📜 말씀카드
+    //  - 페인트는 광고 1번에 1개. 말씀카드 1장 = 페인트 1개, 이모티콘 1개 받기 = 페인트 1개(한 번 받은 건 다시 무료).
+    //  - 말씀 구절은 저장소의 verses.json 에서 바꿔요.
+    // =====================================================================
+    let VERSES = null, wcCurrent = null;
+    function getPaint() { return lsGet(K_PAINT, 0); }
+    function setPaint(n) { lsSet(K_PAINT, Math.max(0, n)); renderVisitBar(); const c = document.getElementById('paintCnt'); if (c) c.innerText = getPaint(); }
+    async function earnPaint() {
+      const b = document.getElementById('wcAd'); if (b) { b.disabled = true; b.innerText = '광고 불러오는 중…'; }
+      await showAd('paint');
+      setPaint(getPaint() + 1);
+      if (b) { b.disabled = false; b.innerText = '📺 광고 보고 💧 +1'; }
+      return true;
+    }
+    // 페인트 1개 쓰기 (없으면 광고 보고 받을지 물어봄). key가 있으면 한 번 낸 건 다시 무료
+    function payPaintFor(key, what) {
+      if (!IS_APP || !EXCFG) return Promise.resolve(true);        // 웹·설정 없음: 그냥 무료
+      const owned = lsGet(K_EMO, []);
+      if (key && owned.includes(key)) return Promise.resolve(true);
+      return new Promise(resolve => {
+        const done = () => { setPaint(getPaint() - 1); if (key) lsSet(K_EMO, [...owned, key]); resolve(true); };
+        if (getPaint() >= 1) { done(); return; }
+        document.getElementById('msgTitle').innerText = '💧 페인트가 없어요';
+        document.getElementById('msgSub').innerHTML = `${what}에는 페인트 1개가 필요해요.<br>광고 1번을 보면 페인트 1개를 받아요.`;
+        const btn = document.getElementById('msgBtn');
+        btn.innerText = '📺 광고 보고 받기';
+        btn.onclick = async () => { closeModal('msgModal'); btn.innerText = '확인'; await earnPaint(); done(); };
+        openModal('msgModal');
+      });
+    }
+
+    async function loadVerses() {
+      if (VERSES) return VERSES;
+      try { const r = await fetch('verses.json?v=' + Math.floor(Date.now() / 300000), { cache: 'no-store' }); VERSES = (await r.json()).verses || []; }
+      catch (e) { VERSES = []; }
+      return VERSES;
+    }
+    function openWord() {
+      closeViewer();
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-word').classList.add('active');
+      window.scrollTo(0, 0);
+      stopShorts();
+      document.getElementById('paintCnt').innerText = getPaint();
+      renderWordGrid();
+      loadVerses();
+    }
+    // 카드 배경 = My Collection에 담은 예성이 작품
+    function cardArtPool() { const ids = (lsGet(K_BOX, { ids: [] }).ids || []); return allArtworks.filter(a => ids.includes(a.id) && !a.isProfile); }
+    function renderWordGrid() {
+      const cards = lsGet(K_CARDS, []);
+      const byId = Object.fromEntries(allArtworks.map(a => [a.id, a]));
+      document.getElementById('wcCount').innerText = cards.length ? `(${cards.length})` : '';
+      document.getElementById('wcGrid').innerHTML = cards.length ? cards.map((c, i) => {
+        const a = byId[c.art];
+        return `<div class="wc-item" onclick="showWordCard(${i})">${a ? `<img src="${a.src}" alt="" loading="lazy">` : ''}<div>${c.ref}</div></div>`;
+      }).join('') : '<div class="store-note">아직 뽑은 카드가 없어요.</div>';
+    }
+
+    async function drawWordCard() {
+      const verses = await loadVerses();
+      const pool = cardArtPool();
+      if (!pool.length) { showMsg('🪣 My Collection이 비어 있어요', '카드 배경은 My Collection에 담은 작품으로 만들어요.<br>마음에 드는 작품을 열고 <b>📥 Add to Collection</b>을 먼저 눌러 주세요.'); return; }
+      if (!verses.length) { showMsg('카드를 준비하지 못했어요', '잠시 뒤 다시 해 주세요.'); return; }
+      if (!await payPaintFor(null, '말씀카드 뽑기')) return;
+      const have = new Set(lsGet(K_CARDS, []).map(c => c.ref));
+      const fresh = verses.filter(v => !have.has(v.ref));            // 아직 안 뽑은 구절 먼저
+      const v = (fresh.length ? fresh : verses)[Math.floor(Math.random() * (fresh.length || verses.length))];
+      const a = pool[Math.floor(Math.random() * pool.length)];
+      const card = { ref: v.ref, text: v.text, art: a.id, t: Date.now() };
+      lsSet(K_CARDS, [card, ...lsGet(K_CARDS, [])]);
+      renderWordGrid();
+      await showWordCard(0, true);
+    }
+
+    // ----- 카드 그리기 (1080×1350) -----
+    let wcFontReady = null;
+    function loadCardFont() {
+      if (!wcFontReady) wcFontReady = (async () => {
+        try {
+          if (!document.getElementById('cardFontCss')) {
+            const l = document.createElement('link'); l.id = 'cardFontCss'; l.rel = 'stylesheet';
+            l.href = 'https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap';
+            document.head.appendChild(l);
+            await new Promise(r => { l.onload = r; l.onerror = r; setTimeout(r, 3000); });
+          }
+          await Promise.all([document.fonts.load('54px "Gowun Batang"', '가나다'), document.fonts.load('bold 34px "Gowun Batang"', '시편')]);
+        } catch (e) {}
+        return '"Gowun Batang", serif';
+      })();
+      return wcFontReady;
+    }
+    function loadImg(src) {
+      return new Promise((res, rej) => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = rej; i.src = src; });
+    }
+    // 말씀 행 나누기: 뜻이 끊기는 곳(…니라, …라, …고, …며, 쉼표 등)에서 줄을 바꾸도록
+    // 모든 나눔 방법을 비교해 가장 자연스러운 것을 고름 (줄 길이도 고르게)
+    function breakCost(w, next) {
+      let c;
+      if (/(,|니라|리라|도다|로다|니이다|이다|노라|라|니|요|다|대)$/.test(w)) c = 0;          // 문장·구절 끝
+      else if (/(고|며|면|매|서|든지|하여|여|사|아|어|게|되|나|지|냐)$/.test(w)) c = 250;      // 이어지는 말 끝
+      else if (/(은|는|이|가|을|를|에|에게|께|께서|와|과|도|로|으로|에서|의|만)$/.test(w)) c = 900; // 조사 뒤
+      else c = 2500;                                                                       // 낱말 중간 느낌
+      // '…하는 / 자는', '…할 / 것이' 처럼 꾸미는 말과 받는 말(자·것·때·수…) 사이는 끊지 않음
+      if (next && /^(자|것|때|수|줄|바|이|날|곳)([는은이가의를을들에]|들에게는|에게|$)/.test(next)) c += 2500;
+      return c;
+    }
+    function phraseLines(g, text, maxW) {
+      // verses.json에서 직접 '/'로 줄을 나눠 두었으면 그대로 따름
+      if (text.includes('/')) return text.split('/').map(t => t.trim()).filter(Boolean).flatMap(l => g.measureText(l).width > maxW ? wrapLines(g, l, maxW) : [l]);
+      const words = text.split(' '), n = words.length;
+      const width = (i, j) => g.measureText(words.slice(i, j).join(' ')).width;
+      const best = new Array(n + 1).fill(Infinity), from = new Array(n + 1).fill(0);
+      best[0] = 0;
+      for (let j = 1; j <= n; j++) {
+        for (let i = j - 1; i >= 0; i--) {
+          const w = width(i, j);
+          if (w > maxW && j - i > 1) break;
+          const last = j === n;
+          const slack = (maxW - Math.min(w, maxW)) / maxW;
+          let c = best[i] + (last ? (j - i === 1 && n > 2 ? 1800 : slack > 0.75 ? 600 : 0) : slack * slack * 1000) + (last ? 0 : breakCost(words[j - 1], words[j])) + 200;
+          if (c < best[j]) { best[j] = c; from[j] = i; }
+        }
+      }
+      const lines = []; let j = n;
+      while (j > 0) { const i = from[j]; lines.unshift(words.slice(i, j).join(' ')); j = i; }
+      const out = lines.flatMap(l => g.measureText(l).width > maxW ? wrapLines(g, l, maxW) : [l]);
+      out.cost = best[n];
+      return out;
+    }
+    function wrapLines(g, text, maxW) {
+      const words = text.split(' '); const lines = []; let line = '';
+      for (const w of words) {
+        const t = line ? line + ' ' + w : w;
+        if (g.measureText(t).width <= maxW) { line = t; continue; }
+        if (line) lines.push(line);
+        line = w;
+        while (g.measureText(line).width > maxW) {            // 너무 긴 낱말은 글자 단위로
+          let k = line.length; while (k > 1 && g.measureText(line.slice(0, k)).width > maxW) k--;
+          lines.push(line.slice(0, k)); line = line.slice(k);
+        }
+      }
+      if (line) lines.push(line);
+      return lines;
+    }
+    async function renderCard(card) {
+      const W = 1080, H = 1350, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+      const g = cv.getContext('2d');
+      const font = await loadCardFont();
+      g.fillStyle = '#2b2620'; g.fillRect(0, 0, W, H);
+      const a = allArtworks.find(x => x.id === card.art);
+      // 배경: 작품을 카드 전체에 꽉 채움
+      if (a) {
+        try {
+          const img = await loadImg(a.src);
+          const s = Math.max(W / img.width, H / img.height);
+          const w = img.width * s, h = img.height * s;
+          if (card.bw) g.filter = 'grayscale(1)';          // 흑백 배경
+          g.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+          g.filter = 'none';
+        } catch (e) {}
+      }
+      // 아래쪽을 살짝 어둡게 (글 상자가 잘 보이게)
+      const grad = g.createLinearGradient(0, H * 0.45, 0, H);
+      grad.addColorStop(0, 'rgba(0,0,0,0)'); grad.addColorStop(1, 'rgba(0,0,0,0.35)');
+      g.fillStyle = grad; g.fillRect(0, 0, W, H);
+      // 말씀 크기 정하기
+      g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+      // 글자 크기마다 줄 나눔을 해 보고, 뜻이 잘 끊기면서 글씨가 큰 쪽을 고름
+      let size = 32, lines = null, bestScore = Infinity;
+      for (let sz = 52; sz >= 32; sz -= 2) {
+        g.font = `${sz}px ${font}`;
+        const ls = phraseLines(g, card.text, 820);
+        if (ls.length * sz * 1.45 > 380 && sz > 32) continue;
+        const score = (ls.cost || 0) + (52 - sz) * 60;
+        if (score < bestScore) { bestScore = score; size = sz; lines = ls; }
+      }
+      g.font = `${size}px ${font}`;
+      const lh = size * 1.45;
+      const panelH = lines.length * lh + 150, panelY = H - 70 - panelH;
+      const bx = WC_BOXES.find(b => b.id === (card.box || 'cream')) || WC_BOXES[0];
+      // 말씀 상자 (색 고르기: 크림·파스텔·투명)
+      if (bx.fill) {
+        g.save(); g.shadowColor = 'rgba(0,0,0,0.25)'; g.shadowBlur = 30; g.shadowOffsetY = 8;
+        g.fillStyle = bx.fill;
+        g.beginPath(); if (g.roundRect) g.roundRect(80, panelY, W - 160, panelH, 32); else g.rect(80, panelY, W - 160, panelH);
+        g.fill(); g.restore();
+      }
+      g.save();
+      if (!bx.fill) { g.shadowColor = 'rgba(0,0,0,0.75)'; g.shadowBlur = 14; g.shadowOffsetY = 2; }   // 투명: 글자에 그림자
+      g.fillStyle = bx.text;
+      const draw = (t, x, y) => {
+        if (!bx.fill) { g.lineJoin = 'round'; g.lineWidth = 7; g.strokeStyle = 'rgba(30,24,18,0.75)'; g.strokeText(t, x, y); }   // 투명: 글자 테두리
+        g.fillText(t, x, y);
+      };
+      lines.forEach((l, i) => draw(l, W / 2, panelY + 60 + size * 0.85 + i * lh));
+      g.font = `bold 32px ${font}`; g.fillStyle = bx.ref;
+      draw(card.ref, W / 2, panelY + panelH - 40);
+      g.restore();
+      // 예성이 작품 표시 (오른쪽 아래)
+      g.save(); g.font = 'bold 30px sans-serif'; g.textAlign = 'right';
+      g.shadowColor = 'rgba(0,0,0,0.6)'; g.shadowBlur = 6; g.fillStyle = 'rgba(255,255,255,0.95)';
+      g.fillText('© jj', W - 36, H - 22); g.restore();
+      return cv.toDataURL('image/png');
+    }
+    async function showWordCard(i, fresh) {
+      const card = lsGet(K_CARDS, [])[i];
+      if (!card) return;
+      const img = document.getElementById('wcImg');
+      img.classList.remove('wc-flip'); img.src = '';
+      openModal('wcModal');
+      wcCurrent = { card, i, url: await renderCard(card) };
+      document.getElementById('wcColor').classList.toggle('on', !card.bw);
+      document.getElementById('wcGray').classList.toggle('on', !!card.bw);
+      renderBoxPick(card.box || 'cream');
+      img.src = wcCurrent.url;
+      if (fresh) { void img.offsetWidth; img.classList.add('wc-flip'); }
+    }
+    // 배경 컬러/흑백 바꾸기 (카드에 기억해 둠)
+    async function setCardTone(bw) {
+      if (!wcCurrent || !!wcCurrent.card.bw === bw) return;
+      const cards = lsGet(K_CARDS, []);
+      if (cards[wcCurrent.i]) { cards[wcCurrent.i].bw = bw; lsSet(K_CARDS, cards); }
+      await showWordCard(wcCurrent.i);
+    }
+    const WC_BOXES = [
+      { id: 'cream',    label: '기본', fill: 'rgba(251,247,239,0.9)', text: '#3b2f22', ref: '#9a7b55' },
+      { id: 'pink',     label: '',     fill: 'rgba(252,228,236,0.9)', text: '#5b2a3c', ref: '#b4587a' },
+      { id: 'peach',    label: '',     fill: 'rgba(255,229,204,0.9)', text: '#5a3518', ref: '#c0763a' },
+      { id: 'lemon',    label: '',     fill: 'rgba(255,248,196,0.9)', text: '#4a4210', ref: '#a08a1e' },
+      { id: 'mint',     label: '',     fill: 'rgba(214,245,230,0.9)', text: '#1f4a3a', ref: '#3f8f6e' },
+      { id: 'sky',      label: '',     fill: 'rgba(214,234,252,0.9)', text: '#1e3a5a', ref: '#4a7fb4' },
+      { id: 'lavender', label: '',     fill: 'rgba(232,224,250,0.9)', text: '#3a2c5e', ref: '#7a62b8' },
+      { id: 'clear',    label: '투명', fill: null,                    text: '#ffffff', ref: '#ffe9b8' },
+    ];
+    function renderBoxPick(cur) {
+      document.getElementById('wcBoxPick').innerHTML = WC_BOXES.map(b =>
+        `<button class="${b.id === cur ? 'on' : ''}" title="${b.label || b.id}" onclick="setCardBox('${b.id}')"
+          style="background:${b.fill ? b.fill.replace(/0\.9\)$/, '1)') : 'repeating-conic-gradient(#cbd5e1 0 25%, #f8fafc 0 50%) 50% / 12px 12px'}">${b.label}</button>`).join('');
+    }
+    // 말씀 상자 색 바꾸기 (카드에 기억해 둠)
+    async function setCardBox(id) {
+      if (!wcCurrent || (wcCurrent.card.box || 'cream') === id) return;
+      const cards = lsGet(K_CARDS, []);
+      if (cards[wcCurrent.i]) { cards[wcCurrent.i].box = id; lsSet(K_CARDS, cards); }
+      await showWordCard(wcCurrent.i);
+    }
+    function wcName() { return `wordcard_${wcCurrent.card.ref.replace(/[\s:]/g, '_')}.png`; }
+    async function saveWordCard() {
+      if (!wcCurrent) return;
+      if (NativeApp) { NativeApp.saveFile(wcCurrent.url, wcName()); return; }
+      const a = document.createElement('a'); a.href = wcCurrent.url; a.download = wcName(); document.body.appendChild(a); a.click(); a.remove();
+    }
+    function shareWordCard() {
+      if (!wcCurrent) return;
+      if (NativeApp && NativeApp.shareFile) { NativeApp.shareFile(wcCurrent.url, wcName()); return; }
+      saveWordCard();
     }
 
     // ----- My Collection -----
@@ -930,7 +1751,6 @@
     async function addSlotWithAd() {
       const r = await showAd('slot');
       closeModal('slotModal');
-      if (r === 'closed') { showMsg('칸을 늘리지 못했어요', '광고를 끝까지 보면 1칸이 늘어나요.'); return; }
       const box = getBox(); box.slots += 1; lsSet(K_BOX, box);
       collectCurrent();
       showMsg('My Collection이 1칸 늘었어요', `이제 ${box.slots}칸이에요.`);
@@ -997,6 +1817,9 @@
       visitTick();
       checkGalleryGate();
       setInterval(visitTick, 20000);
+      startOutBanner();                   // 갤러리 아래 '지금 열리는 전시' 배너 (앱)
+      if (IS_APP && EXCFG) collectPendingPaint();
+      if (new URLSearchParams(location.search).get('open') === 'pang' && EXCFG) { history.replaceState(null, '', location.pathname); openPang(); }
 
       document.getElementById('loadingText').style.display = 'none';
       renderArchive();
@@ -1480,13 +2303,14 @@
       try {
         const blob = await (await fetch(src)).blob();
         storeFile = new File([blob], `yesung_${name}`, { type: 'image/png' });
-        btn.disabled = false; btn.innerText = '저장하기';
+        btn.disabled = false; btn.innerText = (!IS_APP || !EXCFG || lsGet(K_EMO, []).includes('emo:' + storeFile.name)) ? '저장하기' : '저장하기 (💧 1)';
       } catch (e) {
         btn.innerText = '불러오지 못했어요';
       }
     }
     async function saveStoreItem() {
       if (!storeFile) return;
+      if (!await payPaintFor('emo:' + storeFile.name, '이모티콘 받기')) return;
       if (NativeApp) { NativeApp.saveFile(await blobToDataUrl(storeFile), storeFile.name); return; }
       if (isMobileDevice && navigator.canShare && navigator.canShare({ files: [storeFile] })) {
         try { await navigator.share({ files: [storeFile] }); return; }
