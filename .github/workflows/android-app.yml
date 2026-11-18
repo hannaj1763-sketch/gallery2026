@@ -256,6 +256,23 @@ jobs:
                           return "error:" + e.getMessage();
                       }
                   }
+
+                  // 글(링크)만 카카오톡 등으로 보내기 (아트카드 전시 링크)
+                  @JavascriptInterface
+                  public String shareText(String text) {
+                      try {
+                          Intent it = new Intent(Intent.ACTION_SEND);
+                          it.setType("text/plain");
+                          it.putExtra(Intent.EXTRA_TEXT, text);
+                          Intent chooser = Intent.createChooser(it, "보내기");
+                          chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                          runOnUiThread(() -> startActivity(chooser));
+                          return "ok";
+                      } catch (Exception e) {
+                          toast("보내기를 열지 못했어요");
+                          return "error:" + e.getMessage();
+                      }
+                  }
               }
 
               private void loadAndShowAd(String tag) {
@@ -347,6 +364,8 @@ jobs:
           printf '\ndependencies {\n    implementation "com.google.android.gms:play-services-ads:24.+"\n    implementation "androidx.credentials:credentials:1.3.0"\n    implementation "androidx.credentials:credentials-play-services-auth:1.3.0"\n    implementation "com.google.android.libraries.identity.googleid:googleid:1.1.1"\n}\n' >> app-build/android/app/build.gradle
           # AdMob 앱 ID (지금은 구글 시험용 ID). 출시할 때 진짜 ID로 바꿔요.
           sed -i 's#</application>#    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-3940256099942544~3347511713"/>\n    </application>#' app-build/android/app/src/main/AndroidManifest.xml
+          # 내 주변 전시를 먼저 보여 주려고 위치 권한(대략 위치) 요청
+          grep -q ACCESS_COARSE_LOCATION app-build/android/app/src/main/AndroidManifest.xml || sed -i 's#<application#<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <application#' app-build/android/app/src/main/AndroidManifest.xml
           cat app-build/android/app/src/main/AndroidManifest.xml
 
       - name: 같은 서명 키 쓰기 (업데이트 설치가 되도록)
