@@ -1,0 +1,29 @@
+# 전시 소식 자동 수집: 매일 아침 문화포털에서 전시 정보를 받아 culture/exhibits.json 으로 저장해요.
+# 처음 한 번은 Actions 탭 > "전시 소식 받기" > Run workflow 로 직접 돌려 보세요.
+name: 전시 소식 받기
+on:
+  schedule:
+    - cron: '17 21 * * *'      # 매일 한국 시간 아침 6시 17분
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  feed:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 문화포털에서 전시 정보 받기
+        env:
+          CULTURE_API_KEY: ${{ secrets.CULTURE_API_KEY }}
+          OUT: culture/exhibits.json
+        run: |
+          python .github/culture_feed.py
+      - name: 바뀐 내용 저장하기
+        run: |
+          git config user.name "agjj-bot"
+          git config user.email "agjj-bot@users.noreply.github.com"
+          git add culture/exhibits.json
+          git diff --cached --quiet && echo "바뀐 것 없음" || (git commit -m "전시 소식 업데이트" && git push)
