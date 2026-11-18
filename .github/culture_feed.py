@@ -71,7 +71,7 @@ for it in raw:
     realm = pick(it, 'realmName', 'realmname', 'realm')
     if realm and '전시' not in realm and '미술' not in realm: continue
     seq = pick(it, 'seq')
-    title = pick(it, 'title')
+    title = htmllib.unescape(htmllib.unescape(pick(it, 'title'))).strip()   # &lt; 같은 글자 바로잡기
     if not title or seq in seen: continue
     seen.add(seq)
     end = fmt(pick(it, 'endDate', 'enddate'))
@@ -79,7 +79,7 @@ for it in raw:
     exhibits.append({
         'seq': seq, 'title': title,
         'start': fmt(pick(it, 'startDate', 'startdate')), 'end': end,
-        'place': pick(it, 'place', 'placeName'), 'area': pick(it, 'area', 'sido'),
+        'place': htmllib.unescape(pick(it, 'place', 'placeName')), 'area': pick(it, 'area', 'sido'),
         'sigungu': pick(it, 'sigungu'),
         'thumb': pick(it, 'thumbnail', 'imgUrl', 'imgurl'),
         'realm': realm or '전시',
