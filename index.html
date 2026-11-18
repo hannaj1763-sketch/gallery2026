@@ -333,6 +333,33 @@
     .tk-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
     .tk-sub { font-size: 13px; color: #94a3b8; margin-bottom: 14px; line-height: 1.5; }
     .tk-rules { word-break: keep-all; text-align: left; font-size: 13px; color: #cbd5e1; background: #0f1218; border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; line-height: 1.7; }
+    .nick-in { width: 100%; margin-top: 14px; padding: 13px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,.2); background: #0f1218; color: #fff; font-size: 17px; text-align: center; font-family: inherit; }
+    .nick-in:focus { outline: none; border-color: #f59e0b; }
+    .nick-later { margin-top: 10px; background: none; border: none; color: #94a3b8; font-size: 14px; cursor: pointer; font-family: inherit; }
+    .acc-edit { background: none; border: 1px solid rgba(255,255,255,.2); color: #e2e8f0; border-radius: 8px; font-size: 12px; padding: 2px 8px; margin-left: 6px; cursor: pointer; vertical-align: 2px; }
+    .pg-rank { display: block; width: 100%; margin: 4px 0 14px; padding: 12px; border-radius: 12px; border: 1px solid rgba(245,158,11,.45); background: rgba(245,158,11,.1); color: #fcd34d; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    /* ✨ 말씀 뽑기: 3D 카드 회전 (BBB 3D 갤러리의 '오늘의 말씀 뽑기'와 같은 방식) */
+    #wcSpin { position: fixed; inset: 0; z-index: 158; background: radial-gradient(ellipse at 50% 40%, #1f2633, #07090d 70%); display: none; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+    #wcSpin.on { display: flex; }
+    #wcSpin .sp-title { color: #e6c294; font-size: 17px; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
+    #wcSpin .sp-sub { color: #94a3b8; font-size: 12px; }
+    #wcSpin .sp-stage { width: 100%; height: 380px; perspective: 1000px; position: relative; display: flex; align-items: center; justify-content: center; }
+    #wcSpin .sp-car { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; display: flex; align-items: center; justify-content: center; }
+    #wcSpin .sp-card { position: absolute; width: 176px; height: 246px; border-radius: 14px; padding: 14px; background: rgba(22,27,34,.92); border: 1px solid rgba(205,162,110,.35);
+      box-shadow: 0 12px 30px rgba(0,0,0,.55); backface-visibility: hidden; display: flex; flex-direction: column; text-align: left; transition: border-color .3s, box-shadow .3s; }
+    #wcSpin .sp-card .h { display: flex; justify-content: space-between; gap: 6px; font-size: 10px; color: #cda26e; border-bottom: 1px solid rgba(205,162,110,.25); padding-bottom: 6px; }
+    #wcSpin .sp-card .h span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #wcSpin .sp-card .b { flex: 1; margin: 10px 0; font-size: 12.5px; line-height: 1.6; color: #e6edf3; word-break: keep-all; overflow: hidden; }
+    #wcSpin .sp-card .f { font-size: 12px; font-weight: 700; text-align: right; color: #cda26e; }
+    #wcSpin .sp-card.win { border-color: #e6c294; box-shadow: 0 0 0 2px #e6c294, 0 0 40px rgba(230,194,148,.55); }
+    #wcSpin .sp-badge { margin-top: 6px; background: linear-gradient(135deg, #cda26e, #e6c294); color: #0d1117; font-size: 14px; font-weight: 800; padding: 6px 18px; border-radius: 20px; letter-spacing: 1px; opacity: 0; transform: scale(.8); transition: all .35s; }
+    #wcSpin .sp-badge.on { opacity: 1; transform: scale(1); }
+    #wcSpin .sp-skip { position: absolute; bottom: 26px; color: #64748b; font-size: 12px; }
+    .wc-cats { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .wc-cats button { padding: 6px 12px; border-radius: 99px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.05); color: #e2e8f0; font-size: 13px; cursor: pointer; font-family: inherit; }
+    .wc-cats button span { color: #94a3b8; font-size: 11px; }
+    .wc-cats button.on { background: #f59e0b; border-color: #f59e0b; color: #1a1a1a; font-weight: 700; }
+    .wc-cats button.on span { color: #3b2a07; }
     .tk-btn { width: 100%; background: #f59e0b; color: #1a1a1a; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
     .tk-btn.blue { background: #3b82f6; color: #fff; }
     .tk-btn.red { background: #b91c1c; color: #fff; }
@@ -389,6 +416,19 @@
       <div class="tk-sub" id="loginMsg" style="margin:10px 0 0"></div>
       <div class="copy-foot" style="margin:12px 0 0" onclick="openModal('copyModal')">© J.J All rights reserved · <u>저작권 안내</u></div>
       <div id="loginVer" style="margin-top:8px; font-size:10px; color:#475569"></div>
+    </div>
+  </div>
+
+  <!-- 🏷 닉네임 정하기 (처음 가입할 때 한 번 · My에서 바꾸기) -->
+  <div id="nickModal" class="tk-modal" style="background:rgba(11,13,18,.96); z-index:155">
+    <div class="tk-box">
+      <div style="font-size:40px; margin-bottom:6px">🏷️</div>
+      <div class="tk-title" id="nickTitle">갤러리에서 쓸 닉네임을 정해 주세요</div>
+      <div class="tk-sub">아트퐁 순위표 등 다른 관람객에게는<br><b>구글 이름 대신 이 닉네임</b>만 보여요.</div>
+      <input id="nickIn" class="nick-in" maxlength="10" placeholder="한글·영문·숫자 2~10자" autocomplete="off" oninput="document.getElementById('nickMsg').innerText=''" onkeydown="if(event.key==='Enter')saveNick()">
+      <div class="tk-sub" id="nickMsg" style="margin:8px 0 0; min-height:18px; color:#fca5a5"></div>
+      <button class="tk-btn" id="nickGo" onclick="saveNick()">이 닉네임으로 할게요</button>
+      <button class="nick-later" id="nickCancel" onclick="closeModal('nickModal')" style="display:none">취소</button>
     </div>
   </div>
 
@@ -493,8 +533,9 @@
       <div class="tk-title">🔒 개인정보 안내</div>
       <div class="copy-sec">
         <p>· <b>가져오는 정보:</b> 구글 계정의 이름·이메일·프로필 사진(로그인 확인용)</p>
-        <p>· <b>저장하는 정보:</b> 입장권·관람 완료 기록, My Collection, 💧 페인트, 말씀카드·아트카드, 관람 기록(My Art Log), 게임 점수</p>
+        <p>· <b>저장하는 정보:</b> 입장권·관람 완료 기록, My Collection, 💧 페인트, 말씀카드·아트카드, 관람 기록(My Art Log), 닉네임, 게임 점수</p>
         <p>· <b>저장 위치:</b> Google Firebase 서버(서울 지역)와 이 휴대폰</p>
+        <p>· <b>다른 사람에게 보이는 정보:</b> 내가 정한 <b>닉네임</b>과 아트퐁 점수(순위표)만 보여요. 구글 이름·이메일·사진은 보이지 않아요.</p>
         <p>· <b>쓰는 곳:</b> 앱 기능을 위해서만 쓰고, 다른 곳에 팔거나 넘기지 않아요.</p>
         <p>· <b>광고:</b> 구글 AdMob 광고가 나와요. 광고 회사의 정보 처리는 구글 정책을 따라요.</p>
         <p>· <b>지우기:</b> 내 계정 화면의 [계정 삭제]를 누르면 서버의 내 기록이 모두 지워져요.</p>
@@ -527,6 +568,7 @@
     <h2 style="font-size: 20px; font-weight: 600;">🎮 J.J 아트퐁</h2>
     <div class="store-note">같은 그림 보석을 3개 이상 맞추는 60초 퍼즐이에요. <b>한 판에 💧 1개</b>, 목표 점수를 넘기면 💧 1개를 돌려받아요.<br>
       🪣 My Collection에 작품을 담을수록 <b>✨레어 보석</b>이 늘어나서 다음 단계가 열려요. (레어 보석은 점수 2배)</div>
+    <button class="pg-rank" onclick="location.href='game.html?rank=1'">🏆 아트퐁 순위 보기 (이번 주 · 역대)</button>
     <div id="pangStages"></div>
   </div>
 
@@ -598,14 +640,23 @@
   <div id="view-word" class="view-container">
     <button class="back-gallery" onclick="openPlay()">← Play</button>
     <h2 style="font-size: 20px; font-weight: 600;">📜 Word Card</h2>
-    <div class="store-note">말씀 한 구절과 J.J의 그림이 담긴 카드를 뽑아요.<br>카드 1장 = 💧 페인트 1개 · 페인트는 광고 1번에 1개씩 모여요.<br>카드 배경은 🪣 My Collection에 담은 작품 중에서 골라져요.</div>
+    <div class="store-note">BBB 주제별 성경암송 말씀 한 구절과 J.J의 그림이 담긴 카드를 뽑아요. 주제를 고르면 그 주제에서만 나와요.<br>카드 1장 = 💧 페인트 1개 · 페인트는 광고 1번에 1개씩 모여요.<br>카드 배경은 🪣 My Collection에 담은 작품 중에서 골라져요.</div>
+    <div class="wc-cats" id="wcCats"></div>
     <div class="wc-top">
       <div class="wc-paint">💧 <span id="paintCnt">0</span></div>
-      <button class="wc-btn" id="wcDraw" onclick="drawWordCard()">🃏 카드 뽑기 (💧 1)</button>
+      <button class="wc-btn" id="wcDraw" onclick="drawWordCard()">✨ 오늘의 말씀 뽑기 (💧 1)</button>
       <button class="wc-btn ad" id="wcAd" onclick="earnPaint()">📺 광고 보고 💧 +1</button>
     </div>
     <h3 style="font-size:16px; margin-top:26px">My Cards <span id="wcCount" style="color:#94a3b8; font-weight:500"></span></h3>
     <div id="wcGrid" class="wc-grid"></div>
+  </div>
+
+  <div id="wcSpin" onclick="wcSpinSkip && wcSpinSkip()">
+    <div class="sp-title">✨ 오늘의 말씀 뽑기</div>
+    <div class="sp-sub" id="wcSpinSub">말씀 카드가 돌아가요…</div>
+    <div class="sp-stage"><div class="sp-car" id="wcSpinCar"></div></div>
+    <div class="sp-badge" id="wcSpinBadge">✨ 오늘의 말씀</div>
+    <div class="sp-skip">화면을 누르면 바로 볼 수 있어요</div>
   </div>
 
   <div id="wcModal" class="tk-modal" onclick="if (event.target === this) closeModal('wcModal')">
@@ -1108,14 +1159,14 @@
     };          // ← Firebase 콘솔의 firebaseConfig { apiKey, authDomain, projectId, appId ... } 를 여기에
     const GOOGLE_WEB_CLIENT_ID = '83235290466-phg2k92809cr7rp7qqtrbib4tev4bqku.apps.googleusercontent.com';       // ← Authentication > Google > 웹 SDK 구성의 '웹 클라이언트 ID'
     const FB_VER = '10.14.1';
-    var K_UID = 'agjj_uid_v1';
-    var SYNC_KEYS = [K_TICKET, K_VISITED, K_BOX, K_PASS, K_PAINT, K_CARDS, K_EMO, K_LOG];
+    var K_UID = 'agjj_uid_v1', K_NICK = 'agjj_nick_v1';
+    var SYNC_KEYS = [K_TICKET, K_VISITED, K_BOX, K_PASS, K_PAINT, K_CARDS, K_EMO, K_LOG, K_NICK];
     var fb = null, cloudUser = null, cloudTimer = null;   // var: 위쪽 함수에서 먼저 불러도 괜찮게
 
     function cloudOn() { return IS_APP && !!FIREBASE_CONFIG && !!EXCFG; }
     function localState() {
       return { ticket: lsGet(K_TICKET, null), visited: lsGet(K_VISITED, {}), box: lsGet(K_BOX, { slots: FREE_SLOTS, ids: [] }), pass: lsGet(K_PASS, ''),
-               paint: lsGet(K_PAINT, 0), cards: lsGet(K_CARDS, []), emo: lsGet(K_EMO, []), log: lsGet(K_LOG, []) };
+               paint: lsGet(K_PAINT, 0), cards: lsGet(K_CARDS, []), emo: lsGet(K_EMO, []), log: lsGet(K_LOG, []), nick: lsGet(K_NICK, '') };
     }
     async function saveThenReload() { clearTimeout(cloudTimer); await cloudSaveNow(); location.reload(); }
     function cloudSaveSoon() {
@@ -1150,12 +1201,14 @@
       const lseen = new Set(); const log = [];
       [...(loc.log || []), ...(srv.log || [])].forEach(r => { if (!lseen.has(r.id)) { lseen.add(r.id); log.push(r); } });
       log.sort((a, b) => String(b.date).localeCompare(String(a.date)));
-      return { ticket, visited, box, pass, paint, cards, emo, log };
+      const nick = srv.nick || loc.nick || '';
+      return { ticket, visited, box, pass, paint, cards, emo, log, nick };
     }
     function applyState(st) {
       if (st.ticket) lsSet(K_TICKET, st.ticket, true); else { try { localStorage.removeItem(K_TICKET); } catch (e) {} }
       lsSet(K_VISITED, st.visited, true); lsSet(K_BOX, st.box, true); lsSet(K_PASS, st.pass, true);
       lsSet(K_PAINT, st.paint, true); lsSet(K_CARDS, st.cards, true); lsSet(K_EMO, st.emo, true); lsSet(K_LOG, st.log, true);
+      if (st.nick) lsSet(K_NICK, st.nick, true);
     }
 
     async function loadFirebase() {
@@ -1184,6 +1237,66 @@
         currentEx = (lsGet(K_TICKET, null) || {}).exId ? findEx(lsGet(K_TICKET, null).exId) : null;
         await cloudSaveNow();
       } catch (e) { console.log('서버 기록을 불러오지 못했어요(이 폰 기록으로 계속):', e); }
+      if (!lsGet(K_NICK, '')) await askNick(true);     // 처음 가입(또는 닉네임 없는 예전 계정): 닉네임 정하기
+    }
+
+    // =====================================================================
+    // 🏷 닉네임: 순위표 등 다른 사람에게 보이는 이름 (구글 실명은 안 보여요)
+    //  - Firestore nicknames/{소문자 닉네임} = { uid } 로 '이 이름은 내 것' 표시 → 겹치지 않게
+    // =====================================================================
+    const NICK_RE = /^[가-힣a-zA-Z0-9_]{2,10}$/;
+    const NICK_BAD = ['admin', '관리자', '운영자', 'agjj', '아그짜', 'jj', 'j_j'];      // 헷갈릴 수 있는 이름은 그대로는 못 써요
+    const nickKey = n => n.toLowerCase();
+    let nickResolve = null, nickFirst = false;
+    function askNick(first) {
+      nickFirst = !!first;
+      document.getElementById('nickTitle').innerText = first ? '갤러리에서 쓸 닉네임을 정해 주세요' : '닉네임 바꾸기';
+      document.getElementById('nickCancel').style.display = first ? 'none' : 'inline-block';
+      document.getElementById('nickIn').value = first ? '' : lsGet(K_NICK, '');
+      document.getElementById('nickMsg').innerText = '';
+      const go = document.getElementById('nickGo'); go.disabled = false; go.innerText = first ? '이 닉네임으로 할게요' : '바꾸기';
+      document.getElementById('loadingText').style.display = 'none';
+      openModal('nickModal');
+      setTimeout(() => document.getElementById('nickIn').focus(), 200);
+      return new Promise(res => { nickResolve = res; });
+    }
+    async function saveNick() {
+      const inp = document.getElementById('nickIn'), msg = document.getElementById('nickMsg'), go = document.getElementById('nickGo');
+      const nick = inp.value.trim(), old = lsGet(K_NICK, '');
+      if (!NICK_RE.test(nick)) { msg.innerText = '한글(완성된 글자)·영문·숫자·_ 로 2~10자를 써 주세요.'; return; }
+      if (NICK_BAD.includes(nickKey(nick))) { msg.innerText = '쓸 수 없는 닉네임이에요. 다른 이름을 골라 주세요.'; return; }
+      if (nick === old) { closeModal('nickModal'); return; }
+      if (!fb || !cloudUser) { msg.innerText = '로그인 뒤에 정할 수 있어요.'; return; }
+      go.disabled = true; go.innerText = '확인하는 중…';
+      try {
+        const ref = fb.doc(fb.db, 'nicknames', nickKey(nick));
+        let snap = null;
+        try { snap = await fb.getDoc(ref); }
+        catch (e) { if (e.code !== 'permission-denied') throw e; console.log('닉네임 규칙이 아직 없어 이 계정에만 저장해요'); }   // Firestore 규칙을 아직 안 넣었을 때도 앱이 멈추지 않게
+        if (snap && snap.exists() && snap.data().uid !== cloudUser.uid) throw { taken: true };
+        if (snap && !snap.exists()) await fb.setDoc(ref, { uid: cloudUser.uid, at: Date.now() });
+        lsSet(K_NICK, nick, true); await cloudSaveNow();
+        if (old && nickKey(old) !== nickKey(nick)) {
+          await renameInRanks(nick);
+          try { await fb.deleteDoc(fb.doc(fb.db, 'nicknames', nickKey(old))); } catch (e) {}
+        }
+        closeModal('nickModal');
+        if (document.getElementById('view-account').classList.contains('active')) renderAccount();
+        if (nickResolve) { const f = nickResolve; nickResolve = null; f(nick); }
+      } catch (e) {
+        go.disabled = false; go.innerText = nickFirst ? '이 닉네임으로 할게요' : '바꾸기';
+        msg.innerText = e && e.taken || (e && e.code === 'permission-denied') ? '이미 누가 쓰고 있는 닉네임이에요. 다른 이름을 골라 주세요.' : '저장하지 못했어요. 잠시 뒤 다시 해 주세요. (' + ((e && (e.code || e.message)) || '') + ')';
+      }
+    }
+    // 순위표에 올라간 내 기록의 이름도 새 닉네임으로
+    function pongWeek() { const d = new Date(Date.now() + 9 * 3600e3); d.setUTCDate(d.getUTCDate() - (d.getUTCDay() + 6) % 7); return 'w' + d.toISOString().slice(0, 10).replace(/-/g, ''); }
+    async function renameInRanks(nick) {
+      for (const n of [1, 2, 3, 4]) for (const per of ['all', pongWeek()]) {
+        try {
+          const ref = fb.doc(fb.db, 'pong', 's' + n, per, cloudUser.uid), sn = await fb.getDoc(ref);
+          if (sn.exists()) await fb.setDoc(ref, { ...sn.data(), nick });
+        } catch (e) {}
+      }
     }
 
     // 로그인 창: 구글 계정 고르기 → 앱이 받은 신분증(ID 토큰)으로 Firebase 로그인
@@ -1398,7 +1511,7 @@
       document.getElementById('accBody').innerHTML = `
         <div class="acc-card">
           ${u && u.photoURL ? `<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">` : '<div class="ph">👤</div>'}
-          <div style="min-width:0"><div class="acc-name">${esc(u ? (u.displayName || '관람객') : '로그인 전')}</div>
+          <div style="min-width:0"><div class="acc-name">${esc(u ? (lsGet(K_NICK, '') || u.displayName || '관람객') : '로그인 전')}${u ? '<button class="acc-edit" onclick="askNick(false)">✏️ 닉네임</button>' : ''}</div>
             <div class="acc-sub">${u ? esc(u.email || '') + ' · Google 로그인' : '로그인하면 기록이 계정에 저장돼요'}</div>
             ${joined ? `<div class="acc-sub">가입일 ${joined}</div>` : ''}</div>
         </div>
@@ -1423,7 +1536,7 @@
     }
     function askDeleteAccount() {
       document.getElementById('msgTitle').innerText = '계정을 삭제할까요?';
-      document.getElementById('msgSub').innerHTML = '서버에 저장된 입장권·My Collection·💧 페인트·카드·관람 기록이 <b>모두 지워지고 되돌릴 수 없어요.</b>';
+      document.getElementById('msgSub').innerHTML = '서버에 저장된 입장권·My Collection·💧 페인트·카드·관람 기록·닉네임·아트퐁 순위 기록이 <b>모두 지워지고 되돌릴 수 없어요.</b>';
       const btn = document.getElementById('msgBtn');
       btn.innerText = '삭제하기';
       btn.onclick = async () => { closeModal('msgModal'); btn.innerText = '확인'; await deleteAccount(); };
@@ -1433,6 +1546,9 @@
       if (!fb || !cloudUser) return;
       try {
         await fb.deleteDoc(fb.doc(fb.db, 'users', cloudUser.uid));
+        const nk = lsGet(K_NICK, '');
+        if (nk) { try { await fb.deleteDoc(fb.doc(fb.db, 'nicknames', nickKey(nk))); } catch (e) {} }
+        for (const n of [1, 2, 3, 4]) for (const per of ['all', pongWeek()]) { try { await fb.deleteDoc(fb.doc(fb.db, 'pong', 's' + n, per, cloudUser.uid)); } catch (e) {} }
         try { await fb.authM.deleteUser(cloudUser); } catch (e) { await fb.authM.signOut(fb.auth); }
         if (NativeApp && NativeApp.googleSignOut) NativeApp.googleSignOut();
         SYNC_KEYS.concat([K_UID]).forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
@@ -1949,11 +2065,41 @@
       });
     }
 
+    // 말씀 구절: BBB 주제별 성경암송 저장소(BBB-BIBLE-CARD)의 index.html 안 rawData 를 그대로 가져와 씀
+    //  → 그 저장소에 구절을 더하면 말씀카드에도 자동으로 더해져요. (못 불러오면 verses.json)
+    const BBB_URL = 'https://raw.githubusercontent.com/hannaj1763-sketch/BBB-BIBLE-CARD/main/index.html';
+    let wcCat = 'all';
+    function parseBBB(html) {
+      const out = [], re = /\{\s*id:\s*\d+\s*,\s*category:\s*"([^"]*)"\s*,\s*title:\s*"([^"]*)"\s*,\s*reference:\s*"([^"]*)"\s*,\s*verse:\s*"((?:[^"\\]|\\.)*)"\s*\}/g;
+      let m;
+      while ((m = re.exec(html))) {
+        let verse; try { verse = JSON.parse('"' + m[4] + '"'); } catch (e) { verse = m[4].replace(/\\n/g, '\n'); }
+        out.push({ ref: m[3].trim(), text: verse.split('\n').map(t => t.trim()).filter(Boolean).join(' / '), cat: m[1].trim(), title: m[2].trim() });
+      }
+      return out;
+    }
     async function loadVerses() {
-      if (VERSES) return VERSES;
-      try { const r = await fetch('verses.json?v=' + Math.floor(Date.now() / 300000), { cache: 'no-store' }); VERSES = (await r.json()).verses || []; }
-      catch (e) { VERSES = []; }
+      if (VERSES && VERSES.length) { renderWordCats(); return VERSES; }
+      try {
+        const r = await fetch(BBB_URL + '?v=' + Math.floor(Date.now() / 300000), { cache: 'no-store' });
+        if (r.ok) VERSES = parseBBB(await r.text());
+      } catch (e) { console.log('BBB 말씀을 불러오지 못했어요:', e); }
+      if (!VERSES || !VERSES.length) {
+        try { const r = await fetch('verses.json?v=' + Math.floor(Date.now() / 300000), { cache: 'no-store' }); VERSES = (await r.json()).verses || []; }
+        catch (e) { VERSES = []; }
+      }
+      renderWordCats();
       return VERSES;
+    }
+    // 주제 고르기 (전체 · 5확신 · 8지침 · 60구절 …)
+    function renderWordCats() {
+      const el = document.getElementById('wcCats'); if (!el) return;
+      const cats = [...new Set((VERSES || []).map(v => v.cat).filter(Boolean))];
+      if (!cats.includes(wcCat)) wcCat = 'all';
+      el.innerHTML = cats.length ? ['all', ...cats].map(c => {
+        const n = c === 'all' ? VERSES.length : VERSES.filter(v => v.cat === c).length;
+        return `<button class="${c === wcCat ? 'on' : ''}" onclick="wcCat='${esc(c)}'; renderWordCats()">${c === 'all' ? '전체' : esc(c)} <span>${n}</span></button>`;
+      }).join('') : '';
     }
     function openWord() {
       closeViewer();
@@ -1974,7 +2120,7 @@
       document.getElementById('wcCount').innerText = cards.length ? `(${cards.length})` : '';
       document.getElementById('wcGrid').innerHTML = cards.length ? cards.map((c, i) => {
         const a = byId[c.art];
-        return `<div class="wc-item" onclick="showWordCard(${i})">${a ? `<img src="${a.src}" alt="" loading="lazy">` : ''}<div>${c.ref}</div></div>`;
+        return `<div class="wc-item" onclick="showWordCard(${i})">${a ? `<img src="${a.src}" alt="" loading="lazy">` : ''}<div>${c.title ? esc(c.title) + '<br>' : ''}${esc(c.ref)}</div></div>`;
       }).join('') : '<div class="store-note">아직 뽑은 카드가 없어요.</div>';
     }
 
@@ -1993,13 +2139,55 @@
       if (!verses.length) { showMsg('카드를 준비하지 못했어요', '잠시 뒤 다시 해 주세요.'); return; }
       if (!await payPaintFor(null, '말씀카드 뽑기')) return;
       const have = new Set(lsGet(K_CARDS, []).map(c => c.ref));
-      const fresh = verses.filter(v => !have.has(v.ref));            // 아직 안 뽑은 구절 먼저
-      const v = (fresh.length ? fresh : verses)[Math.floor(Math.random() * (fresh.length || verses.length))];
+      const inCat = wcCat === 'all' ? verses : verses.filter(v => v.cat === wcCat);
+      const list = inCat.length ? inCat : verses;
+      const fresh = list.filter(v => !have.has(v.ref));            // 아직 안 뽑은 구절 먼저
+      const v = (fresh.length ? fresh : list)[Math.floor(Math.random() * (fresh.length || list.length))];
       const a = pool[Math.floor(Math.random() * pool.length)];
       const card = { ref: v.ref, text: v.text, art: a.id, t: Date.now() };
+      if (v.title) card.title = v.title;
+      if (v.cat) card.cat = v.cat;
       lsSet(K_CARDS, [card, ...lsGet(K_CARDS, [])]);
       renderWordGrid();
+      loadCardFont();                         // 도는 동안 카드 글씨체 미리 준비
+      await spinVerse(list, v);
       await showWordCard(0, true);
+    }
+
+    // ✨ 3D 카드 회전으로 말씀 뽑기 (BBB 3D 갤러리의 '오늘의 말씀 뽑기' 방식)
+    //  - 고른 주제의 구절 카드가 둥글게 돌다가 뽑힌 구절 앞에서 멈춰요. 화면을 누르면 건너뛰기.
+    let wcSpinSkip = null;
+    function spinVerse(list, v) {
+      return new Promise(resolve => {
+        const ov = document.getElementById('wcSpin'), car = document.getElementById('wcSpinCar'), badge = document.getElementById('wcSpinBadge');
+        // 카드가 너무 많으면 뽑힌 구절 + 무작위 몇 장만 (최대 18장)
+        let deck = list.filter(x => x !== v).sort(() => Math.random() - .5).slice(0, 17);
+        deck.splice(Math.floor(Math.random() * (deck.length + 1)), 0, v);
+        if (deck.length < 6) deck = deck.concat(deck, deck).slice(0, Math.max(6, deck.length));   // 너무 적으면 반복해서 원 만들기
+        const n = deck.length, theta = 360 / n, target = deck.indexOf(v);
+        const radius = Math.max(230, Math.round(100 / Math.tan(Math.PI / n)));
+        car.innerHTML = deck.map((x, i) => `<div class="sp-card" style="transform: rotateY(${theta * i}deg) translateZ(${radius}px)">
+          <div class="h"><span>${esc(x.cat || '말씀')}</span><span>${esc(x.title || '')}</span></div>
+          <div class="b">${esc(x.text).replace(/ \/ /g, '<br>')}</div><div class="f">${esc(x.ref)}</div></div>`).join('');
+        car.style.transition = 'none'; car.style.transform = `translateZ(-${radius}px) rotateY(0deg)`;
+        badge.classList.remove('on'); document.getElementById('wcSpinSub').innerText = '말씀 카드가 돌아가요…';
+        ov.classList.add('on');
+        const end = -((4 + Math.floor(Math.random() * 3)) * 360) - target * theta;
+        let done = false, t1, t2;
+        const finish = (fast) => {
+          if (done) return; done = true; clearTimeout(t1); clearTimeout(t2); wcSpinSkip = null;
+          if (fast) { car.style.transition = 'none'; car.style.transform = `translateZ(-${radius}px) rotateY(${end}deg)`; }
+          car.children[target].classList.add('win'); badge.classList.add('on');
+          document.getElementById('wcSpinSub').innerText = (v.title ? v.title + ' · ' : '') + v.ref;
+          setTimeout(() => { ov.classList.remove('on'); resolve(); }, fast ? 500 : 1100);
+        };
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          car.style.transition = 'transform 3.6s cubic-bezier(0.12, 0.85, 0.18, 1)';
+          car.style.transform = `translateZ(-${radius}px) rotateY(${end}deg)`;
+          t1 = setTimeout(() => finish(false), 3700);
+        }));
+        t2 = setTimeout(() => { wcSpinSkip = () => finish(true); }, 400);     // 시작하자마자 눌린 것은 무시
+      });
     }
 
     // ----- 카드 그리기 (1080×1350) -----
@@ -2106,8 +2294,9 @@
       }
       g.font = `${size}px ${font}`;
       const lh = size * 1.45;
-      const panelH = lines.length * lh + 150, panelY = H - 70 - panelH;
-      const bx = WC_BOXES.find(b => b.id === (card.box || 'cream')) || WC_BOXES[0];
+      const tH = card.title ? 56 : 0;                       // 주제 (예: 구원의 확신)
+      const panelH = lines.length * lh + 150 + tH, panelY = H - 70 - panelH;
+      const bx = WC_BOXES.find(b => b.id === (card.box || WC_DEFAULT_BOX)) || WC_BOXES[0];
       // 말씀 상자 (색 고르기: 크림·파스텔·투명)
       if (bx.fill) {
         g.save(); g.shadowColor = 'rgba(0,0,0,0.25)'; g.shadowBlur = 30; g.shadowOffsetY = 8;
@@ -2122,7 +2311,12 @@
         if (!bx.fill) { g.lineJoin = 'round'; g.lineWidth = 7; g.strokeStyle = 'rgba(30,24,18,0.75)'; g.strokeText(t, x, y); }   // 투명: 글자 테두리
         g.fillText(t, x, y);
       };
-      lines.forEach((l, i) => draw(l, W / 2, panelY + 60 + size * 0.85 + i * lh));
+      if (card.title) {
+        g.save(); g.font = `bold 30px ${font}`; g.fillStyle = bx.ref;
+        draw('〈 ' + card.title + ' 〉', W / 2, panelY + 72); g.restore();
+        g.font = `${size}px ${font}`;
+      }
+      lines.forEach((l, i) => draw(l, W / 2, panelY + 60 + tH + size * 0.85 + i * lh));
       g.font = `bold 32px ${font}`; g.fillStyle = bx.ref;
       draw(card.ref, W / 2, panelY + panelH - 40);
       g.restore();
@@ -2141,7 +2335,7 @@
       wcCurrent = { card, i, url: await renderCard(card) };
       document.getElementById('wcColor').classList.toggle('on', !card.bw);
       document.getElementById('wcGray').classList.toggle('on', !!card.bw);
-      renderBoxPick(card.box || 'cream');
+      renderBoxPick(card.box || WC_DEFAULT_BOX);
       img.src = wcCurrent.url;
       if (fresh) { void img.offsetWidth; img.classList.add('wc-flip'); }
     }
@@ -2152,15 +2346,16 @@
       if (cards[wcCurrent.i]) { cards[wcCurrent.i].bw = bw; lsSet(K_CARDS, cards); }
       await showWordCard(wcCurrent.i);
     }
+    const WC_DEFAULT_BOX = 'clear';        // 말씀 상자 기본 = 완전 투명 (글자만 테두리·그림자)
     const WC_BOXES = [
-      { id: 'cream',    label: '기본', fill: 'rgba(251,247,239,0.9)', text: '#3b2f22', ref: '#9a7b55' },
+      { id: 'clear',    label: '기본', fill: null,                    text: '#ffffff', ref: '#ffe9b8' },
+      { id: 'cream',    label: '크림', fill: 'rgba(251,247,239,0.9)', text: '#3b2f22', ref: '#9a7b55' },
       { id: 'pink',     label: '',     fill: 'rgba(252,228,236,0.9)', text: '#5b2a3c', ref: '#b4587a' },
       { id: 'peach',    label: '',     fill: 'rgba(255,229,204,0.9)', text: '#5a3518', ref: '#c0763a' },
       { id: 'lemon',    label: '',     fill: 'rgba(255,248,196,0.9)', text: '#4a4210', ref: '#a08a1e' },
       { id: 'mint',     label: '',     fill: 'rgba(214,245,230,0.9)', text: '#1f4a3a', ref: '#3f8f6e' },
       { id: 'sky',      label: '',     fill: 'rgba(214,234,252,0.9)', text: '#1e3a5a', ref: '#4a7fb4' },
       { id: 'lavender', label: '',     fill: 'rgba(232,224,250,0.9)', text: '#3a2c5e', ref: '#7a62b8' },
-      { id: 'clear',    label: '투명', fill: null,                    text: '#ffffff', ref: '#ffe9b8' },
     ];
     function renderBoxPick(cur) {
       document.getElementById('wcBoxPick').innerHTML = WC_BOXES.map(b =>
@@ -2169,7 +2364,7 @@
     }
     // 말씀 상자 색 바꾸기 (카드에 기억해 둠)
     async function setCardBox(id) {
-      if (!wcCurrent || (wcCurrent.card.box || 'cream') === id) return;
+      if (!wcCurrent || (wcCurrent.card.box || WC_DEFAULT_BOX) === id) return;
       const cards = lsGet(K_CARDS, []);
       if (cards[wcCurrent.i]) { cards[wcCurrent.i].box = id; lsSet(K_CARDS, cards); }
       await showWordCard(wcCurrent.i);
