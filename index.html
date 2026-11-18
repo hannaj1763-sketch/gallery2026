@@ -207,12 +207,22 @@
     .visit-pill.art { background: rgba(120,83,32,0.88); border-color: #d8b679; }
     #view-artcard { max-width: 900px; margin: 0 auto; padding: 104px 16px 40px; }
     body.has-visit #view-artcard { padding-top: var(--vb, 96px); }
-    .ac-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin-top: 16px; }
+    .ac-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 16px; }
     .ac-item { background: #f6f0e4; color: #2b2119; border-radius: 12px; overflow: hidden; cursor: pointer; position: relative; }
     .ac-item img { width: 100%; aspect-ratio: 5/7; object-fit: cover; display: block; }
-    .ac-item .cap { padding: 8px 10px; font-size: 13px; font-weight: 800; }
+    .ac-item .cap { padding: 6px 8px 8px; font-size: 11.5px; font-weight: 800; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .ac-item .own { position: absolute; top: 8px; right: 8px; background: #d8b679; color: #1b1510; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 999px; }
     .ac-sides { display: flex; gap: 10px; margin-bottom: 12px; }
+    .ac-item .ph { margin: 6px 6px 0; border-radius: 7px; overflow: hidden; position: relative; }
+    .ac-item .ph .wm { position: absolute; inset: -60%; transform: rotate(-28deg); pointer-events: none;     /* 받기 전: J.J 글자 무늬 (포토카드 미리보기처럼) */
+      background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2296%22%20height%3D%2248%22%3E%3Cg%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-weight%3D%22900%22%20font-style%3D%22italic%22%20font-size%3D%2219%22%20fill%3D%22%23fff%22%20fill-opacity%3D%22.72%22%20stroke%3D%22%231e3a8a%22%20stroke-opacity%3D%22.25%22%20stroke-width%3D%22.6%22%3E%3Ctext%20x%3D%222%22%20y%3D%2219%22%3EJ.J%3C/text%3E%3Ctext%20x%3D%2250%22%20y%3D%2219%22%3EJ.J%3C/text%3E%3Ctext%20x%3D%2226%22%20y%3D%2243%22%3EJ.J%3C/text%3E%3Ctext%20x%3D%22-22%22%20y%3D%2243%22%3EJ.J%3C/text%3E%3Ctext%20x%3D%2274%22%20y%3D%2243%22%3EJ.J%3C/text%3E%3C/g%3E%3C/svg%3E") 0 0 / 104px 52px repeat; }
+    .ac-item .ph img { border-radius: 0; }
+    .ac-item .ph img.lock { filter: blur(5px); transform: scale(1.08); }      /* 포토카드 미리보기처럼: 무슨 그림인지 느낌만 */
+    .ac-item .lk { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,.55); color: #fff; font-size: 11px; font-weight: 800; padding: 3px 7px; border-radius: 999px; }
+    .ac-back-lock { flex: 1; width: 50%; border-radius: 10px; background: repeating-linear-gradient(45deg, #1e2530 0 10px, #252d3a 10px 20px); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #cbd5e1; font-size: 12px; text-align: center; padding: 10px; aspect-ratio: 1050/1470; gap: 6px; }
+    .ac-back-lock b { font-size: 28px; }
+    .ac-link { display: flex; gap: 8px; margin-top: 10px; }
+    .ac-link button { flex: 1; padding: 11px 6px; border-radius: 12px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #f1f5f9; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
     .ac-sides img { flex: 1; min-width: 0; width: 50%; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.4); }
     .visit-pill.out { background: rgba(13,110,94,0.88); border-color: #5eead4; }
     /* 전시 소식 배너 (갤러리 아래쪽) */
@@ -372,8 +382,8 @@
     .ex-item { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; background: #0f1218; border: 1px solid rgba(245,158,11,0.45); color: #f0f2f5; border-radius: 12px; padding: 11px 14px; cursor: pointer; }
     .ex-item .ex-name { font-size: 14px; font-weight: 700; }
     .ex-item .ex-meta { font-size: 12px; color: #fbbf24; }
-    .ex-item.done { border-color: rgba(255,255,255,0.1); opacity: 0.55; }
-    .ex-item.done .ex-meta { color: #94a3b8; }
+    .ex-item.done { border-color: rgba(52,211,153,0.45); }
+    .ex-item.done .ex-meta { color: #6ee7b7; }
     .collect-btn { display: none; margin: 0; background: #0ea5e9; color: #fff; border: none; padding: 8px 14px; border-radius: 18px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
     .collect-btn.done { background: #374151; color: #bae6fd; }
     #view-box { max-width: 1200px; margin: 0 auto; padding: 104px 20px 32px; }
@@ -450,7 +460,7 @@
   <div id="exListModal" class="tk-modal" onclick="if (event.target === this) closeModal('exListModal')">
     <div class="tk-box">
       <div class="tk-title">🎟 특별전</div>
-      <div class="tk-sub">특별전은 언제든 열려 있어요. 전시마다 입장권 1장이 필요하고,<br>한 번 퇴장한 전시는 다시 볼 수 없어요.</div>
+      <div class="tk-sub">특별전은 언제든 열려 있어요. 들어갈 때마다 입장권 1장이 필요하고,<br>본 전시도 언제든 다시 볼 수 있어요.</div>
       <div id="exList" class="ex-list"></div>
       <button class="tk-cancel" onclick="closeModal('exListModal')">닫기</button>
     </div>
@@ -471,7 +481,7 @@
   <div id="exitModal" class="tk-modal">
     <div class="tk-box">
       <div class="tk-title">퇴장할까요?</div>
-      <div class="tk-sub">퇴장하면 이 특별전은 <b>다시 볼 수 없어요.</b><br>마음에 든 작품은 📥 Add to Collection으로 남겨 두셨나요?</div>
+      <div class="tk-sub">퇴장한 뒤 다시 보려면 <b>입장권(광고 1번)</b>이 또 필요해요.<br>마음에 든 작품은 📥 Add to Collection으로 남겨 두셨나요?</div>
       <button class="tk-btn red" onclick="exitExhibition()">퇴장하기</button>
       <button class="tk-cancel" onclick="closeModal('exitModal')">계속 볼게요</button>
     </div>
@@ -625,17 +635,17 @@
   <div id="view-artcard" class="view-container">
     <button class="back-gallery" onclick="openPlay()">← Play</button>
     <h2 style="font-size: 20px; font-weight: 600;">🎴 Art Card</h2>
-    <div class="store-note">특별전마다 한 장씩 있는 작품 카드예요. 💧 페인트 1개로 받으면 앞면·뒷면 이미지를 저장할 수 있어요.<br>
+    <div class="store-note">특별전마다 한 장씩 있는 작품 카드예요. 앞면은 그 전시의 대표작이에요. 💧 페인트 1개로 받으면 선명한 앞면과 QR 뒷면이 열리고, 이미지로 저장할 수 있어요.<br>
       인쇄해서 뒷면 QR을 휴대폰 카메라로 찍으면, 그 특별전이 미술관처럼 열려요. (한 번 받은 카드는 다시 저장해도 무료)</div>
     <div id="acGrid" class="ac-grid"></div>
   </div>
 
-  <div id="acModal" class="tk-modal" onclick="if (event.target === this) closeModal('acModal')">
+  <div id="acModal" class="tk-modal" onclick="if (event.target === this) closeArtCard()">
     <div class="tk-box" style="max-width:520px">
       <div class="tk-title" id="acTitle" style="margin-bottom:10px"></div>
       <div class="ac-sides"><img id="acFront" alt="앞면"><img id="acBack" alt="뒷면"></div>
       <div id="acBtns"></div>
-      <button class="tk-cancel" onclick="closeModal('acModal')">닫기</button>
+      <button class="tk-cancel" onclick="closeArtCard()">닫기</button>
     </div>
   </div>
 
@@ -946,6 +956,7 @@
     const VISIT_MS = 2 * 60 * 60 * 1000;   // 관람 시간 2시간
     const GRACE_MS = 10 * 60 * 1000;       // 앱이 꺼져도 10분 안에는 이어서 보기
     const FREE_SLOTS = 1;                  // My Collection 무료 칸
+    const K_VCOUNT = 'agjj_vcount_v1';     // 특별전별 관람 횟수 { exId: n } (입장할 때마다 +1)
     const K_TICKET = 'agjj_ticket_v1', K_VISITED = 'agjj_visited_v1', K_BOX = 'agjj_box_v1', K_PASS = 'agjj_pass_v1';
     const K_PAINT = 'agjj_paint_v1', K_CARDS = 'agjj_cards_v1', K_EMO = 'agjj_emo_v1', K_LOG = 'agjj_artlog_v1';   // + 관람 기록   // 페인트 · 뽑은 말씀카드 · 페인트로 받은 것(이모티콘·아트카드)
     let EXCFG = null;                      // exhibitions.json 내용
@@ -989,6 +1000,7 @@
       lsDel(K_TICKET);
     }
     function hasVisited(exId) { return !!lsGet(K_VISITED, {})[exId]; }
+    function visitCount(exId) { const n = lsGet(K_VCOUNT, {})[exId] || 0; return Math.max(n, hasVisited(exId) ? 1 : 0); }
     function touchTicket() {
       const tk = lsGet(K_TICKET, null);
       if (tk) { tk.lastSeen = Date.now(); lsSet(K_TICKET, tk, true); }   // 20초마다 쓰는 시간 기록은 서버에 안 보냄
@@ -1062,9 +1074,9 @@
     function openExList() {
       const list = EXCFG.exhibitions || [];
       document.getElementById('exList').innerHTML = list.map(e => {
-        const done = hasVisited(e.id);
-        return `<button class="ex-item${done ? ' done' : ''}" onclick="closeModal('exListModal'); openTicket('${e.id}')">
-          <span class="ex-name">${e.title}</span><span class="ex-meta">작품 ${(e.works || []).length}점 · ${done ? '관람 완료' : '입장권 필요'}</span></button>`;
+        const n = visitCount(e.id);
+        return `<button class="ex-item${n ? ' done' : ''}" onclick="closeModal('exListModal'); openTicket('${e.id}')">
+          <span class="ex-name">${e.title}</span><span class="ex-meta">작품 ${(e.works || []).length}점 · ${n ? `✔ ${n}회 관람 · 다시 보기` : '입장권 필요'}</span></button>`;
       }).join('');
       openModal('exListModal');
     }
@@ -1078,18 +1090,15 @@
       document.getElementById('tkTitle').innerText = ex.title;
       document.getElementById('tkSub').innerHTML = `특별전 · 작품 ${n}점`;
       const go = document.getElementById('tkGo');
-      if (hasVisited(ex.id)) {
-        document.getElementById('tkRules').innerHTML = '이미 관람을 마친 특별전이에요.<br>다른 특별전을 둘러보세요!';
-        go.disabled = true; go.innerText = '관람 완료';
-      } else {
-        document.getElementById('tkRules').innerHTML =
-          '· 광고 1번을 보면 입장권 1장을 받아요.<br>' +
-          '· 입장 후 <b>2시간</b> 동안 볼 수 있어요.<br>' +
-          '· <b>퇴장하면 이 전시는 다시 볼 수 없어요.</b><br>' +
-          '· 앱이 꺼져도 10분 안에 다시 열면 이어서 볼 수 있어요.<br>' +
-          '· 마음에 드는 작품은 📥 Add to Collection으로 남겨 두세요.';
-        go.disabled = false; go.innerText = '▶ 광고 보고 입장하기';
-      }
+      const seen = visitCount(ex.id);
+      if (seen) document.getElementById('tkSub').innerHTML += ` · <span style="color:#6ee7b7">✔ 지금까지 ${seen}회 관람</span>`;
+      document.getElementById('tkRules').innerHTML =
+        '· 광고 1번을 보면 입장권 1장을 받아요.<br>' +
+        '· 입장 후 <b>2시간</b> 동안 볼 수 있어요.<br>' +
+        '· 퇴장한 뒤 다시 보고 싶으면 <b>입장권을 다시 받으면 돼요.</b> 볼 때마다 관람 횟수가 쌓여요.<br>' +
+        '· 앱이 꺼져도 10분 안에 다시 열면 이어서 볼 수 있어요.<br>' +
+        '· 마음에 드는 작품은 📥 Add to Collection으로 남겨 두세요.';
+      go.disabled = false; go.innerText = seen ? `▶ 광고 보고 다시 입장하기 (${seen + 1}회째)` : '▶ 광고 보고 입장하기';
       openModal('tkModal');
     }
 
@@ -1110,8 +1119,9 @@
       // 광고를 끝까지 보든 중간에 닫든(closed), 못 불러오든(error) 입장 — 끝까지 보기는 강제하지 않아요
       const now = Date.now();
       lsSet(K_TICKET, { exId: pickedEx.id, enteredAt: now, lastSeen: now });
+      const vc = lsGet(K_VCOUNT, {}); vc[pickedEx.id] = visitCount(pickedEx.id) + 1; lsSet(K_VCOUNT, vc);   // 관람 횟수 +1
       closeModal('tkModal');
-      showMsg('입장했어요 🎟', `${pickedEx.title}<br>2시간 동안 천천히 둘러보세요.` + (r === 'reward' || r === 'closed' ? '' : '<br><span style="color:#64748b">(광고를 불러오지 못해 바로 입장했어요)</span>'), saveThenReload);
+      showMsg('입장했어요 🎟', `${pickedEx.title}${vc[pickedEx.id] > 1 ? ` (${vc[pickedEx.id]}회째 관람)` : ''}<br>2시간 동안 천천히 둘러보세요.` + (r === 'reward' || r === 'closed' ? '' : '<br><span style="color:#64748b">(광고를 불러오지 못해 바로 입장했어요)</span>'), saveThenReload);
     }
 
     function exitExhibition() {
@@ -1165,13 +1175,13 @@
     const GOOGLE_WEB_CLIENT_ID = '83235290466-phg2k92809cr7rp7qqtrbib4tev4bqku.apps.googleusercontent.com';       // ← Authentication > Google > 웹 SDK 구성의 '웹 클라이언트 ID'
     const FB_VER = '10.14.1';
     var K_UID = 'agjj_uid_v1', K_NICK = 'agjj_nick_v1';
-    var SYNC_KEYS = [K_TICKET, K_VISITED, K_BOX, K_PASS, K_PAINT, K_CARDS, K_EMO, K_LOG, K_NICK];
+    var SYNC_KEYS = [K_TICKET, K_VISITED, K_BOX, K_PASS, K_PAINT, K_CARDS, K_EMO, K_LOG, K_NICK, K_VCOUNT];
     var fb = null, cloudUser = null, cloudTimer = null;   // var: 위쪽 함수에서 먼저 불러도 괜찮게
 
     function cloudOn() { return IS_APP && !!FIREBASE_CONFIG && !!EXCFG; }
     function localState() {
       return { ticket: lsGet(K_TICKET, null), visited: lsGet(K_VISITED, {}), box: lsGet(K_BOX, { slots: FREE_SLOTS, ids: [] }), pass: lsGet(K_PASS, ''),
-               paint: lsGet(K_PAINT, 0), cards: lsGet(K_CARDS, []), emo: lsGet(K_EMO, []), log: lsGet(K_LOG, []), nick: lsGet(K_NICK, '') };
+               paint: lsGet(K_PAINT, 0), cards: lsGet(K_CARDS, []), emo: lsGet(K_EMO, []), log: lsGet(K_LOG, []), nick: lsGet(K_NICK, ''), vcount: lsGet(K_VCOUNT, {}) };
     }
     async function saveThenReload() { clearTimeout(cloudTimer); await cloudSaveNow(); location.reload(); }
     function cloudSaveSoon() {
@@ -1195,7 +1205,9 @@
       const box = { slots: Math.max(sb.slots || FREE_SLOTS, lb.slots || FREE_SLOTS, ids.length), ids };
       const pass = [srv.pass || '', loc.pass || ''].sort().pop();
       let ticket = [srv.ticket, loc.ticket].filter(Boolean).sort((a, b) => b.enteredAt - a.enteredAt)[0] || null;
-      if (ticket && visited[ticket.exId]) ticket = null;          // 이미 끝난 전시 입장권은 버림
+      if (ticket && visited[ticket.exId] && visited[ticket.exId] > ticket.enteredAt) ticket = null;   // 다른 폰에서 이미 끝낸 입장권은 버림 (다시 입장한 건 그대로)
+      const vcount = { ...(srv.vcount || {}) };
+      Object.entries(loc.vcount || {}).forEach(([k, n]) => { vcount[k] = Math.max(vcount[k] || 0, n); });
       if (ticket && loc.ticket && loc.ticket.exId === ticket.exId) ticket.lastSeen = Math.max(ticket.lastSeen || 0, loc.ticket.lastSeen || 0);
       // 페인트: 서버 기록이 있으면 서버 값(다른 폰에서 쓴 것도 반영), 처음 로그인이면 이 폰 값
       const paint = typeof srv.paint === 'number' ? srv.paint : (loc.paint || 0);
@@ -1207,13 +1219,14 @@
       [...(loc.log || []), ...(srv.log || [])].forEach(r => { if (!lseen.has(r.id)) { lseen.add(r.id); log.push(r); } });
       log.sort((a, b) => String(b.date).localeCompare(String(a.date)));
       const nick = srv.nick || loc.nick || '';
-      return { ticket, visited, box, pass, paint, cards, emo, log, nick };
+      return { ticket, visited, box, pass, paint, cards, emo, log, nick, vcount };
     }
     function applyState(st) {
       if (st.ticket) lsSet(K_TICKET, st.ticket, true); else { try { localStorage.removeItem(K_TICKET); } catch (e) {} }
       lsSet(K_VISITED, st.visited, true); lsSet(K_BOX, st.box, true); lsSet(K_PASS, st.pass, true);
       lsSet(K_PAINT, st.paint, true); lsSet(K_CARDS, st.cards, true); lsSet(K_EMO, st.emo, true); lsSet(K_LOG, st.log, true);
       if (st.nick) lsSet(K_NICK, st.nick, true);
+      lsSet(K_VCOUNT, st.vcount || {}, true);
     }
 
     async function loadFirebase() {
@@ -1908,8 +1921,8 @@
       document.getElementById('acGrid').innerHTML = exs.map(ex => {
         const c = exCover(ex);
         return `<div class="ac-item" onclick="openArtCard('${ex.id}')">
-          ${c ? `<img src="${c.src}" alt="" loading="lazy">` : ''}
-          ${ownsCard(ex) ? '<span class="own">받음</span>' : ''}
+          <div class="ph">${c ? `<img src="${c.src}" alt="" loading="lazy" class="${ownsCard(ex) ? '' : 'lock'}">` : ''}${ownsCard(ex) ? '' : '<div class="wm"></div>'}</div>
+          ${ownsCard(ex) ? '<span class="own">받음</span>' : '<span class="lk">🔒 💧1</span>'}
           <div class="cap">No.${String(exNo(ex)).padStart(2, '0')} ${ex.short || ex.title}</div></div>`;
       }).join('') || '<div class="store-note">특별전 정보를 불러오지 못했어요.</div>';
     }
@@ -1918,27 +1931,63 @@
       const ex = EXCFG.exhibitions.find(e => e.id === id);
       if (!ex) return;
       document.getElementById('acTitle').innerText = `🎴 No.${String(exNo(ex)).padStart(2, '0')} ${ex.short || ex.title}`;
-      document.getElementById('acFront').src = ''; document.getElementById('acBack').src = '';
+      document.getElementById('acFront').src = '';
+      setAcBack('');
       document.getElementById('acBtns').innerHTML = '<div class="tk-sub">카드를 만드는 중…</div>';
       openModal('acModal');
-      const [front, back] = await Promise.all([renderArtFront(ex), renderArtBack(ex)]);
+      if (NativeApp && NativeApp.setSecure) NativeApp.setSecure(true);       // 카드 보는 동안 화면 캡처 막기
+      // 받기 전에는 앞면을 흐리게, 뒷면(QR)은 아예 만들지 않음 → 캡처해도 전시가 열리지 않게
+      const owned = ownsCard(ex);
+      const [front, back] = await Promise.all([renderArtFront(ex, !owned), owned ? renderArtBack(ex) : Promise.resolve('')]);
       acCurrent = { ex, front, back };
-      document.getElementById('acFront').src = front;
-      document.getElementById('acBack').src = back;
+      document.getElementById('acFront').src = acCurrent.front;
+      setAcBack(back, !owned);
       renderAcBtns();
+    }
+    function setAcBack(url, locked) {
+      const img = document.getElementById('acBack');
+      let lk = document.getElementById('acBackLock');
+      if (!lk) { lk = document.createElement('div'); lk.id = 'acBackLock'; lk.className = 'ac-back-lock'; lk.innerHTML = '<b>🔒</b>뒷면 QR은<br>카드를 받으면 보여요'; img.after(lk); }
+      img.style.display = locked ? 'none' : ''; lk.style.display = locked ? 'flex' : 'none';
+      img.src = url || '';
+    }
+    function closeArtCard() {
+      closeModal('acModal');
+      if (NativeApp && NativeApp.setSecure) NativeApp.setSecure(!!activeTicket());   // 원래대로 (관람 중일 때만 캡처 막기)
     }
     function renderAcBtns() {
       const { ex } = acCurrent;
       document.getElementById('acBtns').innerHTML = ownsCard(ex)
         ? `<button class="tk-btn" onclick="saveArtCard()">앞면·뒷면 이미지 저장</button>
+           <div class="ac-link"><button onclick="copyArtLink()">🔗 전시 링크 복사</button><button onclick="shareArtLink()">📤 링크 보내기</button></div>
+           <div class="tk-sub" id="acLinkMsg" style="margin:6px 0 0; min-height:16px"></div>
            <button class="tk-btn blue" onclick="location.href='${exUrl(ex)}'">▶ 전시 모드로 보기</button>`
         : `<button class="tk-btn" onclick="buyArtCard()">💧 1개로 아트카드 받기</button>`;
     }
     async function buyArtCard() {
       if (!acCurrent) return;
       if (!await payPaintFor('card:' + acCurrent.ex.id, '아트카드 받기')) return;
-      renderAcBtns(); renderArtGrid();
-      if (!document.getElementById('acModal').classList.contains('active')) openModal('acModal');
+      renderArtGrid();
+      await openArtCard(acCurrent.ex.id);                 // 받았으니 선명한 앞면 + QR 뒷면으로 다시 그리기
+    }
+    // 🔗 QR 대신 링크로: 카톡 등에 붙이면 누르는 사람 누구나 바로 그 전시가 열려요 (QR과 같은 주소)
+    function artLinkText(ex) { return `🎴 AGJJ 아트카드 No.${String(exNo(ex)).padStart(2, '0')} 「${ex.short || ex.title}」\n작가 J.J(장예성)의 전시를 열어 보세요 👇\n${exUrl(ex)}`; }
+    async function copyArtLink() {
+      if (!acCurrent) return;
+      const url = exUrl(acCurrent.ex), msg = document.getElementById('acLinkMsg');
+      let ok = false;
+      try { await navigator.clipboard.writeText(url); ok = true; } catch (e) {
+        const t = document.createElement('textarea'); t.value = url; t.style.position = 'fixed'; t.style.opacity = '0'; document.body.appendChild(t); t.select();
+        try { ok = document.execCommand('copy'); } catch (e2) {} t.remove();
+      }
+      msg.innerText = ok ? '복사했어요. 카톡·문자에 붙여넣으면 눌러서 바로 열려요.' : url;
+    }
+    async function shareArtLink() {
+      if (!acCurrent) return;
+      const ex = acCurrent.ex;
+      if (NativeApp && NativeApp.shareText) { NativeApp.shareText(artLinkText(ex)); return; }      // 앱: 카톡 등 보내기 창
+      if (navigator.share) { try { await navigator.share({ title: 'AGJJ 아트카드', text: artLinkText(ex) }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+      copyArtLink();
     }
     function saveArtCard() {
       if (!acCurrent) return;
@@ -1962,7 +2011,7 @@
       [...text].forEach(ch => { g.fillText(ch, cx, y); cx += g.measureText(ch).width + gap; });
       g.textAlign = 'center';
     }
-    async function renderArtFront(ex) {
+    async function renderArtFront(ex, locked) {
       const cv = document.createElement('canvas'); cv.width = AC_W; cv.height = AC_H;
       const g = cv.getContext('2d'); const font = await loadCardFont();
       g.fillStyle = '#f6f0e4'; g.fillRect(0, 0, AC_W, AC_H);
@@ -1980,7 +2029,17 @@
           g.save(); g.shadowColor = 'rgba(40,25,10,.35)'; g.shadowBlur = 30; g.shadowOffsetY = 12;
           g.fillStyle = '#3a2b1f'; g.fillRect(x - 34, y - 34, w + 68, h + 68); g.restore();
           g.fillStyle = '#fbf8f2'; g.fillRect(x - 24, y - 24, w + 48, h + 48);
-          g.drawImage(img, x, y, w, h);
+          if (locked) {                     // 받기 전: 작품 부분만 흐리게 (포토카드 미리보기처럼 액자·제목은 또렷)
+            g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
+            g.filter = 'blur(16px)'; g.drawImage(img, x - 30, y - 30, w + 60, h + 60); g.filter = 'none';
+            // J.J 글자 무늬를 비스듬히 빼곡하게
+            g.translate(x + w / 2, y + h / 2); g.rotate(-28 * Math.PI / 180);
+            g.font = `italic 900 92px "Arial Black", Arial, sans-serif`; g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+            g.lineWidth = 3; g.strokeStyle = 'rgba(30,58,138,.25)'; g.fillStyle = 'rgba(255,255,255,.72)';
+            const R = Math.hypot(w, h) / 2 + 120, sx = 250, sy = 118;
+            for (let yy = -R, row = 0; yy < R; yy += sy, row++) for (let xx = -R - (row % 2 ? sx / 2 : 0); xx < R; xx += sx) { g.strokeText('J.J', xx, yy); g.fillText('J.J', xx, yy); }
+            g.restore();
+          } else g.drawImage(img, x, y, w, h);
         } catch (e) {}
       }
       // 전시 제목
