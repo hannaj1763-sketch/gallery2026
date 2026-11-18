@@ -1560,6 +1560,12 @@
       if (IS_APP) { await showAd('map'); location.href = url; }       // 앱: 광고 후 휴대폰 지도/브라우저로
       else window.open(url, '_blank');
     }
+    // 🚇 대중교통 길찾기: 카카오맵 길찾기(내 위치 → 전시장), 앱에서는 광고 1번
+    async function openTransitWithAd(name, lat, lng) {
+      const url = `https://map.kakao.com/link/to/${name},${lat},${lng}`;
+      if (IS_APP) { await showAd('transit'); location.href = url; }
+      else window.open(url, '_blank');
+    }
     // 🍽 근처 음식점 / ☕ 카페 나눠 보여 주기 (관광공사 분류 코드 + 이름으로 카페 구분)
     function isCafe(f) {
       return /^A05020900/.test(f.cat || '') || /^FD05/.test(f.cat || '') ||
@@ -1673,6 +1679,8 @@
         <button class="tk-btn" onclick="closeModal('outModal'); openLogForm(${esc(JSON.stringify(x))})">${mine ? '✍ 관람 기록 고치기' : '✍ 다녀왔어요 · 기록 남기기'}</button>
         ${!mine && IS_APP && !lsGet(K_EMO, []).includes('log:' + (x.seq || x.title)) ? '<div class="tk-sub" style="margin:6px 0 12px; color:#a78bfa">🎁 처음 기록을 남기면 💧 페인트 1개를 드려요</div>' : ''}
         <button class="tk-btn blue" onclick="openMapWithAd('${encodeURIComponent(x.place || x.title)}')">${IS_APP ? '📺 광고 보고 🗺 지도에서 보기' : '🗺 지도에서 보기'}</button>
+        ${x.gpsX && x.gpsY ? `<button class="tk-btn" style="background:#0f766e" onclick="openTransitWithAd('${encodeURIComponent(x.place || x.title)}', ${+x.gpsY}, ${+x.gpsX})">${IS_APP ? '📺 광고 보고 🚇 대중교통 길찾기' : '🚇 대중교통 길찾기'}</button>
+          <div class="tk-sub" style="margin:-2px 0 10px">지금 있는 곳에서 지하철·버스 경로를 카카오맵으로 보여 줘요</div>` : ''}
         <button class="tk-cancel" onclick="window.open('https://search.naver.com/search.naver?query=${q}', '_blank')">🔎 전시 자세히 찾아보기</button>`;
       openModal('outModal');
     }
