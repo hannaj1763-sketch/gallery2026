@@ -16,7 +16,8 @@
       user-select: none;
     }
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", sans-serif; 
+      font-family: var(--app-font, -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", sans-serif); 
+      font-size: var(--app-size, 16px);
       background: #12151b; 
       color: #f0f2f5; 
       overflow-x: hidden; 
@@ -233,6 +234,23 @@
     .out-areas { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; }
     .out-areas button { flex: none; padding: 6px 12px; border-radius: 999px; border: 1px solid #334155; background: transparent; color: #cbd5e1; font-size: 12px; cursor: pointer; }
     .out-areas button.on { background: #e2e8f0; color: #0f172a; }
+    .out-desc { text-align: left; max-height: 180px; overflow-y: auto; margin-bottom: 12px; padding: 10px 12px; border-radius: 12px; background: #0f1218; }
+    .out-desc p { font-size: 13px; color: #cbd5e1; line-height: 1.65; margin: 0 0 6px; word-break: keep-all; overflow-wrap: anywhere; }
+    .out-desc p:last-child { margin-bottom: 0; }
+    .food-head { text-align: left; font-size: 14px; font-weight: 800; margin: 4px 0 8px; }
+    .food-head span { font-size: 10px; color: #64748b; font-weight: 500; margin-left: 4px; }
+    .food-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .food-item { display: flex; gap: 10px; align-items: center; padding: 8px; border-radius: 12px; background: #0f1218; text-decoration: none; color: #f1f5f9; text-align: left; }
+    .food-item img, .food-item .fi-ph { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; flex: none; background: #1f2430; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .fi-n { font-size: 14px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fi-m { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+    .price-tag { display: inline-block; margin-top: 5px; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: #1e293b; color: #fbbf24; }
+    .price-tag.free { background: #064e3b; color: #6ee7b7; }
+    .out-search { width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px solid #334155; background: #0f1218; color: #f1f5f9; font-size: 14px; margin-bottom: 8px; }
+    .out-areas.sub button { font-size: 11px; padding: 4px 10px; border-style: dashed; }
+    .out-areas.sub:empty { display: none; }
+    .out-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 12px; color: #94a3b8; }
+    .out-bar select { background: #161b24; color: #e2e8f0; border: 1px solid #334155; border-radius: 8px; padding: 5px 8px; font-size: 12px; }
     .out-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
     .out-item { display: flex; gap: 12px; padding: 10px; border-radius: 14px; background: #161b24; border: 1px solid #262d3a; cursor: pointer; }
     .out-item img { width: 72px; height: 96px; object-fit: cover; border-radius: 8px; flex: none; background: #1f2430; }
@@ -291,6 +309,16 @@
     .acc-col { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 12px; padding: 14px 16px; border-radius: 16px; border: 1px solid #334155;
       background: linear-gradient(135deg, #0f2a3a, #12303f); color: #f1f5f9; cursor: pointer; text-align: left; }
     .acc-col .i { font-size: 28px; } .acc-col b { font-size: 16px; display: block; } .acc-col span { font-size: 12px; color: #94a3b8; }
+    button, input, select, textarea { font-family: inherit; }
+    .view-container:not(#view-3d):not(#view-shorts), .tk-box, .viewer-footer { zoom: var(--app-zoom, 1); }   /* 글자 크기 */
+    .font-list { display: flex; flex-direction: column; gap: 8px; max-height: 52vh; overflow-y: auto; margin: 10px 0; }
+    .font-item { text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid #334155; background: #0f1218; color: #f1f5f9; cursor: pointer; }
+    .font-item.on { border-color: #fbbf24; box-shadow: 0 0 0 2px rgba(251,191,36,.35); }
+    .font-item .fn { font-size: 11px; color: #94a3b8; font-family: -apple-system, sans-serif; }
+    .font-item .fs { font-size: 18px; margin-top: 2px; }
+    .size-row { display: flex; gap: 6px; }
+    .size-row button { flex: 1; padding: 8px; border-radius: 10px; border: 1px solid #334155; background: #161b24; color: #e2e8f0; cursor: pointer; }
+    .size-row button.on { background: #f8fafc; color: #0f172a; }
     .copy-foot { margin: 36px auto 8px; text-align: center; font-size: 12px; color: #64748b; cursor: pointer; }
     .copy-foot u { text-underline-offset: 3px; }
     .copy-sec { text-align: left; margin-bottom: 14px; }
@@ -303,7 +331,7 @@
     .tk-box { background: #161a22; border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; padding: 22px 20px; width: 100%; max-width: 360px; text-align: center; }
     .tk-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
     .tk-sub { font-size: 13px; color: #94a3b8; margin-bottom: 14px; line-height: 1.5; }
-    .tk-rules { text-align: left; font-size: 13px; color: #cbd5e1; background: #0f1218; border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; line-height: 1.7; }
+    .tk-rules { word-break: keep-all; text-align: left; font-size: 13px; color: #cbd5e1; background: #0f1218; border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; line-height: 1.7; }
     .tk-btn { width: 100%; background: #f59e0b; color: #1a1a1a; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
     .tk-btn.blue { background: #3b82f6; color: #fff; }
     .tk-btn.red { background: #b91c1c; color: #fff; }
@@ -449,6 +477,16 @@
     <div id="accBody"></div>
   </div>
 
+  <div id="fontModal" class="tk-modal" onclick="if (event.target === this) closeModal('fontModal')" style="z-index:170">
+    <div class="tk-box" style="max-width:480px">
+      <div class="tk-title">🔤 글씨체 · 글자 크기</div>
+      <div class="tk-sub">앱 글씨를 좋아하는 글씨체로 바꿔요. 모두 무료 글씨체예요.</div>
+      <div class="size-row" id="sizeRow"></div>
+      <div class="font-list" id="fontList"></div>
+      <button class="tk-btn" onclick="closeModal('fontModal')">완료</button>
+    </div>
+  </div>
+
   <div id="privacyModal" class="tk-modal" onclick="if (event.target === this) closeModal('privacyModal')" style="z-index:170">
     <div class="tk-box" style="max-width:480px; max-height:90vh; overflow-y:auto">
       <div class="tk-title">🔒 개인정보 안내</div>
@@ -498,7 +536,11 @@
     <div class="store-note">지금 열리는 전시를 둘러보고, 다녀온 전시는 <b>My Art Log</b>에 남겨 두세요. 처음 남기는 전시마다 💧 1개를 드려요.</div>
     <div class="out-tabs"><button id="otNews" class="on" onclick="outTab('news')">전시 소식</button><button id="otLog" onclick="outTab('log')">📒 My Art Log</button></div>
     <div id="outNews">
+      <input id="outQ" class="out-search" type="search" placeholder="🔎 전시·장소·작가·컨셉 검색 (예: 수채화, 모네, 어린이)" oninput="outRender()">
       <div class="out-areas" id="outAreas"></div>
+      <div class="out-areas sub" id="outSigungu"></div>
+      <div class="out-bar"><span><span id="outCount"></span> <label style="margin-left:8px; cursor:pointer"><input type="checkbox" id="outFreeChk" onchange="outFree=this.checked; outRender()"> 무료만</label></span>
+        <select id="outSort" onchange="outRender()"><option value="near">가까운 순</option><option value="end">곧 끝나는 순</option><option value="start">새로 시작한 순</option><option value="name">이름순</option></select></div>
       <div class="out-list" id="outList"></div>
       <div class="store-note" id="outSrc" style="margin-top:14px; font-size:11px"></div>
     </div>
@@ -1282,6 +1324,53 @@
     }
     async function earnPaintPlay() { await earnPaint(); renderPlay(); }
 
+
+    // =====================================================================
+    // 🔤 글씨체 · 글자 크기 (이 휴대폰에 기억)
+    //  - 모두 무료(OFL) 글씨체: 구글 폰트·Pretendard
+    // =====================================================================
+    const APP_FONTS = [
+      { id: 'basic',   name: '기본 (휴대폰 글씨)', family: '' },
+      { id: 'pretendard', name: '프리텐다드', family: 'Pretendard', css: 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css' },
+      { id: 'noto',    name: '본고딕 (Noto Sans KR)', family: 'Noto Sans KR', g: 'Noto+Sans+KR:wght@400;700' },
+      { id: 'nanum',   name: '나눔고딕', family: 'Nanum Gothic', g: 'Nanum+Gothic:wght@400;700' },
+      { id: 'gowund',  name: '고운돋움', family: 'Gowun Dodum', g: 'Gowun+Dodum' },
+      { id: 'gowunb',  name: '고운바탕', family: 'Gowun Batang', g: 'Gowun+Batang:wght@400;700' },
+      { id: 'myeongjo',name: '나눔명조', family: 'Nanum Myeongjo', g: 'Nanum+Myeongjo:wght@400;700' },
+      { id: 'jua',     name: '주아', family: 'Jua', g: 'Jua' },
+      { id: 'dohyeon', name: '도현', family: 'Do Hyeon', g: 'Do+Hyeon' },
+      { id: 'gaegu',   name: '개구', family: 'Gaegu', g: 'Gaegu:wght@400;700' },
+      { id: 'himelody',name: '하이멜로디', family: 'Hi Melody', g: 'Hi+Melody' },
+      { id: 'poorstory', name: '서툰이야기', family: 'Poor Story', g: 'Poor+Story' },
+      { id: 'sunflower', name: '해바라기', family: 'Sunflower', g: 'Sunflower:wght@300;500;700' },
+      { id: 'cute',    name: '귀여운체', family: 'Cute Font', g: 'Cute+Font' },
+    ];
+    const APP_SIZES = [{ id: 's', name: '작게', px: 14, z: 0.92 }, { id: 'm', name: '보통', px: 16, z: 1 }, { id: 'l', name: '크게', px: 18, z: 1.12 }, { id: 'xl', name: '아주 크게', px: 20, z: 1.25 }];
+    function fontCssUrl(f) { return f.css || (f.g ? `https://fonts.googleapis.com/css2?family=${f.g}&display=swap` : ''); }
+    function loadFontCss(f) {
+      const url = fontCssUrl(f); if (!url || document.querySelector(`link[data-font="${f.id}"]`)) return;
+      const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = url; l.dataset.font = f.id; document.head.appendChild(l);
+    }
+    function applyAppFont() {
+      const f = APP_FONTS.find(x => x.id === lsGet('agjj_font', 'basic')) || APP_FONTS[0];
+      const z = APP_SIZES.find(x => x.id === lsGet('agjj_fsize', 'm')) || APP_SIZES[1];
+      if (f.family) { loadFontCss(f); document.body.style.setProperty('--app-font', `"${f.family}", -apple-system, sans-serif`); }
+      else document.body.style.removeProperty('--app-font');
+      document.body.style.setProperty('--app-size', z.px + 'px');
+      document.body.style.setProperty('--app-zoom', z.z);
+    }
+    function openFontPicker() {
+      const cur = lsGet('agjj_font', 'basic'), sz = lsGet('agjj_fsize', 'm');
+      APP_FONTS.forEach(loadFontCss);                  // 미리보기용
+      document.getElementById('sizeRow').innerHTML = APP_SIZES.map(z => `<button class="${z.id === sz ? 'on' : ''}" onclick="lsSet('agjj_fsize','${z.id}',true); applyAppFont(); openFontPicker()">${z.name}</button>`).join('');
+      document.getElementById('fontList').innerHTML = APP_FONTS.map(f => `
+        <button class="font-item ${f.id === cur ? 'on' : ''}" onclick="lsSet('agjj_font','${f.id}',true); applyAppFont(); openFontPicker()">
+          <div class="fn">${f.name}${f.id === cur ? ' · 사용 중' : ''}</div>
+          <div class="fs" style="font-family:${f.family ? `'${f.family}',` : ''} sans-serif">예성이 갤러리 놀러 와요 123</div></button>`).join('');
+      openModal('fontModal');
+    }
+    applyAppFont();
+
     // =====================================================================
     // 👤 내 계정: 프로필 · 내 기록 요약 · 로그아웃 · 계정 삭제 · 저작권/개인정보 안내
     // =====================================================================
@@ -1323,6 +1412,7 @@
         </div>
         ${best ? `<div class="acc-sub" style="margin-top:8px; text-align:center">🎮 아트팡 최고 점수 ${best.toLocaleString()}점</div>` : ''}
         <div class="acc-list">
+          <button onclick="openFontPicker()"><span>🔤 글씨체 · 글자 크기</span><span>›</span></button>
           <button onclick="openModal('copyModal')"><span>© 저작권 안내</span><span>›</span></button>
           <button onclick="openModal('privacyModal')"><span>🔒 개인정보 안내</span><span>›</span></button>
           ${u ? `<button onclick="logout()"><span>로그아웃</span><span>›</span></button>
@@ -1380,8 +1470,12 @@
     const shortDate = d => { const m = String(d || '').match(/^\d{4}-(\d{2})-(\d{2})/); return m ? `${+m[1]}.${+m[2]}` : ''; };
     async function loadOutFeed() {
       if (OUT_FEED) return OUT_FEED;
-      try { OUT_FEED = await (await fetch('culture/exhibits.json?v=' + Math.floor(Date.now() / 600000), { cache: 'no-store' })).json(); }
-      catch (e) { OUT_FEED = { items: [] }; }
+      // 매일 자동 업데이트(로봇이 저장)는 사이트 반영이 늦을 수 있어서, 저장소 원본에서 바로 읽어요
+      const v = Math.floor(Date.now() / 600000);
+      for (const u of [`https://raw.githubusercontent.com/${USERNAME}/${REPO}/main/culture/exhibits.json?v=${v}`, `culture/exhibits.json?v=${v}`]) {
+        try { const r = await fetch(u, { cache: 'no-store' }); if (r.ok) { OUT_FEED = await r.json(); break; } } catch (e) {}
+      }
+      if (!OUT_FEED) OUT_FEED = { items: [] };
       const today = new Date().toISOString().slice(0, 10);
       OUT_FEED.items = (OUT_FEED.items || []).filter(x => !x.end || x.end >= today);
       return OUT_FEED;
@@ -1392,14 +1486,18 @@
       try { if (sessionStorage.getItem('agjj_banner_off')) return; } catch (e) {}
       const f = await loadOutFeed();
       if (!f.items.length) return;
-      const list = f.items.filter(x => x.thumb).concat(f.items.filter(x => !x.thumb)).slice(0, 30);
+      let list = f.items.filter(x => x.thumb).concat(f.items.filter(x => !x.thumb));
+      await getMyPos();
+      if (myPos) { const near = list.filter(x => { const k = kmTo(x); return k != null && k <= NEAR_KM; }); if (near.length >= 3) list = near; }
+      list = list.slice(0, 30);
       let k = Math.floor(Math.random() * list.length);
       const showOne = () => {
         outBannerItem = list[k++ % list.length];
         document.getElementById('obImg').src = https(outBannerItem.thumb);
         document.getElementById('obImg').style.visibility = outBannerItem.thumb ? 'visible' : 'hidden';
         document.getElementById('obName').innerText = outBannerItem.title;
-        document.getElementById('obPlace').innerText = [outBannerItem.place, outBannerItem.end ? '~' + shortDate(outBannerItem.end) : ''].filter(Boolean).join(' · ');
+        const km = kmTo(outBannerItem);
+        document.getElementById('obPlace').innerText = [outBannerItem.place, km != null ? kmText(km) : '', outBannerItem.end ? '~' + shortDate(outBannerItem.end) : ''].filter(Boolean).join(' · ');
       };
       showOne();
       document.getElementById('outBanner').classList.add('on');
@@ -1428,19 +1526,134 @@
       document.getElementById('outNews').style.display = t === 'news' ? '' : 'none';
       document.getElementById('outLog').style.display = t === 'log' ? '' : 'none';
       if (t === 'log') { renderLog(); return; }
-      const f = await loadOutFeed();
-      const areas = ['전체', ...[...new Set(f.items.map(x => x.area).filter(Boolean))].sort()];
-      document.getElementById('outAreas').innerHTML = areas.map(a => `<button class="${a === outArea ? 'on' : ''}" onclick="outArea='${esc(a)}'; outTab('news')">${esc(a)}</button>`).join('');
-      const list = f.items.filter(x => outArea === '전체' || x.area === outArea);
+      await loadOutFeed();
+      if (!outTab.inited) {
+        outTab.inited = true;
+        outRender();                                   // 먼저 보여 주고
+        await getMyPos();                              // 위치를 알면 내 주변으로 바꿔 보여 줌
+        if (myPos) { outArea = '📍 내 주변'; document.getElementById('outSort').value = 'near'; }
+        else { outArea = lsGet('agjj_out_area', '전체'); if (document.getElementById('outSort').value === 'near') document.getElementById('outSort').value = 'end'; }
+      }
+      outRender();
+      const f = OUT_FEED;
+      document.getElementById('outSrc').innerText = f.items.length ? `전시 정보·이미지 출처: ${f.source || '한국문화정보원 문화포털'} · ${String(f.updated || '').slice(0, 10)} 기준` : '';
+    }
+    // 지역 이름을 짧게 맞추기 (전북특별자치도 → 전북 등)
+    const AREA_ORDER = ['서울', '경기', '인천', '강원', '충북', '충남', '대전', '세종', '전북', '전남', '광주', '경북', '경남', '대구', '울산', '부산', '제주'];
+    function areaName(a) {
+      a = String(a || '').trim();
+      const map = { '충청북': '충북', '충청남': '충남', '전라북': '전북', '전북특별': '전북', '전라남': '전남', '경상북': '경북', '경상남': '경남', '강원특별': '강원', '제주특별': '제주', '세종특별': '세종' };
+      for (const k in map) if (a.startsWith(k)) return map[k];
+      return AREA_ORDER.find(x => a.startsWith(x)) || a || '기타';
+    }
+    let outSigungu = '전체', myPos = null, posAsked = false, outFree = false;
+    // 입장료: '무료' / 금액 / 알 수 없음
+    function priceInfo(x) {
+      const p = String(x.price || '').trim();
+      if (!p) return null;
+      if (/무료|free|^0\s*원?$|입장료\s*없/i.test(p) && !/[1-9][0-9,]*\s*원/.test(p.replace(/무료.*/, ''))) return { free: true, text: '무료' };
+      return { free: false, text: p };
+    }
+    // 🗺 지도에서 보기: 앱에서는 광고 1번 보고 넘어가요
+    async function openMapWithAd(q) {
+      const url = 'https://map.naver.com/p/search/' + q;
+      if (IS_APP) { await showAd('map'); location.href = url; }       // 앱: 광고 후 휴대폰 지도/브라우저로
+      else window.open(url, '_blank');
+    }
+    // 🍽 근처 음식점 / ☕ 카페 나눠 보여 주기 (관광공사 분류 코드 + 이름으로 카페 구분)
+    function isCafe(f) {
+      return /^A05020900/.test(f.cat || '') || /^FD05/.test(f.cat || '') ||
+        /카페|커피|찻집|다방|티하우스|다원|베이커리|디저트|cafe|coffee/i.test(f.name || '');
+    }
+    function foodHtml(list) {
+      if (!list || !list.length) return '';
+      const row = f => `
+        <a class="food-item" href="https://map.naver.com/p/search/${encodeURIComponent(f.name + ' ' + (f.addr || '').split(' ').slice(0, 3).join(' '))}" target="_blank">
+          ${f.img ? `<img src="${esc(https(f.img))}" alt="" loading="lazy">` : `<div class="fi-ph">${isCafe(f) ? '☕' : '🍽'}</div>`}
+          <div style="min-width:0"><div class="fi-n">${esc(f.name)}</div>
+          <div class="fi-m">${f.dist ? `🚶 ${Math.round(+f.dist) < 1000 ? Math.round(+f.dist) + 'm' : (+f.dist / 1000).toFixed(1) + 'km'} · ` : ''}${esc((f.addr || '').split(' ').slice(1, 4).join(' '))}</div></div></a>`;
+      const cafes = list.filter(isCafe).slice(0, 4), foods = list.filter(f => !isCafe(f)).slice(0, 4);
+      let h = '';
+      if (foods.length) h += `<div class="food-head">🍽 근처 음식점 <span>걸어서 갈 만한 곳 · 출처: 한국관광공사</span></div><div class="food-list">${foods.map(row).join('')}</div>`;
+      if (cafes.length) h += `<div class="food-head">☕ 근처 카페·찻집 <span>출처: 한국관광공사</span></div><div class="food-list">${cafes.map(row).join('')}</div>`;
+      return h;
+    }
+    // 전시 소개글을 읽기 쉽게 문장·항목마다 줄 나누기
+    function descHtml(t) {
+      let d = String(t || '').replace(/\s+/g, ' ').trim();
+      d = d.replace(/([.!?。])\s+/g, '$1\n')                                   // 문장 끝
+           .replace(/\s+(?=[※■□▶▷●○◆◇•]\s?)/g, '\n')                              // 항목 기호 앞
+           .replace(/(?<![※■□▶▷●○◆◇•]\s?)\s+(?=(?:주차|관람료|입장료|관람시간|운영시간|휴관|문의|장소|기간|일시|참여작가|작가|프로그램|체험)\s*[:：은는])/g, '\n')   // 안내 항목 앞
+           .replace(/([가-힣])\s+(?=(?:주차|관람|문의)[가-힣]*\s)/g, (m, a) => a === '영' || a === '다' || a === '요' ? a + '\n' : m);
+      return d.split('\n').map(l => l.trim()).filter(Boolean).map(l => `<p>${esc(l)}</p>`).join('');
+    }
+    // 소개글에서 주차 안내 한 줄 찾기
+    function parkingInfo(x) {
+      const lines = descHtml(x.desc).split('</p>').map(l => l.replace(/<p>/, '').trim());
+      const line = lines.find(l => l.includes('주차'));
+      return line ? line.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").slice(0, 120) : '';
+    }
+    const NEAR_KM = 30;                              // '📍 내 주변' 범위 (가까운 전시가 적으면 가장 가까운 10개)
+    // 내 위치 (대략) 한 번 알아 두기 — 허락하지 않으면 지난번 고른 지역으로
+    function getMyPos() {
+      if (myPos || posAsked) return Promise.resolve(myPos);
+      posAsked = true;
+      const saved = lsGet('agjj_mypos', null);
+      if (saved && Date.now() - saved.t < 6 * 3600 * 1000) { myPos = saved; return Promise.resolve(myPos); }
+      return new Promise(res => {
+        if (!navigator.geolocation) return res(null);
+        navigator.geolocation.getCurrentPosition(p => {
+          myPos = { lat: p.coords.latitude, lon: p.coords.longitude, t: Date.now() };
+          lsSet('agjj_mypos', myPos, true); res(myPos);
+        }, () => res(null), { enableHighAccuracy: false, timeout: 8000, maximumAge: 3600000 });
+      });
+    }
+    function kmTo(x) {
+      if (!myPos || !x.gpsY || !x.gpsX) return null;
+      const R = 6371, toR = d => d * Math.PI / 180;
+      const dLat = toR(+x.gpsY - myPos.lat), dLon = toR(+x.gpsX - myPos.lon);
+      const h = Math.sin(dLat / 2) ** 2 + Math.cos(toR(myPos.lat)) * Math.cos(toR(+x.gpsY)) * Math.sin(dLon / 2) ** 2;
+      return 2 * R * Math.asin(Math.sqrt(h));
+    }
+    const kmText = k => k == null ? '' : k < 1 ? `${Math.round(k * 1000)}m` : `${k < 10 ? k.toFixed(1) : Math.round(k)}km`;
+    function outRender() {
+      const f = OUT_FEED || { items: [] };
+      const items = f.items.map(x => ({ ...x, _a: areaName(x.area), _km: kmTo(x) }));
+      const byKm = items.filter(x => x._km != null).sort((a, b) => a._km - b._km);
+      let nearSet = byKm.filter(x => x._km <= NEAR_KM);
+      if (nearSet.length < 6) nearSet = byKm.slice(0, 10);
+      const nearIds = new Set(nearSet.map(x => x.seq)), nearN = nearSet.length;
+      const cnt = {}; items.forEach(x => cnt[x._a] = (cnt[x._a] || 0) + 1);
+      const areas = [...(myPos ? ['📍 내 주변'] : []), '전체', ...AREA_ORDER.filter(a => cnt[a]), ...Object.keys(cnt).filter(a => !AREA_ORDER.includes(a))];
+      try { if (outArea !== '📍 내 주변') localStorage.setItem('agjj_out_area', JSON.stringify(outArea)); } catch (e) {}
+      if (!areas.includes(outArea)) outArea = '전체';
+      document.getElementById('outAreas').innerHTML = areas.map(a =>
+        `<button class="${a === outArea ? 'on' : ''}" onclick="outArea='${esc(a)}'; outSigungu='전체'; outRender()">${esc(a)} ${a === '전체' ? items.length : a === '📍 내 주변' ? nearN : cnt[a]}</button>`).join('');
+      let list = items.filter(x => outArea === '전체' || (outArea === '📍 내 주변' ? nearIds.has(x.seq) : x._a === outArea));
+      // 시·군·구 (지역을 고르면 나와요)
+      const sg = outArea === '전체' || outArea === '📍 내 주변' ? [] : [...new Set(list.map(x => x.sigungu).filter(Boolean))].sort();
+      if (!sg.includes(outSigungu)) outSigungu = '전체';
+      document.getElementById('outSigungu').innerHTML = sg.length > 1 ? ['전체', ...sg].map(g =>
+        `<button class="${g === outSigungu ? 'on' : ''}" onclick="outSigungu='${esc(g)}'; outRender()">${esc(g)}</button>`).join('') : '';
+      if (outSigungu !== '전체') list = list.filter(x => x.sigungu === outSigungu);
+      if (outFree) list = list.filter(x => { const p = priceInfo(x); return p && p.free; });
+      const q = (document.getElementById('outQ').value || '').trim().toLowerCase();
+      // 여러 낱말을 쓰면 모두 들어간 전시만 (예: "수채화 서울") — 제목·장소·작가·전시 소개까지 찾아요
+      if (q) { const words = q.split(/\s+/).filter(Boolean);
+        list = list.filter(x => { const hay = [x.title, x.place, x.sigungu, x._a, x.desc].join(' ').toLowerCase(); return words.every(w => hay.includes(w)); }); }
+      const sort = document.getElementById('outSort').value;
+      if (sort === 'near' && !myPos) document.getElementById('outSort').value = 'end';
+      list.sort((a, b) => sort === 'near' && myPos ? (a._km ?? 9e9) - (b._km ?? 9e9) : sort === 'start' ? String(b.start).localeCompare(String(a.start)) : sort === 'name' ? String(a.title).localeCompare(String(b.title), 'ko') : String(a.end || '9999').localeCompare(String(b.end || '9999')));
+      document.getElementById('outCount').innerText = `${list.length}개 전시`;
       window.__outList = list;
       document.getElementById('outList').innerHTML = list.length ? list.slice(0, 200).map((x, i) => `
         <div class="out-item" onclick="openOutDetail(window.__outList[${i}])">
           ${x.thumb ? `<img src="${esc(https(x.thumb))}" alt="" loading="lazy">` : '<img alt="">'}
           <div><div class="oi-t">${esc(x.title)}</div>
-          <div class="oi-m">📍 ${esc([x.area, x.place].filter(Boolean).join(' · '))}<br>🗓 ${esc(x.start)} ~ ${esc(x.end)}</div>
+          <div class="oi-m">📍 ${esc([x._a, x.sigungu, x.place].filter(Boolean).join(' · '))}${x._km != null ? ` <b style="color:#5eead4">· ${kmText(x._km)}</b>` : ''}<br>🗓 ${esc(x.start)} ~ ${esc(x.end)}</div>
+          ${(() => { const p = priceInfo(x); return p ? `<span class="price-tag ${p.free ? 'free' : ''}">${p.free ? '무료' : '💳 ' + esc(p.text.length > 28 ? p.text.slice(0, 28) + '…' : p.text)}</span>` : ''; })()}
           ${logOf(x.seq) ? '<div class="oi-s">✓ 다녀왔어요</div>' : ''}</div>
-        </div>`).join('') : '<div class="store-note">전시 소식을 준비하고 있어요. 매일 아침 새로 받아 와요.</div>';
-      document.getElementById('outSrc').innerText = f.items.length ? `전시 정보·이미지 출처: ${f.source || '한국문화정보원 문화포털'} · ${String(f.updated || '').slice(0, 10)} 기준` : '';
+        </div>`).join('') : `<div class="store-note">${f.items.length ? (outArea === '📍 내 주변' ? `내 주변 ${NEAR_KM}km 안에는 지금 열리는 전시가 없어요. '전체'나 다른 지역을 눌러 보세요.` : '찾는 전시가 없어요. 다른 지역이나 검색어로 찾아보세요.') : '전시 소식을 준비하고 있어요. 매일 아침 새로 받아 와요.'}</div>`;
     }
     function logOf(seq) { return seq && lsGet(K_LOG, []).find(r => r.seq === seq); }
 
@@ -1452,9 +1665,14 @@
         ${x.thumb ? `<img class="out-detail-img" src="${esc(https(x.thumb))}" alt=""><div class="out-src">이미지 출처: 문화포털</div>` : ''}
         <div class="tk-title" style="text-align:left">${esc(x.title)}</div>
         <div class="tk-rules">📍 ${esc([x.area, x.sigungu, x.place].filter(Boolean).join(' · '))}<br>🗓 ${esc(x.start)} ~ ${esc(x.end)}${x.realm ? '<br>🎨 ' + esc(x.realm) : ''}</div>
+        ${(() => { const p = priceInfo(x), pk = parkingInfo(x);
+          return `<div class="tk-rules">💳 입장료: ${p ? (p.free ? '<b style="color:#6ee7b7">무료</b>' : esc(p.text)) : '정보 없음 (전시장에 확인해 주세요)'}<br>🅿 주차: ${pk ? esc(pk) : '정보 없음 · 아래 지도에서 주변 주차장을 확인해 보세요'}</div>`; })()}
+        ${x.desc ? `<div class="out-desc">${descHtml(x.desc)}</div>` : ''}
+        ${foodHtml(x.food)}
         ${mine ? `<div class="tk-sub">✓ ${esc(mine.date)}에 다녀왔어요 ${'★'.repeat(mine.stars || 0)}</div>` : ''}
         <button class="tk-btn" onclick="closeModal('outModal'); openLogForm(${esc(JSON.stringify(x))})">${mine ? '✍ 관람 기록 고치기' : '✍ 다녀왔어요 · 기록 남기기'}</button>
-        <button class="tk-btn blue" onclick="window.open('https://map.naver.com/p/search/${encodeURIComponent(x.place || x.title)}', '_blank')">🗺 지도에서 보기</button>
+        ${!mine && IS_APP && !lsGet(K_EMO, []).includes('log:' + (x.seq || x.title)) ? '<div class="tk-sub" style="margin:6px 0 12px; color:#a78bfa">🎁 처음 기록을 남기면 💧 페인트 1개를 드려요</div>' : ''}
+        <button class="tk-btn blue" onclick="openMapWithAd('${encodeURIComponent(x.place || x.title)}')">${IS_APP ? '📺 광고 보고 🗺 지도에서 보기' : '🗺 지도에서 보기'}</button>
         <button class="tk-cancel" onclick="window.open('https://search.naver.com/search.naver?query=${q}', '_blank')">🔎 전시 자세히 찾아보기</button>`;
       openModal('outModal');
     }
