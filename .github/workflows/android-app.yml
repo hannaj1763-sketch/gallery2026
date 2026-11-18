@@ -118,6 +118,7 @@ jobs:
           import androidx.credentials.exceptions.ClearCredentialException;
           import androidx.credentials.exceptions.GetCredentialCancellationException;
           import androidx.credentials.exceptions.GetCredentialException;
+          import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
           import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption;
           import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
           import com.getcapacitor.BridgeActivity;
@@ -179,6 +180,10 @@ jobs:
               public class AtelierApp {
                   @JavascriptInterface
                   public boolean isApp() { return true; }
+
+                  // 몇 번째로 만든 앱인지 (GitHub Actions 실행 번호)
+                  @JavascriptInterface
+                  public String appBuild() { return "__BUILD__"; }
 
                   // 사진첩(안드로이드 10 이상)에 바로 저장. 옛 기기는 보내기 창으로 대신.
                   @JavascriptInterface
@@ -271,9 +276,17 @@ jobs:
                   });
               }
 
+              // 1) 휴대폰에 있는 구글 계정 목록(아래에서 올라오는 창) → 2) 안 되면 'Google로 로그인' 전체 화면
               private void startGoogleSignIn(String webClientId) {
-                  GetSignInWithGoogleOption opt = new GetSignInWithGoogleOption.Builder(webClientId).build();
-                  GetCredentialRequest req = new GetCredentialRequest.Builder().addCredentialOption(opt).build();
+                  GetGoogleIdOption opt = new GetGoogleIdOption.Builder()
+                          .setFilterByAuthorizedAccounts(false)
+                          .setServerClientId(webClientId)
+                          .setAutoSelectEnabled(false)
+                          .build();
+                  requestGoogle(new GetCredentialRequest.Builder().addCredentialOption(opt).build(), webClientId, true);
+              }
+
+              private void requestGoogle(GetCredentialRequest req, String webClientId, boolean first) {
                   CredentialManager.create(this).getCredentialAsync(this, req, new CancellationSignal(), ContextCompat.getMainExecutor(this),
                           new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
                               @Override
@@ -282,12 +295,19 @@ jobs:
                                   if (c instanceof CustomCredential && GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL.equals(c.getType())) {
                                       try {
                                           loginResult("ok", GoogleIdTokenCredential.createFrom(((CustomCredential) c).getData()).getIdToken());
-                                      } catch (Exception e) { loginResult("error", "token"); }
-                                  } else loginResult("error", "type");
+                                      } catch (Exception e) { loginResult("error", "token: " + e.getMessage()); }
+                                  } else loginResult("error", "type: " + c.getType());
                               }
                               @Override
                               public void onError(GetCredentialException e) {
-                                  loginResult(e instanceof GetCredentialCancellationException ? "cancel" : "error", e.getClass().getSimpleName());
+                                  String why = e.getClass().getSimpleName() + ": " + e.getMessage();
+                                  if (first && !(e instanceof GetCredentialCancellationException)) {
+                                      // 계정 목록 방식이 안 되면 전체 화면 방식으로 한 번 더
+                                      GetSignInWithGoogleOption opt2 = new GetSignInWithGoogleOption.Builder(webClientId).build();
+                                      requestGoogle(new GetCredentialRequest.Builder().addCredentialOption(opt2).build(), webClientId, false);
+                                      return;
+                                  }
+                                  loginResult(e instanceof GetCredentialCancellationException ? "cancel" : "error", why);
                               }
                           });
               }
@@ -322,6 +342,7 @@ jobs:
               }
           }
           JAVA
+          sed -i "s/__BUILD__/${{ github.run_number }}/" app-build/android/app/src/main/java/io/github/hannaj1763/gallery/MainActivity.java
           # 구글 광고(AdMob) 도구 추가
           printf '\ndependencies {\n    implementation "com.google.android.gms:play-services-ads:24.+"\n    implementation "androidx.credentials:credentials:1.3.0"\n    implementation "androidx.credentials:credentials-play-services-auth:1.3.0"\n    implementation "com.google.android.libraries.identity.googleid:googleid:1.1.1"\n}\n' >> app-build/android/app/build.gradle
           # AdMob 앱 ID (지금은 구글 시험용 ID). 출시할 때 진짜 ID로 바꿔요.
@@ -340,11 +361,20 @@ jobs:
           ./gradlew assembleDebug --no-daemon
           cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/atelier-archive.apk"
 
+      - name: 앱 서명 지문(SHA-1) 확인 — Firebase에 넣은 값과 같아야 구글 로그인이 돼요
+        continue-on-error: true
+        run: |
+          SIGNER=$(ls -d $ANDROID_HOME/build-tools/*/ | sort -V | tail -1)apksigner
+          $SIGNER verify --print-certs atelier-archive.apk | tee certs.txt
+          SHA1=$(grep -i "SHA-1 digest" certs.txt | head -1 | awk '{print $NF}' | sed 's/../&:/g;s/:$//' | tr a-f A-F)
+          echo "앱 SHA-1: $SHA1"
+          echo "SHA1=$SHA1" >> $GITHUB_ENV
+
       - name: 다운로드 페이지(Releases)에 올리기
         uses: softprops/action-gh-release@v2
         with:
           tag_name: app-v${{ github.run_number }}
           name: AGJJ 안드로이드 시험판 ${{ github.run_number }}
-          body: AGJJ(아그짜) 안드로이드 시험판이에요. atelier-archive.apk 를 휴대폰에서 받아 설치하세요.
+          body: "AGJJ(아그짜) 안드로이드 시험판 ${{ github.run_number }}번이에요. atelier-archive.apk 를 휴대폰에서 받아 설치하세요. 앱 서명 SHA-1: ${{ env.SHA1 }}"
           files: atelier-archive.apk
           make_latest: true
