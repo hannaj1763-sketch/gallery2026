@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#14110f">
+<title>AGJJ 전시 모드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<!--
+  AGJJ 전시 모드 (아트카드)
+  - 아트카드 뒷면 QR → exhibit.html?ex=ex3&c=카드암호 로 들어오면 그 특별전이 미술관처럼 열려요.
+  - 순서: 개막(전시 제목) → 작가의 말 → 작품(액자·조명·캡션) → 폐막
+  - 휴대폰은 가로로 눕히면 더 크게 보여요. TV·프로젝터로 미러링해도 그대로 나와요.
+  - 전시 내용(작품·작가의 말·카드 암호)은 저장소의 exhibitions.json 에서 바꿔요.
+-->
+<style>
+  :root {
+    --wall1: #2a2420; --wall2: #171310;
+    --ink: #f5ede1; --muted: #b9a993; --gold: #d8b679;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: #0d0b0a; color: var(--ink); overflow: hidden;
+    font-family: 'Gowun Batang', 'Noto Serif KR', serif; }
+  #stage { position: fixed; inset: 0; overflow: hidden;
+    background: radial-gradient(ellipse at 50% 18%, var(--wall1) 0%, var(--wall2) 70%, #0d0b0a 100%); }
+  /* 벽 질감 */
+  #stage::before { content: ''; position: absolute; inset: 0; opacity: .5; pointer-events: none;
+    background-image: repeating-linear-gradient(90deg, rgba(255,255,255,.012) 0 2px, transparent 2px 7px),
+                      repeating-linear-gradient(0deg, rgba(0,0,0,.05) 0 1px, transparent 1px 5px); }
+  /* 바닥 */
+  #floor { position: absolute; left: 0; right: 0; bottom: 0; height: 9vh;
+    background: linear-gradient(180deg, #120f0d, #0a0807); border-top: 1px solid rgba(216,182,121,.12); }
+
+  .scene { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 6vh 7vw; opacity: 0; transition: opacity 1.6s ease, transform 1.6s ease; pointer-events: none; }
+  .scene.show { opacity: 1; pointer-events: auto; }
+
+  /* 조명 */
+  .beam { position: absolute; left: 50%; top: -10vh; width: 120vmin; height: 120vmin; transform: translateX(-50%);
+    background: radial-gradient(ellipse at 50% 30%, rgba(255,236,200,.22) 0%, rgba(255,236,200,.08) 35%, transparent 62%);
+    pointer-events: none; opacity: 0; transition: opacity 2.4s ease; }
+  .scene.show .beam { opacity: 1; }
+
+  /* 개막 */
+  .kicker { font-size: clamp(11px, 1.6vmin, 15px); letter-spacing: .5em; color: var(--gold); margin-bottom: 3vmin; }
+  .ex-title { font-size: clamp(30px, 8vmin, 84px); font-weight: 700; line-height: 1.25; text-shadow: 0 4px 30px rgba(0,0,0,.6); }
+  .ex-sub { margin-top: 2.6vmin; font-size: clamp(14px, 2.6vmin, 24px); color: var(--muted); }
+  .rule { width: 12vmin; height: 1px; background: var(--gold); opacity: .7; margin: 3.4vmin auto; }
+  .start-btn { margin-top: 5vmin; padding: 1.6vmin 4.4vmin; font-family: inherit; font-size: clamp(15px, 2.4vmin, 22px); font-weight: 700;
+    color: #1b1510; background: var(--gold); border: none; border-radius: 999px; cursor: pointer; box-shadow: 0 8px 30px rgba(216,182,121,.25); }
+  .hint { margin-top: 2.4vmin; font-size: clamp(11px, 1.7vmin, 14px); color: #8a7c6a; }
+
+  /* 작가의 말 */
+  .intro-text { max-width: 900px; font-size: clamp(17px, 3.4vmin, 34px); line-height: 1.85; word-break: keep-all; }
+  .intro-sign { margin-top: 3.4vmin; color: var(--gold); font-size: clamp(13px, 2vmin, 18px); letter-spacing: .2em; }
+
+  /* 작품 */
+  #works { position: absolute; inset: 0; pointer-events: none; }
+  .work { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4vw;
+    padding: 4vh 6vw 11vh; transform: translateX(110vw); transition: transform 1.6s cubic-bezier(.65,0,.35,1), opacity 1.6s; opacity: 0; }
+  .work.here { transform: translateX(0); opacity: 1; }
+  .work.gone { transform: translateX(-110vw); opacity: 0; }
+  .work .light { position: absolute; left: 50%; top: -18vh; width: 90vmin; height: 110vmin; transform: translateX(-50%);
+    background: radial-gradient(ellipse at 50% 40%, rgba(255,240,210,.26) 0%, rgba(255,240,210,.1) 38%, transparent 66%); }
+  .frame { position: relative; padding: 2.2vmin; background: #f7f2e9; box-shadow:
+      0 0 0 1.1vmin #3a2b1f, 0 0 0 1.3vmin #1d140e, 0 3vmin 6vmin rgba(0,0,0,.65); }
+  .frame img { display: block; max-width: 56vw; max-height: 70vh; object-fit: contain; }
+  .work.here .frame { animation: breathe 9s ease-out forwards; }
+  @keyframes breathe { from { transform: scale(1); } to { transform: scale(1.045); } }
+  .label { position: relative; align-self: flex-end; margin-bottom: 8vh; width: min(30vw, 300px); padding: 2vmin 2.2vmin;
+    background: #f4efe6; color: #2b2119; text-align: left; box-shadow: 0 1vmin 3vmin rgba(0,0,0,.45); border-radius: 2px; }
+  .label .t { font-size: clamp(14px, 2.3vmin, 22px); font-weight: 700; line-height: 1.35; word-break: keep-all; }
+  .label .a { margin-top: .9vmin; font-size: clamp(11px, 1.6vmin, 15px); color: #6b5a48; }
+  .label .m { margin-top: .4vmin; font-size: clamp(10px, 1.45vmin, 13px); color: #8a7864; }
+  .label .n { margin-top: 1.4vmin; font-size: clamp(10px, 1.35vmin, 12px); color: #a8957c; letter-spacing: .15em; }
+  /* 세로 화면(휴대폰 세로) */
+  @media (orientation: portrait) {
+    .work { flex-direction: column; gap: 3.5vh; padding: 9vh 6vw 12vh; }
+    .frame img { max-width: 80vw; max-height: 52vh; }
+    .label { align-self: center; margin: 0; width: min(80vw, 360px); }
+  }
+
+  /* 폐막 */
+  .thanks { font-size: clamp(24px, 6vmin, 60px); font-weight: 700; }
+  .end-btns { display: flex; gap: 2vmin; justify-content: center; margin-top: 5vmin; flex-wrap: wrap; }
+  .end-btns button { padding: 1.4vmin 3.4vmin; font-family: inherit; font-size: clamp(14px, 2.1vmin, 19px); border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--gold); background: transparent; color: var(--ink); }
+  .end-btns button.main { background: var(--gold); color: #1b1510; font-weight: 700; }
+
+  /* 조작 막대 (화면을 누르면 잠깐 보임) */
+  #ctrl { position: fixed; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(140%);
+    display: flex; gap: 6px; padding: 8px; background: rgba(20,16,13,.88); border: 1px solid rgba(216,182,121,.3); border-radius: 999px;
+    backdrop-filter: blur(10px); transition: transform .35s ease; z-index: 20; }
+  #ctrl.on { transform: translateX(-50%) translateY(0); }
+  #ctrl button { width: 44px; height: 44px; border-radius: 50%; border: none; background: rgba(255,255,255,.08); color: var(--ink); font-size: 18px; cursor: pointer; }
+  #progress { position: fixed; left: 0; top: 0; height: 3px; background: var(--gold); opacity: .7; width: 0; transition: width .6s linear; z-index: 21; }
+  #rotateTip { position: fixed; left: 50%; top: calc(12px + env(safe-area-inset-top)); transform: translateX(-50%); z-index: 22;
+    padding: 7px 14px; border-radius: 999px; background: rgba(20,16,13,.85); color: var(--muted); font-size: 12px; white-space: nowrap;
+    border: 1px solid rgba(216,182,121,.25); opacity: 0; transition: opacity .6s; pointer-events: none; }
+  #rotateTip.on { opacity: 1; }
+  .msg { color: var(--muted); font-size: clamp(14px, 2.4vmin, 20px); line-height: 1.8; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="floor"></div>
+
+  <!-- 불러오는 중 / 카드 확인 -->
+  <section class="scene show" id="sLoading">
+    <div class="kicker">AGJJ ART CARD</div>
+    <div class="msg" id="loadingMsg">전시장을 준비하고 있어요…</div>
+  </section>
+
+  <!-- 개막 -->
+  <section class="scene" id="sOpen">
+    <div class="beam"></div>
+    <div class="kicker">AGJJ SPECIAL EXHIBITION</div>
+    <div class="ex-title" id="openTitle"></div>
+    <div class="rule"></div>
+    <div class="ex-sub" id="openSub"></div>
+    <button class="start-btn" id="startBtn">입장하기</button>
+    <div class="hint" id="startHint">휴대폰을 가로로 눕히면 더 크게 볼 수 있어요</div>
+  </section>
+
+  <!-- 작가의 말 -->
+  <section class="scene" id="sIntro">
+    <div class="beam"></div>
+    <div class="kicker">ARTIST'S NOTE</div>
+    <div class="intro-text" id="introText"></div>
+    <div class="intro-sign">— J.J</div>
+  </section>
+
+  <div id="works"></div>
+
+  <!-- 폐막 -->
+  <section class="scene" id="sEnd">
+    <div class="beam"></div>
+    <div class="kicker">THE END</div>
+    <div class="thanks">관람해 주셔서 감사합니다</div>
+    <div class="rule"></div>
+    <div class="ex-sub" id="endSub"></div>
+    <div class="end-btns">
+      <button class="main" onclick="restart()">↻ 처음부터 다시 보기</button>
+      <button onclick="goGallery()">갤러리로 가기</button>
+    </div>
+  </section>
+</div>
+
+<div id="progress"></div>
+<div id="rotateTip">⟲ 가로로 눕히면 더 크게 보여요</div>
+<div id="ctrl">
+  <button onclick="step(-1)" title="이전">⏮</button>
+  <button id="playBtn" onclick="togglePause()" title="멈춤">⏸</button>
+  <button onclick="step(1)" title="다음">⏭</button>
+  <button id="soundBtn" onclick="toggleSound()" title="음악">🔈</button>
+  <button onclick="toggleFull()" title="전체 화면">⛶</button>
+  <button onclick="goGallery()" title="나가기">✕</button>
+</div>
+
+<script>
+  const USERNAME = 'hannaj1763-sketch', REPO = 'gallery2026';
+  const OPEN_MS = 6000, INTRO_MS = 9000, WORK_MS = 9000;   // 장면마다 머무는 시간
+  const qs = new URLSearchParams(location.search);
+  const EX_ID = qs.get('ex'), CODE = qs.get('c');
+  const LOOP = qs.get('loop') === '1';                    // ?loop=1 이면 끝나고 처음부터 다시 (TV·전시장용)
+
+  let EX = null, works = [], scenes = [], idx = -1, timer = null, paused = false, started = false;
+
+  const $ = id => document.getElementById(id);
+  const rawUrl = p => `https://raw.githubusercontent.com/${USERNAME}/${REPO}/main/` + p.split('/').map(encodeURIComponent).join('/');
+
+  async function repoTree() {
+    try {
+      const r = await fetch(`https://api.github.com/repos/${USERNAME}/${REPO}/git/trees/main?recursive=1`);
+      if (r.ok) return (await r.json()).tree || [];
+    } catch (e) {}
+    const r = await fetch(`https://data.jsdelivr.com/v1/packages/gh/${USERNAME}/${REPO}@main?structure=flat`);
+    const d = await r.json();
+    return (d.files || []).map(f => ({ path: String(f.name).replace(/^\//, ''), type: 'blob' }));
+  }
+
+  function cleanMeta(m) { return String(m || '').replace(/^\s*종이\s*위\s*(원화|그림)\s*\|?\s*/, '').trim(); }
+  function prettyDate(d) { const m = String(d || '').match(/^(\d{4})-(\d{2})/); return m ? `${m[1]}년 ${+m[2]}월` : ''; }
+
+  async function load() {
+    let cfg;
+    try { cfg = await (await fetch('exhibitions.json?v=' + Math.floor(Date.now() / 300000), { cache: 'no-store' })).json(); }
+    catch (e) { return fail('전시 정보를 불러오지 못했어요.<br>인터넷 연결을 확인해 주세요.'); }
+    EX = (cfg.exhibitions || []).find(e => e.id === EX_ID);
+    if (!EX || (EX.card && EX.card !== CODE)) return fail('아트카드를 확인하지 못했어요.<br>카드 뒷면의 QR을 휴대폰 카메라로 다시 찍어 주세요.');
+
+    let tree;
+    try { tree = await repoTree(); } catch (e) { return fail('작품을 불러오지 못했어요.<br>잠시 뒤 다시 열어 주세요.'); }
+    const imgOf = {};
+    tree.forEach(t => {
+      const p = t.path.split('/');
+      if (p.length === 3 && p[0] === 'artworks' && /\.(jpe?g|png|webp)$/i.test(p[2]) && !imgOf[p[1]]) imgOf[p[1]] = t.path;
+    });
+    const list = await Promise.all(EX.works.filter(id => imgOf[id]).map(async id => {
+      let n = {};
+      try { n = await (await fetch(rawUrl(`artworks/${id}/note.json`))).json(); } catch (e) {}
+      const meta = cleanMeta(n.meta);
+      return { id, src: rawUrl(imgOf[id]), title: n.title || id, date: n.date || '', meta: /^\d{4}-\d{2}(-\d{2})?$/.test(meta) || meta === n.date ? '' : meta };
+    }));
+    works = list.sort((a, b) => String(a.date).localeCompare(String(b.date)));
+    if (!works.length) return fail('이 전시에 걸린 작품이 아직 없어요.');
+
+    $('openTitle').innerText = EX.short || EX.title;
+    $('openSub').innerText = `${(EX.title.match(/^제\d+회[^「]*/) || [''])[0].trim()} · J.J 장예성 · 작품 ${works.length}점`;
+    $('introText').innerText = EX.intro || `꼬마 화가 J.J가 그린 작품 ${works.length}점을 모았어요. 천천히 걸으며 감상해 주세요.`;
+    $('endSub').innerText = `${EX.title} · AGJJ Art Gallery of Jane Jang`;
+    document.title = `AGJJ · ${EX.short || EX.title}`;
+    buildWorks();
+    preload(0); preload(1);
+    show('sOpen');
+  }
+
+  function fail(html) { $('loadingMsg').innerHTML = html; }
+
+  function buildWorks() {
+    $('works').innerHTML = works.map((w, i) => `
+      <div class="work" id="w${i}">
+        <div class="light"></div>
+        <div class="frame"><img alt="${w.title}" data-src="${w.src}"></div>
+        <div class="label">
+          <div class="t">${w.title}</div>
+          <div class="a">J.J 장예성${w.date ? ' · ' + prettyDate(w.date) : ''}</div>
+          ${w.meta ? `<div class="m">${w.meta}</div>` : ''}
+          <div class="n">${String(i + 1).padStart(2, '0')} / ${String(works.length).padStart(2, '0')}</div>
+        </div>
+      </div>`).join('');
+    scenes = ['sIntro', ...works.map((_, i) => 'w' + i), 'sEnd'];
+  }
+  function preload(i) { const img = document.querySelector(`#w${i} img`); if (img && !img.src) img.src = img.dataset.src; }
+
+  function show(id) {
+    document.querySelectorAll('.scene').forEach(s => s.classList.toggle('show', s.id === id));
+  }
+
+  // ----- 진행 -----
+  function goTo(n) {
+    clearTimeout(timer);
+    n = Math.max(0, Math.min(scenes.length - 1, n));
+    const prev = scenes[idx], next = scenes[n];
+    const fwd = n >= idx;
+    idx = n;
+    // 작품끼리는 옆 벽으로 걸어가듯
+    document.querySelectorAll('.work').forEach(w => {
+      if (w.id === next) { w.classList.remove('gone'); w.classList.add('here'); }
+      else if (w.id === prev) { w.classList.remove('here'); w.classList.toggle('gone', fwd); }
+      else { w.classList.remove('here'); w.classList.toggle('gone', scenes.indexOf(w.id) < n); }
+    });
+    if (next.startsWith('w')) { show(null); const k = +next.slice(1); preload(k); preload(k + 1); preload(k + 2); }
+    else show(next);
+    $('progress').style.width = (100 * (n + 1) / scenes.length) + '%';
+    schedule();
+  }
+  function schedule() {
+    clearTimeout(timer);
+    if (paused) return;
+    const cur = scenes[idx];
+    if (cur === 'sEnd') { if (LOOP) timer = setTimeout(restart, 12000); return; }
+    timer = setTimeout(() => goTo(idx + 1), cur === 'sIntro' ? INTRO_MS : WORK_MS);
+  }
+  function step(d) { if (started) goTo(idx + d); poke(); }
+  function togglePause() {
+    paused = !paused; $('playBtn').innerText = paused ? '▶' : '⏸';
+    document.querySelectorAll('.work.here .frame').forEach(f => f.style.animationPlayState = paused ? 'paused' : 'running');
+    paused ? clearTimeout(timer) : schedule();
+    poke();
+  }
+  function restart() { idx = -1; document.querySelectorAll('.work').forEach(w => w.classList.remove('here', 'gone')); show('sOpen'); started = false; $('progress').style.width = 0;
+    if (LOOP) setTimeout(begin, OPEN_MS); }
+
+  function begin() {
+    if (started) return; started = true;
+    keepAwake(); rotateTip();
+    if (!soundOn) toggleSound(true);
+    goTo(0);
+  }
+  $('startBtn').onclick = (e) => { e.stopPropagation(); tryFull(); begin(); };
+
+  // ----- 화면 누르면 조작 막대 -----
+  let ctrlTimer = null;
+  function poke() { $('ctrl').classList.add('on'); clearTimeout(ctrlTimer); ctrlTimer = setTimeout(() => $('ctrl').classList.remove('on'), 3500); }
+  $('stage').addEventListener('click', () => { if (started) poke(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') step(1); else if (e.key === 'ArrowLeft') step(-1);
+    else if (e.key === ' ') { e.preventDefault(); started ? togglePause() : begin(); }
+  });
+  // 손가락으로 밀어서 넘기기
+  let tx = null;
+  $('stage').addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  $('stage').addEventListener('touchend', e => {
+    if (tx === null || !started) return; const dx = e.changedTouches[0].clientX - tx; tx = null;
+    if (Math.abs(dx) > 60) step(dx < 0 ? 1 : -1);
+  });
+
+  // ----- 전체 화면 · 화면 꺼짐 막기 · 가로 안내 -----
+  function tryFull() {
+    const el = document.documentElement;
+    try { if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape').catch(() => {})).catch(() => {}); } catch (e) {}
+  }
+  function toggleFull() { if (document.fullscreenElement) document.exitFullscreen(); else tryFull(); poke(); }
+  let wake = null;
+  async function keepAwake() { try { wake = await navigator.wakeLock.request('screen'); } catch (e) {} }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && started) keepAwake(); });
+  function rotateTip() {
+    const portrait = innerHeight > innerWidth;
+    $('rotateTip').classList.toggle('on', portrait && started);
+    if (portrait && started) setTimeout(() => $('rotateTip').classList.remove('on'), 4000);
+  }
+  addEventListener('resize', rotateTip);
+
+  // ----- 배경 음악 (잔잔한 화음을 직접 만들어 연주) -----
+  let ac = null, master = null, soundOn = false, musicTimer = null;
+  const CHORDS = [[261.6, 329.6, 392.0, 493.9], [220.0, 261.6, 329.6, 392.0], [174.6, 220.0, 261.6, 329.6], [196.0, 246.9, 293.7, 392.0]];
+  function playChord(k) {
+    const t = ac.currentTime;
+    CHORDS[k % CHORDS.length].forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = i === 0 ? 'triangle' : 'sine'; o.frequency.value = f / (i === 0 ? 2 : 1);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.05, t + 2.5); g.gain.linearRampToValueAtTime(0, t + 8.5);
+      o.connect(g).connect(master); o.start(t); o.stop(t + 9);
+    });
+    // 반짝이는 한 음
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine'; o.frequency.value = CHORDS[k % CHORDS.length][3] * 2;
+    g.gain.setValueAtTime(0, t + 1.5); g.gain.linearRampToValueAtTime(0.018, t + 1.7); g.gain.exponentialRampToValueAtTime(0.0001, t + 5.5);
+    o.connect(g).connect(master); o.start(t + 1.5); o.stop(t + 6);
+  }
+  function toggleSound(forceOn) {
+    try {
+      if (!ac) { ac = new (window.AudioContext || window.webkitAudioContext)(); master = ac.createGain(); master.gain.value = 0.9; master.connect(ac.destination); }
+      soundOn = forceOn === true ? true : !soundOn;
+      clearInterval(musicTimer);
+      if (soundOn) { ac.resume(); let k = 0; playChord(k++); musicTimer = setInterval(() => playChord(k++), 7000); }
+      $('soundBtn').innerText = soundOn ? '🔈' : '🔇';
+    } catch (e) {}
+    if (forceOn !== true) poke();
+  }
+
+  function goGallery() {
+    if (window.AtelierApp) location.href = './'; else location.href = './';
+  }
+
+  if (!EX_ID) fail('아트카드 뒷면의 QR을 휴대폰 카메라로 찍으면<br>그 특별전이 이곳에서 열려요.');
+  else load();
+  if (LOOP) setTimeout(() => { if (!started && EX) begin(); }, OPEN_MS + 3000);
+</script>
+</body>
+</html>
