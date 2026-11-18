@@ -2,7 +2,7 @@
 # GitHub Actions 에서 매일 실행돼요. 인증키는 저장소 Settings > Secrets 의 CULTURE_API_KEY.
 # 출처: 한국문화정보원 문화포털 (공공데이터포털, 이용허락범위 제한 없음)
 import os, sys, json, datetime, urllib.parse, urllib.request, urllib.error
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET, re, html as htmllib
 
 KEY = os.environ.get('CULTURE_API_KEY', '').strip()
 OUT = os.environ.get('OUT', 'culture/exhibits.json')
@@ -85,7 +85,95 @@ for it in raw:
         'realm': realm or '전시',
         'gpsX': pick(it, 'gpsX', 'gpsx'), 'gpsY': pick(it, 'gpsY', 'gpsy'),
         'url': pick(it, 'url', 'placeUrl'),
+        **({'price': pick(it, 'price')} if pick(it, 'price') else {}),
     })
+
+# ----- 상세 정보(작가·전시 소개)로 검색이 잘 되게 -----
+# 상세 조회는 하루 호출 수가 정해져 있어서, 예전에 받아 둔 설명은 다시 쓰고 새 전시만 받아요.
+old = {}
+try:
+    for e in json.load(open(OUT, encoding='utf-8')).get('items', []):
+        if e.get('desc') is not None and 'price' in e: old[e['seq']] = (e['desc'], e['price'])
+except Exception: pass
+SKIP = {'seq', 'title', 'startdate', 'enddate', 'place', 'area', 'sido', 'sigungu', 'thumbnail', 'imgurl', 'gpsx', 'gpsy',
+        'realmname', 'realmcode', 'servicename', 'price', 'phone', 'url', 'placeurl', 'placeseq', 'serviceTp'.lower()}
+def detail_text(seq):
+    for path in ('detail2', 'detail'):
+        try:
+            code, msg, total, items = items_of(call(path, seq=seq, PageNo=1, numOfrows=1))
+            if not items: continue
+            it = items[0]
+            parts = []
+            for k, v in it.items():
+                if k.lower() in SKIP or not v or v.startswith('http'): continue
+                t = re.sub(r'<[^>]+>', ' ', htmllib.unescape(v))
+                t = re.sub(r'\s+', ' ', t).strip()
+                if len(t) >= 2: parts.append(t)
+            price = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', htmllib.unescape(pick(it, 'price', 'charge', 'fee')))).strip()[:120]
+            return ' '.join(parts)[:700], price
+        except Exception as e:
+            last = e
+    return None
+budget = int(os.environ.get('DETAIL_MAX', '400'))
+got_new = 0
+for e in exhibits:
+    if e['seq'] in old: e['desc'], e['price'] = old[e['seq']]; continue
+    if budget <= 0: continue
+    budget -= 1
+    d = detail_text(e['seq'])
+    if d is not None: e['desc'], e['price'] = d; got_new += 1
+print(f'상세 설명: 새로 {got_new}건, 예전 것 재사용 {sum(1 for e in exhibits if e["seq"] in old)}건')
+if got_new == 0 and not old: print('  (상세 조회가 안 되면 제목·장소로만 검색돼요)')
+
+# ----- 🍽 전시장 근처 음식점 (한국관광공사_국문 관광정보 서비스) -----
+# 같은 장소는 한 번만 묻고, 예전에 받아 둔 건 7일 동안 다시 써요. 안 되면 그냥 건너뛰어요.
+def tour_call(op, **params):
+    key = KEY if '%' in KEY else urllib.parse.quote(KEY, safe='')
+    base = dict(MobileOS='ETC', MobileApp='AGJJ', _type='json')
+    base.update(params)
+    q = '&'.join(f'{k}={urllib.parse.quote(str(v))}' for k, v in base.items())
+    url = f'https://apis.data.go.kr/B551011/{op}?serviceKey={key}&{q}'
+    with urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'AGJJ-feed'}), timeout=30) as r:
+        t = r.read().decode('utf-8', 'replace')
+    try: d = json.loads(t)
+    except Exception: raise RuntimeError('JSON 아님: ' + t[:200])
+    body = d.get('response', {}).get('body', {})
+    items = body.get('items') or {}
+    items = items.get('item', []) if isinstance(items, dict) else []
+    return items if isinstance(items, list) else [items]
+old_food = {}
+try:
+    for e in json.load(open(OUT, encoding='utf-8')).get('items', []):
+        if 'food' in e: old_food[e['seq']] = (e['food'], e.get('foodAt', ''))
+except Exception: pass
+food_ok, food_cache, food_new, food_fail = None, {}, 0, ''
+week_ago = (today - datetime.timedelta(days=7)).isoformat()
+for e in exhibits:
+    if e['seq'] in old_food and old_food[e['seq']][1] >= week_ago:
+        e['food'], e['foodAt'] = old_food[e['seq']]; continue
+    if food_ok is False or not e.get('gpsX') or not e.get('gpsY'): continue
+    k = (round(float(e['gpsX']), 4), round(float(e['gpsY']), 4))
+    if k not in food_cache:
+        got = None
+        for op in ('KorService2/locationBasedList2', 'KorService1/locationBasedList1'):
+            try:
+                got = tour_call(op, numOfRows=12, pageNo=1, mapX=e['gpsX'], mapY=e['gpsY'], radius=1000, contentTypeId=39, arrange='E')
+                break
+            except urllib.error.HTTPError as er:
+                try: food_fail = f'{op}: HTTP {er.code} ' + er.read().decode('utf-8', 'replace')[:200].replace(chr(10), ' ')
+                except Exception: food_fail = f'{op}: HTTP {er.code}'
+            except Exception as er:
+                food_fail = f'{op}: {er}'
+        if got is None:
+            food_ok = False; print('🍽 근처 음식점을 받지 못했어요 →', food_fail); continue
+        food_ok = True
+        food_cache[k] = [{'name': f.get('title', ''), 'addr': f.get('addr1', ''), 'img': f.get('firstimage2') or f.get('firstimage', ''),
+                          'dist': f.get('dist', ''), 'tel': f.get('tel', ''), 'x': f.get('mapx', ''), 'y': f.get('mapy', ''),
+                          'cat': f.get('cat3') or f.get('lclsSystm3') or f.get('lclsSystm2') or ''}   # 분류 코드 (카페·전통찻집 구분용)
+                         for f in got if f.get('title')][:12]
+        food_new += 1
+    e['food'], e['foodAt'] = food_cache[k], today.isoformat()
+print(f'🍽 근처 음식점: 새로 받은 장소 {food_new}곳' + ('' if food_ok is not False else ' (실패 — 위 메시지 확인)'))
 
 exhibits.sort(key=lambda e: (e['end'] or '9999', e['title']))
 if not exhibits:
