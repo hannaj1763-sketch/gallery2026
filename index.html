@@ -175,7 +175,8 @@
     }
 
     /* ===== 입장권·My Collection (AGJJ) ===== */
-    .visit-bar { position: fixed; left: 12px; top: 74px; z-index: 60; display: flex; gap: 6px; flex-wrap: wrap; max-width: calc(100vw - 150px); }
+    .visit-bar { position: fixed; left: 12px; top: 74px; z-index: 60; display: flex; gap: 6px; flex-wrap: wrap; max-width: calc(100vw - 24px); }
+    body.has-visit .auto-btn { top: 54px; }   /* 메뉴 알약 한 줄 아래로 */
 .back-gallery { display: inline-block; margin-bottom: 12px; color: #f0f2f5; font-size: 14px; font-weight: 700; padding: 7px 14px; border-radius: 18px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
     .visit-pill { background: rgba(0,0,0,0.62); color: #f0f2f5; border: 1px solid rgba(255,255,255,0.2); padding: 7px 12px; border-radius: 18px; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); white-space: nowrap; }
     .visit-pill.enter { background: #f59e0b; border-color: #f59e0b; color: #1a1a1a; }
@@ -273,6 +274,23 @@
     .acc-list button { display: flex; justify-content: space-between; width: 100%; padding: 14px 16px; background: #161b24; border: none; border-bottom: 1px solid #262d3a; color: #e2e8f0; font-size: 14px; cursor: pointer; text-align: left; }
     .acc-list button:last-child { border-bottom: none; }
     .acc-list button.danger { color: #f87171; }
+    #view-play { max-width: 760px; margin: 0 auto; padding: 104px 16px 40px; }
+    body.has-visit #view-play { padding-top: var(--vb, 96px); }
+    .pl-paint { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; border-radius: 16px; margin-top: 12px;
+      background: linear-gradient(135deg, #2e1065, #4c1d95); border: 1px solid #a78bfa; }
+    .pl-paint b { font-size: 24px; }
+    .pl-paint button { background: #fff; color: #4c1d95; border: none; border-radius: 12px; padding: 9px 12px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+    .pl-cat { margin-top: 22px; font-size: 13px; font-weight: 800; color: #94a3b8; letter-spacing: .04em; }
+    .pl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+    .pl-tile { text-align: left; padding: 14px; border-radius: 16px; border: 1px solid #262d3a; background: #161b24; color: #f1f5f9; cursor: pointer; }
+    .pl-tile.wide { grid-column: 1 / -1; }
+    .pl-tile .i { font-size: 26px; }
+    .pl-tile .t { font-size: 15px; font-weight: 800; margin-top: 6px; }
+    .pl-tile .d { font-size: 12px; color: #94a3b8; margin-top: 3px; line-height: 1.45; }
+    .pl-tile .n { float: right; font-size: 12px; color: #fbbf24; font-weight: 800; }
+    .acc-col { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 12px; padding: 14px 16px; border-radius: 16px; border: 1px solid #334155;
+      background: linear-gradient(135deg, #0f2a3a, #12303f); color: #f1f5f9; cursor: pointer; text-align: left; }
+    .acc-col .i { font-size: 28px; } .acc-col b { font-size: 16px; display: block; } .acc-col span { font-size: 12px; color: #94a3b8; }
     .copy-foot { margin: 36px auto 8px; text-align: center; font-size: 12px; color: #64748b; cursor: pointer; }
     .copy-foot u { text-underline-offset: 3px; }
     .copy-sec { text-align: left; margin-bottom: 14px; }
@@ -408,10 +426,18 @@
 
   <!-- My Collection -->
   <div id="view-box" class="view-container">
+    <button class="back-gallery" onclick="openAccount()">← My</button>
     <h2 style="font-size: 20px; font-weight: 600;">🪣 My Collection</h2>
     <div class="store-note" id="boxNote"></div>
     <div id="boxGrid" class="box-grid"></div>
     <div id="boxAccount" class="store-note" style="margin-top:16px; text-align:center"></div>
+  </div>
+
+  <!-- ✨ Play: 카드 만들기 · 게임 · 바깥 전시 -->
+  <div id="view-play" class="view-container">
+    <button class="back-gallery" onclick="switchView('3d')">← Gallery</button>
+    <h2 style="font-size: 20px; font-weight: 600;">✨ Play</h2>
+    <div id="playBody"></div>
   </div>
 
   <!-- 👤 내 계정 -->
@@ -456,7 +482,7 @@
 
   <!-- 🎮 Art Pang: 예성이 그림 보석 퍼즐 (한 판 = 💧 1개) -->
   <div id="view-pang" class="view-container">
-    <button class="back-gallery" onclick="switchView('3d')">← Gallery</button>
+    <button class="back-gallery" onclick="openPlay()">← Play</button>
     <h2 style="font-size: 20px; font-weight: 600;">🎮 J.J 아트팡</h2>
     <div class="store-note">같은 그림 보석을 3개 이상 맞추는 60초 퍼즐이에요. <b>한 판에 💧 1개</b>, 목표 점수를 넘기면 💧 1개를 돌려받아요.<br>
       🪣 My Collection에 작품을 담을수록 <b>✨레어 보석</b>이 늘어나서 다음 단계가 열려요. (레어 보석은 점수 2배)</div>
@@ -465,7 +491,7 @@
 
   <!-- 🗞 Art Out: 바깥 전시 소식(문화포털) + 나의 관람 기록 -->
   <div id="view-out" class="view-container">
-    <button class="back-gallery" onclick="switchView('3d')">← Gallery</button>
+    <button class="back-gallery" onclick="openPlay()">← Play</button>
     <h2 style="font-size: 20px; font-weight: 600;">🗞 Art Out</h2>
     <div class="store-note">지금 열리는 전시를 둘러보고, 다녀온 전시는 <b>My Art Log</b>에 남겨 두세요. 처음 남기는 전시마다 💧 1개를 드려요.</div>
     <div class="out-tabs"><button id="otNews" class="on" onclick="outTab('news')">전시 소식</button><button id="otLog" onclick="outTab('log')">📒 My Art Log</button></div>
@@ -507,7 +533,7 @@
 
   <!-- 아트카드 (특별전 카드, 💧 1개로 받기 → 앞·뒤 이미지 저장, QR로 전시 모드) -->
   <div id="view-artcard" class="view-container">
-    <button class="back-gallery" onclick="switchView('3d')">← Gallery</button>
+    <button class="back-gallery" onclick="openPlay()">← Play</button>
     <h2 style="font-size: 20px; font-weight: 600;">🎴 Art Card</h2>
     <div class="store-note">특별전마다 한 장씩 있는 작품 카드예요. 💧 페인트 1개로 받으면 앞면·뒷면 이미지를 저장할 수 있어요.<br>
       인쇄해서 뒷면 QR을 휴대폰 카메라로 찍으면, 그 특별전이 미술관처럼 열려요. (한 번 받은 카드는 다시 저장해도 무료)</div>
@@ -525,7 +551,7 @@
 
   <!-- 말씀카드 뽑기 (페인트 1개) -->
   <div id="view-word" class="view-container">
-    <button class="back-gallery" onclick="switchView('3d')">← Gallery</button>
+    <button class="back-gallery" onclick="openPlay()">← Play</button>
     <h2 style="font-size: 20px; font-weight: 600;">📜 Word Card</h2>
     <div class="store-note">말씀 한 구절과 J.J의 그림이 담긴 카드를 뽑아요.<br>카드 1장 = 💧 페인트 1개 · 페인트는 광고 1번에 1개씩 모여요.<br>카드 배경은 🪣 My Collection에 담은 작품 중에서 골라져요.</div>
     <div class="wc-top">
@@ -902,7 +928,7 @@
       }
       const tk = activeTicket();
       const box = lsGet(K_BOX, { slots: FREE_SLOTS, ids: [] });
-      let html = `<button class="visit-pill me" onclick="openAccount()">👤 My</button>`;
+      let html = '';
       if (tk) {
         const left = Math.max(0, VISIT_MS - (Date.now() - tk.enteredAt));
         const h = Math.floor(left / 3600000), m = Math.floor(left / 60000) % 60;
@@ -912,11 +938,9 @@
       } else {
         html += `<button class="visit-pill enter" onclick="openExList()">🎟 Exhibitions</button>`;
       }
-      html += `<button class="visit-pill" onclick="openBox()">🪣 My Collection ${box.ids.length}/${box.slots}</button>`;
-      html += `<button class="visit-pill paint" onclick="openWord()">📜 Word Card · 💧 ${getPaint()}</button>`;
-      html += `<button class="visit-pill art" onclick="openArtCards()">🎴 Art Card</button>`;
-      html += `<button class="visit-pill out" onclick="openArtOut()">🗞 Art Out</button>`;
-      html += `<button class="visit-pill pang" onclick="openPang()">🎮 Art Pang</button>`;
+      // 메뉴는 3개만: 특별전 · ✨ Play(카드·게임·바깥 전시) · 👤 My(내 계정·My Collection)
+      html += `<button class="visit-pill paint" onclick="openPlay()">✨ Play · 💧 ${getPaint()}</button>`;
+      html += `<button class="visit-pill me" onclick="openAccount()">👤 My</button>`;
       bar.innerHTML = html;
     }
 
@@ -1211,6 +1235,48 @@
     }
     // 게임에서 돌려받은 💧 를 계정 페인트에 넣기
 
+
+    // =====================================================================
+    // ✨ Play: 카테고리별로 모아 보기
+    // =====================================================================
+    function openPlay() {
+      closeViewer();
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-play').classList.add('active');
+      window.scrollTo(0, 0);
+      stopShorts();
+      renderPlay();
+    }
+    function renderPlay() {
+      const cards = lsGet(K_CARDS, []).length;
+      const art = lsGet(K_EMO, []).filter(k => k.startsWith('card:')).length;
+      const logs = lsGet(K_LOG, []).length;
+      const best = Math.max(0, ...[1, 2, 3, 4].map(n => lsGet('agjj_pang_best_' + n, 0)));
+      const n = v => v ? `<span class="n">${v}</span>` : '';
+      document.getElementById('playBody').innerHTML = `
+        <div class="pl-paint"><div><div style="font-size:12px; color:#ddd6fe">내 페인트</div><b>💧 ${getPaint()}</b></div>
+          <button onclick="earnPaintPlay()">📺 광고 보고 💧 +1</button></div>
+
+        <div class="pl-cat">🃏 카드 만들기</div>
+        <div class="pl-grid">
+          <button class="pl-tile" onclick="openWord()"><div class="i">📜</div>${n(cards)}<div class="t">말씀카드</div><div class="d">My Collection 작품 위에 말씀 한 구절 · 💧 1</div></button>
+          <button class="pl-tile" onclick="openArtCards()"><div class="i">🎴</div>${n(art)}<div class="t">아트카드</div><div class="d">특별전 포스터 카드 · QR로 전시 모드 · 💧 1</div></button>
+        </div>
+
+        <div class="pl-cat">🎮 게임</div>
+        <div class="pl-grid">
+          <button class="pl-tile wide" onclick="openPang()"><div class="i">💎</div>${n(best ? '최고 ' + best.toLocaleString() : '')}<div class="t">J.J 아트팡</div><div class="d">예성이 그림 보석 맞추기 60초 퍼즐 · 한 판 💧 1 · 목표를 넘기면 💧 돌려받기</div></button>
+        </div>
+
+        <div class="pl-cat">🗞 바깥 전시</div>
+        <div class="pl-grid">
+          <button class="pl-tile" onclick="openArtOut('news')"><div class="i">🖼</div><div class="t">전시 소식</div><div class="d">지금 열리는 전시 둘러보기</div></button>
+          <button class="pl-tile" onclick="openArtOut('log')"><div class="i">📒</div>${n(logs)}<div class="t">My Art Log</div><div class="d">다녀온 전시 기록 · 처음 기록마다 💧 1</div></button>
+        </div>`;
+    }
+    async function earnPaintPlay() { await earnPaint(); renderPlay(); }
+
     // =====================================================================
     // 👤 내 계정: 프로필 · 내 기록 요약 · 로그아웃 · 계정 삭제 · 저작권/개인정보 안내
     // =====================================================================
@@ -1241,6 +1307,7 @@
             <div class="acc-sub">${u ? esc(u.email || '') + ' · Google 로그인' : '로그인하면 기록이 계정에 저장돼요'}</div>
             ${joined ? `<div class="acc-sub">가입일 ${joined}</div>` : ''}</div>
         </div>
+        <button class="acc-col" onclick="openBox()"><span class="i">🪣</span><div><b>My Collection ${box.ids.length}/${box.slots}</b><span>담아 둔 예성이 작품 보기 · 칸 늘리기</span></div></button>
         <div class="acc-stats">
           <button onclick="openWord()"><b>💧 ${getPaint()}</b><span>페인트</span></button>
           <button onclick="openBox()"><b>${box.ids.length}/${box.slots}</b><span>My Collection</span></button>
