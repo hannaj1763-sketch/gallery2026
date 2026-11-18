@@ -421,6 +421,8 @@
       <div class="tk-title" id="msgTitle"></div>
       <div class="tk-sub" id="msgSub"></div>
       <button class="tk-btn blue" id="msgBtn" onclick="closeModal('msgModal')">확인</button>
+      <div class="tk-sub" id="msgNote" style="display:none; margin:12px 0 0; text-align:left; background:#0f1218; border-radius:12px; padding:10px 12px; line-height:1.6"></div>
+      <button class="tk-cancel" id="msgLater" style="display:none; width:100%; text-align:center" onclick="closeModal('msgModal')">나중에 할게요</button>
     </div>
   </div>
 
@@ -949,6 +951,9 @@
     function showMsg(title, sub, onOk) {
       document.getElementById('msgTitle').innerText = title;
       document.getElementById('msgSub').innerHTML = sub;
+      document.getElementById('msgBtn').innerText = '확인';
+      document.getElementById('msgNote').style.display = 'none';
+      document.getElementById('msgLater').style.display = 'none';
       document.getElementById('msgBtn').onclick = () => { closeModal('msgModal'); if (onOk) onOk(); };
       openModal('msgModal');
     }
@@ -1738,7 +1743,15 @@
     async function drawWordCard() {
       const verses = await loadVerses();
       const pool = cardArtPool();
-      if (!pool.length) { showMsg('🪣 My Collection이 비어 있어요', '카드 배경은 My Collection에 담은 작품으로 만들어요.<br>마음에 드는 작품을 열고 <b>📥 Add to Collection</b>을 먼저 눌러 주세요.'); return; }
+      if (!pool.length) {
+        showMsg('🪣 작품 모으러 갈까요?', '말씀카드 배경은 <b>My Collection</b>에 모은 예성이 작품으로 만들어요.<br>아직 모은 작품이 없어요.', () => switchView('archive'));
+        document.getElementById('msgBtn').innerText = 'OK, 갤러리로 가기';
+        const note = document.getElementById('msgNote');
+        note.innerHTML = '💡 <b>이렇게 모아요</b><br>① 갤러리에서 마음에 드는 작품을 눌러요<br>② 위쪽 <b>📥 Add to Collection</b>을 누르면 My Collection에 저장돼요<br>③ ✨ Play → 말씀카드로 돌아와서 카드를 뽑아요';
+        note.style.display = 'block';
+        document.getElementById('msgLater').style.display = 'block';
+        return;
+      }
       if (!verses.length) { showMsg('카드를 준비하지 못했어요', '잠시 뒤 다시 해 주세요.'); return; }
       if (!await payPaintFor(null, '말씀카드 뽑기')) return;
       const have = new Set(lsGet(K_CARDS, []).map(c => c.ref));
