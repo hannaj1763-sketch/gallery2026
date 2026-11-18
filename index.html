@@ -244,6 +244,7 @@
     .food-item img, .food-item .fi-ph { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; flex: none; background: #1f2430; display: flex; align-items: center; justify-content: center; font-size: 22px; }
     .fi-n { font-size: 14px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .fi-m { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+    .dt { font-family: -apple-system, 'Roboto', 'Noto Sans KR', sans-serif; letter-spacing: 0; color: #f1f5f9; font-weight: 700; white-space: nowrap; }
     .price-tag { display: inline-block; margin-top: 5px; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: #1e293b; color: #fbbf24; }
     .price-tag.free { background: #064e3b; color: #6ee7b7; }
     .out-search { width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px solid #334155; background: #0f1218; color: #f1f5f9; font-size: 14px; margin-bottom: 8px; }
@@ -1477,7 +1478,8 @@
       }
       if (!OUT_FEED) OUT_FEED = { items: [] };
       const today = new Date().toISOString().slice(0, 10);
-      OUT_FEED.items = (OUT_FEED.items || []).filter(x => !x.end || x.end >= today);
+      const unent = t => { if (!t || !/&[#a-z0-9]+;/i.test(t)) return t; const d = document.createElement('textarea'); d.innerHTML = t; return d.value; };
+      OUT_FEED.items = (OUT_FEED.items || []).filter(x => !x.end || x.end >= today).map(x => ({ ...x, title: unent(unent(x.title)), place: unent(x.place), desc: unent(x.desc) }));
       return OUT_FEED;
     }
     // 갤러리 배너: 6초마다 다른 전시
@@ -1554,9 +1556,19 @@
       if (/무료|free|^0\s*원?$|입장료\s*없/i.test(p) && !/[1-9][0-9,]*\s*원/.test(p.replace(/무료.*/, ''))) return { free: true, text: '무료' };
       return { free: false, text: p };
     }
+    // 전시 기간을 짧게 한 줄로: 2026.11.13 ~ 11.18 (같은 해면 끝 날짜의 연도 생략)
+    function dateRange(a, b) {
+      const p = d => (String(d || '').match(/^(\d{4})-(\d{2})-(\d{2})/) || []).slice(1);
+      const [y1, m1, d1] = p(a), [y2, m2, d2] = p(b);
+      if (!y1) return [a, b].filter(Boolean).join(' ~ ');
+      const left = `${y1}.${m1}.${d1}`;
+      if (!y2) return left + ' ~';
+      return left + ' ~ ' + (y1 === y2 ? `${m2}.${d2}` : `${y2}.${m2}.${d2}`);
+    }
     // 🗺 지도에서 보기: 앱에서는 광고 1번 보고 넘어가요
-    async function openMapWithAd(q) {
-      const url = 'https://map.naver.com/p/search/' + q;
+    async function openMapWithAd(q, lat, lng) {
+      // 좌표가 있으면 카카오맵에 그 자리로 핀 (이름 검색은 장소명이 달라 못 찾는 경우가 있어서)
+      const url = lat && lng ? `https://map.kakao.com/link/map/${q},${lat},${lng}` : 'https://map.naver.com/p/search/' + q;
       if (IS_APP) { await showAd('map'); location.href = url; }       // 앱: 광고 후 휴대폰 지도/브라우저로
       else window.open(url, '_blank');
     }
@@ -1656,7 +1668,7 @@
         <div class="out-item" onclick="openOutDetail(window.__outList[${i}])">
           ${x.thumb ? `<img src="${esc(https(x.thumb))}" alt="" loading="lazy">` : '<img alt="">'}
           <div><div class="oi-t">${esc(x.title)}</div>
-          <div class="oi-m">📍 ${esc([x._a, x.sigungu, x.place].filter(Boolean).join(' · '))}${x._km != null ? ` <b style="color:#5eead4">· ${kmText(x._km)}</b>` : ''}<br>🗓 ${esc(x.start)} ~ ${esc(x.end)}</div>
+          <div class="oi-m">📍 ${esc([x._a, x.sigungu, x.place].filter(Boolean).join(' · '))}${x._km != null ? ` <b style="color:#5eead4">· ${kmText(x._km)}</b>` : ''}<br>📅 <span class="dt">${esc(dateRange(x.start, x.end))}</span></div>
           ${(() => { const p = priceInfo(x); return p ? `<span class="price-tag ${p.free ? 'free' : ''}">${p.free ? '무료' : '💳 ' + esc(p.text.length > 28 ? p.text.slice(0, 28) + '…' : p.text)}</span>` : ''; })()}
           ${logOf(x.seq) ? '<div class="oi-s">✓ 다녀왔어요</div>' : ''}</div>
         </div>`).join('') : `<div class="store-note">${f.items.length ? (outArea === '📍 내 주변' ? `내 주변 ${NEAR_KM}km 안에는 지금 열리는 전시가 없어요. '전체'나 다른 지역을 눌러 보세요.` : '찾는 전시가 없어요. 다른 지역이나 검색어로 찾아보세요.') : '전시 소식을 준비하고 있어요. 매일 아침 새로 받아 와요.'}</div>`;
@@ -1670,7 +1682,7 @@
       document.getElementById('outDetail').innerHTML = `
         ${x.thumb ? `<img class="out-detail-img" src="${esc(https(x.thumb))}" alt=""><div class="out-src">이미지 출처: 문화포털</div>` : ''}
         <div class="tk-title" style="text-align:left">${esc(x.title)}</div>
-        <div class="tk-rules">📍 ${esc([x.area, x.sigungu, x.place].filter(Boolean).join(' · '))}<br>🗓 ${esc(x.start)} ~ ${esc(x.end)}${x.realm ? '<br>🎨 ' + esc(x.realm) : ''}</div>
+        <div class="tk-rules">📍 ${esc([x.area, x.sigungu, x.place].filter(Boolean).join(' · '))}<br>📅 <span class="dt">${esc(dateRange(x.start, x.end))}</span>${x.realm ? '<br>🎨 ' + esc(x.realm) : ''}</div>
         ${(() => { const p = priceInfo(x), pk = parkingInfo(x);
           return `<div class="tk-rules">💳 입장료: ${p ? (p.free ? '<b style="color:#6ee7b7">무료</b>' : esc(p.text)) : '정보 없음 (전시장에 확인해 주세요)'}<br>🅿 주차: ${pk ? esc(pk) : '정보 없음 · 아래 지도에서 주변 주차장을 확인해 보세요'}</div>`; })()}
         ${x.desc ? `<div class="out-desc">${descHtml(x.desc)}</div>` : ''}
@@ -1678,7 +1690,7 @@
         ${mine ? `<div class="tk-sub">✓ ${esc(mine.date)}에 다녀왔어요 ${'★'.repeat(mine.stars || 0)}</div>` : ''}
         <button class="tk-btn" onclick="closeModal('outModal'); openLogForm(${esc(JSON.stringify(x))})">${mine ? '✍ 관람 기록 고치기' : '✍ 다녀왔어요 · 기록 남기기'}</button>
         ${!mine && IS_APP && !lsGet(K_EMO, []).includes('log:' + (x.seq || x.title)) ? '<div class="tk-sub" style="margin:6px 0 12px; color:#a78bfa">🎁 처음 기록을 남기면 💧 페인트 1개를 드려요</div>' : ''}
-        <button class="tk-btn blue" onclick="openMapWithAd('${encodeURIComponent(x.place || x.title)}')">${IS_APP ? '📺 광고 보고 🗺 지도에서 보기' : '🗺 지도에서 보기'}</button>
+        <button class="tk-btn blue" onclick="openMapWithAd('${encodeURIComponent(x.place || x.title)}', ${x.gpsY ? +x.gpsY : 'null'}, ${x.gpsX ? +x.gpsX : 'null'})">${IS_APP ? '📺 광고 보고 🗺 지도에서 보기' : '🗺 지도에서 보기'}</button>
         ${x.gpsX && x.gpsY ? `<button class="tk-btn" style="background:#0f766e" onclick="openTransitWithAd('${encodeURIComponent(x.place || x.title)}', ${+x.gpsY}, ${+x.gpsX})">${IS_APP ? '📺 광고 보고 🚇 대중교통 길찾기' : '🚇 대중교통 길찾기'}</button>
           <div class="tk-sub" style="margin:-2px 0 10px">지금 있는 곳에서 지하철·버스 경로를 카카오맵으로 보여 줘요</div>` : ''}
         <button class="tk-cancel" onclick="window.open('https://search.naver.com/search.naver?query=${q}', '_blank')">🔎 전시 자세히 찾아보기</button>`;
