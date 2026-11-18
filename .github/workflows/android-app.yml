@@ -174,6 +174,8 @@ jobs:
                   if (n.endsWith(".webp")) return "image/webp";
                   if (n.endsWith(".mp4")) return "video/mp4";
                   if (n.endsWith(".webm")) return "video/webm";
+                  if (n.endsWith(".wav")) return "audio/wav";
+                  if (n.endsWith(".mp3")) return "audio/mpeg";
                   return "image/jpeg";
               }
 
@@ -191,17 +193,17 @@ jobs:
                       try {
                           byte[] bytes = decode(data);
                           String mime = mimeOf(name);
-                          boolean video = mime.startsWith("video/");
+                          boolean video = mime.startsWith("video/"), audio = mime.startsWith("audio/");
                           if (Build.VERSION.SDK_INT >= 29) {
                               ContentValues v = new ContentValues();
                               v.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
                               v.put(MediaStore.MediaColumns.MIME_TYPE, mime);
-                              v.put(MediaStore.MediaColumns.RELATIVE_PATH, (video ? "Movies" : "Pictures") + "/Atelier Archive");
-                              Uri col = video ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI : MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                              v.put(MediaStore.MediaColumns.RELATIVE_PATH, (audio ? "Music" : video ? "Movies" : "Pictures") + "/Atelier Archive");
+                              Uri col = audio ? MediaStore.Audio.Media.EXTERNAL_CONTENT_URI : video ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI : MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
                               Uri uri = getContentResolver().insert(col, v);
                               if (uri == null) throw new Exception("insert failed");
                               try (OutputStream os = getContentResolver().openOutputStream(uri)) { os.write(bytes); }
-                              toast(video ? "동영상을 사진첩에 저장했어요" : "사진첩(Atelier Archive 앨범)에 저장했어요");
+                              toast(audio ? "음악(Music/Atelier Archive)에 저장했어요" : video ? "동영상을 사진첩에 저장했어요" : "사진첩(Atelier Archive 앨범)에 저장했어요");
                               return "ok";
                           } else {
                               shareBytes(bytes, name);
