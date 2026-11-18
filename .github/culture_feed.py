@@ -1,7 +1,7 @@
 # 문화포털 '한눈에보는문화정보' 오픈 API → 전시 소식 파일(culture/exhibits.json) 만들기
 # GitHub Actions 에서 매일 실행돼요. 인증키는 저장소 Settings > Secrets 의 CULTURE_API_KEY.
 # 출처: 한국문화정보원 문화포털 (공공데이터포털, 이용허락범위 제한 없음)
-import os, sys, json, datetime, urllib.parse, urllib.request
+import os, sys, json, datetime, urllib.parse, urllib.request, urllib.error
 import xml.etree.ElementTree as ET
 
 KEY = os.environ.get('CULTURE_API_KEY', '').strip()
@@ -43,8 +43,7 @@ def fmt(d):
     return f'{d[:4]}-{d[4:6]}-{d[6:8]}' if len(d) >= 8 else d
 
 # 분야별(전시 = D000) 목록을 먼저, 안 되면 기간별 목록에서 '전시'만 골라요
-TRIES = [('realm2', {'realmCode': 'D000'}), ('realm', {'realmCode': 'D000'}),
-         ('period2', {}), ('period', {})]
+TRIES = [('realm2', {'realmCode': 'D000'}), ('period2', {})]   # 주소 확인됨: realm2·period2
 raw = []
 for path, extra in TRIES:
     try:
@@ -59,6 +58,11 @@ for path, extra in TRIES:
             page += 1
         if got:
             raw = got; print(f'→ {path} 사용, {len(got)}건'); break
+    except urllib.error.HTTPError as e:
+        body = ''
+        try: body = e.read().decode('utf-8', 'replace')[:400].replace('\n', ' ')
+        except Exception: pass
+        print(f'[{path}] 실패: HTTP {e.code} {e.reason} | 답: {body}')
     except Exception as e:
         print(f'[{path}] 실패: {e}')
 
