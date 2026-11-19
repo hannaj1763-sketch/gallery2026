@@ -52,6 +52,22 @@
     .art-card { background: #1c212c; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
     .art-card:hover { transform: translateY(-4px); box-shadow: 0 14px 28px rgba(0,0,0,0.5); }
     
+    .lock-intro { margin: 26px 2px 6px; padding: 12px 14px; border-radius: 12px; background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.3); color: #fde68a; font-size: 13.5px; line-height: 1.7; }
+    .lock-head { display: flex; align-items: center; gap: 8px; margin: 22px 2px 10px; font-size: 16px; font-weight: 700; color: #f1f5f9; flex-wrap: wrap; }
+    .lock-head span { font-size: 12.5px; color: #94a3b8; font-weight: 400; }
+    .lock-head button { margin-left: auto; background: #f59e0b; color: #1a1a1a; border: none; border-radius: 999px; padding: 6px 14px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: inherit; }
+    .lock-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)) !important; gap: 8px !important; }
+    .lock-grid .thumb-wrapper { height: 112px; }
+    .lock-grid .art-info { padding: 6px 8px 8px; }
+    .lock-grid .art-title { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lock-grid .art-meta { font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lock-grid .lock-mark { font-size: 22px; }
+    .lock-grid .own-badge { font-size: 10px; padding: 2px 6px; left: 5px; top: 5px; }
+    .art-card.locked .art-thumb { filter: blur(6px) brightness(.9); transform: scale(1.1); }
+    .art-card.locked .art-title { color: #cbd5e1; }
+    .art-card.locked .jjwm { position: absolute; inset: -60%; transform: rotate(-28deg); pointer-events: none; background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2296%22%20height%3D%2248%22%3E%3Cg%20font-family%3D%22Arial%20Black%2CArial%2Csans-serif%22%20font-weight%3D%22900%22%20font-style%3D%22italic%22%20font-size%3D%2219%22%20fill%3D%22%23fff%22%20fill-opacity%3D%22.72%22%20stroke%3D%22%231e3a8a%22%20stroke-opacity%3D%22.25%22%20stroke-width%3D%22.6%22%3E%3Ctext%20x%3D%222%22%20y%3D%2219%22%3EJ.J%3C/text%3E%3Ctext%20x%3D%2250%22%20y%3D%2219%22%3EJ.J%3C/text%3E%3Ctext%20x%3D%2226%22%20y%3D%2243%22%3EJ.J%3C/text%3E%3Ctext%20x%3D%22-22%22%20y%3D%2243%22%3EJ.J%3C/text%3E%3Ctext%20x%3D%2274%22%20y%3D%2243%22%3EJ.J%3C/text%3E%3C/g%3E%3C/svg%3E") 0 0 / 78px 39px repeat; }   /* J.J 글자 무늬 */
+    .lock-mark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 34px; text-shadow: 0 2px 10px rgba(0,0,0,.6); }
+    .own-badge { position: absolute; left: 8px; top: 8px; background: rgba(0,0,0,.6); color: #fde68a; border-radius: 999px; padding: 3px 9px; font-size: 11.5px; font-weight: 700; }
     .thumb-wrapper { position: relative; width: 100%; height: 260px; background: #11141a; overflow: hidden; display: flex; align-items: center; justify-content: center; }
     .art-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
     .thumb-watermark {
@@ -159,6 +175,10 @@
     .shorts-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #8a99ad; font-size: 14px; pointer-events: none; }
 
     .lbl-short { display: none; }
+    #view-bbb { padding: 0 !important; }
+    body.has-visit #view-bbb { padding-top: 52px !important; }   /* 위쪽 Exhibitions·Play·My 알약에 가리지 않게 */
+    #view-bbb.active { display: block; }
+    #bbbFrame { width: 100%; height: calc(100vh - 175px); height: calc(100dvh - 175px); border: 0; display: block; background: #0d1117; }
     .tab-btn { white-space: nowrap; }
     @media (max-width: 640px) {
       header { padding: 12px 12px; gap: 8px; }
@@ -170,9 +190,10 @@
       .tab-btn { padding: 7px 10px; font-size: 12px; }
     }
     @media (max-width: 440px) {
-      header > div:first-child { display: none; }   /* 좁은 휴대폰에서는 메뉴 5개가 한 줄에 들어가도록 제목 숨김 */
-      header { justify-content: center; }
-      .nav-tabs { gap: 5px; }
+      header > div:first-child { display: none; }   /* 좁은 휴대폰에서는 메뉴 6개가 한 줄에 들어가도록 제목 숨김 */
+      header { justify-content: center; padding-left: 6px; padding-right: 6px; }
+      .nav-tabs { gap: 4px; flex-wrap: nowrap; }
+      .tab-btn { padding: 6px 8px; font-size: 11.5px; letter-spacing: -0.2px; }
     }
 
     /* ===== 입장권·My Collection (AGJJ) ===== */
@@ -393,6 +414,8 @@
     #songPlayer .sp-top button { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); color: #fff; border-radius: 999px; padding: 7px 14px; font-size: 14px; cursor: pointer; font-family: inherit; }
     #songPlayer .sp-top span { font-size: 14px; font-weight: 700; color: #e6c294; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     #songPlayer iframe { flex: 1; width: 100%; border: 0; background: #0d1117; }
+    .adb { display: inline-block; background: #fbbf24; color: #111; font: 800 10.5px/1 Arial, sans-serif; letter-spacing: .3px; padding: 3px 4px 2px; border-radius: 3px; vertical-align: 2px; }   /* 유튜브처럼 노란 AD 표시 */
+    .tk-btn .adb, .lock-head button .adb { background: #111; color: #fbbf24; }   /* 주황 버튼 위에서는 검은 바탕 */
     .tk-btn { width: 100%; background: #f59e0b; color: #1a1a1a; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
     .tk-btn.blue { background: #3b82f6; color: #fff; }
     .tk-btn.red { background: #b91c1c; color: #fff; }
@@ -430,6 +453,7 @@
       <button class="tab-btn" onclick="switchView('archive')"><span class="lbl-long">All Works</span><span class="lbl-short">All Works</span></button>
       <button class="tab-btn" onclick="switchView('shorts')">Shorts</button>
       <button class="tab-btn" onclick="switchView('store')"><span class="lbl-long">📦 Emoticon Library</span><span class="lbl-short">📦 Library</span></button>
+      <button class="tab-btn" onclick="switchView('bbb')"><span class="lbl-long">📖 BBB 말씀</span><span class="lbl-short">📖 BBB</span></button>
       <a class="tab-btn studio-tab" href="emoticon.html"><span class="lbl-long">🎨 Emoticon Studio</span><span class="lbl-short">🎨 Studio</span></a>
     </div>
     <div class="header-note" style="font-size:12px; color:#8a99ad;">Large Frame Mode</div>
@@ -471,7 +495,7 @@
       <div class="tk-title">AGJJ 아그짜에 오신 걸 환영해요</div>
       <div class="tk-sub">Art Gallery of Jane Jang<br>작가 J.J(장예성)의 그림 갤러리예요.</div>
       <div class="tk-rules">· 광고 1번을 보면 <b>오늘 하루</b> 갤러리에 자유롭게 들어올 수 있어요.<br>· 특별전은 갤러리 안에서 전시마다 입장권이 따로 필요해요.</div>
-      <button class="tk-btn" id="gateGo" onclick="enterGalleryWithAd()">▶ 광고 보고 갤러리 입장</button>
+      <button class="tk-btn" id="gateGo" onclick="enterGalleryWithAd()"><span class="adb">AD</span> 시청 후 갤러리 입장</button>
       <div class="tk-sub" id="gateMsg" style="margin:10px 0 0"></div>
     </div>
   </div>
@@ -492,7 +516,7 @@
       <div class="tk-title" id="tkTitle">특별전</div>
       <div class="tk-sub" id="tkSub"></div>
       <div class="tk-rules" id="tkRules"></div>
-      <button class="tk-btn" id="tkGo" onclick="enterWithAd()">▶ 광고 보고 입장하기</button>
+      <button class="tk-btn" id="tkGo" onclick="enterWithAd()"><span class="adb">AD</span> 시청 후 입장하기</button>
       <button class="tk-cancel" onclick="closeModal('tkModal')">다음에 볼게요</button>
     </div>
   </div>
@@ -512,7 +536,7 @@
     <div class="tk-box">
       <div class="tk-title">My Collection이 가득 찼어요</div>
       <div class="tk-sub" id="slotSub"></div>
-      <button class="tk-btn" onclick="addSlotWithAd()">▶ 광고 보고 1칸 늘리기</button>
+      <button class="tk-btn" onclick="addSlotWithAd()"><span class="adb">AD</span> 시청 후 1칸 늘리기</button>
       <button class="tk-cancel" onclick="closeModal('slotModal')">닫기</button>
     </div>
   </div>
@@ -678,7 +702,7 @@
     <div class="wc-top">
       <div class="wc-paint">💧 <span id="paintCnt">0</span></div>
       <button class="wc-btn" id="wcDraw" onclick="drawWordCard()">✨ 오늘의 말씀 뽑기 (💧 1)</button>
-      <button class="wc-btn ad" id="wcAd" onclick="earnPaint()">📺 광고 보고 💧 +3</button>
+      <button class="wc-btn ad" id="wcAd" onclick="earnPaint()"><span class="adb">AD</span> 시청 💧 +3</button>
     </div>
     <h3 style="font-size:16px; margin-top:26px">My Cards <span id="wcCount" style="color:#94a3b8; font-weight:500"></span></h3>
     <div id="wcGrid" class="wc-grid"></div>
@@ -770,6 +794,11 @@
   </div>
 
   <!-- 이모티콘 창고: 공방에서 올린 이모티콘을 누구나 받아 가기 -->
+  <!-- 📖 BBB: 주제별 성경암송 3D 갤러리 (BBB-BIBLE-CARD 저장소를 그대로 띄워요) -->
+  <div id="view-bbb" class="view-container">
+    <iframe id="bbbFrame" title="BBB 주제별 성경암송 3D 갤러리" allow="autoplay"></iframe>
+  </div>
+
   <div id="view-store" class="view-container">
     <button class="back-gallery" onclick="switchView('3d')">← Gallery</button>
     <h2 style="font-size: 20px; font-weight: 600;">📦 Yesung's Emoticon Library</h2>
@@ -1137,7 +1166,7 @@
         '· 퇴장한 뒤 다시 보고 싶으면 <b>입장권을 다시 받으면 돼요.</b> 볼 때마다 관람 횟수가 쌓여요.<br>' +
         '· 앱이 꺼져도 10분 안에 다시 열면 이어서 볼 수 있어요.<br>' +
         '· 마음에 드는 작품은 📥 Add to Collection으로 남겨 두세요.';
-      go.disabled = false; go.innerText = seen ? `▶ 광고 보고 다시 입장하기 (${seen + 1}회째)` : '▶ 광고 보고 입장하기';
+      go.disabled = false; go.innerHTML = seen ? `<span class="adb">AD</span> 시청 후 다시 입장하기 (${seen + 1}회째)` : '<span class="adb">AD</span> 시청 후 입장하기';
       openModal('tkModal');
     }
 
@@ -1484,7 +1513,7 @@
       document.getElementById('playBody').innerHTML = `
         <div class="pl-paint"><div><div style="font-size:12px; color:#ddd6fe">내 페인트</div><b>💧 ${getPaint()}</b>
             <div style="font-size:11.5px; color:#c4b5fd; margin-top:2px">🎨 오늘의 물감 ${freeLeft()} + 모은 페인트 ${savedPaint()}</div></div>
-          <button onclick="earnPaintPlay()" ${adLeftToday() ? '' : 'disabled'}>📺 광고 보고 💧 +${AD_PAINT}<br><small>오늘 ${adLeftToday()}번 남음</small></button></div>
+          <button onclick="earnPaintPlay()" ${adLeftToday() ? '' : 'disabled'}><span class="adb">AD</span> 시청 💧 +${AD_PAINT}<br><small>오늘 ${adLeftToday()}번 남음</small></button></div>
         <div class="pl-how">🎨 매일 오늘의 물감 ${FREE_DAILY}개 (안 쓰면 사라져요) · 🔥 7일 연속 출석 +5 · 🎟 특별전 관람 완료 +2 · 💌 아트빔 링크로 친구 입장 +3 (하루 3명) · 💎 아트퐁 목표 달성 · 📒 첫 관람 기록</div>
 
         <div class="pl-cat">🃏 카드 만들기</div>
@@ -1920,8 +1949,8 @@
         ${mine ? `<div class="tk-sub">✓ ${esc(mine.date)}에 다녀왔어요 ${'★'.repeat(mine.stars || 0)}</div>` : ''}
         <button class="tk-btn" onclick="closeModal('outModal'); openLogForm(${esc(JSON.stringify(x))})">${mine ? '✍ 관람 기록 고치기' : '✍ 다녀왔어요 · 기록 남기기'}</button>
         ${!mine && IS_APP && !lsGet(K_EMO, []).includes('log:' + (x.seq || x.title)) ? '<div class="tk-sub" style="margin:6px 0 12px; color:#a78bfa">🎁 처음 기록을 남기면 💧 페인트 1개를 드려요</div>' : ''}
-        <button class="tk-btn blue" onclick="openMapWithAd('${encodeURIComponent(x.place || x.title)}', ${x.gpsY ? +x.gpsY : 'null'}, ${x.gpsX ? +x.gpsX : 'null'})">${IS_APP ? '📺 광고 보고 🗺 지도에서 보기' : '🗺 지도에서 보기'}</button>
-        ${x.gpsX && x.gpsY ? `<button class="tk-btn" style="background:#0f766e" onclick="openTransitWithAd('${encodeURIComponent(x.place || x.title)}', ${+x.gpsY}, ${+x.gpsX})">${IS_APP ? '📺 광고 보고 🚇 대중교통 길찾기' : '🚇 대중교통 길찾기'}</button>
+        <button class="tk-btn blue" onclick="openMapWithAd('${encodeURIComponent(x.place || x.title)}', ${x.gpsY ? +x.gpsY : 'null'}, ${x.gpsX ? +x.gpsX : 'null'})">${IS_APP ? '🗺 지도에서 보기 <span class="adb">AD</span>' : '🗺 지도에서 보기'}</button>
+        ${x.gpsX && x.gpsY ? `<button class="tk-btn" style="background:#0f766e" onclick="openTransitWithAd('${encodeURIComponent(x.place || x.title)}', ${+x.gpsY}, ${+x.gpsX})">${IS_APP ? '🚇 대중교통 길찾기 <span class="adb">AD</span>' : '🚇 대중교통 길찾기'}</button>
           <div class="tk-sub" style="margin:-2px 0 10px">지금 있는 곳에서 지하철·버스 경로를 카카오맵으로 보여 줘요</div>` : ''}
         <button class="tk-cancel" onclick="window.open('https://search.naver.com/search.naver?query=${q}', '_blank')">🔎 전시 자세히 찾아보기</button>`;
       openModal('outModal');
@@ -2219,8 +2248,8 @@
       const b = document.getElementById('wcAd'); if (b) { b.disabled = true; b.innerText = '광고 불러오는 중…'; }
       await showAd('paint');
       const bn = lsGet(K_BONUS, {}); if (bn.adDay !== todayStr()) { bn.adDay = todayStr(); bn.adCount = 0; } bn.adCount++; lsSet(K_BONUS, bn);
-      addPaint(AD_PAINT); toast(`📺 광고 보상 💧 +${AD_PAINT}`);
-      if (b) { b.disabled = false; b.innerText = `📺 광고 보고 💧 +${AD_PAINT}`; }
+      addPaint(AD_PAINT); toast(`<span class="adb">AD</span> 광고 보상 💧 +${AD_PAINT}`);
+      if (b) { b.disabled = false; b.innerHTML = `<span class="adb">AD</span> 시청 💧 +${AD_PAINT}`; }
       return true;
     }
     // 작은 알림 (화면 아래에 잠깐)
@@ -2271,7 +2300,7 @@
         document.getElementById('msgTitle').innerText = '💧 페인트가 없어요';
         document.getElementById('msgSub').innerHTML = `${what}에는 페인트 1개가 필요해요.<br>광고 1번을 보면 페인트 ${AD_PAINT}개를 받아요. (오늘 ${adLeftToday()}번 남음)<br>🎨 오늘의 물감 ${FREE_DAILY}개는 내일 다시 채워져요.`;
         const btn = document.getElementById('msgBtn');
-        btn.innerText = adLeftToday() ? '📺 광고 보고 받기' : '확인';
+        btn.innerHTML = adLeftToday() ? '<span class="adb">AD</span> 시청 후 받기' : '확인';
         btn.onclick = async () => { closeModal('msgModal'); btn.innerText = '확인'; if (await earnPaint()) done(); else resolve(false); };
         openModal('msgModal');
       });
@@ -2701,6 +2730,27 @@
       if (document.getElementById('view-shorts').classList.contains('active')) startShorts();
     }
 
+    // 아직 볼 수 없는 작품(특별전 작품 중 My Collection에 없는 것)은 흐리게, 전시별로 묶어서 — 이 앱의 작품 전체를 보여줘요
+    function lockedSections() {
+      if (!EXCFG) return '';
+      const vis = new Set(artworks.map(a => a.id)), mine = new Set(getBox().ids || []), byId = Object.fromEntries(allArtworks.map(a => [a.id, a]));
+      const tk = IS_APP ? activeTicket() : null;
+      let html = '', nLocked = 0;
+      (EXCFG.exhibitions || []).forEach((ex, i) => {
+        const items = (ex.works || []).map(id => byId[id]).filter(a => a && !a.isProfile && !vis.has(a.id));
+        if (!items.length) return;
+        const seen = visitCount(ex.id);
+        html += `<div class="lock-head">${tk && tk.exId === ex.id ? '🎟' : '🔒'} 제${i + 1}회 「${esc(ex.short || ex.title)}」 <span>${(ex.works || []).length}점${seen ? ` · ✔ ${seen}회 관람` : ''}</span>
+          <button onclick="${IS_APP ? `openTicket('${ex.id}')` : `showMsg('📱 앱에서 열려요', '특별전은 AGJJ 앱에서 광고 1번으로 입장해요.')`}">${IS_APP ? '입장하기 <span class="adb">AD</span>' : '앱에서 보기'}</button></div>`;
+        html += `<div class="gallery-grid lock-grid">` + items.map(a => {
+          const own = mine.has(a.id); if (!own) nLocked++;
+          return `<div class="art-card ${own ? '' : 'locked'}" onclick="${own ? `openBoxItem('${a.id}')` : (IS_APP ? `openTicket('${ex.id}')` : `showMsg('📱 앱에서 열려요', '이 작품은 특별전 「${esc(ex.short || ex.title)}」에 있어요. AGJJ 앱에서 입장하면 볼 수 있어요.')`)}">
+            <div class="thumb-wrapper"><img src="${a.src}" class="art-thumb" alt="" loading="lazy" decoding="async">${own ? '<div class="thumb-watermark">J.J</div><span class="own-badge"><span class="easel"></span> 내 컬렉션</span>' : '<div class="jjwm"></div><div class="lock-mark">🔒</div>'}</div>
+            <div class="art-info"><div class="art-title">${esc(a.title)}</div><div class="art-meta">${own ? esc(a.meta || '') : '🔒 특별전에서 만나요'}</div></div></div>`;
+        }).join('') + `</div>`;
+      });
+      return html ? `<div class="lock-intro">✨ 지금 볼 수 있는 작품 <b>${artworks.filter(a => !a.isProfile).length}점</b> · 특별전에서 만날 작품 <b>${nLocked}점</b> (모두 ${allArtworks.filter(a => !a.isProfile).length}점)<br>흐린 작품은 특별전에 입장하거나 <span class="easel"></span> My Collection에 담으면 또렷하게 보여요.</div>` + html : '';
+    }
     function renderArchive() {
       const grid = document.getElementById('artGrid');
       // [속도개선] 도록 썸네일은 화면에 보일 때만 로드
@@ -2719,8 +2769,12 @@
           </div>
         </div>
       `).join('');
+      let lk = document.getElementById('lockedWorks');
+      if (!lk) { lk = document.createElement('div'); lk.id = 'lockedWorks'; grid.after(lk); }
+      lk.innerHTML = lockedSections();
     }
 
+    const BBB_SITE = 'https://hannaj1763-sketch.github.io/BBB-BIBLE-CARD/';
     function switchView(mode) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
@@ -2730,6 +2784,10 @@
       } else if (mode === 'shorts') {
         document.querySelectorAll('.tab-btn')[2].classList.add('active');
         document.getElementById('view-shorts').classList.add('active');
+      } else if (mode === 'bbb') {
+        document.querySelectorAll('.tab-btn')[4].classList.add('active');
+        document.getElementById('view-bbb').classList.add('active');
+        const f = document.getElementById('bbbFrame'); if (!f.src) f.src = BBB_SITE;      // 처음 열 때만 불러오기
       } else if (mode === 'store') {
         document.querySelectorAll('.tab-btn')[3].classList.add('active');
         document.getElementById('view-store').classList.add('active');
