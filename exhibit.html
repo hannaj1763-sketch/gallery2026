@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
 <!--
-  AGJJ 전시 모드 (아트카드)
-  - 아트카드 뒷면 QR → exhibit.html?ex=ex3&c=카드암호 로 들어오면 그 특별전이 미술관처럼 열려요.
+  AGJJ 전시 모드 (아트빔)
+  - 아트빔 뒷면 QR → exhibit.html?ex=ex3&c=카드암호 로 들어오면 그 특별전이 미술관처럼 열려요.
   - 순서: 개막(전시 제목) → 작가의 말 → 작품(액자·조명·캡션) → 폐막
   - 휴대폰은 가로로 눕히면 더 크게 보여요. TV·프로젝터로 미러링해도 그대로 나와요.
   - 전시 내용(작품·작가의 말·카드 암호)은 저장소의 exhibitions.json 에서 바꿔요.
@@ -108,7 +108,7 @@
 
   <!-- 불러오는 중 / 카드 확인 -->
   <section class="scene show" id="sLoading">
-    <div class="kicker">AGJJ ART CARD</div>
+    <div class="kicker">AGJJ ART BEAM</div>
     <div class="msg" id="loadingMsg">전시장을 준비하고 있어요…</div>
   </section>
 
@@ -189,7 +189,7 @@
     try { cfg = await (await fetch('exhibitions.json?v=' + Math.floor(Date.now() / 300000), { cache: 'no-store' })).json(); }
     catch (e) { return fail('전시 정보를 불러오지 못했어요.<br>인터넷 연결을 확인해 주세요.'); }
     EX = (cfg.exhibitions || []).find(e => e.id === EX_ID);
-    if (!EX || (EX.card && EX.card !== CODE)) return fail('아트카드를 확인하지 못했어요.<br>카드 뒷면의 QR을 휴대폰 카메라로 다시 찍어 주세요.');
+    if (!EX || (EX.card && EX.card !== CODE)) return fail('아트빔을 확인하지 못했어요.<br>아트빔 뒷면의 QR을 휴대폰 카메라로 다시 찍어 주세요.');
 
     let tree;
     try { tree = await repoTree(); } catch (e) { return fail('작품을 불러오지 못했어요.<br>잠시 뒤 다시 열어 주세요.'); }
@@ -346,12 +346,12 @@
     if (window.AtelierApp) location.href = './'; else location.href = './';
   }
 
-  if (!EX_ID) fail('아트카드 뒷면의 QR을 휴대폰 카메라로 찍으면<br>그 특별전이 이곳에서 열려요.');
+  if (!EX_ID) fail('아트빔 뒷면의 QR을 휴대폰 카메라로 찍으면<br>그 특별전이 이곳에서 열려요.');
   else load();
   if (LOOP) setTimeout(() => { if (!started && EX) begin(); }, OPEN_MS + 3000);
 </script>
 <script type="module">
-  // 💌 친구 초대: 아트카드 링크(&r=보낸 사람)로 처음 들어온 사람이면 보낸 사람에게 💧 3 (보낸 사람 앱이 다음에 열릴 때 받아요)
+  // 💌 친구 초대: 아트빔 링크(&r=보낸 사람)로 처음 들어온 사람이면 보낸 사람에게 💧 3 (보낸 사람 앱이 다음에 열릴 때 받아요)
   (async () => {
     const q = new URLSearchParams(location.search), ref = q.get('r'), ex = q.get('ex');
     if (!ref || !/^[A-Za-z0-9]{10,40}$/.test(ref)) return;

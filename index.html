@@ -203,7 +203,7 @@
     .wc-card-img { width: 100%; max-height: 62vh; object-fit: contain; border-radius: 12px; display: block; margin: 0 auto 12px; }
     .wc-flip { animation: wcflip .7s ease; }
     @keyframes wcflip { 0% { transform: perspective(800px) rotateY(90deg) scale(.8); opacity: 0; } 100% { transform: perspective(800px) rotateY(0) scale(1); opacity: 1; } }
-    #msgModal { z-index: 160; }   /* 안내창은 다른 창(아트카드·말씀카드) 위에 */
+    #msgModal { z-index: 160; }   /* 안내창은 다른 창(아트빔·말씀카드) 위에 */
     .visit-pill.art { background: rgba(120,83,32,0.88); border-color: #d8b679; }
     #view-artcard { max-width: 900px; margin: 0 auto; padding: 104px 16px 40px; }
     body.has-visit #view-artcard { padding-top: var(--vb, 96px); }
@@ -566,7 +566,7 @@
       <div class="tk-title">🔒 개인정보 안내</div>
       <div class="copy-sec">
         <p>· <b>가져오는 정보:</b> 구글 계정의 이름·이메일·프로필 사진(로그인 확인용)</p>
-        <p>· <b>저장하는 정보:</b> 입장권·관람 완료 기록, My Collection, 💧 페인트, 말씀카드·아트카드, 관람 기록(My Art Log), 닉네임, 게임 점수</p>
+        <p>· <b>저장하는 정보:</b> 입장권·관람 완료 기록, My Collection, 💧 페인트, 말씀카드·아트빔, 관람 기록(My Art Log), 닉네임, 게임 점수</p>
         <p>· <b>저장 위치:</b> Google Firebase 서버(서울 지역)와 이 휴대폰</p>
         <p>· <b>다른 사람에게 보이는 정보:</b> 내가 정한 <b>닉네임</b>과 아트퐁 점수(순위표)만 보여요. 구글 이름·이메일·사진은 보이지 않아요.</p>
         <p>· <b>쓰는 곳:</b> 앱 기능을 위해서만 쓰고, 다른 곳에 팔거나 넘기지 않아요.</p>
@@ -590,7 +590,7 @@
       <div class="copy-sec"><h4>版权声明</h4>
         <p>本仓库及网站（应用）所载的所有画作、角色及表情包，其著作权均归作者张艺成（J.J）所有。未经作者事先许可，禁止复制、传播、修改或用于商业用途。</p>
         <div class="c">© J.J 版权所有。</div></div>
-      <div class="copy-sec"><p style="font-size:12px; color:#94a3b8">앱에서 저장한 이미지(이모티콘·말씀카드·아트카드)는 개인적으로 간직하고 나누는 용도로만 쓸 수 있어요. 판매나 상품 제작에는 쓸 수 없어요.</p></div>
+      <div class="copy-sec"><p style="font-size:12px; color:#94a3b8">앱에서 저장한 이미지(이모티콘·말씀카드·아트빔)는 개인적으로 간직하고 나누는 용도로만 쓸 수 있어요. 판매나 상품 제작에는 쓸 수 없어요.</p></div>
       <button class="tk-btn" onclick="closeModal('copyModal')">확인</button>
     </div>
   </div>
@@ -651,12 +651,12 @@
     </div>
   </div>
 
-  <!-- 아트카드 (특별전 카드, 💧 1개로 받기 → 앞·뒤 이미지 저장, QR로 전시 모드) -->
+  <!-- 아트빔 (특별전 카드, 💧 1개로 받기 → 앞·뒤 이미지 저장, QR로 전시 모드) -->
   <div id="view-artcard" class="view-container">
     <button class="back-gallery" onclick="openPlay()">← Play</button>
-    <h2 style="font-size: 20px; font-weight: 600;">🎴 Art Card</h2>
-    <div class="store-note">특별전마다 한 장씩 있는 작품 카드예요. 앞면은 그 전시의 대표작이에요. 💧 페인트 1개로 받으면 선명한 앞면과 QR 뒷면이 열리고, 이미지로 저장할 수 있어요.<br>
-      인쇄해서 뒷면 QR을 휴대폰 카메라로 찍으면, 그 특별전이 미술관처럼 열려요. (한 번 받은 카드는 다시 저장해도 무료)</div>
+    <h2 style="font-size: 20px; font-weight: 600;">📽️ Art Beam</h2>
+    <div class="store-note">📽️ 아트빔은 특별전을 내 휴대폰으로 쏘아 보는 영사 카드예요. 특별전마다 한 장씩 있어요. 앞면은 그 전시의 대표작이에요. 💧 페인트 1개로 받으면 선명한 앞면과 QR 뒷면이 열리고, 이미지로 저장할 수 있어요.<br>
+      인쇄해서 뒷면 QR을 휴대폰 카메라로 찍으면, 그 특별전이 미술관처럼 열려요. (한 번 받은 아트빔은 다시 저장해도 무료)</div>
     <div id="acGrid" class="ac-grid"></div>
   </div>
 
@@ -996,7 +996,7 @@
     const FREE_SLOTS = 1;                  // My Collection 무료 칸
     const K_VCOUNT = 'agjj_vcount_v1';     // 특별전별 관람 횟수 { exId: n } (입장할 때마다 +1)
     const K_TICKET = 'agjj_ticket_v1', K_VISITED = 'agjj_visited_v1', K_BOX = 'agjj_box_v1', K_PASS = 'agjj_pass_v1';
-    const K_PAINT = 'agjj_paint_v1', K_CARDS = 'agjj_cards_v1', K_EMO = 'agjj_emo_v1', K_LOG = 'agjj_artlog_v1';   // + 관람 기록   // 페인트 · 뽑은 말씀카드 · 페인트로 받은 것(이모티콘·아트카드)
+    const K_PAINT = 'agjj_paint_v1', K_CARDS = 'agjj_cards_v1', K_EMO = 'agjj_emo_v1', K_LOG = 'agjj_artlog_v1';   // + 관람 기록   // 페인트 · 뽑은 말씀카드 · 페인트로 받은 것(이모티콘·아트빔)
     let EXCFG = null;                      // exhibitions.json 내용
     let allArtworks = [];                  // 저장소의 모든 작품
     let currentEx = null;                  // 지금(또는 곧) 열리는 특별전
@@ -1485,12 +1485,12 @@
         <div class="pl-paint"><div><div style="font-size:12px; color:#ddd6fe">내 페인트</div><b>💧 ${getPaint()}</b>
             <div style="font-size:11.5px; color:#c4b5fd; margin-top:2px">🎨 오늘의 물감 ${freeLeft()} + 모은 페인트 ${savedPaint()}</div></div>
           <button onclick="earnPaintPlay()" ${adLeftToday() ? '' : 'disabled'}>📺 광고 보고 💧 +${AD_PAINT}<br><small>오늘 ${adLeftToday()}번 남음</small></button></div>
-        <div class="pl-how">🎨 매일 오늘의 물감 ${FREE_DAILY}개 (안 쓰면 사라져요) · 🔥 7일 연속 출석 +5 · 🎟 특별전 관람 완료 +2 · 💌 아트카드 링크로 친구 입장 +3 (하루 3명) · 💎 아트퐁 목표 달성 · 📒 첫 관람 기록</div>
+        <div class="pl-how">🎨 매일 오늘의 물감 ${FREE_DAILY}개 (안 쓰면 사라져요) · 🔥 7일 연속 출석 +5 · 🎟 특별전 관람 완료 +2 · 💌 아트빔 링크로 친구 입장 +3 (하루 3명) · 💎 아트퐁 목표 달성 · 📒 첫 관람 기록</div>
 
         <div class="pl-cat">🃏 카드 만들기</div>
         <div class="pl-grid">
           <button class="pl-tile" onclick="openWord()"><div class="i">📜</div>${n(cards)}<div class="t">말씀카드</div><div class="d">My Collection 작품 위에 말씀 한 구절 · 💧 1</div></button>
-          <button class="pl-tile" onclick="openArtCards()"><div class="i">🎴</div>${n(art)}<div class="t">아트카드</div><div class="d">특별전 포스터 카드 · QR로 전시 모드 · 💧 1</div></button>
+          <button class="pl-tile" onclick="openArtCards()"><div class="i">📽️</div>${n(art)}<div class="t">아트빔</div><div class="d">특별전을 영사하듯 · QR·링크로 전시 모드 · 💧 1</div></button>
         </div>
 
         <div class="pl-cat">🎵 음악</div>
@@ -1635,7 +1635,7 @@
           <button onclick="openBox()"><b>${box.ids.length}/${box.slots}</b><span>My Collection</span></button>
           <button onclick="openExList()"><b>${visited}/${(EXCFG && EXCFG.exhibitions || []).length}</b><span>관람한 특별전</span></button>
           <button onclick="openWord()"><b>${cards}</b><span>말씀카드</span></button>
-          <button onclick="openArtCards()"><b>${artCards}</b><span>아트카드</span></button>
+          <button onclick="openArtCards()"><b>${artCards}</b><span>아트빔</span></button>
           <button onclick="openArtOut('log')"><b>${logs}</b><span>관람 기록</span></button>
         </div>
         ${best ? `<div class="acc-sub" style="margin-top:8px; text-align:center">🎮 아트퐁 최고 점수 ${best.toLocaleString()}점</div>` : ''}
@@ -1991,7 +1991,7 @@
     }
 
     // =====================================================================
-    // 🎴 아트카드: 특별전 카드 (앞면 = 대표작 포스터, 뒷면 = 전시 모드 QR)
+    // 📽️ 아트빔: 특별전 카드 (앞면 = 대표작 포스터, 뒷면 = 전시 모드 QR)
     //  - 💧 1개로 받기(한 번 받으면 계속 무료) → 앞면·뒷면 이미지 저장
     //  - QR 주소: exhibit.html?ex=전시&c=카드암호  (암호는 exhibitions.json 의 card)
     // =====================================================================
@@ -2026,7 +2026,7 @@
     async function openArtCard(id) {
       const ex = EXCFG.exhibitions.find(e => e.id === id);
       if (!ex) return;
-      document.getElementById('acTitle').innerText = `🎴 No.${String(exNo(ex)).padStart(2, '0')} ${ex.short || ex.title}`;
+      document.getElementById('acTitle').innerText = `📽️ No.${String(exNo(ex)).padStart(2, '0')} ${ex.short || ex.title}`;
       document.getElementById('acFront').src = '';
       setAcBack('');
       document.getElementById('acBtns').innerHTML = '<div class="tk-sub">카드를 만드는 중…</div>';
@@ -2043,7 +2043,7 @@
     function setAcBack(url, locked) {
       const img = document.getElementById('acBack');
       let lk = document.getElementById('acBackLock');
-      if (!lk) { lk = document.createElement('div'); lk.id = 'acBackLock'; lk.className = 'ac-back-lock'; lk.innerHTML = '<b>🔒</b>뒷면 QR은<br>카드를 받으면 보여요'; img.after(lk); }
+      if (!lk) { lk = document.createElement('div'); lk.id = 'acBackLock'; lk.className = 'ac-back-lock'; lk.innerHTML = '<b>🔒</b>뒷면 QR은<br>아트빔을 받으면 보여요'; img.after(lk); }
       img.style.display = locked ? 'none' : ''; lk.style.display = locked ? 'flex' : 'none';
       img.src = url || '';
     }
@@ -2058,16 +2058,16 @@
            <div class="ac-link"><button onclick="copyArtLink()">🔗 전시 링크 복사</button><button onclick="shareArtLink()">📤 링크 보내기</button></div>
            <div class="tk-sub" id="acLinkMsg" style="margin:6px 0 0; min-height:16px"></div>
            <button class="tk-btn blue" onclick="location.href='${exUrl(ex)}'">▶ 전시 모드로 보기</button>`
-        : `<button class="tk-btn" onclick="buyArtCard()">💧 1개로 아트카드 받기</button>`;
+        : `<button class="tk-btn" onclick="buyArtCard()">💧 1개로 아트빔 받기</button>`;
     }
     async function buyArtCard() {
       if (!acCurrent) return;
-      if (!await payPaintFor('card:' + acCurrent.ex.id, '아트카드 받기')) return;
+      if (!await payPaintFor('card:' + acCurrent.ex.id, '아트빔 받기')) return;
       renderArtGrid();
       await openArtCard(acCurrent.ex.id);                 // 받았으니 선명한 앞면 + QR 뒷면으로 다시 그리기
     }
     // 🔗 QR 대신 링크로: 카톡 등에 붙이면 누르는 사람 누구나 바로 그 전시가 열려요 (QR과 같은 주소)
-    function artLinkText(ex) { return `🎴 AGJJ 아트카드 No.${String(exNo(ex)).padStart(2, '0')} 「${ex.short || ex.title}」\n작가 J.J(장예성)의 전시를 열어 보세요 👇\n${exUrl(ex)}`; }
+    function artLinkText(ex) { return `📽️ AGJJ 아트빔 No.${String(exNo(ex)).padStart(2, '0')} 「${ex.short || ex.title}」\n작가 J.J(장예성)의 전시를 열어 보세요 👇\n${exUrl(ex)}`; }
     async function copyArtLink() {
       if (!acCurrent) return;
       const url = exUrl(acCurrent.ex), msg = document.getElementById('acLinkMsg');
@@ -2082,7 +2082,7 @@
       if (!acCurrent) return;
       const ex = acCurrent.ex;
       if (NativeApp && NativeApp.shareText) { NativeApp.shareText(artLinkText(ex)); return; }      // 앱: 카톡 등 보내기 창
-      if (navigator.share) { try { await navigator.share({ title: 'AGJJ 아트카드', text: artLinkText(ex) }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+      if (navigator.share) { try { await navigator.share({ title: 'AGJJ 아트빔', text: artLinkText(ex) }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
       copyArtLink();
     }
     function saveArtCard() {
@@ -2146,7 +2146,7 @@
       g.fillText(`제${exNo(ex)}회 특별전  ·  J.J 장예성`, AC_W / 2, 1186);
       g.fillStyle = '#c9a463'; g.fillRect(AC_W / 2 - 60, 1228, 120, 2);
       g.fillStyle = '#8a7660'; g.font = `bold 26px ${font}`;
-      g.textAlign = 'left'; spaced(g, `ART CARD  No.${String(exNo(ex)).padStart(2, '0')}`, 250, 1372, 4);
+      g.textAlign = 'left'; spaced(g, `ART BEAM  No.${String(exNo(ex)).padStart(2, '0')}`, 250, 1372, 4);
       g.textAlign = 'right'; g.font = 'bold 28px sans-serif'; g.fillText('© jj', AC_W - 92, 1372);
       return cv.toDataURL('image/png');
     }
@@ -2188,7 +2188,7 @@
       g.fillStyle = '#8a7660'; g.font = `24px ${font}`;
       g.fillText('가로로 눕히거나 TV·프로젝터로 보내면 더 크게 볼 수 있어요', AC_W / 2, 1222);
       g.fillStyle = '#c9a463'; g.font = `bold 24px ${font}`;
-      spaced(g, `ART CARD  No.${String(exNo(ex)).padStart(2, '0')}`, AC_W / 2, 1372, 4);
+      spaced(g, `ART BEAM  No.${String(exNo(ex)).padStart(2, '0')}`, AC_W / 2, 1372, 4);
       return cv.toDataURL('image/png');
     }
 
@@ -2243,11 +2243,11 @@
         if (b.streak % 7 === 0) { add += 5; got.push(`🔥 ${b.streak}일 연속 출석 💧 +5`); }
       }
       lsSet(K_BONUS, b); if (add) addPaint(add);
-      const ref = await claimReferrals(); if (ref) got.push(`💌 아트카드 링크로 친구 ${ref / 3}명 입장 💧 +${ref}`);
+      const ref = await claimReferrals(); if (ref) got.push(`💌 아트빔 링크로 친구 ${ref / 3}명 입장 💧 +${ref}`);
       if (got.length) toast(got.join('<br>'));
       paintRefresh();
     }
-    // 💌 친구 초대: 내 아트카드 링크로 처음 들어온 사람 → referrals 에 남은 기록 받기 (하루 3명까지)
+    // 💌 친구 초대: 내 아트빔 링크로 처음 들어온 사람 → referrals 에 남은 기록 받기 (하루 3명까지)
     async function claimReferrals() {
       if (!fb || !cloudUser || !fb.getDocs) return 0;
       try {
