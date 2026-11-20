@@ -176,6 +176,35 @@
 
     .lbl-short { display: none; }
     #view-bbb { padding: 0 !important; }
+    /* 🌿 시니어: 큰 글씨 · 큰 버튼 */
+    .sn { max-width: 620px; margin: 0 auto; padding: 8px 4px 40px; font-size: 18px; }
+    body.has-visit .sn { padding-top: 56px; }
+    .sn-head { background: linear-gradient(135deg, #14532d, #166534); border-radius: 20px; padding: 18px 20px; color: #ecfdf5; }
+    .sn-t { font-size: 26px; font-weight: 900; } .sn-d { font-size: 17px; margin-top: 4px; color: #bbf7d0; }
+    .sn-prog { height: 10px; background: rgba(255,255,255,.2); border-radius: 10px; margin-top: 12px; overflow: hidden; } .sn-prog b { display: block; height: 100%; background: #fde047; border-radius: 10px; }
+    .sn-lv { display: flex; gap: 8px; align-items: center; margin: 14px 2px; font-size: 16px; color: #cbd5e1; flex-wrap: wrap; }
+    .sn-lv button { flex: 1; padding: 10px 6px; border-radius: 14px; border: 1px solid rgba(255,255,255,.2); background: #1e2530; color: #fff; font-size: 17px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .sn-lv button small { font-size: 13px; color: #94a3b8; font-weight: 400; } .sn-lv button.on { background: #fde047; color: #1a1a1a; } .sn-lv button.on small { color: #444; }
+    .sn-step { display: flex; gap: 14px; background: #161b22; border: 2px solid rgba(255,255,255,.08); border-radius: 18px; padding: 16px; margin-bottom: 12px; }
+    .sn-step.ok { border-color: #22c55e; }
+    .sn-n { flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; background: #334155; color: #fff; font-size: 22px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+    .sn-step.ok .sn-n { background: #22c55e; }
+    .sn-b { flex: 1; min-width: 0; } .sn-st { font-size: 22px; font-weight: 800; color: #f8fafc; } .sn-ss { font-size: 16.5px; color: #cbd5e1; margin-top: 4px; line-height: 1.6; }
+    .sn-colors { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+    .sn-colors button { height: 72px; border-radius: 14px; border: 3px solid transparent; color: #fff; font-size: 16px; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,.5); cursor: pointer; font-family: inherit; transition: transform .15s; }
+    .sn-colors button b { font-size: 20px; } .sn-colors button.hit { transform: scale(1.12); border-color: #fff; box-shadow: 0 0 18px #fff; }
+    .sn-go { margin-top: 10px; width: 100%; padding: 16px; border-radius: 16px; border: none; background: #fde047; color: #1a1a1a; font-size: 20px; font-weight: 800; cursor: pointer; font-family: inherit; }
+    .sn-go.alt { background: #e0f2fe; } .sn-go.right { background: #22c55e; color: #fff; } .sn-go.wrong { background: #fecaca; }
+    .sn-row { display: flex; gap: 8px; flex-wrap: wrap; } .sn-row .sn-go { flex: 1; min-width: 120px; }
+    .sn-game { margin-top: 12px; background: #0f172a; border-radius: 14px; padding: 12px; }
+    .sn-mini { margin-left: 6px; padding: 6px 12px; border-radius: 999px; border: none; background: #fde047; font-size: 16px; font-weight: 700; cursor: pointer; }
+    .sn-verse { font-size: 21px; line-height: 1.8; color: #fff; text-align: center; padding: 6px; } .sn-ref { font-size: 16px; color: #fde68a; margin-top: 6px; }
+    .sn-blank { background: #fde047; color: #1a1a1a; border-radius: 8px; padding: 0 8px; } .sn-blank.ok { background: #22c55e; color: #fff; }
+    .sn-cal { background: #161b22; border-radius: 18px; padding: 16px; margin-top: 4px; }
+    .sn-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 10px; }
+    .sn-days i { font-style: normal; text-align: center; padding: 8px 0; border-radius: 10px; background: #1e2530; color: #94a3b8; font-size: 15px; }
+    .sn-days i.some { background: #166534; color: #fff; } .sn-days i.full { background: #22c55e; color: #fff; font-weight: 800; } .sn-days i.today { outline: 2px solid #fde047; }
+    .sn-note { font-size: 14px; color: #94a3b8; text-align: center; margin-top: 16px; }
     body.has-visit #view-bbb { padding-top: 52px !important; }   /* 위쪽 Exhibitions·Play·My 알약에 가리지 않게 */
     #view-bbb.active { display: block; }
     #bbbFrame { width: 100%; height: calc(100vh - 175px); height: calc(100dvh - 175px); border: 0; display: block; background: #0d1117; }
@@ -192,7 +221,8 @@
     @media (max-width: 440px) {
       header > div:first-child { display: none; }   /* 좁은 휴대폰에서는 메뉴 6개가 한 줄에 들어가도록 제목 숨김 */
       header { justify-content: center; padding-left: 6px; padding-right: 6px; }
-      .nav-tabs { gap: 4px; flex-wrap: nowrap; }
+      .nav-tabs { gap: 4px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; max-width: 100%; -webkit-overflow-scrolling: touch; }
+      .nav-tabs::-webkit-scrollbar { display: none; }
       .tab-btn { padding: 6px 8px; font-size: 11.5px; letter-spacing: -0.2px; }
     }
 
@@ -454,6 +484,7 @@
       <button class="tab-btn" onclick="switchView('shorts')">Shorts</button>
       <button class="tab-btn" onclick="switchView('store')"><span class="lbl-long">📦 Emoticon Library</span><span class="lbl-short">📦 Library</span></button>
       <button class="tab-btn" onclick="switchView('bbb')"><span class="lbl-long">📖 BBB 말씀</span><span class="lbl-short">📖 BBB</span></button>
+      <button class="tab-btn" onclick="switchView('senior')"><span class="lbl-long">🌿 시니어 활동</span><span class="lbl-short">🌿 시니어</span></button>
       <a class="tab-btn studio-tab" href="emoticon.html"><span class="lbl-long">🎨 Emoticon Studio</span><span class="lbl-short">🎨 Studio</span></a>
     </div>
     <div class="header-note" style="font-size:12px; color:#8a99ad;">Large Frame Mode</div>
@@ -798,6 +829,9 @@
   <div id="view-bbb" class="view-container">
     <iframe id="bbbFrame" title="BBB 주제별 성경암송 3D 갤러리" allow="autoplay"></iframe>
   </div>
+
+  <!-- 🌿 시니어 인지 활동 프로그램 -->
+  <div id="view-senior" class="view-container"><div class="sn" id="seniorBox"></div></div>
 
   <div id="view-store" class="view-container">
     <button class="back-gallery" onclick="switchView('3d')">← Gallery</button>
@@ -1243,13 +1277,14 @@
     const GOOGLE_WEB_CLIENT_ID = '83235290466-phg2k92809cr7rp7qqtrbib4tev4bqku.apps.googleusercontent.com';       // ← Authentication > Google > 웹 SDK 구성의 '웹 클라이언트 ID'
     const FB_VER = '10.14.1';
     var K_UID = 'agjj_uid_v1', K_NICK = 'agjj_nick_v1', K_BONUS = 'agjj_bonus_v1';   // 보상 기록 (가입 선물·출석·오늘의 물감·광고 횟수)
-    var SYNC_KEYS = [K_TICKET, K_VISITED, K_BOX, K_PASS, K_PAINT, K_CARDS, K_EMO, K_LOG, K_NICK, K_VCOUNT, K_BONUS];
+    var K_SENIOR = 'agjj_senior_v1';   // 🌿 시니어 인지 활동 기록 { 날짜: [한 단계들] }
+    var SYNC_KEYS = [K_TICKET, K_VISITED, K_BOX, K_PASS, K_PAINT, K_CARDS, K_EMO, K_LOG, K_NICK, K_VCOUNT, K_BONUS, K_SENIOR];
     var fb = null, cloudUser = null, cloudTimer = null;   // var: 위쪽 함수에서 먼저 불러도 괜찮게
 
     function cloudOn() { return IS_APP && !!FIREBASE_CONFIG && !!EXCFG; }
     function localState() {
       return { ticket: lsGet(K_TICKET, null), visited: lsGet(K_VISITED, {}), box: lsGet(K_BOX, { slots: FREE_SLOTS, ids: [] }), pass: lsGet(K_PASS, ''),
-               paint: lsGet(K_PAINT, 0), cards: lsGet(K_CARDS, []), emo: lsGet(K_EMO, []), log: lsGet(K_LOG, []), nick: lsGet(K_NICK, ''), vcount: lsGet(K_VCOUNT, {}), bonus: lsGet(K_BONUS, {}) };
+               paint: lsGet(K_PAINT, 0), cards: lsGet(K_CARDS, []), emo: lsGet(K_EMO, []), log: lsGet(K_LOG, []), nick: lsGet(K_NICK, ''), vcount: lsGet(K_VCOUNT, {}), bonus: lsGet(K_BONUS, {}), senior: lsGet(K_SENIOR, {}) };
     }
     async function saveThenReload() { clearTimeout(cloudTimer); await cloudSaveNow(); location.reload(); }
     function cloudSaveSoon() {
@@ -1293,13 +1328,16 @@
       const bonus = { ...late, welcome: !!(sbn.welcome || lbn.welcome) };
       if (sbn.freeDay === lbn.freeDay && sbn.freeDay) bonus.freeLeft = Math.min(sbn.freeLeft ?? 5, lbn.freeLeft ?? 5);
       if (sbn.adDay === lbn.adDay && sbn.adDay) bonus.adCount = Math.max(sbn.adCount || 0, lbn.adCount || 0);
-      return { ticket, visited, box, pass, paint, cards, emo, log, nick, vcount, bonus };
+      const senior = { ...(srv.senior || {}) };
+      Object.entries(loc.senior || {}).forEach(([d, st]) => { senior[d] = [...new Set([...(senior[d] || []), ...st])]; });
+      return { ticket, visited, box, pass, paint, cards, emo, log, nick, vcount, bonus, senior };
     }
     function applyState(st) {
       if (st.ticket) lsSet(K_TICKET, st.ticket, true); else { try { localStorage.removeItem(K_TICKET); } catch (e) {} }
       lsSet(K_VISITED, st.visited, true); lsSet(K_BOX, st.box, true); lsSet(K_PASS, st.pass, true);
       lsSet(K_PAINT, st.paint, true); lsSet(K_CARDS, st.cards, true); lsSet(K_EMO, st.emo, true); lsSet(K_LOG, st.log, true);
       if (st.nick) lsSet(K_NICK, st.nick, true);
+      lsSet(K_SENIOR, st.senior || {}, true);
       lsSet(K_VCOUNT, st.vcount || {}, true);
       lsSet(K_BONUS, st.bonus || {}, true);
     }
@@ -1524,6 +1562,7 @@
 
         <div class="pl-cat">🎵 음악</div>
         <div class="pl-grid">
+          <button class="pl-tile wide" onclick="openColoring()"><div class="i">🖍</div><div class="t">아트컬러링</div><div class="d">오늘의 예성이 그림 도안에 큰 색 버튼으로 색칠하면, 그 색으로 노래해요 · 무료</div></button>
           <button class="pl-tile wide" onclick="openSong()"><div class="i">🎶</div>${n(lsGet(K_EMO, []).filter(k => k.startsWith('song:')).length)}<div class="t">아트쏭 · 그림이 노래해요</div><div class="d">그림 색이 음이 되는 나만의 노래 · 길·스타일·악기 고르기, 겹겹이 쌓기 · 로비 6점 무료 체험 · My Collection 작품은 💧 1로 영원히</div></button>
         </div>
 
@@ -1538,6 +1577,122 @@
           <button class="pl-tile" onclick="openArtOut('log')"><div class="i">📒</div>${n(logs)}<div class="t">My Art Log</div><div class="d">다녀온 전시 기록 · 처음 기록마다 💧 1</div></button>
         </div>`;
     }
+
+    // =====================================================================
+    // 🌿 시니어 인지 활동 프로그램 (하루 30~40분, 5단계)
+    //  ① 색 이름 말하기 ② 아트컬러링 ③ 내 노래 듣기 ④ 기억 활동 ⑤ 나누기 — 무료, 큰 글씨·큰 버튼
+    //  ※ 치료·예방 효과를 말하지 않아요. '즐거운 미술·음악 활동'이에요.
+    // =====================================================================
+    const SN_COLORS = [['빨강', '도', '#d64545', 60], ['주황', '레', '#e8873a', 62], ['노랑', '미', '#e2c43a', 64], ['초록', '파', '#3fae55', 65], ['파랑', '솔', '#3c8fd6', 67], ['남색', '라', '#4a4fc4', 69], ['보라', '시', '#9b4fc9', 71]];
+    const SN_STEPS = [['color', '🎨', '색 이름 말하기', '색을 누르며 "빨강은 도" 하고 소리 내어 말해요'], ['paint', '🖍', '아트컬러링', '예성이 그림 도안에 색칠해요'], ['song', '🎵', '내 노래 듣기', '칠한 색이 민요·트로트로 노래해요'], ['memory', '🧠', '기억 활동', '색 순서 기억하기 · 말씀 빈칸 채우기'], ['share', '💌', '나누기', '오늘 활동을 가족에게 보내요']];
+    const snToday = () => todayStr();
+    function snDone(step) {
+      const d = lsGet(K_SENIOR, {}), t = snToday(); d[t] = [...new Set([...(d[t] || []), step])]; lsSet(K_SENIOR, d);
+      // 화면은 다시 그리지 않고 ✔·진행 막대만 (하고 있던 게임이 사라지지 않게)
+      const done = d[t], box = document.getElementById('seniorBox'); if (!box || !box.innerHTML) return;
+      box.querySelectorAll('.sn-step').forEach((el, i) => { const ok = done.includes(SN_STEPS[i][0]); el.classList.toggle('ok', ok); el.querySelector('.sn-n').innerText = ok ? '✔' : i + 1; });
+      const pr = box.querySelector('.sn-prog b'); if (pr) pr.style.width = done.length * 20 + '%';
+      const dd = box.querySelector('.sn-d'); if (dd) dd.innerText = dd.innerText.replace(/오늘 \d\/5 단계/, `오늘 ${done.length}/5 단계`);
+      if (done.length === 5 && !snDone.cheered) { snDone.cheered = true; setTimeout(() => { snSay('오늘 활동을 모두 마치셨어요. 정말 잘 하셨어요!'); showMsg('🌿 오늘 활동 완료!', '다섯 단계를 모두 마치셨어요. 내일 또 만나요 🎨🎵'); }, 600); }
+    }
+    function snSay(t) { try { if (NativeApp && typeof NativeApp.speak === 'function' && NativeApp.speak(t, .85) === 'ok') return; if (!window.speechSynthesis) return; speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'ko-KR'; u.rate = .85; speechSynthesis.speak(u); } catch (e) {} }
+    let snCtx = null;
+    function snTone(midi, dur = .55) {
+      try {
+        snCtx = snCtx || new (window.AudioContext || window.webkitAudioContext)(); snCtx.resume();
+        const t = snCtx.currentTime, f = 440 * Math.pow(2, (midi - 69) / 12), g = snCtx.createGain(); g.connect(snCtx.destination);
+        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.35, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + dur + .5);
+        [1, 2.01].forEach((m, i) => { const o = snCtx.createOscillator(); o.type = 'sine'; o.frequency.value = f * m; const gg = snCtx.createGain(); gg.gain.value = i ? .25 : 1; o.connect(gg); gg.connect(g); o.start(t); o.stop(t + dur + .6); });
+      } catch (e) {}
+    }
+    function renderSenior() {
+      const d = lsGet(K_SENIOR, {}), done = d[snToday()] || [], now = new Date();
+      const days = Object.keys(d).filter(k => k.startsWith(snToday().slice(0, 7)) && d[k].length).length;
+      const dim = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const cal = [...Array(dim)].map((_, i) => { const k = `${snToday().slice(0, 8)}${String(i + 1).padStart(2, '0')}`; const n = (d[k] || []).length; return `<i class="${n >= 5 ? 'full' : n ? 'some' : ''} ${i + 1 === now.getDate() ? 'today' : ''}">${i + 1}</i>`; }).join('');
+      document.getElementById('seniorBox').innerHTML = `
+        <div class="sn-head"><div class="sn-t">🌿 오늘의 미술·음악 활동</div><div class="sn-d">${now.getMonth() + 1}월 ${now.getDate()}일 ${'일월화수목금토'[now.getDay()]}요일 · 오늘 ${done.length}/5 단계</div>
+          <div class="sn-prog"><b style="width:${done.length * 20}%"></b></div></div>
+        ${SN_STEPS.map(([k, e, t, sub], i) => `<div class="sn-step ${done.includes(k) ? 'ok' : ''}">
+          <div class="sn-n">${done.includes(k) ? '✔' : i + 1}</div><div class="sn-b"><div class="sn-st">${e} ${t}</div><div class="sn-ss">${sub}</div>
+          ${k === 'color' ? `<div class="sn-colors">${SN_COLORS.map(([c, n, h, m], j) => `<button style="background:${h}" onclick="snColor(${j}, this)">${c}<br><b>${n}</b></button>`).join('')}</div>` : ''}
+          ${k === 'paint' ? `<button class="sn-go" onclick="snPaint()">🖍 색칠하러 가기</button>` : ''}
+          ${k === 'song' ? `<div class="sn-ss">색칠을 마치고 <b>🎵 내 색으로 노래하기</b>를 누르면 민요·트로트·동요 중에서 골라 들을 수 있어요. 노래가 끝나면 ✔가 돼요.</div>` : ''}
+          ${k === 'memory' ? `<div class="sn-row"><button class="sn-go" onclick="snSimon()">🎨 색 순서 기억하기</button><button class="sn-go alt" onclick="snVerse()">📖 말씀 빈칸 채우기</button></div><div id="snGame"></div>` : ''}
+          ${k === 'share' ? `<button class="sn-go" onclick="snShare()">💌 가족에게 보내기</button>` : ''}
+          </div></div>`).join('')}
+        <div class="sn-cal"><div class="sn-st">📅 이번 달 참여 ${days}일</div><div class="sn-days">${cal}</div><div class="sn-ss">● 5단계 모두 · ◐ 일부</div></div>
+        <div class="sn-note">즐겁게 보고, 칠하고, 듣고, 기억하는 미술·음악 활동이에요. 의료 치료를 대신하지 않아요.</div>`;
+    }
+    const snTapped = new Set();
+    function snColor(j, btn) {
+      const [c, n, , m] = SN_COLORS[j]; snTone(m); snSay(`${c}, ${n}`);
+      btn.classList.add('hit'); setTimeout(() => btn.classList.remove('hit'), 400);
+      snTapped.add(j); if (snTapped.size >= 7) { snTapped.clear(); setTimeout(() => { snSay('잘 하셨어요!'); snDone('color'); }, 700); }
+    }
+    function snPaint() {
+      const lob = (EXCFG && EXCFG.lobby) || []; if (!lob.length) return;
+      const d = new Date(), n = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5), id = lob[n % lob.length], a = allArtworks.find(x => x.id === id);
+      document.getElementById('songTitle').innerText = '🖍 아트컬러링' + (a ? ' · ' + a.title : '');
+      document.getElementById('songFrame').src = `${SONG_URL}?art=${encodeURIComponent(id)}&embed=1&color=1&big=1`;
+      document.getElementById('songPlayer').classList.add('on');
+      snDone('paint');
+    }
+    // 🎨 색 순서 기억하기: 색이 차례로 빛나고 소리가 나면, 같은 순서로 눌러요 (3개 → 4개 → 5개 …)
+    let SIM = null;
+    function snSimon(len) {
+      len = len || 3;
+      const seq = [...Array(len)].map((_, i) => (Math.floor(Math.random() * 7)));
+      SIM = { seq, pos: 0, len, busy: true };
+      document.getElementById('snGame').innerHTML = `<div class="sn-game"><div class="sn-ss" id="simMsg">잘 보고 들어 보세요… (${len}개)</div>
+        <div class="sn-colors">${SN_COLORS.map(([c, n, h], j) => `<button style="background:${h}" id="sim${j}" onclick="snSimTap(${j})">${c}<br><b>${n}</b></button>`).join('')}</div></div>`;
+      snSay(`색 ${len}개를 잘 보고 들어 보세요.`);
+      seq.forEach((j, i) => setTimeout(() => { const b = document.getElementById('sim' + j); if (!b) return; b.classList.add('hit'); snTone(SN_COLORS[j][3], .45); setTimeout(() => b.classList.remove('hit'), 500); }, 1600 + i * 900));
+      setTimeout(() => { if (SIM) { SIM.busy = false; const m = document.getElementById('simMsg'); if (m) m.innerText = '이제 같은 순서로 눌러 보세요!'; snSay('이제 같은 순서로 눌러 보세요.'); } }, 1600 + len * 900);
+    }
+    function snSimTap(j) {
+      if (!SIM || SIM.busy) return;
+      const b = document.getElementById('sim' + j); b.classList.add('hit'); setTimeout(() => b.classList.remove('hit'), 300); snTone(SN_COLORS[j][3], .35);
+      const m = document.getElementById('simMsg');
+      if (SIM.seq[SIM.pos] !== j) { SIM.busy = true; m.innerHTML = `아쉬워요! 정답은 ${SIM.seq.map(x => SN_COLORS[x][0]).join(' → ')} <button class="sn-mini" onclick="snSimon(${SIM.len})">다시 하기</button>`; snSay('아쉬워요. 다시 해 볼까요?'); return; }
+      SIM.pos++;
+      if (SIM.pos >= SIM.seq.length) {
+        SIM.busy = true; snDone('memory');
+        m.innerHTML = `🎉 맞았어요! ${SIM.len}개를 기억했어요. <button class="sn-mini" onclick="snSimon(${Math.min(8, SIM.len + 1)})">${Math.min(8, SIM.len + 1)}개 도전</button>`; snSay('맞았어요! 정말 잘 하셨어요.');
+      }
+    }
+    // 📖 말씀 빈칸 채우기: BBB 말씀 한 구절에서 한 단어를 가리고 보기 3개 중에 고르기
+    async function snVerse() {
+      const vs = await loadVerses(); if (!vs.length) return;
+      const d = new Date(), n = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5), v = vs[n % vs.length];
+      const words = v.text.replace(/ \/ /g, ' ').split(' ').filter(w => w.replace(/[^가-힣]/g, '').length >= 2);
+      if (words.length < 3) return;
+      const ans = words[(n * 7) % words.length], others = words.filter(w => w !== ans);
+      const opts = [ans, others[(n * 3) % others.length], others[(n * 5 + 1) % others.length]].filter((x, i, a) => a.indexOf(x) === i);
+      while (opts.length < 3) opts.push(others[opts.length]);
+      opts.sort((a, b) => (a.length * 7 + n) % 5 - (b.length * 7 + n) % 5);
+      const shown = v.text.replace(/ \/ /g, '<br>').replace(ans, '<span class="sn-blank">❓❓</span>');
+      document.getElementById('snGame').innerHTML = `<div class="sn-game"><div class="sn-verse">${shown}<div class="sn-ref">${esc(v.ref)}</div></div>
+        <div class="sn-ss">빈칸에 들어갈 말을 골라 보세요</div><div class="sn-row">${opts.map(o => `<button class="sn-go alt" onclick="snVerseAns(this, ${o === ans})">${esc(o)}</button>`).join('')}</div><div class="sn-ss" id="vMsg"></div></div>`;
+      snSay(v.text.replace(/ \/ /g, ' ').replace(ans, '무엇') + '. 빈칸에 들어갈 말을 골라 보세요.');
+    }
+    function snVerseAns(btn, ok) {
+      btn.classList.add(ok ? 'right' : 'wrong');
+      document.getElementById('vMsg').innerText = ok ? '🎉 맞았어요! 소리 내어 한 번 읽어 보세요.' : '다시 골라 보세요.';
+      snSay(ok ? '맞았어요! 소리 내어 한 번 읽어 보세요.' : '다시 골라 보세요.');
+      if (ok) { const b = document.querySelector('.sn-blank'); if (b) { b.innerText = btn.innerText; b.classList.add('ok'); } snDone('memory'); }
+    }
+    function snShare() {
+      const n = (lsGet(K_SENIOR, {})[snToday()] || []).length;
+      const text = `🌿 오늘 아그짜 미술·음악 활동을 했어요! (${n}/5 단계)\n예성이 그림에 색칠하고, 그 색으로 노래를 들었어요 🎨🎵\nhttps://hannaj1763-sketch.github.io/gallery2026/`;
+      if (NativeApp && NativeApp.shareText) NativeApp.shareText(text);
+      else if (navigator.share) navigator.share({ text }).catch(() => {});
+      else { try { navigator.clipboard.writeText(text); showMsg('복사했어요', '카톡에 붙여넣어 보내 주세요.'); } catch (e) {} }
+      snDone('share');
+    }
+    // 아트쏭 노래가 끝나면 ③ 단계 완료
+    window.addEventListener('message', e => { const d = e.data || {}; if (!/^https:\/\/hannaj1763-sketch\.github\.io$/.test(e.origin)) return; if (d.jjmusic === 'done') snDone('song'); if (d.jjmusic === 'say' && typeof d.text === 'string') snSay(d.text.slice(0, 200)); });
+
     async function earnPaintPlay() { await earnPaint(); renderPlay(); }
 
     // =====================================================================
@@ -1557,6 +1712,14 @@
         (mine.length ? `<div class="song-grid">${mine.map(a => tile(a, false)).join('')}</div>`
           : `<div class="tk-sub" style="text-align:left">아직 모은 작품이 없어요. 특별전에서 📥 Add to Collection으로 담으면 그 그림도 노래하게 할 수 있어요.</div>`);
       openModal('songModal');
+    }
+    // 🖍 아트컬러링: 날짜마다 무료 로비 작품 하나, 큰 그림 모드 (JJ-MUSIC 색칠 화면)
+    function openColoring() {
+      const lob = (EXCFG && EXCFG.lobby) || []; if (!lob.length) return;
+      const d = new Date(), n = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5), id = lob[n % lob.length], a = allArtworks.find(x => x.id === id);
+      document.getElementById('songTitle').innerText = '🖍 아트컬러링' + (a ? ' · ' + a.title : '');
+      document.getElementById('songFrame').src = `${SONG_URL}?art=${encodeURIComponent(id)}&embed=1&color=1&big=1`;
+      document.getElementById('songPlayer').classList.add('on');
     }
     async function playSong(id) {
       const a = allArtworks.find(x => x.id === id); if (!a) return;
@@ -2776,6 +2939,7 @@
 
     const BBB_SITE = 'https://hannaj1763-sketch.github.io/BBB-BIBLE-CARD/';
     function switchView(mode) {
+      setTimeout(() => { const t = document.querySelector('.tab-btn.active'); if (t && t.scrollIntoView) t.scrollIntoView({ inline: 'center', block: 'nearest' }); }, 0);   // 메뉴가 많아 넘치면 고른 메뉴가 보이게
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
       if(mode === '3d') {
@@ -2788,6 +2952,10 @@
         document.querySelectorAll('.tab-btn')[4].classList.add('active');
         document.getElementById('view-bbb').classList.add('active');
         const f = document.getElementById('bbbFrame'); if (!f.src) f.src = BBB_SITE;      // 처음 열 때만 불러오기
+      } else if (mode === 'senior') {
+        document.querySelectorAll('.tab-btn')[5].classList.add('active');
+        document.getElementById('view-senior').classList.add('active');
+        renderSenior();
       } else if (mode === 'store') {
         document.querySelectorAll('.tab-btn')[3].classList.add('active');
         document.getElementById('view-store').classList.add('active');
