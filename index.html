@@ -30,9 +30,10 @@
       pointer-events: none;
     }
 
-    header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(18,21,27,0.92); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px); }
+    header { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(18,21,27,0.92); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px); }
     .nav-tabs { display: flex; gap: 8px; }
-    .tab-btn { background: #222733; border: 1px solid rgba(255,255,255,0.12); color: #9daec2; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+    .tab-btn { background: #222733; border: 1px solid rgba(255,255,255,0.12); color: #b4c2d4; padding: 10px 18px; border-radius: 22px; cursor: pointer; font-size: 15px; font-weight: 700; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+    .tab-btn .ti { font-size: 16px; }
     .tab-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
     
     .view-container { display: none; min-height: calc(100vh - 65px); }
@@ -210,24 +211,20 @@
     #bbbFrame { width: 100%; height: calc(100vh - 175px); height: calc(100dvh - 175px); border: 0; display: block; background: #0d1117; }
     .tab-btn { white-space: nowrap; }
     @media (max-width: 640px) {
-      header { padding: 12px 12px; gap: 8px; }
-      header > div:first-child { font-size: 14px !important; white-space: nowrap; }
+      header { padding: 8px 10px; gap: 7px; }
       .lbl-long { display: none; }
       .lbl-short { display: inline; }
       .header-note { display: none; }
-      .nav-tabs { gap: 6px; }
-      .tab-btn { padding: 7px 10px; font-size: 12px; }
+      .nav-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
+      .tab-btn { padding: 11px 4px; font-size: 14.5px; border-radius: 14px; }
     }
     @media (max-width: 440px) {
-      header > div:first-child { display: none; }   /* 좁은 휴대폰에서는 메뉴 6개가 한 줄에 들어가도록 제목 숨김 */
-      header { justify-content: center; padding-left: 6px; padding-right: 6px; }
-      .nav-tabs { gap: 4px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; max-width: 100%; -webkit-overflow-scrolling: touch; }
-      .nav-tabs::-webkit-scrollbar { display: none; }
-      .tab-btn { padding: 6px 8px; font-size: 11.5px; letter-spacing: -0.2px; }
+
+      .tab-btn { padding: 11px 2px; font-size: 14px; letter-spacing: -0.3px; }
     }
 
     /* ===== 입장권·My Collection (AGJJ) ===== */
-    .visit-bar { position: fixed; left: 12px; top: 74px; z-index: 60; display: flex; gap: 6px; flex-wrap: wrap; max-width: calc(100vw - 24px); }
+    .visit-bar { position: fixed; left: 12px; top: calc(var(--hdrH, 66px) + 8px); z-index: 60; display: flex; gap: 6px; flex-wrap: wrap; max-width: calc(100vw - 24px); }
     body.has-visit .auto-btn { top: 54px; }   /* 메뉴 알약 한 줄 아래로 */
 .back-gallery { display: inline-block; margin-bottom: 12px; color: #f0f2f5; font-size: 14px; font-weight: 700; padding: 7px 14px; border-radius: 18px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
     .visit-pill { background: rgba(0,0,0,0.62); color: #f0f2f5; border: 1px solid rgba(255,255,255,0.2); padding: 7px 12px; border-radius: 18px; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); white-space: nowrap; }
@@ -362,6 +359,45 @@
     .pl-paint b { font-size: 24px; }
     .pl-paint button { background: #fff; color: #4c1d95; border: none; border-radius: 12px; padding: 9px 12px; font-weight: 800; cursor: pointer; white-space: nowrap; }
     .pl-cat { margin-top: 22px; font-size: 13px; font-weight: 800; color: #94a3b8; letter-spacing: .04em; }
+    /* 공통 줄 · JJ 메뉴 · 갤러리 보기 방식 */
+    .cbar { display: flex; align-items: center; gap: 6px; }
+    .cb-home { background: #222733; color: #e2e8f0; border: 1px solid rgba(255,255,255,.14); border-radius: 18px; padding: 8px 13px; font-size: 13px; font-weight: 800; letter-spacing: .5px; cursor: pointer; font-family: inherit; white-space: nowrap; }
+    .cb-r { margin-left: auto; display: flex; gap: 2px; }
+    .cb-r button { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; background: none; border: none; color: #b4c2d4; padding: 3px 7px; border-radius: 10px; cursor: pointer; font-family: inherit; }
+    .cb-r button b { font-size: 19px; line-height: 1.1; } .cb-r button span { font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .cb-r button.on { color: #fbbf24; background: rgba(251,191,36,.1); }
+    .cb-r .tlk-dot { position: absolute; top: 0; right: 2px; margin: 0; }
+    .jj-row { display: flex; align-items: center; gap: 10px; }
+    .jj-name { font-family: Georgia, serif; font-size: 20px; letter-spacing: 2px; color: #f8fafc; padding: 0 2px; }
+    .jj-row .nav-tabs { flex: 1; }
+    .gal-seg { display: none; gap: 6px; }
+    body.gal .gal-seg { display: flex; }
+    .gal-seg button { flex: 1; background: transparent; color: #94a3b8; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; padding: 7px 4px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; }
+    .gal-seg button.on { background: #1e293b; color: #fff; border-color: #60a5fa; }
+    body.common-mode .jj-row, body.common-mode .gal-seg, body.common-mode .visit-bar { display: none !important; }
+    body.common-mode .back-gallery { display: none !important; }   /* 위에 '← ARTISTS'가 있어요 */
+    body.common-mode .tlk, body.common-mode .sn { padding-top: 4px !important; }
+    body.common-mode #view-account, body.common-mode #view-out { padding-top: 14px !important; }
+    @media (max-width: 640px) { .jj-row .nav-tabs { display: grid; grid-template-columns: repeat(3, 1fr); } .jj-name { font-size: 17px; } }
+    .ah-common { display: flex; gap: 2px; margin-top: 8px; }
+    .ah-common button { display: flex; align-items: center; gap: 4px; background: #fff; border: 1px solid #e2e0da; border-radius: 16px; padding: 6px 10px; font-size: 12.5px; font-weight: 700; color: #3f3f46; cursor: pointer; font-family: inherit; }
+    .bbb-top .cb-r button { color: #cbd5e1; }
+    /* ← 돌아가기는 언제나 왼쪽 위 한 곳 (화면 안의 따로 있던 뒤로 버튼은 숨겨요) */
+    .back-gallery { display: none !important; }
+    .tlk-top > .tlk-back:first-child { display: none; }
+    .ah-common { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; } .ah-common::-webkit-scrollbar { display: none; } .ah-common button { white-space: nowrap; flex: none; }
+    .mem-t { margin-top: 26px !important; }
+    /* ✨ Play: 큰 타일 2칸 */
+    .pg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+    .pt { position: relative; text-align: center; padding: 18px 8px 14px; border-radius: 18px; border: 1px solid #262d3a; background: #161b24; color: #f1f5f9; cursor: pointer; font-family: inherit; transition: transform .12s; }
+    .pt:active { transform: scale(.97); }
+    .pt-i { font-size: 38px; line-height: 1.1; }
+    .pt-t { font-size: 16px; font-weight: 800; margin-top: 8px; letter-spacing: -.3px; }
+    .pt-d { font-size: 12.5px; color: #94a3b8; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pt-b { position: absolute; top: 8px; right: 9px; font-size: 11.5px; font-weight: 800; color: #fbbf24; }
+    .pt-b em { font-style: normal; background: #2a2340; color: #c4b5fd; border-radius: 9px; padding: 2px 7px; } .pt-b em.free { background: #12301f; color: #86efac; }
+    details.pl-how { margin: 2px 2px 6px; } details.pl-how summary { cursor: pointer; color: #c4b5fd; font-size: 13px; font-weight: 700; padding: 6px 0; }
+    .pl-cat { font-size: 15px !important; color: #e2e8f0 !important; }
     .pl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
     .pl-tile { text-align: left; padding: 14px; border-radius: 16px; border: 1px solid #262d3a; background: #161b24; color: #f1f5f9; cursor: pointer; }
     .pl-tile.wide { grid-column: 1 / -1; }
@@ -392,11 +428,38 @@
     .visit-bar.has-exit { width: calc(100vw - 24px); flex-wrap: nowrap; }      /* 한 줄로: 전시 이름이 길면 … 로 줄임 */
     .visit-bar.has-exit .visit-pill { flex-shrink: 0; padding: 7px 10px; }
     .visit-bar.has-exit .visit-pill.live { flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    /* 👥 작가 고르기 (ARTISTS): 앱을 열면 작가 카드 → 고르면 화면 가득 펼쳐지며 갤러리로 */
+    #artistHub { position: fixed; inset: 0; z-index: 125; overflow-y: auto; background: #f6f5f2; color: #1d1d1f; transition: opacity .45s; }
+    #artistHub.out { opacity: 0; pointer-events: none; }
+    .ah-top { position: sticky; top: 0; z-index: 2; background: rgba(246,245,242,.94); backdrop-filter: blur(8px); padding: 18px 20px 12px; }
+    .ah-top b { display: block; font-family: Georgia, serif; font-size: 26px; letter-spacing: 3px; }
+    .ah-top small { color: #7a7a80; font-size: 13px; }
+    .ah-list { max-width: 520px; margin: 0 auto; padding: 8px 18px 40px; display: flex; flex-direction: column; gap: 22px; }
+    .ah-card { display: block; width: 100%; text-align: left; border: none; padding: 0; background: #fff; border-radius: 22px; overflow: hidden; box-shadow: 0 8px 26px rgba(0,0,0,.08); cursor: pointer; font-family: inherit; color: inherit; }
+    .ah-img { width: 100%; aspect-ratio: 5 / 4; background: #ddd center 35% / cover no-repeat; }
+    .ah-info { display: flex; align-items: center; gap: 10px; padding: 16px 20px 18px; }
+    .ah-info > div { flex: 1; min-width: 0; }
+    .ah-badge { display: inline-block; padding: 3px 11px; border-radius: 12px; background: linear-gradient(90deg, #ff5fa2, #ffb347); color: #fff; font-size: 12px; font-weight: 800; font-style: italic; letter-spacing: .3px; }
+    .ah-name { font-size: 24px; font-weight: 900; margin-top: 6px; letter-spacing: .5px; }
+    .ah-desc { color: #5f5f66; font-size: 14px; margin-top: 3px; line-height: 1.5; }
+    .ah-info i { font-style: normal; font-size: 26px; color: #b5b5bb; }
+    .ah-soon { border: 2px dashed #d6d4cf; border-radius: 22px; padding: 26px 20px; text-align: center; color: #8a8a90; font-size: 14px; line-height: 1.6; }
+    .ah-soon b { display: block; font-size: 16px; color: #55555b; margin-bottom: 2px; }
+    .ah-grow { position: fixed; opacity: 1; z-index: 126; border-radius: 22px; background: #0d1117 center 35% / cover no-repeat; transition: left .6s cubic-bezier(.7,0,.2,1), top .6s cubic-bezier(.7,0,.2,1), width .6s cubic-bezier(.7,0,.2,1), height .6s cubic-bezier(.7,0,.2,1), border-radius .6s, opacity .6s; pointer-events: none; }
+    .ah-bbb { background: radial-gradient(circle at 30% 30%, #3b4f8f, #121a33 70%) !important; display: flex; align-items: center; justify-content: center; }
+    .ah-bbb div { text-align: center; color: #fff; } .ah-bbb b { display: block; font-family: Georgia, serif; font-size: 64px; letter-spacing: 8px; text-shadow: 0 4px 24px rgba(120,160,255,.6); }
+    .ah-bbb span { font-size: 15px; color: #c7d2fe; letter-spacing: 1px; }
+    .ah-badge.bbb { background: linear-gradient(90deg, #4f6bd8, #8b5cf6); }
+    .bbb-full { display: none; position: fixed; inset: 0; z-index: 124; background: #0d1117; flex-direction: column; }
+    .bbb-full.on { display: flex; }
+    .bbb-top { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.08); color: #e2e8f0; }
+    .bbb-top button { background: #222733; color: #fff; border: 1px solid rgba(255,255,255,.15); border-radius: 18px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .bbb-full iframe { flex: 1; width: 100%; border: 0; background: #0d1117; }
     /* 🧠 아트메모리게임 */
     .mem { display: none; position: fixed; inset: 0; z-index: 160; overflow-y: auto; background: radial-gradient(circle at 50% 0%, #fff6ec, #fbe3e3 60%, #f6dbe6); padding: 14px 10px 30px; }
     .mem.on { display: block; }
     .mem-box { position: relative; max-width: 520px; margin: 0 auto; background: #fffcf6; border: 2px solid #e7738b; border-radius: 26px; padding: 22px 16px 20px; box-shadow: 0 0 0 6px #fffcf6, 0 0 0 7px #f6b8c4, 0 16px 40px rgba(200,70,100,.15); text-align: center; color: #8a3a4a; }
-    .mem-x { position: absolute; top: 10px; right: 12px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #f3c2cb; background: #fff; color: #c2415a; font-size: 16px; cursor: pointer; }
+    .mem-x { position: absolute; top: 10px; left: 12px; height: 36px; padding: 0 14px; border-radius: 18px; font-weight: 800; font-family: inherit; border: 1px solid #f3c2cb; background: #fff; color: #c2415a; font-size: 16px; cursor: pointer; }
     .mem-k { font-family: Georgia, serif; font-size: 11.5px; letter-spacing: 2.5px; color: #d14563; }
     .mem-t { font-size: 27px; font-weight: 900; color: #e03e62; margin: 4px 0 2px; letter-spacing: -.5px; }
     .mem-s { font-size: 13px; color: #a8606e; }
@@ -690,18 +753,32 @@
   </script>
 
   <header>
-    <div style="font-weight: 700; font-size: 16px; letter-spacing: -0.5px;">Atelier Archive</div>
-    <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchView('3d')"><span class="lbl-long">3D Atelier</span><span class="lbl-short">3D</span></button>
-      <button class="tab-btn" onclick="switchView('archive')"><span class="lbl-long">All Works</span><span class="lbl-short">All Works</span></button>
-      <button class="tab-btn" onclick="switchView('shorts')">Shorts</button>
-      <button class="tab-btn" onclick="switchView('store')"><span class="lbl-long">📦 Emoticon Library</span><span class="lbl-short">📦 Library</span></button>
-      <button class="tab-btn" onclick="switchView('bbb')"><span class="lbl-long">📖 BBB 말씀</span><span class="lbl-short">📖 BBB</span></button>
-      <button class="tab-btn" onclick="switchView('senior')"><span class="lbl-long">🌿 Art Care</span><span class="lbl-short">🌿 Art Care</span></button>
-      <button class="tab-btn" onclick="switchView('talk')">💬 아트톡<i class="tlk-dot" id="talkDot"></i></button>
-      <a class="tab-btn studio-tab" href="emoticon.html"><span class="lbl-long">🎨 Emoticon Studio</span><span class="lbl-short">🎨 Studio</span></a>
+    <!-- 공통 줄: 어느 공간에서든 같은 계정·페인트·채팅방 -->
+    <div class="cbar">
+      <button class="cb-home" onclick="goBack()">← <span data-i18n="back">돌아가기</span></button>
+      <div class="cb-r">
+        <button data-c="talk" onclick="openCommon('talk')"><b>💬</b><span data-i18n="talk">아트톡</span><i class="tlk-dot" id="talkDot"></i></button>
+        <button data-c="senior" onclick="openCommon('senior')"><b>🌿</b><span data-i18n="care">Art Care</span></button>
+        <button data-c="out" onclick="openCommon('out')"><b>🗞</b><span data-i18n="out">전시</span></button>
+        <button data-c="my" onclick="openCommon('my')"><b>👤</b><span data-i18n="my">My</span></button>
+        <button onclick="openLang()"><b>🌐</b><span class="langCode">KO</span></button>
+      </div>
     </div>
-    <div class="header-note" style="font-size:12px; color:#8a99ad;">Large Frame Mode</div>
+    <!-- JJ 갤러리 메뉴: 그 작가의 것만 -->
+    <div class="jj-row">
+      <b class="jj-name">JJ</b>
+      <div class="nav-tabs">
+        <button class="tab-btn active" data-v="gallery" onclick="switchView('gallery')"><span class="ti">🖼</span><span data-i18n="gallery">갤러리</span></button>
+        <button class="tab-btn" data-v="play" onclick="openPlay()"><span class="ti">✨</span><span data-i18n="play">Play</span></button>
+        <button class="tab-btn" data-v="box" onclick="openBox()"><span class="ti">🎁</span><span data-i18n="box">컬렉션</span></button>
+      </div>
+    </div>
+    <!-- 갤러리 보기 방식 -->
+    <div class="gal-seg" id="galSeg">
+      <button data-g="3d" onclick="switchView('3d')" data-i18n="walk">🏛 걸어보기</button>
+      <button data-g="archive" onclick="switchView('archive')" data-i18n="grid">▦ 모아보기</button>
+      <button data-g="shorts" onclick="switchView('shorts')" data-i18n="swipe">▶ 넘겨보기</button>
+    </div>
   </header>
 
   <!-- 입장권 상태 줄 (AGJJ) -->
@@ -712,7 +789,7 @@
     <div class="tk-box">
       <div style="font-size:40px; margin-bottom:6px">🖼️</div>
       <div class="tk-title">AGJJ 아그짜</div>
-      <div class="tk-sub">Art Gallery of Jane Jang</div>
+      <div class="tk-sub">Art Gallery of J.J</div>
       <div class="tk-rules">· 구글 계정으로 로그인하면 입장권과 <b>My Collection</b>이 계정에 저장돼요.<br>· 앱을 지우거나 휴대폰을 바꿔도 그대로 남아요.<br>· 이름과 이메일 외에는 아무것도 가져오지 않아요.</div>
       <button class="tk-btn" id="loginGo" onclick="startLogin()">Google로 로그인</button>
       <div class="tk-sub" id="loginMsg" style="margin:10px 0 0"></div>
@@ -738,7 +815,7 @@
     <div class="tk-box">
       <div style="font-size:40px; margin-bottom:6px">🖼️</div>
       <div class="tk-title">AGJJ 아그짜에 오신 걸 환영해요</div>
-      <div class="tk-sub">Art Gallery of Jane Jang<br>작가 JJ의 그림 갤러리예요.</div>
+      <div class="tk-sub">Art Gallery of J.J<br>작가 JJ의 그림 갤러리예요.</div>
       <div class="tk-rules">· 광고 1번을 보면 <b>오늘 하루</b> 갤러리에 자유롭게 들어올 수 있어요.<br>· 특별전은 갤러리 안에서 전시마다 입장권이 따로 필요해요.</div>
       <button class="tk-btn" id="gateGo" onclick="enterGalleryWithAd()"><span class="adb">AD</span> 시청 후 갤러리 입장</button>
       <div class="tk-sub" id="gateMsg" style="margin:10px 0 0"></div>
@@ -986,7 +1063,7 @@
   </div>
   <!-- 🎶 아트쏭: 연주 화면 (J.J Color Music) -->
   <div id="songPlayer">
-    <div class="sp-top"><button onclick="closeSong()">← 돌아가기</button><span id="songTitle"></span></div>
+    <div class="sp-top"><button onclick="closeSong()">← <span data-i18n="back">돌아가기</span></button><span id="songTitle"></span></div>
     <iframe id="songFrame" allow="autoplay" title="J.J Color Music"></iframe>
   </div>
 
@@ -1046,9 +1123,32 @@
 
   <!-- 🌿 시니어 인지 활동 프로그램 -->
   <div id="view-senior" class="view-container"><div class="sn" id="seniorBox"></div></div>
+  <!-- 👥 작가 고르기 -->
+  <div id="artistHub" role="dialog" aria-label="작가 고르기">
+    <div class="ah-top"><b>ARTISTS</b><small data-i18n="hubSub">작가를 골라 갤러리에 들어가요</small>
+      <div class="ah-common"><button onclick="openCommon('talk')">💬 <span data-i18n="talk">아트톡</span></button><button onclick="openCommon('senior')">🌿 <span data-i18n="care">Art Care</span></button><button onclick="openCommon('out')">🗞 <span data-i18n="out">전시</span></button><button onclick="openCommon('my')">👤 <span data-i18n="my">My</span></button><button onclick="openLang()">🌐 <span class="langCode">KO</span></button></div></div>
+    <div class="ah-list">
+      <button class="ah-card" id="ahJJ" onclick="enterArtist(this)">
+        <div class="ah-img" id="ahJJimg"></div>
+        <div class="ah-info"><div><span class="ah-badge">ARTIST</span><div class="ah-name">JJ</div>
+          <div class="ah-desc" id="ahJJdesc">이 갤러리 그림을 그린 작가예요</div></div><i>›</i></div>
+      </button>
+      <button class="ah-card" id="ahBBB" onclick="enterBBB(this)">
+        <div class="ah-img ah-bbb"><div><b>BBB</b><span data-i18n="bbbSub">📖 말씀 갤러리</span></div></div>
+        <div class="ah-info"><div><span class="ah-badge bbb">SCRIPTURE</span><div class="ah-name">BBB</div>
+          <div class="ah-desc" data-i18n="bbbDesc">3D로 돌려 보는 말씀 암송 카드 · 오늘의 말씀 뽑기</div></div><i>›</i></div>
+      </button>
+      <div class="ah-soon"><b data-i18n="soonT">🎨 곧 새로운 작가가 찾아와요</b><span data-i18n="soonD">다른 작가들의 갤러리도 여기에서 만날 수 있어요</span></div>
+    </div>
+  </div>
+  <script>   // 같은 창에서 이미 작가를 골랐거나(특별전에서 돌아올 때), 바로 가기 주소로 들어오면 작가 목록은 건너뛰어요
+    try { if (sessionStorage.getItem('agjj_hub') || location.search) document.getElementById('artistHub').style.display = 'none'; } catch (e) {}
+  </script>
+  <!-- 📖 BBB (작가 목록에서 들어가는 별도 공간) -->
+  <div id="bbbFull" class="bbb-full"><div class="bbb-top"><button onclick="goBack()">← <span data-i18n="back">돌아가기</span></button><b>📖 BBB</b><div class="cb-r"><button onclick="openCommon('talk')"><b>💬</b><span data-i18n="talk">아트톡</span></button><button onclick="openCommon('senior')"><b>🌿</b><span data-i18n="care">Art Care</span></button><button onclick="openCommon('out')"><b>🗞</b><span data-i18n="out">전시</span></button><button onclick="openCommon('my')"><b>👤</b><span data-i18n="my">My</span></button><button onclick="openLang()"><b>🌐</b><span class="langCode">KO</span></button></div></div><iframe id="bbbFrame2" title="BBB 말씀 갤러리" allow="autoplay; fullscreen"></iframe></div>
   <!-- 🧠 아트메모리게임 -->
   <div id="memModal" class="mem" role="dialog" aria-label="아트메모리게임"><div class="mem-box">
-    <button class="mem-x" onclick="closeMem()" aria-label="닫기">✕</button>
+    <button class="mem-x" onclick="closeMem()">← <span data-i18n="back">돌아가기</span></button>
     <div id="memHead"><div class="mem-k" id="memKick">A LITTLE ART MAGIC</div>
     <div class="mem-t">아트메모리게임</div>
     <div class="mem-s" id="memSub">카드를 뒤집어 같은 그림 8쌍을 찾아요</div></div>
@@ -1070,7 +1170,7 @@
   </div>
 
   <div id="view-store" class="view-container">
-    <button class="back-gallery" onclick="switchView('3d')">← Gallery</button>
+    <button class="back-gallery" onclick="openPlay()">← Play</button>
     <h2 style="font-size: 20px; font-weight: 600;">📦 JJ's Emoticon Library</h2>
     <div class="store-note">마음에 드는 이모티콘을 눌러 저장한 뒤 카카오톡 대화에서 사진처럼 보내 보세요.<br>개인 대화용으로 자유롭게 쓸 수 있어요. 상업적 이용과 재배포는 할 수 없어요. © J.J</div>
     <div id="storeGrid" class="store-grid"></div>
@@ -1123,7 +1223,6 @@
         <button class="lang-btn" onclick="changeLang('en')">English</button>
         <button class="lang-btn" onclick="changeLang('ja')">日本語</button>
         <button class="lang-btn" onclick="changeLang('zh')">中文</button>
-        <button class="lang-btn" onclick="changeLang('es')">Español</button>
       </div>
 
       <div id="viewerNote" class="note-content"></div>
@@ -1239,6 +1338,12 @@
 
     // [속도개선] GitHub API는 저장소 전체 파일 목록 1번만 호출
     async function fetchRepoTree() {
+      // ① 저장소의 파일 목록(files.json) — GitHub Actions가 파일을 올릴 때마다 자동으로 만들어요 (횟수 제한 없음)
+      try {
+        const r = await fetch(`https://raw.githubusercontent.com/${USERNAME}/${REPO}/main/files.json?t=${Math.floor(Date.now() / 60000)}`);
+        if (r.ok) { const d = await r.json(); const tree = (d.files || []).map(p => ({ path: p, type: 'blob' })); if (tree.length) return { branch: 'main', tree }; }
+      } catch (e) {}
+      // ② GitHub 목록 API (같은 인터넷에서 1시간에 60번까지)
       try {
         const res = await fetch(`https://api.github.com/repos/${USERNAME}/${REPO}/git/trees/main?recursive=1`);
         if (res.ok) {
@@ -1388,7 +1493,7 @@
     function renderVisitBar() {
       const bar = document.getElementById('visitBar');
       const head = document.querySelector('header');
-      if (head) bar.style.top = (head.offsetHeight + 8) + 'px';
+      bar.style.top = '';      // 위치는 CSS(--hdrH: 메뉴 높이)가 맞춰요
       requestAnimationFrame(() => { if (bar.offsetHeight && head) document.body.style.setProperty('--vb', Math.max(60, bar.getBoundingClientRect().bottom - head.getBoundingClientRect().bottom + 18) + 'px'); });   // 알약이 여러 줄이 돼도 화면 내용이 가려지지 않게
       document.body.classList.toggle('has-visit', !!EXCFG);
       if (!EXCFG) { bar.innerHTML = ''; return; }
@@ -1408,8 +1513,7 @@
         html += `<button class="visit-pill enter" onclick="openExList()">🎟 Exhibitions</button>`;
       }
       // 메뉴는 3개만: 특별전 · ✨ Play(카드·게임·바깥 전시) · 👤 My(내 계정·My Collection)
-      html += `<button class="visit-pill paint" onclick="openPlay()">✨ Play · 💧 ${getPaint()}</button>`;
-      html += `<button class="visit-pill me" onclick="openAccount()">👤 My</button>`;
+      html += `<span class="visit-pill paint" onclick="openPlay()">💧 ${getPaint()}</span>`;     // ✨ Play·👤 My는 위 메뉴로 옮겼어요
       // 전시 관람 중이면 Exit는 맨 오른쪽 끝에 따로
       if (tk) html += `<button class="visit-pill exit" onclick="openModal('exitModal')">✕ Exit</button>`;
       bar.classList.toggle('has-exit', !!tk);
@@ -1524,7 +1628,7 @@
     //  - FIREBASE_CONFIG 가 비어 있으면(null) 로그인 없이 예전처럼 휴대폰 안에만 저장해요.
     // =====================================================================
     const FIREBASE_CONFIG = {
-      apiKey: "AIzaSyD2PczZ3z0MFwOday-iwHsLoW3tbbagSdU",
+      apiKey: "AIzaSyBwlcopOmwqdoZZcXwVIDOPtds85xTJfRM",
       authDomain: "agjj-adb63.firebaseapp.com",
       projectId: "agjj-adb63",
       storageBucket: "agjj-adb63.firebasestorage.app",
@@ -1799,7 +1903,7 @@
     // ✨ Play: 카테고리별로 모아 보기
     // =====================================================================
     function openPlay() {
-      closeViewer();
+      closeViewer(); navPush('play'); setTimeout(() => setNav('play'), 0);
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
       document.getElementById('view-play').classList.add('active');
@@ -1813,35 +1917,37 @@
       const logs = lsGet(K_LOG, []).length;
       const best = Math.max(0, ...[1, 2, 3, 4].map(n => lsGet('agjj_pang_best_' + n, 0)));
       const n = v => v ? `<span class="n">${v}</span>` : '';
+      const songs = lsGet(K_EMO, []).filter(k => k.startsWith('song:')).length, memBest = lsGet(K_MEM, {}).best || 0;
+      // 큰 타일 하나 = 아이콘 · 이름 · 한 줄 설명 · 오른쪽 위 배지(💧 값이나 내 기록)
+      const T = (fn, i, t, d, badge, cls = '') => `<button class="pt ${cls}" onclick="${fn}"><span class="pt-b">${badge || ''}</span><div class="pt-i">${i}</div><div class="pt-t">${t}</div><div class="pt-d">${d}</div></button>`;
+      const free = `<em class="free">${t('free')}</em>`, p1 = '<em>💧 1</em>';
       document.getElementById('playBody').innerHTML = `
-        <div class="pl-paint"><div><div style="font-size:12px; color:#ddd6fe">내 페인트</div><b>💧 ${getPaint()}</b>
-            <div style="font-size:11.5px; color:#c4b5fd; margin-top:2px">🎨 오늘의 물감 ${freeLeft()} + 모은 페인트 ${savedPaint()}</div></div>
+        <div class="pl-paint"><div><div style="font-size:12px; color:#ddd6fe">${t('myPaint')}</div><b>💧 ${getPaint()}</b>
+            <div style="font-size:11.5px; color:#c4b5fd; margin-top:2px">${t('paintSub', { a: freeLeft(), b: savedPaint() })}</div></div>
           <button onclick="earnPaintPlay()" ${adLeftToday() ? '' : 'disabled'}><span class="adb">AD</span> 시청 💧 +${AD_PAINT}<br><small>오늘 ${adLeftToday()}번 남음</small></button></div>
-        <div class="pl-how">🎨 매일 오늘의 물감 ${FREE_DAILY}개 (안 쓰면 사라져요) · 🔥 7일 연속 출석 +5 · 🎟 특별전 관람 완료 +2 · 💌 아트빔 링크로 친구 입장 +3 (하루 3명) · 💎 아트퐁 목표 달성 · 📒 첫 관람 기록</div>
+        <details class="pl-how"><summary>${t('howPaint')}</summary>🎨 매일 오늘의 물감 ${FREE_DAILY}개 (안 쓰면 사라져요) · 🔥 7일 연속 출석 +5 · 🎟 특별전 관람 완료 +2 · 💌 아트빔 링크로 친구 입장 +3 (하루 3명) · 💎 아트퐁 목표 달성 · 🧠 아트메모리게임 성공 +1 · 📒 첫 관람 기록</details>
 
-        <div class="pl-cat">🃏 카드 만들기</div>
-        <div class="pl-grid">
-          <button class="pl-tile" onclick="openWord()"><div class="i">📜</div>${n(cards)}<div class="t">말씀카드</div><div class="d">My Collection 작품 위에 말씀 한 구절 · 💧 1</div></button>
-          <button class="pl-tile" onclick="openArtCards()"><div class="i">📽️</div>${n(art)}<div class="t">아트빔</div><div class="d">특별전을 영사하듯 · QR·링크로 전시 모드 · 💧 1</div></button>
+        <div class="pl-cat">${t('catGame')}</div>
+        <div class="pg">
+          ${T('openPang()', '💎', t('pongT'), t('pongD'), best ? '🏆 ' + best.toLocaleString() : p1)}
+          ${T('openMem()', '🧠', t('memT'), t('memD'), memBest ? '🏆 ' + memBest.toLocaleString() : free)}
         </div>
 
-        <div class="pl-cat">🎵 음악</div>
-        <div class="pl-grid">
-          <button class="pl-tile wide" onclick="openColoring()"><div class="i">🖍</div><div class="t">아트컬러링</div><div class="d">오늘의 JJ의 그림 도안에 큰 색 버튼으로 색칠하면, 그 색으로 노래해요 · 무료</div></button>
-          <button class="pl-tile wide" onclick="openSong()"><div class="i">🎶</div>${n(lsGet(K_EMO, []).filter(k => k.startsWith('song:')).length)}<div class="t">아트쏭 · 그림이 노래해요</div><div class="d">그림 색이 음이 되는 나만의 노래 · 길·스타일·악기 고르기, 겹겹이 쌓기 · 로비 6점 무료 체험 · My Collection 작품은 💧 1로 영원히</div></button>
+        <div class="pl-cat">${t('catMusic')}</div>
+        <div class="pg">
+          ${T('openSong()', '🎶', t('songT'), t('songD'), songs ? '🎵 ' + songs : free)}
+          ${T('openColoring()', '🖍', t('colorT'), t('colorD'), free)}
         </div>
 
-        <div class="pl-cat">🎮 게임</div>
-        <div class="pl-grid">
-          <button class="pl-tile wide" onclick="openPang()"><div class="i">💎</div>${n(best ? '최고 ' + best.toLocaleString() : '')}<div class="t">J.J 아트퐁</div><div class="d">JJ의 그림 보석 맞추기 60초 퍼즐 · 한 판 💧 1 · 목표를 넘기면 💧 돌려받기</div></button>
-          <button class="pl-tile wide" onclick="openMem()"><div class="i">🧠</div>${n((lsGet(K_MEM, {}).best || 0) ? '최고 ' + lsGet(K_MEM, {}).best.toLocaleString() : '')}<div class="t">아트메모리게임</div><div class="d">JJ의 그림 카드를 뒤집어 같은 그림 찾기 · 무료 그림 6쌍부터, My Collection을 모을수록 다음 단계 · 하루 한 번 성공하면 💧 +1</div></button>
+        <div class="pl-cat">${t('catMake')}</div>
+        <div class="pg">
+          ${T('openWord()', '📜', t('wordT'), t('wordD'), cards ? '📜 ' + cards : p1)}
+          ${T('openArtCards()', '📽️', t('beamT'), t('beamD'), art ? '📽️ ' + art : p1)}
+          ${T("location.href='emoticon.html'", '🎨', t('emoT'), t('emoD'), free)}
+          ${T("switchView('store')", '📦', t('storeT'), t('storeD'), free)}
         </div>
 
-        <div class="pl-cat">🗞 바깥 전시</div>
-        <div class="pl-grid">
-          <button class="pl-tile" onclick="openArtOut('news')"><div class="i">🖼</div><div class="t">전시 소식</div><div class="d">지금 열리는 전시 둘러보기</div></button>
-          <button class="pl-tile" onclick="openArtOut('log')"><div class="i">📒</div>${n(logs)}<div class="t">My Art Log</div><div class="d">다녀온 전시 기록 · 처음 기록마다 💧 1</div></button>
-        </div>`;
+`;
     }
 
     // =====================================================================
@@ -2068,7 +2174,7 @@
     // 👤 내 계정: 프로필 · 내 기록 요약 · 로그아웃 · 계정 삭제 · 저작권/개인정보 안내
     // =====================================================================
     function openAccount() {
-      closeViewer();
+      closeViewer(); navPush('my'); setTimeout(() => setNav('c:my'), 0);
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
       document.getElementById('view-account').classList.add('active');
@@ -2106,13 +2212,14 @@
         </div>
         ${best ? `<div class="acc-sub" style="margin-top:8px; text-align:center">🎮 아트퐁 최고 점수 ${best.toLocaleString()}점</div>` : ''}
         <div class="acc-list">
+          <button onclick="openHub()"><span>👥 작가 목록</span><span>›</span></button>
           <button onclick="openFontPicker()"><span>🔤 글씨체 · 글자 크기</span><span>›</span></button>
           <button onclick="openModal('copyModal')"><span>© 저작권 안내</span><span>›</span></button>
           <button onclick="openModal('privacyModal')"><span>🔒 개인정보 안내</span><span>›</span></button>
           ${u ? `<button onclick="logout()"><span>로그아웃</span><span>›</span></button>
                  <button class="danger" onclick="askDeleteAccount()"><span>계정 삭제</span><span>›</span></button>` : ''}
         </div>
-        <div class="acc-sub" style="margin-top:12px; text-align:center">AGJJ 아그짜 · Art Gallery of Jane Jang${ver ? ' · 앱 ' + ver : ''}</div>`;
+        <div class="acc-sub" style="margin-top:12px; text-align:center">AGJJ 아그짜 · Art Gallery of J.J${ver ? ' · 앱 ' + ver : ''}</div>`;
     }
     function askDeleteAccount() {
       document.getElementById('msgTitle').innerText = '계정을 삭제할까요?';
@@ -2211,7 +2318,7 @@
     }
 
     function openArtOut(tab) {
-      closeViewer();
+      closeViewer(); navPush('out:' + (tab || 'news')); setTimeout(() => setNav('c:out'), 0);
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
       document.getElementById('view-out').classList.add('active');
@@ -2636,7 +2743,7 @@
       g.lineWidth = 1; g.strokeRect(46, 46, AC_W - 92, AC_H - 92);
       g.textAlign = 'center'; g.fillStyle = '#d8b679'; g.font = `bold 64px ${font}`;
       spaced(g, 'AGJJ', AC_W / 2, 190, 22);
-      g.fillStyle = '#b9a993'; g.font = `26px ${font}`; g.fillText('Art Gallery of Jane Jang', AC_W / 2, 240);
+      g.fillStyle = '#b9a993'; g.font = `26px ${font}`; g.fillText('Art Gallery of J.J', AC_W / 2, 240);
       // QR
       const box = 600, bx = (AC_W - box) / 2, by = 320;
       g.fillStyle = '#fbf8f2'; g.beginPath(); if (g.roundRect) g.roundRect(bx, by, box, box, 28); else g.rect(bx, by, box, box); g.fill();
@@ -3092,7 +3199,7 @@
       showMsg('My Collection이 1칸 늘었어요', `이제 ${box.slots}칸이에요.`);
     }
     function openBox() {
-      closeViewer();
+      closeViewer(); navPush('box'); setTimeout(() => setNav('box'), 0);
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
       document.getElementById('view-box').classList.add('active');
@@ -3164,7 +3271,7 @@
 
       hideSplash();
       renderArchive();
-      saveSplashArt();
+      saveSplashArt(); renderHub();
       try { init3D(); } catch (e) { console.log('3D 전시관을 준비하지 못했어요:', e); }
       if (document.getElementById('view-shorts').classList.contains('active')) startShorts();
     }
@@ -3214,6 +3321,37 @@
     }
 
     const BBB_SITE = 'https://hannaj1763-sketch.github.io/BBB-BIBLE-CARD/';
+    // =====================================================================
+    // 👥 작가 고르기: 앱을 열면 작가 카드가 보이고, 고르면 카드가 화면 가득 펼쳐지며 갤러리가 열려요
+    //  (지금은 JJ 한 명 · 나중에 다른 작가가 입점하면 카드를 더해요)
+    // =====================================================================
+    function renderHub() {
+      const prof = allArtworks.find(a => a.isProfile), n = allArtworks.filter(a => !a.isProfile).length;
+      if (prof) document.getElementById('ahJJimg').style.backgroundImage = `url('${prof.src}')`;
+      document.getElementById('ahJJdesc').innerHTML = t('jjDesc') + (n ? ' · ' + t('works', { n }) : '');
+    }
+    function openHub() {
+      navPush('hub');
+      const h = document.getElementById('artistHub'); h.style.display = ''; h.classList.remove('out'); h.scrollTop = 0; renderHub();
+    }
+    // 📖 BBB: JJ 갤러리 밖, 작가 목록에서 들어가는 별도 공간
+    function enterBBB(card) {
+      const f = document.getElementById('bbbFrame2'); if (!f.src) f.src = BBB_SITE;
+      enterArtist(card, true);
+      setTimeout(() => document.getElementById('bbbFull').classList.add('on'), 600); navPush('bbb');
+    }
+    function closeBBB() { document.getElementById('bbbFull').classList.remove('on'); openHub(); }
+    function enterArtist(card, keepHub) {
+      const h = document.getElementById('artistHub'), img = card.querySelector('.ah-img'), r = img.getBoundingClientRect();
+      if (!keepHub) { try { sessionStorage.setItem('agjj_hub', '1'); } catch (e) {} document.body.classList.remove('common-mode'); setTimeout(() => switchView('gallery'), 300); }
+      const g = document.createElement('div'); g.className = 'ah-grow';
+      g.style.cssText = `left:${r.left}px; top:${r.top}px; width:${r.width}px; height:${r.height}px; background-image:${img.style.backgroundImage}`;
+      document.body.appendChild(g);
+      requestAnimationFrame(() => requestAnimationFrame(() => { g.style.left = '0px'; g.style.top = '0px'; g.style.width = '100vw'; g.style.height = '100vh'; g.style.borderRadius = '0px'; }));
+      setTimeout(() => { h.style.display = 'none'; g.style.opacity = '0'; }, 650);       // 카드가 화면 가득 → 갤러리가 드러나요
+      setTimeout(() => g.remove(), 1300);
+    }
+
     // =====================================================================
     // 🧠 아트메모리게임 (카드 짝맞추기): 16장 · 8쌍 · 60초
     //  - 그림: 무료 대표작 + 내 컬렉션 (모자라면 그림 기호 카드) · 잠긴 그림은 나오지 않아요
@@ -3843,37 +3981,128 @@
       } catch (e) { if (!quiet) toast('없애지 못했어요'); console.log(e); }
     }
 
+    // =====================================================================
+    // 🌐 언어: 공통 줄에서 고르면 메뉴·처음 화면·Play·작품 설명이 바뀌어요
+    //  지금 보이는 언어: 한국어 · English · 中文 · 日本語 (나머지는 show: true로 켜면 돼요)
+    // =====================================================================
+    const APP_LANGS = [
+      { k: 'ko', n: '한국어', c: 'KO', show: true }, { k: 'en', n: 'English', c: 'EN', show: true },
+      { k: 'zh', n: '中文', c: '中', show: true }, { k: 'ja', n: '日本語', c: '日', show: true },
+      { k: 'es', n: 'Español', c: 'ES' }, { k: 'vi', n: 'Tiếng Việt', c: 'VI' }, { k: 'th', n: 'ไทย', c: 'TH' }, { k: 'hi', n: 'हिन्दी', c: 'HI' },
+    ];
+    const I18N = {
+      talk: ['아트톡', 'Art Talk', '艺术聊天', 'アートトーク'], care: ['Art Care', 'Art Care', 'Art Care', 'Art Care'],
+      out: ['전시', 'Exhibits', '展览', '展示'], my: ['My', 'My', '我的', 'マイ'],
+      gallery: ['갤러리', 'Gallery', '画廊', 'ギャラリー'], play: ['Play', 'Play', '玩乐', 'Play'], box: ['컬렉션', 'Collection', '收藏', 'コレクション'],
+      walk: ['🏛 걸어보기', '🏛 Walk', '🏛 漫步', '🏛 歩いて見る'], grid: ['▦ 모아보기', '▦ All', '▦ 全部', '▦ 一覧'], swipe: ['▶ 넘겨보기', '▶ Swipe', '▶ 滑动', '▶ めくる'],
+      hubSub: ['작가를 골라 갤러리에 들어가요', 'Choose an artist to enter the gallery', '选择艺术家，进入画廊', 'アーティストを選んでギャラリーへ'],
+      jjDesc: ['이 갤러리 그림을 그린 작가예요', 'The artist behind this gallery', '本画廊作品的作者', 'このギャラリーの絵を描いた作家'],
+      works: ['작품 {n}점', '{n} works', '作品 {n} 幅', '作品 {n} 点'],
+      bbbDesc: ['3D로 돌려 보는 말씀 암송 카드 · 오늘의 말씀 뽑기', '3D scripture memory cards · Verse of the day', '3D 经文背诵卡 · 今日经文', '3Dで回す聖句暗唱カード · 今日のみことば'],
+      bbbSub: ['📖 말씀 갤러리', '📖 Scripture Gallery', '📖 经文画廊', '📖 みことばギャラリー'],
+      soonT: ['🎨 곧 새로운 작가가 찾아와요', '🎨 New artists coming soon', '🎨 新艺术家即将入驻', '🎨 新しい作家がまもなく登場'],
+      soonD: ['다른 작가들의 갤러리도 여기에서 만날 수 있어요', "Other artists' galleries will appear here", '其他艺术家的画廊也会出现在这里', 'ほかの作家のギャラリーもここで会えます'],
+      lang: ['🌐 언어', '🌐 Language', '🌐 语言', '🌐 言語'], langNote: ['메뉴와 작품 설명이 바뀌어요. 일부 화면은 아직 한국어예요.', 'Menus and artwork notes will change. Some screens are still in Korean.', '菜单和作品说明会切换，部分页面暂为韩语。', 'メニューと作品説明が切り替わります。一部の画面はまだ韓国語です。'],
+      close: ['닫기', 'Close', '关闭', '閉じる'], back: ['돌아가기', 'Back', '返回', '戻る'],
+      catGame: ['🎮 게임', '🎮 Games', '🎮 游戏', '🎮 ゲーム'], catMusic: ['🎵 그림 × 음악', '🎵 Art × Music', '🎵 画 × 音乐', '🎵 絵 × 音楽'], catMake: ['✂️ 만들기', '✂️ Create', '✂️ 创作', '✂️ つくる'],
+      free: ['무료', 'Free', '免费', '無料'], myPaint: ['내 페인트', 'My paint', '我的颜料', 'マイ絵の具'],
+      paintSub: ['🎨 오늘의 물감 {a} + 모은 페인트 {b}', "🎨 Today's {a} + saved {b}", '🎨 今日颜料 {a} + 已存 {b}', '🎨 今日の絵の具 {a} + 貯めた分 {b}'],
+      howPaint: ['💧 페인트 모으는 법', '💧 How to get paint', '💧 如何获得颜料', '💧 絵の具の集め方'],
+      pongT: ['J.J 아트퐁', 'J.J Art Pong', 'J.J 艺术碰碰', 'J.J アートポン'], pongD: ['그림 보석 맞추기', 'Match the art gems', '画作宝石消除', '絵の宝石そろえ'],
+      memT: ['아트메모리게임', 'Art Memory', '艺术记忆游戏', 'アートメモリー'], memD: ['같은 그림 짝 찾기', 'Find matching pairs', '找出相同的画', '同じ絵のペア探し'],
+      songT: ['아트쏭', 'Art Song', '艺术之歌', 'アートソング'], songD: ['그림이 노래해요', 'Paintings that sing', '画会唱歌', '絵が歌います'],
+      colorT: ['아트컬러링', 'Art Coloring', '艺术涂色', 'アートぬりえ'], colorD: ['색칠하면 노래가 돼요', 'Color it into a song', '涂上颜色就变成歌', '塗ると歌になります'],
+      wordT: ['말씀카드', 'Verse Card', '经文卡', 'みことばカード'], wordD: ['그림 위에 말씀 한 구절', 'A verse on a painting', '画上的一句经文', '絵にみことばを一節'],
+      beamT: ['아트빔', 'Art Beam', '艺术投影', 'アートビーム'], beamD: ['특별전을 영사하듯', 'Project an exhibition', '像放映一样展示特展', '特別展を映すように'],
+      emoT: ['이모티콘 공방', 'Emoticon Studio', '表情工坊', 'スタンプ工房'], emoD: ['그림으로 이모티콘 만들기', 'Make emoticons from art', '用画作做表情', '絵でスタンプを作る'],
+      storeT: ['이모티콘 저장소', 'Emoticon Library', '表情库', 'スタンプ倉庫'], storeD: ['받아서 카톡으로 보내기', 'Save and send in chats', '保存后在聊天中发送', '保存してチャットで送る'],
+    };
+    const LANG_IDX = { ko: 0, en: 1, zh: 2, ja: 3 };
+    let appLang = (() => { try { return localStorage.getItem('agjj_lang') || ''; } catch (e) { return ''; } })();
+    if (!appLang) { const nl = (navigator.language || 'ko').slice(0, 2); appLang = LANG_IDX[nl] !== undefined ? nl : 'ko'; }   // 처음엔 휴대폰 언어로
+    function t(k, v) {
+      const row = I18N[k]; let s = row ? (row[LANG_IDX[appLang] ?? 0] || row[0]) : k;
+      if (v) Object.entries(v).forEach(([a, b]) => { s = s.split('{' + a + '}').join(b); });
+      return s;
+    }
+    function applyLang() {
+      document.documentElement.lang = appLang;
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+      const L = APP_LANGS.find(x => x.k === appLang) || APP_LANGS[0];
+      document.querySelectorAll('.langCode').forEach(el => { el.textContent = L.c; });
+      try { if (typeof renderHub === 'function' && allArtworks.length) renderHub(); } catch (e) {}
+      try { if (document.getElementById('view-play').classList.contains('active')) renderPlay(); } catch (e) {}
+      try { changeLang(['ko', 'en', 'ja', 'zh', 'es'].includes(appLang) ? appLang : 'en'); } catch (e) {}      // 작품 설명 언어도 함께
+    }
+    function setAppLang(k) { appLang = k; try { localStorage.setItem('agjj_lang', k); } catch (e) {} closeModal('talkSheet'); applyLang(); }
+    function openLang() {
+      talkSheet(`<div class="tk-title">${t('lang')}</div><div class="tk-sub">${t('langNote')}</div>
+        <div class="tlk-pick">${APP_LANGS.filter(x => x.show).map(x => `<button onclick="setAppLang('${x.k}')" style="${x.k === appLang ? 'border-color:#f59e0b' : ''}">${x.n}<small>${x.k === appLang ? '✔' : ''}</small></button>`).join('')}</div>
+        <button class="tk-cancel" onclick="closeModal('talkSheet')">${t('close')}</button>`);
+    }
+    document.addEventListener('DOMContentLoaded', () => { applyLang(); navPush(document.getElementById('artistHub').style.display === 'none' ? 'v:3d' : 'hub'); });
+
+    // ── ← 돌아가기: 지나온 화면을 기억했다가 바로 전 화면으로 (처음 화면까지)
+    const NAV = []; let navBusy = false;
+    const JJ_KEYS = k => /^(v:(3d|archive|shorts|store)|play|box)$/.test(k);
+    function navPush(k) { if (navBusy) return; if (NAV[NAV.length - 1] !== k) NAV.push(k); if (NAV.length > 40) NAV.shift(); }
+    function navOpen(k) {
+      navBusy = true;
+      try {
+        const hub = document.getElementById('artistHub'), bbb = document.getElementById('bbbFull');
+        if (k !== 'bbb') bbb.classList.remove('on');
+        if (k === 'hub') { openHub(); return; }
+        hub.style.display = 'none';
+        if (k === 'bbb') { bbb.classList.add('on'); return; }
+        if (JJ_KEYS(k)) document.body.classList.remove('common-mode');
+        if (k.startsWith('v:')) switchView(k.slice(2));
+        else if (k === 'play') openPlay(); else if (k === 'box') openBox(); else if (k === 'my') openAccount();
+        else if (k.startsWith('out')) openArtOut(k.split(':')[1] || 'news');
+      } finally { navBusy = false; }
+    }
+    function goBack() {
+      if (typeof TK !== 'undefined' && TK.room) { talkCloseRoom(); return; }                       // 채팅방 안 → 채팅 목록
+      const vm = document.getElementById('viewerModal'); if (vm && vm.classList.contains('active')) { closeViewer(); return; }
+      NAV.pop();                                                                                    // 지금 화면
+      const prev = NAV[NAV.length - 1];
+      if (!prev) { NAV.length = 0; navPush('hub'); openHub(); return; }
+      navOpen(prev);
+    }
+    // ── 메뉴 표시: JJ 메뉴(갤러리·Play·컬렉션) / 공통 줄(아트톡·Art Care·전시·My) / 갤러리 보기 방식
+    function setNav(key, galMode) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.v === key));
+      document.querySelectorAll('.cbar .cb-r button').forEach(b => b.classList.toggle('on', 'c:' + b.dataset.c === key));
+      document.body.classList.toggle('gal', key === 'gallery');
+      document.querySelectorAll('#galSeg button').forEach(b => b.classList.toggle('on', b.dataset.g === galMode));
+    }
+    // 공통 기능 열기: 처음 화면(ARTISTS)·BBB에서 열면 JJ 메뉴는 숨기고 '← ARTISTS'로 돌아가요
+    function openCommon(k) {
+      const hub = document.getElementById('artistHub'), bbb = document.getElementById('bbbFull');
+      if (hub.style.display !== 'none' || bbb.classList.contains('on')) { hub.style.display = 'none'; bbb.classList.remove('on'); document.body.classList.add('common-mode'); }
+      if (k === 'talk' || k === 'senior') switchView(k);
+      else if (k === 'out') openArtOut('news');
+      else openAccount();
+    }
+    function goHub() { if (TK && TK.room) talkCloseRoom(true); openHub(); }
+    // 위 메뉴가 두 줄이 되어도 Exhibitions·Play·My 알약이 그 아래에 오도록
+    (function () { let last = 0; const set = () => { const h = document.querySelector('header'); if (!h) return; document.documentElement.style.setProperty('--hdrH', h.offsetHeight + 'px'); if (h.offsetHeight !== last) { last = h.offsetHeight; try { renderVisitBar(); } catch (e) {} } };
+      window.addEventListener('resize', set); window.addEventListener('load', set); setTimeout(set, 0); try { new ResizeObserver(set).observe(document.querySelector('header')); } catch (e) {} })();
     function switchView(mode) {
       setTimeout(() => { const t = document.querySelector('.tab-btn.active'); if (t && t.scrollIntoView) t.scrollIntoView({ inline: 'center', block: 'nearest' }); }, 0);   // 메뉴가 많아 넘치면 고른 메뉴가 보이게
       if (mode !== 'talk' && typeof TK !== 'undefined' && TK.room) talkCloseRoom(true);     // 아트톡을 떠나면 채팅방 실시간 연결은 끊어요
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
-      if(mode === '3d') {
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.getElementById('view-3d').classList.add('active');
-      } else if (mode === 'shorts') {
-        document.querySelectorAll('.tab-btn')[2].classList.add('active');
-        document.getElementById('view-shorts').classList.add('active');
-      } else if (mode === 'bbb') {
-        document.querySelectorAll('.tab-btn')[4].classList.add('active');
-        document.getElementById('view-bbb').classList.add('active');
-        const f = document.getElementById('bbbFrame'); if (!f.src) f.src = BBB_SITE;      // 처음 열 때만 불러오기
-      } else if (mode === 'senior') {
-        document.querySelectorAll('.tab-btn')[5].classList.add('active');
-        document.getElementById('view-senior').classList.add('active');
-        renderSenior();
-      } else if (mode === 'talk') {
-        document.querySelectorAll('.tab-btn')[6].classList.add('active');
-        document.getElementById('view-talk').classList.add('active');
-        renderTalk(); talkOnline();
-      } else if (mode === 'store') {
-        document.querySelectorAll('.tab-btn')[3].classList.add('active');
-        document.getElementById('view-store').classList.add('active');
-        loadStore();
-      } else {
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        document.getElementById('view-archive').classList.add('active');
-      }
+      if (mode === 'gallery') mode = lsGet('agjj_galmode', '3d');       // 🖼 갤러리 = 마지막에 본 보기 방식
+      if (['3d', 'archive', 'shorts'].includes(mode)) lsSet('agjj_galmode', mode, true);
+      navPush('v:' + mode);
+      setNav(['3d', 'archive', 'shorts'].includes(mode) ? 'gallery' : mode === 'store' ? 'play' : mode === 'senior' || mode === 'talk' ? 'c:' + mode : '', mode);
+      if (mode === '3d') document.getElementById('view-3d').classList.add('active');
+      else if (mode === 'shorts') document.getElementById('view-shorts').classList.add('active');
+      else if (mode === 'bbb') { document.getElementById('view-3d').classList.add('active'); const f = document.getElementById('bbbFrame2'); if (!f.src) f.src = BBB_SITE; document.getElementById('bbbFull').classList.add('on'); }   // BBB는 작가 목록의 별도 공간
+      else if (mode === 'senior') { document.getElementById('view-senior').classList.add('active'); renderSenior(); }
+      else if (mode === 'talk') { document.getElementById('view-talk').classList.add('active'); renderTalk(); talkOnline(); }
+      else if (mode === 'store') { document.getElementById('view-store').classList.add('active'); loadStore(); }
+      else document.getElementById('view-archive').classList.add('active');
       if (mode === 'shorts') startShorts(); else stopShorts();
     }
 
@@ -3899,7 +4128,7 @@
       frame.style.backgroundColor = art.theme.frameColor;
       
       updateReactionsDisplay();
-      changeLang(currentLang);
+      changeLang(['ko', 'en', 'ja', 'zh', 'es'].includes(appLang) ? appLang : currentLang);
       updateCollectBtn();
     }
 

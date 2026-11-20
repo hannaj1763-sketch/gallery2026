@@ -92,6 +92,7 @@
   #ctrl { position: fixed; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(140%);
     display: flex; gap: 6px; padding: 8px; background: rgba(20,16,13,.88); border: 1px solid rgba(216,182,121,.3); border-radius: 999px;
     backdrop-filter: blur(10px); transition: transform .35s ease; z-index: 20; }
+  #backBtn { position: fixed; top: calc(12px + env(safe-area-inset-top)); left: 12px; z-index: 60; background: rgba(0,0,0,.55); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 18px; padding: 8px 14px; font-size: 14px; font-weight: 700; cursor: pointer; backdrop-filter: blur(4px); font-family: inherit; }
   #ctrl.on { transform: translateX(-50%) translateY(0); }
   #ctrl button { width: 44px; height: 44px; border-radius: 50%; border: none; background: rgba(255,255,255,.08); color: var(--ink); font-size: 18px; cursor: pointer; }
   #progress { position: fixed; left: 0; top: 0; height: 3px; background: var(--gold); opacity: .7; width: 0; transition: width .6s linear; z-index: 21; }
@@ -148,6 +149,7 @@
   </section>
 </div>
 
+<button id="backBtn" onclick="goGallery()">← 돌아가기</button>
 <div id="progress"></div>
 <div id="rotateTip">⟲ 가로로 눕히면 더 크게 보여요</div>
 <div id="ctrl">
@@ -156,7 +158,6 @@
   <button onclick="step(1)" title="다음">⏭</button>
   <button id="soundBtn" onclick="toggleSound()" title="음악">🔈</button>
   <button onclick="toggleFull()" title="전체 화면">⛶</button>
-  <button onclick="goGallery()" title="나가기">✕</button>
 </div>
 
 <script>
@@ -180,6 +181,10 @@
   const rawUrl = p => `https://raw.githubusercontent.com/${USERNAME}/${REPO}/main/` + p.split('/').map(encodeURIComponent).join('/');
 
   async function repoTree() {
+    try {     // 저장소 파일 목록(files.json, Actions가 자동으로 만들어요) → 안 되면 GitHub API → jsDelivr
+      const m = await fetch(`https://raw.githubusercontent.com/${USERNAME}/${REPO}/main/files.json?t=${Math.floor(Date.now() / 60000)}`);
+      if (m.ok) { const d = await m.json(); if ((d.files || []).length) return d.files.map(p => ({ path: p, type: 'blob' })); }
+    } catch (e) {}
     try {
       const r = await fetch(`https://api.github.com/repos/${USERNAME}/${REPO}/git/trees/main?recursive=1`);
       if (r.ok) return (await r.json()).tree || [];
@@ -218,7 +223,7 @@
     $('openTitle').innerText = EX.short || EX.title;
     $('openSub').innerText = `${(EX.title.match(/^제\d+회[^「]*/) || [''])[0].trim()} · JJ · 작품 ${works.length}점`;
     $('introText').innerText = EX.intro || `꼬마 화가 J.J가 그린 작품 ${works.length}점을 모았어요. 천천히 걸으며 감상해 주세요.`;
-    $('endSub').innerText = `${EX.title} · AGJJ Art Gallery of Jane Jang`;
+    $('endSub').innerText = `${EX.title} · AGJJ Art Gallery of J.J`;
     document.title = `AGJJ · ${EX.short || EX.title}`;
     buildWorks();
     preload(0); preload(1);

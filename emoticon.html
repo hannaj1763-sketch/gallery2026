@@ -70,7 +70,7 @@
   </style>
 </head>
 <body>
-<div class="topbar"><a href="./">← Gallery</a></div>
+<div class="topbar"><a href="./">← 돌아가기</a></div>
 <div class="wrap">
   <h1>JJ's Emoticon Studio</h1>
   <div class="sub">작품에서 캐릭터를 오려 카카오톡 이모티콘(360×360)으로 만들어요</div>
@@ -190,7 +190,6 @@
     <div class="hint">그림을 누르면 다시 저장돼요. 이 페이지를 닫거나 새로고침하면 목록이 사라지니, 만들 때마다 저장해 두세요.</div>
   </div>
 
-  <a class="back" href="./">← Back to Gallery</a>
 </div>
 
 <script>
@@ -411,6 +410,10 @@
   function fetchTree() {
     if (!treePromise) {
       treePromise = (async () => {
+        try {     // 저장소 파일 목록(files.json, Actions가 자동으로 만들어요) 먼저
+          const m = await fetch(`https://raw.githubusercontent.com/${OWNER}/${REPO}/main/files.json?t=${Math.floor(Date.now() / 60000)}`);
+          if (m.ok) { const d = await m.json(); if ((d.files || []).length) return { branch: 'main', tree: d.files.map(p => ({ path: p, type: 'blob' })) }; }
+        } catch (e) {}
         try {
           const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/git/trees/main?recursive=1`);
           if (res.ok) return { branch: 'main', tree: (await res.json()).tree || [] };

@@ -91,7 +91,7 @@
 <body>
 <div class="wrap">
   <div class="top">
-    <button onclick="goGallery()">← Gallery</button>
+    <button onclick="goGallery()">← 돌아가기</button>
     <div class="title">J.J 아트퐁</div>
     <button id="soundBtn" onclick="toggleSound()">🔊</button>
   </div>
@@ -125,7 +125,7 @@
     <div class="reward" id="rewardMsg" style="display:none"></div>
     <div class="rank" id="rankEnd"></div>
     <button class="big" id="againBtn" onclick="playAgain()">한 판 더!</button>
-    <button class="ghost" onclick="goGallery()">갤러리로 돌아가기</button>
+    <button class="ghost" onclick="goGallery()">돌아가기</button>
   </div>
 </div>
 
@@ -151,7 +151,11 @@
     if (STAGE.ids) { ids = STAGE.ids.lobby.slice(); rare = STAGE.ids.rare.slice(); }
     else { try { const cfg = await (await fetch('exhibitions.json', { cache: 'no-store' })).json(); ids = (cfg.lobby || []).slice(0, 6); } catch (e) {} }
     let tree = [];
-    try {
+    try {     // 저장소 파일 목록(files.json, Actions가 자동으로 만들어요) 먼저
+      const m = await fetch(`https://raw.githubusercontent.com/${USERNAME}/${REPO}/main/files.json?t=${Math.floor(Date.now() / 60000)}`);
+      if (m.ok) tree = ((await m.json()).files || []).map(p => ({ path: p, type: 'blob' }));
+    } catch (e) {}
+    if (!tree.length) try {
       const r = await fetch(`https://api.github.com/repos/${USERNAME}/${REPO}/git/trees/main?recursive=1`);
       if (r.ok) tree = (await r.json()).tree || [];
     } catch (e) {}
