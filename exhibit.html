@@ -160,6 +160,14 @@
 </div>
 
 <script>
+    function anonName(t) {   // 작가 실명은 보여주지 않아요 → 예명 JJ (이름은 코드에도 그대로 적지 않아요)
+      if (typeof t !== 'string') return t;
+      if (!anonName.list) anonName.list = ['5byg6Im65oiQ77yIWWVzdW5nIEphbmfvvIk=', '5byg6Im65oiQ', '44OB44Oj44Oz44O744Kk44Kn44K944Oz', 'WWVzdW5nIEphbmc=', 'SmFuZyBZZXN1bmc=', '7J6l7JiI7ISx', 'WWVzdW5n', '7JiI7ISx7J20'].map(x => { try { return decodeURIComponent(escape(atob(x))); } catch (e) { return ''; } }).filter(Boolean);
+      anonName.list.forEach(n => { t = t.split(n).join('JJ'); });
+      return t;
+    }
+    function anonObj(a) { if (!a) return a; a.title = anonName(a.title); a.meta = anonName(a.meta); if (a.notes && typeof a.notes === 'object') Object.keys(a.notes).forEach(k => { a.notes[k] = anonName(a.notes[k]); }); else a.notes = anonName(a.notes); return a; }
+
   const USERNAME = 'hannaj1763-sketch', REPO = 'gallery2026';
   const OPEN_MS = 6000, INTRO_MS = 9000, WORK_MS = 9000;   // 장면마다 머무는 시간
   const qs = new URLSearchParams(location.search);
@@ -200,7 +208,7 @@
     });
     const list = await Promise.all(EX.works.filter(id => imgOf[id]).map(async id => {
       let n = {};
-      try { n = await (await fetch(rawUrl(`artworks/${id}/note.json`))).json(); } catch (e) {}
+      try { n = await (await fetch(rawUrl(`artworks/${id}/note.json`))).json(); } catch (e) {} anonObj(n);
       const meta = cleanMeta(n.meta);
       return { id, src: rawUrl(imgOf[id]), title: n.title || id, date: n.date || '', meta: /^\d{4}-\d{2}(-\d{2})?$/.test(meta) || meta === n.date ? '' : meta };
     }));
@@ -208,7 +216,7 @@
     if (!works.length) return fail('이 전시에 걸린 작품이 아직 없어요.');
 
     $('openTitle').innerText = EX.short || EX.title;
-    $('openSub').innerText = `${(EX.title.match(/^제\d+회[^「]*/) || [''])[0].trim()} · J.J 장예성 · 작품 ${works.length}점`;
+    $('openSub').innerText = `${(EX.title.match(/^제\d+회[^「]*/) || [''])[0].trim()} · JJ · 작품 ${works.length}점`;
     $('introText').innerText = EX.intro || `꼬마 화가 J.J가 그린 작품 ${works.length}점을 모았어요. 천천히 걸으며 감상해 주세요.`;
     $('endSub').innerText = `${EX.title} · AGJJ Art Gallery of Jane Jang`;
     document.title = `AGJJ · ${EX.short || EX.title}`;
@@ -226,7 +234,7 @@
         <div class="frame"><img alt="${w.title}" data-src="${w.src}"></div>
         <div class="label">
           <div class="t">${w.title}</div>
-          <div class="a">J.J 장예성${w.date ? ' · ' + prettyDate(w.date) : ''}</div>
+          <div class="a">JJ${w.date ? ' · ' + prettyDate(w.date) : ''}</div>
           ${w.meta ? `<div class="m">${w.meta}</div>` : ''}
           <div class="n">${String(i + 1).padStart(2, '0')} / ${String(works.length).padStart(2, '0')}</div>
         </div>

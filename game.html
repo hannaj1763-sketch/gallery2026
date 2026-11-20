@@ -7,7 +7,7 @@
 <title>J.J 아트퐁</title>
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <!--
-  J.J 아트퐁: 예성이 작품으로 하는 3개 맞추기 퍼즐
+  J.J 아트퐁: JJ의 작품으로 하는 3개 맞추기 퍼즐
   - 같은 그림 3개 이상을 가로·세로로 맞추면 터져요. 60초 동안 최고 점수에 도전!
   - 4개 이상 맞추면 +2초, 연달아 터지면 콤보 점수
   - 1단계 보석 = 무료 로비 작품 6점. My Collection에 작품을 담을수록 ✨레어 보석이 늘어 2·3·4단계가 열려요.
@@ -69,6 +69,23 @@
   .final { font-size: 54px; color: #ffe27a; margin: 6px 0; text-shadow: 0 3px 0 #9a4a00; }
   .reward { margin-top: 8px; padding: 8px; border-radius: 12px; background: rgba(107,255,176,.12); color: #8dffc4; font-size: 15px; }
   .loading { color: #c9b8f0; font-size: 16px; }
+  .card { max-height: 94vh; overflow-y: auto; }
+  /* 🏆 순위표 */
+  .rank { margin-top: 14px; padding: 10px; border-radius: 16px; background: rgba(0,0,0,.25); border: 1px solid rgba(255,216,107,.25); text-align: left; display: none; }
+  .rank.on { display: block; }
+  .rk-title { text-align: center; color: #ffd86b; font-size: 17px; margin-bottom: 6px; }
+  .rk-tabs { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; margin-bottom: 6px; }
+  .rk-tabs button { font-family: inherit; font-size: 13px; padding: 4px 10px; border-radius: 99px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #ddd0f7; cursor: pointer; }
+  .rk-tabs button.on { background: #ffd86b; color: #3a1d00; border-color: #ffd86b; }
+  .rk-list { max-height: 210px; overflow-y: auto; }
+  .rk-row { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 10px; font-size: 15px; color: #f1e9ff; }
+  .rk-row:nth-child(odd) { background: rgba(255,255,255,.04); }
+  .rk-row.me { background: rgba(255,216,107,.22); color: #fff3c4; }
+  .rk-row .n { width: 26px; text-align: center; flex-shrink: 0; }
+  .rk-row .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rk-row .sc { color: #ffe27a; }
+  .rk-me, .rk-empty { text-align: center; font-size: 13px; color: #c9b8f0; margin-top: 6px; line-height: 1.5; }
+  .rk-me b { color: #ffe27a; }
 </style>
 </head>
 <body>
@@ -94,8 +111,9 @@
     <p>같은 그림을 <b>3개 이상</b> 가로·세로로 맞추면 팡!<br>그림을 밀거나 두 칸을 차례로 누르면 자리가 바뀌어요.<br>4개 이상 맞추면 ⏱ +2초, 연달아 터지면 콤보!</p>
     <div class="gems-preview" id="preview"><span class="loading">그림을 불러오는 중…</span></div>
     <button class="big" id="startBtn" onclick="startGame()" disabled>게임 시작</button>
-    <p style="margin-top:10px; font-size:11px; color:#9d8cc4">© J.J All rights reserved · 그림의 저작권은 작가 장예성(J.J)에게 있어요</p>
     <button class="ghost" id="needTicket" style="display:none" onclick="location.href='./?open=pang'">💧 페인트로 입장권 받으러 가기</button>
+    <div class="rank" id="rankStart"></div>
+    <p style="margin-top:10px; font-size:11px; color:#9d8cc4">© J.J All rights reserved · 그림의 저작권은 작가 JJ에게 있어요</p>
   </div>
 </div>
 
@@ -105,6 +123,7 @@
     <div class="final" id="finalScore">0</div>
     <p id="endMsg"></p>
     <div class="reward" id="rewardMsg" style="display:none"></div>
+    <div class="rank" id="rankEnd"></div>
     <button class="big" id="againBtn" onclick="playAgain()">한 판 더!</button>
     <button class="ghost" onclick="goGallery()">갤러리로 돌아가기</button>
   </div>
@@ -410,6 +429,90 @@
     }
     $('againBtn').innerText = IS_APP ? '💧 1개로 한 판 더!' : '한 판 더!';
     $('endOv').classList.add('on');
+    submitScore(score);
+  }
+
+  // =====================================================================
+  // 🏆 순위표 (앱 + 로그인한 사람만) — Firestore
+  //   pong/s{단계}/all/{uid}         역대 최고 점수
+  //   pong/s{단계}/w{월요일날짜}/{uid}  이번 주 최고 점수 (매주 월요일 0시, 한국 시간에 새로 시작)
+  //   이름은 닉네임만 보여요 (구글 실명 X)
+  // =====================================================================
+  const FIREBASE_CONFIG = { apiKey: "AIzaSyBwlcopOmwqdoZZcXwVIDOPtds85xTJfRM", authDomain: "agjj-adb63.firebaseapp.com", projectId: "agjj-adb63",
+    storageBucket: "agjj-adb63.firebasestorage.app", messagingSenderId: "83235290466", appId: "1:83235290466:web:56aec1eebc3eae0a11403b" };
+  const FB_VER = '10.14.1', K_NICK = 'agjj_nick_v1', RANK_TOP = 10;
+  const escH = t => String(t || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  function weekKey() { const d = new Date(Date.now() + 9 * 3600e3); d.setUTCDate(d.getUTCDate() - (d.getUTCDay() + 6) % 7); return 'w' + d.toISOString().slice(0, 10).replace(/-/g, ''); }
+  let fbP = null;
+  function fbReady() {
+    if (!IS_APP) return Promise.resolve(null);
+    if (!fbP) fbP = (async () => {
+      const base = `https://www.gstatic.com/firebasejs/${FB_VER}/`;
+      const [appM, authM, fsM] = await Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-auth.js'), import(base + 'firebase-firestore.js')]);
+      const app = appM.initializeApp(FIREBASE_CONFIG);
+      const auth = authM.initializeAuth(app, { persistence: [authM.indexedDBLocalPersistence, authM.browserLocalPersistence] });
+      const user = await new Promise(res => { const off = authM.onAuthStateChanged(auth, u => { off(); res(u); }); });
+      if (!user) return null;
+      return { user, db: fsM.getFirestore(app), ...fsM };
+    })().catch(e => { console.log('순위표를 불러오지 못했어요:', e); return null; });
+    return fbP;
+  }
+  const rankCol = (f, n, per) => f.collection(f.db, 'pong', 's' + n, per);
+
+  // 내 점수 올리기 (그 기간 내 최고보다 높을 때만)
+  let lastSubmit = null;
+  async function submitScore(sc) {
+    const box = $('rankEnd');
+    const f = await fbReady();
+    if (!f) { box.classList.remove('on'); return; }
+    const nick = ls.get(K_NICK, '');
+    box.classList.add('on');
+    if (!nick) { box.innerHTML = '<div class="rk-empty">🏷 닉네임을 정하면 순위표에 올라가요.<br>갤러리 → 👤 My → ✏️ 닉네임</div>'; return; }
+    box.innerHTML = '<div class="rk-empty">🏆 순위 확인 중…</div>';
+    const up = {};
+    for (const per of ['all', weekKey()]) {
+      try {
+        const ref = f.doc(rankCol(f, STAGE.n, per), f.user.uid), sn = await f.getDoc(ref);
+        if (sc > 0 && (!sn.exists() || sc > (sn.data().score || 0))) { await f.setDoc(ref, { nick, score: sc, at: Date.now() }); up[per === 'all' ? 'all' : 'week'] = true; }
+      } catch (e) { console.log('점수를 올리지 못했어요:', e); }
+    }
+    lastSubmit = up;
+    rankUI('rankEnd', { stage: STAGE.n, per: 'week', chips: false });
+  }
+
+  // 순위표 그리기  opt: { stage, per: 'week'|'all', chips: 단계 고르기 보이기 }
+  const rankState = {};
+  async function rankUI(id, opt) {
+    const box = $(id), st = rankState[id] = { ...(rankState[id] || {}), ...opt };
+    const f = await fbReady();
+    if (!f) { box.classList.remove('on'); return; }
+    box.classList.add('on');
+    const per = st.per === 'all' ? 'all' : weekKey();
+    const chips = st.chips ? [1, 2, 3, 4].map(n => `<button class="${n === st.stage ? 'on' : ''}" onclick="rankUI('${id}', {stage:${n}})">${n}단계</button>`).join('') : '';
+    box.innerHTML = `<div class="rk-title">🏆 ${st.chips ? '' : st.stage + '단계 '}순위</div>
+      ${chips ? `<div class="rk-tabs">${chips}</div>` : ''}
+      <div class="rk-tabs"><button class="${st.per !== 'all' ? 'on' : ''}" onclick="rankUI('${id}', {per:'week'})">이번 주</button><button class="${st.per === 'all' ? 'on' : ''}" onclick="rankUI('${id}', {per:'all'})">역대</button></div>
+      <div class="rk-list"><div class="rk-empty">불러오는 중…</div></div><div class="rk-me"></div>`;
+    try {
+      const col = rankCol(f, st.stage, per);
+      const top = await f.getDocs(f.query(col, f.orderBy('score', 'desc'), f.limit(RANK_TOP)));
+      if (rankState[id] !== st) return;            // 그새 다른 탭을 눌렀으면 그만
+      const rows = top.docs.map((d, i) => { const v = d.data(); const n = i < 3 ? ['🥇', '🥈', '🥉'][i] : i + 1;
+        return `<div class="rk-row ${d.id === f.user.uid ? 'me' : ''}"><span class="n">${n}</span><span class="nm">${escH(v.nick)}</span><span class="sc">${Number(v.score || 0).toLocaleString()}</span></div>`; }).join('');
+      box.querySelector('.rk-list').innerHTML = rows || `<div class="rk-empty">${st.per === 'all' ? '아직 기록이 없어요.' : '이번 주 첫 기록의 주인공이 되어 보세요!'}</div>`;
+      const mine = await f.getDoc(f.doc(col, f.user.uid));
+      let me = '';
+      if (mine.exists()) {
+        const my = mine.data().score || 0;
+        const above = (await f.getCountFromServer(f.query(col, f.where('score', '>', my)))).data().count;
+        const isNew = id === 'rankEnd' && lastSubmit && lastSubmit[st.per === 'all' ? 'all' : 'week'];
+        me = `${isNew ? '🎉 순위표 기록 갱신! ' : ''}내 ${st.per === 'all' ? '역대' : '이번 주'} 최고 <b>${my.toLocaleString()}점</b> · <b>${above + 1}위</b>`;
+      } else me = ls.get(K_NICK, '') ? '아직 내 기록이 없어요. 한 판 하면 올라가요!' : '🏷 닉네임을 정하면 순위표에 올라가요 (My → ✏️ 닉네임)';
+      if (rankState[id] === st) box.querySelector('.rk-me').innerHTML = me;
+    } catch (e) {
+      console.log('순위표 오류:', e);
+      if (rankState[id] === st) box.querySelector('.rk-list').innerHTML = '<div class="rk-empty">순위표를 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.</div>';
+    }
   }
   function goGallery() { location.href = './'; }
   function playAgain() { if (IS_APP) location.href = './?open=pang'; else startGame(); }
@@ -427,6 +530,8 @@
   $('best').innerText = ls.get(K_BEST + '_' + STAGE.n, 0).toLocaleString();
   layout();
   loadArt();
+  { const q = Number(new URLSearchParams(location.search).get('rank')) || 0;     // ?rank=1 : 순위만 보러 왔을 때
+    rankUI('rankStart', { stage: q >= 1 && q <= 4 && !ticketOk ? q : STAGE.n, per: 'week', chips: true }); }
 </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>예성이 이모티콘 공방</title>
+  <title>JJ 이모티콘 공방</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
   <style>
@@ -72,7 +72,7 @@
 <body>
 <div class="topbar"><a href="./">← Gallery</a></div>
 <div class="wrap">
-  <h1>Yesung's Emoticon Studio</h1>
+  <h1>JJ's Emoticon Studio</h1>
   <div class="sub">작품에서 캐릭터를 오려 카카오톡 이모티콘(360×360)으로 만들어요</div>
 
   <!-- 1. 캐릭터 고르기 -->
@@ -134,10 +134,10 @@
     <div class="step"><b>4</b>문구 고르기</div>
     <span class="opt-label" style="margin-top:0">글씨체</span>
     <div class="chips" id="fontChips" style="margin:4px 0 4px"></div>
-    <div class="hint" style="margin:0 0 12px">저장소에 글씨체 파일(.woff, .ttf)을 올리면 여기에 자동으로 생겨요. 파일 이름이 글씨체 이름이 돼요. (예: 예성체.woff)</div>
+    <div class="hint" style="margin:0 0 12px">저장소에 글씨체 파일(.woff, .ttf)을 올리면 여기에 자동으로 생겨요. 파일 이름이 글씨체 이름이 돼요. (예: JJ체.woff)</div>
     <span class="opt-label" style="margin-top:0">문구</span>
     <div class="chips" id="chips"></div>
-    <input type="text" id="customText" placeholder="직접 쓰기 (예: 예성이 최고)" maxlength="12">
+    <input type="text" id="customText" placeholder="직접 쓰기 (예: JJ 최고)" maxlength="12">
     <span class="opt-label">글자 위치</span>
     <div class="seg" id="posSeg"><button data-v="top">위</button><button data-v="bottom" class="on">아래</button></div>
     <span class="opt-label">글자 색</span>
@@ -221,7 +221,7 @@
   const BG_COLORS = ['transparent', '#FFF1C9', '#FFE0E6', '#DDEEFF', '#E3F6DF', '#EDE4FF', '#FFE7D1'];
   let phrase = '', textPos = 'bottom', textColor = COLORS[0], outlineR = 9, bgColor = BG_COLORS[0];
   // 글씨체 목록: 주아체 + 저장소에 올린 글씨체 파일들(자동으로 찾음). 글씨체에 없는 글자는 주아체로 대신 보여요.
-  const FONT_ALIAS = { hanna1: '한나체1', yesung: '예성체', yesung2: '예성체2', hanna2: '한나체2', circuit: '회로숫자' };   // 영어 파일 이름을 한글 이름으로 보여 주기
+  const FONT_ALIAS = { hanna1: '한나체1', yesung: 'JJ체', yesung2: 'JJ체2', hanna2: '한나체2', circuit: '회로숫자' };   // 영어 파일 이름을 한글 이름으로 보여 주기
   const fonts = [{ label: '주아체', family: 'Jua' }];
   let fontFamily = 'Jua';
   const fontStack = () => fontFamily === 'Jua' ? 'Jua, sans-serif' : `"${fontFamily}", Jua, sans-serif`;
@@ -885,7 +885,7 @@
   loadRepoFonts();
 
   // ================= 저장 (한 장씩) =================
-  function fileName(i) { return `yesung_emoticon_${String(i + 1).padStart(2, '0')}.png`; }
+  function fileName(i) { return `jj_emoticon_${String(i + 1).padStart(2, '0')}.png`; }
   function dataUrlToFile(url, name) {
     const bin = atob(url.split(',')[1]);
     const arr = new Uint8Array(bin.length);
@@ -912,7 +912,7 @@
     render(true);
     const url = pv.toDataURL('image/png');
     render();
-    NativeApp.shareFile(url, 'yesung_emoticon.png');
+    NativeApp.shareFile(url, 'jj_emoticon.png');
   }
   if (NativeApp) document.getElementById('appShareRow').style.display = '';
   function saveCurrent() {

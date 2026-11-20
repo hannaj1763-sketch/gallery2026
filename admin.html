@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>예성이 갤러리 - 간편 업로드 스튜디오</title>
+  <title>JJ 갤러리 - 간편 업로드 스튜디오</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif; background: #0f1115; color: #f0f2f5; padding: 20px; line-height: 1.5; }
@@ -74,8 +74,8 @@
   </div>
 
   <div class="form-group">
-    <label for="artNoteKo">예성이의 생각 및 메모 (한국어)</label>
-    <textarea id="artNoteKo" rows="3" placeholder="예성이가 그림을 그릴 때 한 말이나 생각을 편하게 적어주세요"></textarea>
+    <label for="artNoteKo">작가의 생각 및 메모 (한국어)</label>
+    <textarea id="artNoteKo" rows="3" placeholder="작가가 그림을 그릴 때 한 말이나 생각을 편하게 적어주세요"></textarea>
   </div>
 
   <button class="btn-submit" id="submitBtn" onclick="uploadArtwork()">전시관에 즉시 발행</button>
@@ -364,10 +364,10 @@
         meta: meta || date,
         notes: {
           ko: noteKo || "작품 설명이 등록되었습니다.",
-          en: `Artwork: ${title}. Created by artist Yesung Jang.`,
-          ja: `作品：${title}。作家チャン・イェソンの作品です。`,
-          zh: `作品：《${title}》。张艺成艺术家的画作。`,
-          es: `Obra: ${title}. Creada por el artista Yesung Jang.`
+          en: `Artwork: ${title}. Created by artist JJ.`,
+          ja: `作品：${title}。作家JJの作品です。`,
+          zh: `作品：《${title}》。JJ艺术家的画作。`,
+          es: `Obra: ${title}. Creada por el artista JJ.`
         }
       };
       msg.innerText = '작품 메모 생성 중...';
