@@ -391,6 +391,133 @@
     .visit-bar.has-exit { width: calc(100vw - 24px); flex-wrap: nowrap; }      /* 한 줄로: 전시 이름이 길면 … 로 줄임 */
     .visit-bar.has-exit .visit-pill { flex-shrink: 0; padding: 7px 10px; }
     .visit-bar.has-exit .visit-pill.live { flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    /* 🧠 아트메모리게임 */
+    .mem { display: none; position: fixed; inset: 0; z-index: 160; overflow-y: auto; background: radial-gradient(circle at 50% 0%, #fff6ec, #fbe3e3 60%, #f6dbe6); padding: 14px 10px 30px; }
+    .mem.on { display: block; }
+    .mem-box { position: relative; max-width: 520px; margin: 0 auto; background: #fffcf6; border: 2px solid #e7738b; border-radius: 26px; padding: 22px 16px 20px; box-shadow: 0 0 0 6px #fffcf6, 0 0 0 7px #f6b8c4, 0 16px 40px rgba(200,70,100,.15); text-align: center; color: #8a3a4a; }
+    .mem-x { position: absolute; top: 10px; right: 12px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #f3c2cb; background: #fff; color: #c2415a; font-size: 16px; cursor: pointer; }
+    .mem-k { font-family: Georgia, serif; font-size: 11.5px; letter-spacing: 2.5px; color: #d14563; }
+    .mem-t { font-size: 27px; font-weight: 900; color: #e03e62; margin: 4px 0 2px; letter-spacing: -.5px; }
+    .mem-s { font-size: 13px; color: #a8606e; }
+    .mem-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 16px 0 10px; }
+    .mem-stats div { background: #fff2e2; border: 1px solid #f6c9cf; border-radius: 14px; padding: 8px 0; }
+    .mem-stats b { display: block; font-family: Georgia, serif; font-size: 24px; color: #e03e62; font-weight: 400; } .mem-stats small { font-size: 11px; color: #b07a82; }
+    .mem-bar { height: 7px; border-radius: 6px; background: #fbe0e5; overflow: hidden; margin-bottom: 14px; }
+    .mem-bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #f0517a, #f8a24c); transition: width 1s linear; }
+    .mem-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; perspective: 900px; }
+    .mem-c { position: relative; aspect-ratio: 3 / 4; border: none; padding: 0; background: none; cursor: pointer; }
+    .mem-in { position: absolute; inset: 0; transition: transform .45s; transform-style: preserve-3d; }
+    .mem-c.up .mem-in, .mem-c.done .mem-in { transform: rotateY(180deg); }
+    .mem-back, .mem-front { position: absolute; inset: 0; border-radius: 12px; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; }
+    .mem-back { background: linear-gradient(160deg, #f0517a, #db2f59); box-shadow: 0 3px 0 #f6a3b6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #fff3df; }
+    .mem-back::after { content: ''; position: absolute; inset: 5px; border: 1px solid rgba(255,243,223,.7); border-radius: 8px; }
+    .mem-back span { position: absolute; top: 7px; left: 9px; font-family: Georgia, serif; font-size: 11px; opacity: .85; }
+    .mem-back svg { width: 34%; } .mem-back b { font-family: Georgia, serif; font-size: 7.5px; letter-spacing: 1px; font-weight: 400; }
+    .mem-front { transform: rotateY(180deg); background: #fff center/cover no-repeat; border: 2px solid #f0517a; display: flex; align-items: center; justify-content: center; font-size: 34px; }
+    .mem-c.done .mem-front { border-color: #f8a24c; box-shadow: 0 0 0 3px #ffe2b8; }
+    .mem-c.done::after { content: '✦'; position: absolute; top: 4px; right: 6px; color: #f8a24c; font-size: 14px; }
+    .mem-foot { margin-top: 16px; }
+    .mem-go { background: #e03e62; color: #fff; border: none; border-radius: 22px; padding: 13px 34px; font-size: 16px; font-weight: 800; box-shadow: 0 4px 0 #f6a3b6; cursor: pointer; }
+    .mem-go.sub { background: #fff; color: #e03e62; border: 1px solid #f3c2cb; box-shadow: none; margin-left: 6px; }
+    .mem-rule { font-size: 12px; color: #b07a82; margin-top: 10px; }
+    .mem-res { font-size: 20px; font-weight: 900; color: #e03e62; } .mem-res + p { font-size: 13.5px; color: #8a3a4a; line-height: 1.7; margin: 6px 0 14px; }
+    .mem-shake { animation: memShake .35s; } @keyframes memShake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+    /* 💬 아트톡 */
+    .tlk { max-width: 640px; margin: 0 auto; padding: 4px 0 30px; }
+    body.has-visit .tlk { padding-top: 56px; }   /* 위쪽 Exhibitions·Play·My 알약에 가리지 않게 */
+    body.has-visit .tlk-msgs { height: calc(100vh - 345px); }
+    .tlk-dot { display: none; min-width: 16px; height: 16px; line-height: 16px; padding: 0 4px; margin-left: 4px; border-radius: 9px; background: #ef4444; color: #fff; font-size: 10px; font-style: normal; font-weight: 800; vertical-align: 1px; }
+    .tlk-safe { background: #12261c; border: 1px solid #1f5135; color: #bbf7d0; border-radius: 14px; padding: 11px 14px; font-size: 13px; line-height: 1.55; }
+    .tlk-sec { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 18px 0 8px; font-size: 15px; font-weight: 800; color: #e2e8f0; }
+    .tlk-sec > span { color: #94a3b8; font-weight: 600; font-size: 13px; }
+    .tlk-hide { margin-left: auto; font-size: 12px; font-weight: 500; color: #94a3b8; display: flex; align-items: center; gap: 4px; }
+    .tlk-new { margin-left: auto; background: #f59e0b; color: #1a1a1a; border: none; border-radius: 16px; padding: 6px 12px; font-size: 12.5px; font-weight: 800; cursor: pointer; }
+    .tlk-new.alt { margin-left: 0; background: #222733; color: #fde68a; border: 1px solid rgba(253,230,138,.3); }
+    .tlk-online { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+    .tlk-online button { flex: none; display: flex; align-items: center; gap: 6px; background: #1b2130; border: 1px solid rgba(255,255,255,.1); color: #e2e8f0; border-radius: 18px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+    .tlk-online i { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+    .tlk-none { color: #7c8799; font-size: 13px; line-height: 1.6; }
+    .tlk-room { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; background: #161a22; border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 12px; margin-bottom: 8px; color: #e2e8f0; cursor: pointer; position: relative; font: inherit; }
+    .tlk-room.inv { border-color: rgba(245,158,11,.45); background: #221c10; }
+    .tlk-av { flex: none; width: 42px; height: 42px; border-radius: 14px; background: #222a3a; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .tlk-rb { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .tlk-rb b { font-size: 15px; } .tlk-rb b small { color: #7c8799; font-weight: 500; font-size: 12px; }
+    .tlk-rb > small { color: #94a3b8; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tlk-rb em { font-style: normal; color: #fbbf24; font-size: 11.5px; }
+    .tlk-un { position: absolute; right: 12px; top: 12px; width: 9px; height: 9px; border-radius: 50%; background: #ef4444; }
+    .tlk-rq { flex: none; background: #f59e0b; color: #1a1a1a; border-radius: 10px; padding: 3px 8px; font-size: 12px; font-weight: 800; }
+    .tlk-ok, .tlk-no { flex: none; border: none; border-radius: 10px; padding: 8px 12px; font-weight: 800; cursor: pointer; }
+    .tlk-ok { background: #f59e0b; color: #1a1a1a; } .tlk-no { background: #2a3040; color: #cbd5e1; }
+    .tlk-sheet { max-width: 420px; max-height: 86vh; overflow-y: auto; }
+    .tlk-in { width: 100%; background: #0f1218; border: 1px solid rgba(255,255,255,.15); color: #fff; border-radius: 12px; padding: 12px; font-size: 15px; margin: 8px 0; }
+    .tlk-in.code { text-align: center; font-size: 22px; letter-spacing: 4px; font-weight: 800; text-transform: uppercase; }
+    .tlk-types { display: flex; flex-direction: column; gap: 6px; text-align: left; }
+    .tlk-types label { display: flex; gap: 10px; align-items: flex-start; background: #0f1218; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 10px; cursor: pointer; }
+    .tlk-types label:has(input:checked) { border-color: #f59e0b; background: #221c10; }
+    .tlk-types span { display: flex; flex-direction: column; gap: 2px; } .tlk-types small { color: #94a3b8; font-size: 12px; line-height: 1.4; }
+    .tlk-sched { margin-top: 10px; text-align: left; }
+    .tlk-days { display: flex; gap: 5px; justify-content: space-between; }
+    .tlk-days label { flex: 1; } .tlk-days input { display: none; }
+    .tlk-days span { display: block; text-align: center; padding: 8px 0; border-radius: 10px; background: #0f1218; border: 1px solid rgba(255,255,255,.12); color: #cbd5e1; font-weight: 700; cursor: pointer; }
+    .tlk-days input:checked + span { background: #f59e0b; color: #1a1a1a; border-color: #f59e0b; }
+    .tlk-time { margin-top: 10px; color: #cbd5e1; font-size: 14px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .tlk-time input, .tlk-time select { background: #0f1218; color: #fff; border: 1px solid rgba(255,255,255,.15); border-radius: 10px; padding: 8px; font-size: 15px; }
+    .tlk-pick { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+    .tlk-pick button { display: flex; justify-content: space-between; align-items: center; background: #0f1218; border: 1px solid rgba(255,255,255,.12); color: #e2e8f0; border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .tlk-pick button small { color: #94a3b8; font-weight: 500; } .tlk-pick button:disabled { opacity: .5; }
+    .tlk-ghost { width: 100%; margin-top: 8px; background: #1b2130; border: 1px solid rgba(255,255,255,.1); color: #e2e8f0; border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .tlk-ghost.red { color: #fca5a5; }
+    .tlk-top { display: flex; align-items: center; gap: 8px; background: #161a22; border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 8px; }
+    .tlk-back { flex: none; width: 40px; height: 40px; border-radius: 12px; border: none; background: #222a3a; color: #fff; font-size: 18px; cursor: pointer; }
+    .tlk-tt { flex: 1; min-width: 0; display: flex; flex-direction: column; } .tlk-tt b { font-size: 16px; } .tlk-tt small { color: #fbbf24; font-size: 11.5px; }
+    .tlk-req { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; background: #221c10; border: 1px solid rgba(245,158,11,.4); color: #fde68a; border-radius: 12px; padding: 9px 12px; margin-top: 8px; font-size: 13.5px; }
+    .tlk-req button { margin-left: auto; border: none; border-radius: 9px; padding: 6px 12px; background: #f59e0b; color: #1a1a1a; font-weight: 800; cursor: pointer; }
+    .tlk-req button.no { margin-left: 0; background: #2a3040; color: #cbd5e1; }
+    .tlk-msgs { height: calc(100vh - 290px); min-height: 280px; overflow-y: auto; padding: 10px 2px; display: flex; flex-direction: column; gap: 6px; }
+    .tlk-day { align-self: center; color: #7c8799; font-size: 11.5px; background: #161a22; border-radius: 10px; padding: 3px 10px; margin: 8px 0; }
+    .tlk-m { display: flex; flex-direction: column; align-items: flex-start; max-width: 80%; }
+    .tlk-m.me { align-self: flex-end; align-items: flex-end; }
+    .tlk-n { font-size: 12px; color: #94a3b8; margin: 0 0 3px 4px; }
+    .tlk-bub { background: #222a3a; color: #f1f5f9; border-radius: 4px 16px 16px 16px; padding: 9px 12px; font-size: 14.5px; line-height: 1.5; word-break: break-word; cursor: pointer; }
+    .tlk-m.me .tlk-bub { background: #f59e0b; color: #1a1a1a; border-radius: 16px 4px 16px 16px; }
+    .tlk-bub.rich { padding: 6px; background: #1b2130; color: #f1f5f9; }
+    .tlk-m.me .tlk-bub.rich { background: #3a2a0c; color: #f1f5f9; }
+    .tlk-img { display: block; max-width: 220px; max-height: 260px; border-radius: 12px; }
+    .tlk-cap { font-size: 12.5px; padding: 5px 4px 1px; color: #cbd5e1; }
+    .tlk-card { display: flex; gap: 10px; align-items: center; padding: 4px; } .tlk-card img { width: 56px; height: 56px; object-fit: cover; border-radius: 10px; }
+    .tlk-play { width: 100%; margin-top: 6px; border: none; border-radius: 10px; padding: 8px; background: #8b5cf6; color: #fff; font-weight: 800; cursor: pointer; }
+    .tlk-word { position: relative; width: 230px; border-radius: 12px; overflow: hidden; background: #111; }
+    .tlk-word img { width: 100%; height: 150px; object-fit: cover; display: block; opacity: .55; }
+    .tlk-word div { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 12px; text-shadow: 0 1px 4px #000; }
+    .tlk-word p { margin: 0 0 6px; font-size: 13.5px; line-height: 1.5; color: #fff; } .tlk-word b { font-size: 12px; color: #fde68a; }
+    .tlk-word img + div { background: linear-gradient(transparent, rgba(0,0,0,.35)); }
+    .tlk-meta { display: flex; gap: 4px; align-items: center; margin-top: 3px; font-size: 11px; color: #7c8799; }
+    .tlk-meta span { background: #1b2130; border-radius: 10px; padding: 1px 6px; font-size: 12px; }
+    .tlk-input { display: flex; gap: 6px; align-items: center; background: #161a22; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 6px; }
+    .tlk-input input { flex: 1; min-width: 0; background: transparent; border: none; color: #fff; font-size: 15px; padding: 8px 4px; outline: none; }
+    .tlk-plus { flex: none; width: 38px; height: 38px; border-radius: 12px; border: none; background: #222a3a; color: #fde68a; font-size: 20px; cursor: pointer; }
+    .tlk-send { flex: none; border: none; border-radius: 12px; padding: 10px 14px; background: #f59e0b; color: #1a1a1a; font-weight: 800; cursor: pointer; }
+    .tlk-closed { text-align: center; background: #161a22; border: 1px dashed rgba(255,255,255,.15); border-radius: 14px; padding: 12px; color: #cbd5e1; font-size: 14px; line-height: 1.6; }
+    .tlk-closed small { color: #7c8799; }
+    .tlk-tabs { display: flex; gap: 6px; margin: 8px 0 12px; } .tlk-tabs button { flex: 1; background: #0f1218; border: 1px solid rgba(255,255,255,.12); color: #cbd5e1; border-radius: 10px; padding: 9px 0; font-weight: 700; cursor: pointer; font-size: 13px; }
+    .tlk-tabs button.on { background: #f59e0b; color: #1a1a1a; border-color: #f59e0b; }
+    .tlk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .tlk-grid button { background: #0f1218; border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: 4px; cursor: pointer; color: #cbd5e1; }
+    .tlk-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; display: block; } .tlk-grid small { display: block; font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; }
+    .tlk-list { display: flex; flex-direction: column; gap: 6px; text-align: left; }
+    .tlk-list button { display: flex; gap: 10px; align-items: center; background: #0f1218; border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: 6px; color: #e2e8f0; cursor: pointer; text-align: left; }
+    .tlk-list img { width: 44px; height: 44px; object-fit: cover; border-radius: 8px; } .tlk-list span { display: flex; flex-direction: column; min-width: 0; } .tlk-list small { color: #94a3b8; font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tlk-rx { display: flex; justify-content: space-around; margin-bottom: 6px; }
+    .tlk-rx button { width: 58px; height: 58px; border-radius: 16px; background: #0f1218; border: 1px solid rgba(255,255,255,.12); font-size: 28px; cursor: pointer; }
+    .tlk-rx button.on { border-color: #f59e0b; background: #221c10; }
+    .tlk-code { background: #0f1218; border-radius: 12px; padding: 10px; color: #cbd5e1; font-size: 14px; } .tlk-code b { color: #fde68a; font-size: 22px; letter-spacing: 3px; margin-left: 6px; }
+    .tlk-mems { text-align: left; display: flex; flex-direction: column; gap: 4px; }
+    .tlk-mem { display: flex; align-items: center; gap: 6px; background: #0f1218; border-radius: 10px; padding: 8px 10px; font-size: 14px; color: #e2e8f0; }
+    .tlk-mem.dim { color: #94a3b8; } .tlk-mem button { margin-left: auto; background: #2a3040; color: #fca5a5; border: none; border-radius: 8px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
+    .tlk-gate { text-align: center; background: #161a22; border: 1px solid rgba(255,255,255,.1); border-radius: 18px; padding: 28px 20px; margin-top: 10px; color: #e2e8f0; }
+    .tlk-gate .i { font-size: 44px; margin-bottom: 8px; } .tlk-gate b { font-size: 18px; display: block; }
+    .tlk-gate p { color: #94a3b8; font-size: 14px; line-height: 1.7; margin: 10px 0 18px; }
+    .tlk-gate small { display: block; color: #7c8799; font-size: 12px; margin-top: 12px; }
     .tk-modal { display: none; position: fixed; inset: 0; z-index: 130; background: rgba(8,10,14,0.88); align-items: center; justify-content: center; padding: 20px; }
     .tk-modal.active { display: flex; }
     .tk-box { background: #161a22; border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; padding: 22px 20px; width: 100%; max-width: 360px; text-align: center; }
@@ -469,12 +596,72 @@
     .box-card.empty { display: flex; align-items: center; justify-content: center; aspect-ratio: 1 / 1; color: #64748b; font-size: 13px; border: 2px dashed #334155; background: none; }
     .box-view-img { max-width: 100%; max-height: 52vh; display: block; margin: 0 auto 10px; border-radius: 8px; }
 
-    #loadingText { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #8a99ad; font-size: 14px; z-index: 200; pointer-events: none; }
+    /* ✦ 기다림 화면: 액자 문 두 짝이 열리며 예성이 그림이 보여요 (12월 1~25일은 크리스마스) */
+    #loadingText { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px;
+      background: radial-gradient(circle at 50% 45%, #fff8ea 0%, #f8ead9 70%, #f1dfcc 100%); color: #a8424f; transition: opacity .5s; overflow: hidden; }
+    #loadingText.out { opacity: 0; pointer-events: none; }
+    .sp-k { font-family: Georgia, 'Times New Roman', serif; letter-spacing: 3px; font-size: 13px; color: #a8424f; }
+    .sp-c { position: relative; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, #fff9ee 55%, #f3e3d2 100%);
+      border: 1px solid #e6cfc0; box-shadow: 0 20px 50px rgba(168,66,79,.12); display: flex; align-items: center; justify-content: center; perspective: 900px; }
+    .sp-frame { position: relative; width: 190px; height: 228px; }
+    .sp-in { position: absolute; inset: 6px; border-radius: 6px; background: #fff center/cover no-repeat; box-shadow: inset 0 0 0 3px #f4d9d2, 0 0 0 2px #b9616d; transition: background-image .6s; }
+    .sp-in.empty { background-image: none; display: flex; align-items: center; justify-content: center; }
+    .sp-door { position: absolute; top: 0; width: 50%; height: 100%; background: #fffaf2; border: 3px solid #b9616d; box-sizing: border-box;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; animation-duration: 1.4s; animation-fill-mode: both; animation-timing-function: cubic-bezier(.6,.05,.3,1); animation-delay: .7s; }
+    .sp-door::after { content: ''; position: absolute; inset: 6px; border: 2px solid #ecc4bc; border-radius: 3px; pointer-events: none; }
+    .sp-door.l { left: 0; border-radius: 10px 2px 2px 10px; transform-origin: left center; animation-name: spOpenL; }
+    .sp-door.r { right: 0; border-radius: 2px 10px 10px 2px; transform-origin: right center; animation-name: spOpenR; }
+    .sp-door i { font-style: normal; color: #d79aa1; font-size: 16px; }
+    .sp-door b { font-family: Georgia, serif; font-size: 11px; letter-spacing: 2px; color: #a8424f; font-weight: 400; }
+    .sp-door svg { width: 56px; height: 74px; }
+    @keyframes spOpenL { from { transform: rotateY(0); } to { transform: rotateY(-78deg); } }
+    @keyframes spOpenR { from { transform: rotateY(0); } to { transform: rotateY(78deg); } }
+    .sp-t { font-size: 16px; color: #b5424f; letter-spacing: -.2px; }
+    .sp-s { font-size: 12px; color: #b9938d; margin-top: -14px; }
+    .sp-snow { position: absolute; top: -10px; color: #fff; text-shadow: 0 0 3px #e6b7b0; animation: spSnow linear infinite; pointer-events: none; }
+    @keyframes spSnow { to { transform: translateY(110vh) translateX(20px); } }
+    @media (prefers-reduced-motion: reduce) { .sp-door { animation-duration: .01s; animation-delay: 0s; } .sp-snow { display: none; } }
   </style>
 </head>
 <body>
 
-  <div id="loadingText">전시관 아틀리에 큐레이팅 중...</div>
+  <div id="loadingText" role="status" aria-label="전시관 아틀리에 큐레이팅 중">
+    <div class="sp-k" id="spKick">THE ATELIER OPENS</div>
+    <div class="sp-c"><div class="sp-frame">
+      <div class="sp-in empty" id="spArt"><svg viewBox="0 0 80 60" width="90"><ellipse cx="40" cy="32" rx="34" ry="24" fill="#f6dccf" stroke="#b9616d" stroke-width="2"/><circle cx="52" cy="40" r="6" fill="#fffaf2" stroke="#b9616d" stroke-width="2"/><circle cx="22" cy="26" r="5" fill="#e0707c"/><circle cx="36" cy="18" r="5" fill="#f2c063"/><circle cx="52" cy="22" r="5" fill="#8a9a85"/><circle cx="24" cy="42" r="5" fill="#7d9bc9"/></svg></div>
+      <div class="sp-door l" id="spL"></div><div class="sp-door r" id="spR"></div>
+    </div></div>
+    <div class="sp-t" id="spT">예성이의 아틀리에로 들어가요</div>
+    <div class="sp-s">전시관 아틀리에 큐레이팅 중…</div>
+  </div>
+  <script>
+    // 기다림 화면 꾸미기 (페이지를 그리기 전에 바로)
+    (function () {
+      var now = new Date(), xmas = now.getMonth() === 11 && now.getDate() <= 25;
+      var tree = '<svg viewBox="0 0 56 74"><polygon points="28,4 50,60 6,60" fill="#8a9a85"/><rect x="5" y="58" width="46" height="4" fill="#c9a28f"/><rect x="25" y="58" width="6" height="12" fill="#b98c79"/></svg>';
+      var brush = '<svg viewBox="0 0 56 74"><rect x="24" y="4" width="8" height="40" rx="3" fill="#c9a28f" transform="rotate(18 28 37)"/><rect x="22" y="42" width="12" height="7" fill="#b9616d" transform="rotate(18 28 37)"/><path d="M22 49 h12 l-3 16 q-3 6 -6 0 z" fill="#e0707c" transform="rotate(18 28 37)"/></svg>';
+      var pal = '<svg viewBox="0 0 56 74"><ellipse cx="28" cy="38" rx="22" ry="17" fill="#f6dccf" stroke="#b9616d" stroke-width="2"/><circle cx="36" cy="44" r="4" fill="#fffaf2" stroke="#b9616d" stroke-width="2"/><circle cx="17" cy="34" r="3.5" fill="#e0707c"/><circle cx="26" cy="27" r="3.5" fill="#f2c063"/><circle cx="37" cy="29" r="3.5" fill="#8a9a85"/><circle cx="19" cy="44" r="3.5" fill="#7d9bc9"/></svg>';
+      document.getElementById('spL').innerHTML = '<i>✧</i>' + (xmas ? tree : brush) + '<b>J.J</b>';
+      document.getElementById('spR').innerHTML = '<i>✧</i>' + (xmas ? tree : pal) + '<b>AGJJ</b>';
+      if (xmas) {
+        document.getElementById('spKick').textContent = 'THE CHRISTMAS ATELIER';
+        document.getElementById('spT').textContent = '크리스마스 아틀리에로 들어가요';
+        var box = document.getElementById('loadingText');
+        for (var i = 0; i < 18; i++) { var f = document.createElement('span'); f.className = 'sp-snow'; f.textContent = i % 3 ? '•' : '❄';
+          f.style.left = (Math.random() * 100) + '%'; f.style.fontSize = (6 + Math.random() * 8) + 'px'; f.style.opacity = .5 + Math.random() * .5;
+          f.style.animationDuration = (6 + Math.random() * 6) + 's'; f.style.animationDelay = (-Math.random() * 8) + 's'; box.appendChild(f); }
+      }
+      // 문 안쪽 그림: 지난번에 저장해 둔 무료 대표작·내 컬렉션 그림 (처음엔 팔레트)
+      try {
+        var list = JSON.parse(localStorage.getItem('agjj_splash_v1') || '[]');
+        if (list.length) { var el = document.getElementById('spArt'), k = Math.floor(Math.random() * list.length);
+          var show = function () { el.classList.remove('empty'); el.innerHTML = ''; el.style.backgroundImage = 'url("' + list[k % list.length] + '")'; k++; };
+          var im = new Image(); im.onload = show; im.src = list[k % list.length];
+          window.__spTimer = setInterval(function () { var n = new Image(); n.onload = show; n.src = list[k % list.length]; }, 2600); }
+      } catch (e) {}
+      window.__spStart = Date.now();
+    })();
+  </script>
 
   <header>
     <div style="font-weight: 700; font-size: 16px; letter-spacing: -0.5px;">Atelier Archive</div>
@@ -485,6 +672,7 @@
       <button class="tab-btn" onclick="switchView('store')"><span class="lbl-long">📦 Emoticon Library</span><span class="lbl-short">📦 Library</span></button>
       <button class="tab-btn" onclick="switchView('bbb')"><span class="lbl-long">📖 BBB 말씀</span><span class="lbl-short">📖 BBB</span></button>
       <button class="tab-btn" onclick="switchView('senior')"><span class="lbl-long">🌿 시니어 활동</span><span class="lbl-short">🌿 시니어</span></button>
+      <button class="tab-btn" onclick="switchView('talk')">💬 아트톡<i class="tlk-dot" id="talkDot"></i></button>
       <a class="tab-btn studio-tab" href="emoticon.html"><span class="lbl-long">🎨 Emoticon Studio</span><span class="lbl-short">🎨 Studio</span></a>
     </div>
     <div class="header-note" style="font-size:12px; color:#8a99ad;">Large Frame Mode</div>
@@ -832,6 +1020,22 @@
 
   <!-- 🌿 시니어 인지 활동 프로그램 -->
   <div id="view-senior" class="view-container"><div class="sn" id="seniorBox"></div></div>
+  <!-- 🧠 아트메모리게임 -->
+  <div id="memModal" class="mem" role="dialog" aria-label="아트메모리게임"><div class="mem-box">
+    <button class="mem-x" onclick="closeMem()" aria-label="닫기">✕</button>
+    <div class="mem-k" id="memKick">A LITTLE ART MAGIC</div>
+    <div class="mem-t">아트메모리게임</div>
+    <div class="mem-s" id="memSub">카드를 뒤집어 같은 그림 8쌍을 찾아요</div>
+    <div class="mem-stats"><div><b id="memTime">60</b><small>남은 시간 · 초</small></div><div><b id="memScore">0</b><small>MY SCORE</small></div><div><b id="memFound">0 / 8</b><small>찾은 그림</small></div></div>
+    <div class="mem-bar"><i id="memBar"></i></div>
+    <div class="mem-grid" id="memGrid"></div>
+    <div class="mem-foot" id="memFoot"></div>
+  </div></div>
+  <!-- 💬 아트톡 -->
+  <div id="view-talk" class="view-container"><div class="tlk" id="talkBox"></div></div>
+  <div id="talkSheet" class="tk-modal" onclick="if (event.target === this) closeModal('talkSheet')" style="z-index:165">
+    <div class="tk-box tlk-sheet" id="talkSheetBox"></div>
+  </div>
 
   <div id="view-store" class="view-container">
     <button class="back-gallery" onclick="switchView('3d')">← Gallery</button>
@@ -965,6 +1169,20 @@
       return String(meta || '').replace(/^\s*종이\s*위\s*(원화|그림)\s*\|?\s*/, '').trim();
     }
 
+    // 기다림 화면 닫기: 문이 열리는 모습은 보이게 (최소 1.6초) 천천히 사라져요
+    function hideSplash() {
+      const el = document.getElementById('loadingText'); if (!el || el.dataset.out) return; el.dataset.out = '1';
+      setTimeout(() => { el.classList.add('out'); clearInterval(window.__spTimer); setTimeout(() => { el.style.display = 'none'; }, 520); },
+        Math.max(0, 1600 - (Date.now() - (window.__spStart || 0))));
+    }
+    // 다음 기다림 화면에 쓸 그림: 무료 대표작 + 내 컬렉션 (잠긴 그림은 넣지 않아요)
+    function saveSplashArt() {
+      try {
+        const ids = [...((EXCFG && EXCFG.lobby) || []), ...((lsGet(K_BOX, { ids: [] }).ids) || [])];
+        const src = [...new Set(ids)].map(id => (allArtworks.find(a => a.id === id) || {}).src).filter(Boolean).slice(0, 12);
+        if (src.length) localStorage.setItem('agjj_splash_v1', JSON.stringify(src));
+      } catch (e) {}
+    }
     function readCache() {
       try {
         const raw = localStorage.getItem(CACHE_KEY);
@@ -1276,15 +1494,16 @@
     };          // ← Firebase 콘솔의 firebaseConfig { apiKey, authDomain, projectId, appId ... } 를 여기에
     const GOOGLE_WEB_CLIENT_ID = '83235290466-phg2k92809cr7rp7qqtrbib4tev4bqku.apps.googleusercontent.com';       // ← Authentication > Google > 웹 SDK 구성의 '웹 클라이언트 ID'
     const FB_VER = '10.14.1';
-    var K_UID = 'agjj_uid_v1', K_NICK = 'agjj_nick_v1', K_BONUS = 'agjj_bonus_v1';   // 보상 기록 (가입 선물·출석·오늘의 물감·광고 횟수)
+    var K_UID = 'agjj_uid_v1', K_NICK = 'agjj_nick_v1', K_BONUS = 'agjj_bonus_v1', K_AGE = 'agjj_age_v1';   // K_AGE: 💬 아트톡 만 14세 이상 확인 { ok, at } (생년월일은 받지 않아요)
+      // 보상 기록 (가입 선물·출석·오늘의 물감·광고 횟수)
     var K_SENIOR = 'agjj_senior_v1';   // 🌿 시니어 인지 활동 기록 { 날짜: [한 단계들] }
-    var SYNC_KEYS = [K_TICKET, K_VISITED, K_BOX, K_PASS, K_PAINT, K_CARDS, K_EMO, K_LOG, K_NICK, K_VCOUNT, K_BONUS, K_SENIOR];
+    var SYNC_KEYS = [K_TICKET, K_VISITED, K_BOX, K_PASS, K_PAINT, K_CARDS, K_EMO, K_LOG, K_NICK, K_VCOUNT, K_BONUS, K_SENIOR, K_AGE];
     var fb = null, cloudUser = null, cloudTimer = null;   // var: 위쪽 함수에서 먼저 불러도 괜찮게
 
     function cloudOn() { return IS_APP && !!FIREBASE_CONFIG && !!EXCFG; }
     function localState() {
       return { ticket: lsGet(K_TICKET, null), visited: lsGet(K_VISITED, {}), box: lsGet(K_BOX, { slots: FREE_SLOTS, ids: [] }), pass: lsGet(K_PASS, ''),
-               paint: lsGet(K_PAINT, 0), cards: lsGet(K_CARDS, []), emo: lsGet(K_EMO, []), log: lsGet(K_LOG, []), nick: lsGet(K_NICK, ''), vcount: lsGet(K_VCOUNT, {}), bonus: lsGet(K_BONUS, {}), senior: lsGet(K_SENIOR, {}) };
+               paint: lsGet(K_PAINT, 0), cards: lsGet(K_CARDS, []), emo: lsGet(K_EMO, []), log: lsGet(K_LOG, []), nick: lsGet(K_NICK, ''), vcount: lsGet(K_VCOUNT, {}), bonus: lsGet(K_BONUS, {}), senior: lsGet(K_SENIOR, {}), age: lsGet(K_AGE, null) };
     }
     async function saveThenReload() { clearTimeout(cloudTimer); await cloudSaveNow(); location.reload(); }
     function cloudSaveSoon() {
@@ -1330,7 +1549,10 @@
       if (sbn.adDay === lbn.adDay && sbn.adDay) bonus.adCount = Math.max(sbn.adCount || 0, lbn.adCount || 0);
       const senior = { ...(srv.senior || {}) };
       Object.entries(loc.senior || {}).forEach(([d, st]) => { senior[d] = [...new Set([...(senior[d] || []), ...st])]; });
-      return { ticket, visited, box, pass, paint, cards, emo, log, nick, vcount, bonus, senior };
+      // 아트톡 나이 확인: 한 번이라도 '만 14세 미만'이라고 했으면 그쪽을 따라요 (안전한 쪽)
+      const ages = [srv.age, loc.age].filter(a => a && typeof a.ok === 'boolean');
+      const age = ages.find(a => a.ok === false) || ages[0] || null;
+      return { ticket, visited, box, pass, paint, cards, emo, log, nick, vcount, bonus, senior, age };
     }
     function applyState(st) {
       if (st.ticket) lsSet(K_TICKET, st.ticket, true); else { try { localStorage.removeItem(K_TICKET); } catch (e) {} }
@@ -1340,6 +1562,7 @@
       lsSet(K_SENIOR, st.senior || {}, true);
       lsSet(K_VCOUNT, st.vcount || {}, true);
       lsSet(K_BONUS, st.bonus || {}, true);
+      if (st.age) lsSet(K_AGE, st.age, true);
     }
 
     async function loadFirebase() {
@@ -1348,7 +1571,9 @@
       const app = appM.initializeApp(FIREBASE_CONFIG);
       const auth = authM.initializeAuth(app, { persistence: [authM.indexedDBLocalPersistence, authM.browserLocalPersistence] });
       return { auth, authM, db: fsM.getFirestore(app), doc: fsM.doc, getDoc: fsM.getDoc, setDoc: fsM.setDoc, deleteDoc: fsM.deleteDoc,
-               collection: fsM.collection, query: fsM.query, where: fsM.where, limit: fsM.limit, getDocs: fsM.getDocs };
+               collection: fsM.collection, query: fsM.query, where: fsM.where, limit: fsM.limit, getDocs: fsM.getDocs,
+               onSnapshot: fsM.onSnapshot, orderBy: fsM.orderBy, updateDoc: fsM.updateDoc, addDoc: fsM.addDoc,
+               arrayUnion: fsM.arrayUnion, arrayRemove: fsM.arrayRemove, deleteField: fsM.deleteField };
     }
 
     // 앱을 열 때: 로그인 확인 → 서버 기록 불러와 합치기
@@ -1371,6 +1596,7 @@
       } catch (e) { console.log('서버 기록을 불러오지 못했어요(이 폰 기록으로 계속):', e); }
       if (!lsGet(K_NICK, '')) await askNick(true);     // 처음 가입(또는 닉네임 없는 예전 계정): 닉네임 정하기
       grantDaily();                                      // 🎁 가입 선물 · 🎨 오늘의 물감 · 🔥 연속 출석 · 💌 친구 입장
+      talkStart();                                       // 💬 아트톡 (내 채팅방 · 초대 · 접속 표시)
     }
 
     // =====================================================================
@@ -1388,7 +1614,7 @@
       document.getElementById('nickIn').value = first ? '' : lsGet(K_NICK, '');
       document.getElementById('nickMsg').innerText = '';
       const go = document.getElementById('nickGo'); go.disabled = false; go.innerText = first ? '이 닉네임으로 할게요' : '바꾸기';
-      document.getElementById('loadingText').style.display = 'none';
+      hideSplash();
       openModal('nickModal');
       setTimeout(() => document.getElementById('nickIn').focus(), 200);
       return new Promise(res => { nickResolve = res; });
@@ -1455,7 +1681,7 @@
     function askLogin() {
       let ver = ''; try { ver = NativeApp && NativeApp.appBuild ? '앱 ' + NativeApp.appBuild() + '번' : '앱 옛 버전'; } catch (e) {}
       document.getElementById('loginVer').innerText = ver;
-      return new Promise(res => { loginResolve = res; document.getElementById('loadingText').style.display = 'none'; openModal('loginModal'); });
+      return new Promise(res => { loginResolve = res; hideSplash(); openModal('loginModal'); });
     }
     function startLogin() {
       const go = document.getElementById('loginGo');
@@ -1569,6 +1795,7 @@
         <div class="pl-cat">🎮 게임</div>
         <div class="pl-grid">
           <button class="pl-tile wide" onclick="openPang()"><div class="i">💎</div>${n(best ? '최고 ' + best.toLocaleString() : '')}<div class="t">J.J 아트퐁</div><div class="d">예성이 그림 보석 맞추기 60초 퍼즐 · 한 판 💧 1 · 목표를 넘기면 💧 돌려받기</div></button>
+          <button class="pl-tile wide" onclick="openMem()"><div class="i">🧠</div>${n((lsGet(K_MEM, {}).best || 0) ? '최고 ' + lsGet(K_MEM, {}).best.toLocaleString() : '')}<div class="t">아트메모리게임</div><div class="d">예성이 그림 카드 16장을 뒤집어 같은 그림 8쌍 찾기 · 60초 · 무료 · 하루 한 번 성공하면 💧 +1</div></button>
         </div>
 
         <div class="pl-cat">🗞 바깥 전시</div>
@@ -1852,6 +2079,7 @@
       if (!fb || !cloudUser) return;
       try {
         await fb.deleteDoc(fb.doc(fb.db, 'users', cloudUser.uid));
+        try { await fb.deleteDoc(fb.doc(fb.db, 'presence', cloudUser.uid)); } catch (e) {}
         const nk = lsGet(K_NICK, '');
         if (nk) { try { await fb.deleteDoc(fb.doc(fb.db, 'nicknames', nickKey(nk))); } catch (e) {} }
         for (const n of [1, 2, 3, 4]) for (const per of ['all', pongWeek()]) { try { await fb.deleteDoc(fb.doc(fb.db, 'pong', 's' + n, per, cloudUser.uid)); } catch (e) {} }
@@ -2887,8 +3115,9 @@
       if (IS_APP && EXCFG) collectPendingPaint();
       if (new URLSearchParams(location.search).get('open') === 'pang' && EXCFG) { history.replaceState(null, '', location.pathname); openPang(); }
 
-      document.getElementById('loadingText').style.display = 'none';
+      hideSplash();
       renderArchive();
+      saveSplashArt();
       try { init3D(); } catch (e) { console.log('3D 전시관을 준비하지 못했어요:', e); }
       if (document.getElementById('view-shorts').classList.contains('active')) startShorts();
     }
@@ -2938,8 +3167,588 @@
     }
 
     const BBB_SITE = 'https://hannaj1763-sketch.github.io/BBB-BIBLE-CARD/';
+    // =====================================================================
+    // 🧠 아트메모리게임 (카드 짝맞추기): 16장 · 8쌍 · 60초
+    //  - 그림: 무료 대표작 + 내 컬렉션 (모자라면 그림 기호 카드) · 잠긴 그림은 나오지 않아요
+    //  - 점수: 맞히면 +100 · 틀리면 −10 · 다 찾으면 남은 시간 × 10 보너스
+    //  - 하루 한 번 성공하면 💧 +1 · 12월 1~25일은 크리스마스 카드
+    // =====================================================================
+    const K_MEM = 'agjj_mem_v1';
+    let MEM = null;
+    const memXmas = () => { const d = new Date(); return d.getMonth() === 11 && d.getDate() <= 25; };
+    function memBackIcon() {
+      return memXmas() ? '<svg viewBox="0 0 40 52"><polygon points="20,2 36,40 4,40" fill="#fff3df"/><rect x="2" y="39" width="36" height="3" fill="#ffd9a8"/><rect x="17" y="40" width="6" height="9" fill="#ffd9a8"/></svg>'
+        : '<svg viewBox="0 0 40 52"><ellipse cx="20" cy="27" rx="17" ry="13" fill="#fff3df"/><circle cx="27" cy="32" r="3.5" fill="#e8476c"/><circle cx="12" cy="24" r="3" fill="#ffd9a8"/><circle cx="20" cy="19" r="3" fill="#ffd9a8"/><circle cx="28" cy="22" r="3" fill="#ffd9a8"/></svg>';
+    }
+    function memPool() {
+      const ids = [...new Set([...((EXCFG && EXCFG.lobby) || []), ...(getBox().ids || [])])];
+      const arts = ids.map(id => allArtworks.find(a => a.id === id)).filter(a => a && !a.isProfile).sort(() => Math.random() - .5).slice(0, 8);
+      const fill = memXmas() ? ['🎄', '🎁', '⛄', '🔔', '⭐', '🧦', '🕯️', '❄️'] : ['🎨', '🖌️', '🖍️', '🎵', '💧', '⭐', '🌈', '✨'];
+      const bg = ['#ffe4e8', '#fff1d6', '#e3f2e1', '#e3edfb', '#f1e6fb', '#fde6f3', '#e2f5f3', '#fff8d9'];
+      const faces = arts.map(a => ({ key: a.id, src: a.src, title: a.title }));
+      for (let i = 0; faces.length < 8; i++) faces.push({ key: 'e' + i, emoji: fill[i], bg: bg[i] });
+      return [...faces, ...faces].map(f => ({ ...f })).sort(() => Math.random() - .5);
+    }
+    function memDraw() {
+      const g = document.getElementById('memGrid'), cards = MEM ? MEM.cards : Array.from({ length: 16 }, () => ({}));
+      g.innerHTML = cards.map((c, i) => `<button class="mem-c ${c.up ? 'up' : ''} ${c.done ? 'done' : ''}" onclick="memFlip(${i})" aria-label="카드 ${i + 1}">
+        <div class="mem-in"><div class="mem-back"><span>${String(i + 1).padStart(2, '0')}</span>${memBackIcon()}<b>AGJJ MEMORY</b></div>
+        <div class="mem-front" style="${c.src ? `background-image:url('${c.src}')` : c.bg ? `background:${c.bg}` : ''}">${c.emoji || ''}</div></div></button>`).join('');
+    }
+    function memStats() {
+      const m = MEM || { left: 60, score: 0, found: 0 };
+      document.getElementById('memTime').innerText = m.left;
+      document.getElementById('memScore').innerText = m.score.toLocaleString();
+      document.getElementById('memFound').innerText = `${m.found} / 8`;
+      document.getElementById('memBar').style.width = (m.left / 60 * 100) + '%';
+    }
+    function openMem() {
+      closeViewer && closeViewer();
+      if (MEM && MEM.t) clearInterval(MEM.t); MEM = null;
+      const x = memXmas(), rec = lsGet(K_MEM, {});
+      document.getElementById('memKick').innerText = x ? 'A LITTLE CHRISTMAS MAGIC' : 'A LITTLE ART MAGIC';
+      document.getElementById('memSub').innerText = `${lsGet(K_NICK, '') ? lsGet(K_NICK, '') + '님의 ' : ''}${x ? '크리스마스 ' : ''}그림 찾기 · 16장의 카드를 열고 같은 그림 8쌍을 찾아요`;
+      memStart();
+      document.getElementById('memModal').classList.add('on');
+      if (NativeApp && NativeApp.setSecure) NativeApp.setSecure(true);
+    }
+    function closeMem() {
+      if (MEM && MEM.t) clearInterval(MEM.t); MEM = null;
+      document.getElementById('memModal').classList.remove('on');
+      if (NativeApp && NativeApp.setSecure) NativeApp.setSecure(!!activeTicket());
+      if (document.getElementById('view-play').classList.contains('active')) renderPlay();
+    }
+    function memStart() {
+      if (MEM && MEM.t) clearInterval(MEM.t);
+      MEM = { cards: memPool(), open: [], found: 0, score: 0, left: 60, lock: false, run: true, t: null };
+      memDraw(); memStats();
+      const best = lsGet(K_MEM, {}).best;
+      document.getElementById('memFoot').innerHTML = `<div class="mem-rule" style="font-size:13px">✧ 첫 번째 카드를 열면 시간이 흐르기 시작해요 ✧</div>
+        <div class="mem-rule">맞히면 +100점 · 틀리면 −10점 · 다 찾으면 남은 시간 × 10 보너스${best ? ` · 내 최고 ${best.toLocaleString()}점` : ''}</div>`;
+    }
+    function memFlip(i) {
+      if (!MEM || !MEM.run || MEM.lock) return;
+      const c = MEM.cards[i]; if (c.up || c.done) return;
+      if (!MEM.t) MEM.t = setInterval(() => { if (!MEM || !MEM.run) return; MEM.left--; memStats(); if (MEM.left <= 0) memEnd(false); }, 1000);   // 첫 카드를 열면 시간 시작
+      c.up = true; MEM.open.push(i);
+      const el = document.querySelectorAll('#memGrid .mem-c'); el[i].classList.add('up');
+      if (MEM.open.length < 2) return;
+      const [a, b] = MEM.open; MEM.open = [];
+      if (MEM.cards[a].key === MEM.cards[b].key) {
+        [a, b].forEach(k => { MEM.cards[k].done = true; el[k].classList.add('done'); });
+        MEM.found++; MEM.score += 100; memStats();
+        try { navigator.vibrate && navigator.vibrate(30); } catch (e) {}
+        if (MEM.found === 8) memEnd(true);
+      } else {
+        MEM.score = Math.max(0, MEM.score - 10); MEM.lock = true; memStats();
+        setTimeout(() => { if (!MEM) return; [a, b].forEach(k => { MEM.cards[k].up = false; el[k].classList.remove('up'); el[k].classList.add('mem-shake'); setTimeout(() => el[k].classList.remove('mem-shake'), 360); }); MEM.lock = false; }, 750);
+      }
+    }
+    function memEnd(win) {
+      clearInterval(MEM.t); MEM.run = false; MEM.lock = true;
+      const bonus = win ? MEM.left * 10 : 0; MEM.score += bonus; memStats();
+      const rec = lsGet(K_MEM, {}), newBest = MEM.score > (rec.best || 0); if (newBest) rec.best = MEM.score;
+      let gift = false; if (win && rec.giftDay !== todayStr()) { rec.giftDay = todayStr(); gift = true; addPaint(1); }
+      lsSet(K_MEM, rec, true);
+      if (!win) MEM.cards.forEach((c, i) => { if (!c.done) setTimeout(() => { c.up = true; const e = document.querySelectorAll('#memGrid .mem-c')[i]; if (e) e.classList.add('up'); }, 40 * i); });
+      const canBrag = typeof talkAgeOk === 'function' && talkAgeOk() && Object.values(TK.rooms).some(roomAlive);
+      MEM.result = `🧠 아트메모리게임 ${win ? '성공' : ''} ${MEM.score.toLocaleString()}점! (${MEM.found}/8쌍${win ? ` · ${60 - MEM.left}초` : ''})`;
+      document.getElementById('memFoot').innerHTML = `<div class="mem-res">${win ? '🎉 8쌍을 모두 찾았어요!' : '⏰ 시간이 다 됐어요'}</div>
+        <p>${MEM.score.toLocaleString()}점${win ? ` (남은 시간 보너스 +${bonus})` : ` · ${MEM.found}쌍 찾았어요`}${newBest ? '<br>✨ 내 최고 점수예요!' : ''}${gift ? '<br>💧 오늘의 성공 선물 +1' : ''}</p>
+        <button class="mem-go" onclick="memStart()">다시 하기</button>${canBrag ? `<button class="mem-go sub" onclick="memBrag()">💬 아트톡에 자랑</button>` : ''}`;
+    }
+    function memBrag() {
+      const rooms = Object.values(TK.rooms).filter(r => roomAlive(r) && schedWin(r).open);
+      talkSheet(`<div class="tk-title">💬 어느 채팅방에 보낼까요?</div><div class="tk-sub">${esc(MEM.result)}</div>
+        <div class="tlk-pick">${rooms.map(r => `<button onclick="memBragTo('${sid(r.id)}')">${esc(r.name)}<small>${(r.members || []).length}명</small></button>`).join('') || '<div class="tlk-none">지금 열린 채팅방이 없어요.</div>'}</div>
+        <button class="tk-cancel" onclick="closeModal('talkSheet')">닫기</button>`);
+    }
+    async function memBragTo(rid) {
+      const me = tkMe(), now = Date.now(), text = MEM.result, r = TK.rooms[rid];
+      try {
+        await fb.setDoc(tkRef('rooms', rid, 'msgs', now.toString(36) + me.slice(0, 6)), { uid: me, nick: lsGet(K_NICK, ''), k: 'text', text, at: now, rx: {} });
+        const upd = { last: { text: text.slice(0, 40), nick: lsGet(K_NICK, ''), uid: me, at: now } }; if (r && r.host === me) upd.hostAt = now;
+        fb.updateDoc(tkRef('rooms', rid), upd).catch(() => {});
+        closeModal('talkSheet'); toast('💬 점수를 보냈어요');
+      } catch (e) { toast('보내지 못했어요'); }
+    }
+
+    // =====================================================================
+    // 💬 아트톡: 초대받은 사람끼리만 이야기하는 채팅방
+    //  - 🟢 접속 중인 사람(닉네임)을 눌러 내 채팅방으로 초대 → 그 사람이 '입장'을 누르면 함께 이야기
+    //  - 🔑 초대 코드(8자리)를 보내면, 코드를 넣은 사람은 '입장 요청' → 방장이 허락해야 입장
+    //  - 💬 일반방: 방장이 마지막으로 앱에 들어온 뒤 3일 유지 · 📌 고정방: 계속 유지 · ⏰ 정해진 시간 방: 정한 요일·시간에만 열림
+    //  - 글 · 내 그림 · 아트쏭 · 말씀카드 · 반응(🎨❤️👏🙏) · 🚩 신고 · 🚫 차단 · 전화번호·바깥 링크·나쁜 말 막기
+    //  - 서버(Firestore): presence/{uid} · rooms/{코드} (+ msgs · reqs) · reports
+    // =====================================================================
+    const K_TALK = 'agjj_talk_v1';
+    const TALK_TTL = 3 * 864e5, ONLINE_MS = 150000, TALK_RX = ['🎨', '❤️', '👏', '🙏'], TALK_DAYS = '일월화수목금토';
+    const TALK_CODE_CH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';           // 헷갈리는 0·O·1·I 는 빼요
+    const TK = { rooms: {}, inv: {}, online: [], room: null, msgs: [], reqs: [], reqN: {}, subs: [], roomSubs: [], wasOpen: {}, started: false, touched: false, pending: null };
+    const tkData = () => Object.assign({ read: {}, block: [], hide: false }, lsGet(K_TALK, {}));
+    const tkSave = d => lsSet(K_TALK, d, true);
+    const tkMe = () => (cloudUser && cloudUser.uid) || '';
+    const tkRef = (...p) => fb.doc(fb.db, ...p);
+    const sid = s => String(s || '').replace(/[^\w-]/g, '');
+    const pad2 = n => String(n).padStart(2, '0');
+    const talkCodeFmt = c => c.length === 8 ? c.slice(0, 4) + '-' + c.slice(4) : c;
+    function talkNewCode() { let c = ''; const a = new Uint32Array(8); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach((_, i) => a[i] = Math.random() * 1e9); a.forEach(x => c += TALK_CODE_CH[x % TALK_CODE_CH.length]); return c; }
+    const talkAgeOk = () => { const a = lsGet(K_AGE, null); return !!(a && a.ok === true); };
+    function talkAgeSet(ok) {
+      lsSet(K_AGE, { ok: !!ok, at: Date.now() });               // 계정에 저장돼 다른 휴대폰에서도 같아요
+      if (ok) { talkStart(); talkBeat(); toast('💬 아트톡에 오신 걸 환영해요'); }
+      renderTalk(); if (ok) talkOnline();
+    }
+    function talkSheet(html) { document.getElementById('talkSheetBox').innerHTML = html; openModal('talkSheet'); }
+
+    // 🛡 보내기 전에 살피기: 전화번호·다른 앱 연락처·바깥 링크는 막고, 나쁜 말은 ♡로 가려요
+    const TALK_BAD = ['씨발', '시발', 'ㅅㅂ', 'ㅆㅂ', '병신', 'ㅂㅅ', '개새', '새끼', '좆', '존나', 'ㅈㄴ', '꺼져', '미친놈', '미친년', '닥쳐', 'fuck', 'shit', 'bitch'];
+    function talkCheck(t) {
+      const s = String(t || '').replace(/[\s()]/g, '');
+      if (/0\d{1,2}[-.]?\d{3,4}[-.]?\d{4}/.test(s) || /\d{3,4}[-.]\d{4}/.test(t)) return { err: '📵 전화번호는 보낼 수 없어요.' };
+      if (/(카톡|카카오톡?|오픈채팅|라인|인스타|텔레그램|디엠|dm|디코|디스코드)\s*(아이디|id|주소|으로|친추|추가)/i.test(t) || /open\.kakao|t\.me\/|discord\.gg/i.test(s)) return { err: '🛡 다른 앱으로 옮겨 가는 연락처는 보낼 수 없어요.' };
+      const urls = String(t).match(/https?:\/\/\S+|www\.\S+/gi) || [];
+      if (urls.some(u => !/^https:\/\/hannaj1763-sketch\.github\.io\//.test(u))) return { err: '🔗 바깥 링크는 보낼 수 없어요. (AGJJ 링크만 돼요)' };
+      let out = String(t); TALK_BAD.forEach(w => { out = out.replace(new RegExp(w, 'gi'), m => '♡'.repeat(m.length)); });
+      return { text: out };
+    }
+
+    // ⏰ 정해진 시간 방: 지금 열려 있나? 다음엔 언제 열리나?
+    function schedWin(r, now = Date.now()) {
+      const s = r && r.sched; if (!s || !(s.days || []).length) return { open: true };
+      const base = new Date(now); base.setHours(0, 0, 0, 0);
+      let next = null;
+      for (let k = -1; k <= 7; k++) {
+        const st = new Date(base); st.setDate(base.getDate() + k);
+        if (!s.days.includes(st.getDay())) continue;
+        st.setHours(s.h, s.m, 0, 0); const en = st.getTime() + s.dur * 3600e3;
+        if (now >= st.getTime() && now < en) return { open: true, end: en };
+        if (st.getTime() > now && !next) next = st;
+      }
+      return { open: false, next };
+    }
+    function fmtNext(d) {
+      if (!d) return '';
+      const t0 = new Date(); t0.setHours(0, 0, 0, 0); const dd = Math.round((new Date(d).setHours(0, 0, 0, 0) - t0) / 864e5);
+      return `${dd === 0 ? '오늘' : dd === 1 ? '내일' : TALK_DAYS[d.getDay()] + '요일'} ${d.getHours() < 12 ? '오전' : '오후'} ${(d.getHours() % 12) || 12}:${pad2(d.getMinutes())}`;
+    }
+    const roomAlive = r => !!r && (r.fixed || !!r.sched || (r.hostAt || r.at || 0) > Date.now() - TALK_TTL);
+    function talkBadges(r) {
+      const b = [];
+      if (r.host === tkMe()) b.push('👑 방장');
+      if (r.sched) { const w = schedWin(r), s = r.sched; b.push(`⏰ ${s.days.slice().sort().map(i => TALK_DAYS[i]).join('·')} ${pad2(s.h)}:${pad2(s.m)} ${s.dur}시간${w.open ? ' · 열림' : ''}`); }
+      else if (r.fixed) b.push('📌 고정방');
+      else b.push(`⏳ ${Math.max(1, Math.ceil(((r.hostAt || r.at) + TALK_TTL - Date.now()) / 864e5))}일 남음`);
+      return b.join(' · ');
+    }
+
+    // 시작: 로그인 뒤 한 번 (내 방 · 받은 초대를 실시간으로)
+    function talkStart() {
+      if (!fb || !cloudUser || !fb.onSnapshot || TK.started || !talkAgeOk()) return; TK.started = true;     // 만 14세 이상 확인한 사람만 (접속 표시도 그때부터)
+      const me = tkMe(), col = fb.collection(fb.db, 'rooms');
+      TK.subs.push(fb.onSnapshot(fb.query(col, fb.where('members', 'array-contains', me)), s => {
+        TK.rooms = {}; s.docs.forEach(d => { TK.rooms[d.id] = { id: d.id, ...d.data() }; }); TK.roomsLoaded = true; talkTick();
+      }, e => console.log('아트톡 방 목록을 불러오지 못했어요:', e)));
+      TK.subs.push(fb.onSnapshot(fb.query(col, fb.where('invited', 'array-contains', me)), s => {
+        TK.inv = {}; s.docs.forEach(d => { TK.inv[d.id] = { id: d.id, ...d.data() }; }); talkTick();
+      }, e => console.log('아트톡 초대를 불러오지 못했어요:', e)));
+      talkBeat(); setInterval(talkBeat, 60000);
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) talkBeat(); });
+      const p = sid(new URLSearchParams(location.search).get('talk')).toUpperCase();
+      if (p) { history.replaceState(null, '', location.pathname); setTimeout(() => talkJoinCode(p), 1200); }
+    }
+    // 방 목록이 바뀔 때마다
+    function talkTick() {
+      const me = tkMe();
+      if (TK.roomsLoaded && !TK.touched) {                 // 방장이 앱에 들어왔어요 → 일반방 3일 다시 시작 · 지난 방은 정리
+        TK.touched = true;
+        Object.values(TK.rooms).filter(r => r.host === me && !r.fixed && !r.sched).forEach(r => {
+          if (!roomAlive(r)) talkDeleteRoom(r.id, true);
+          else if ((r.hostAt || 0) < Date.now() - 3600e3) fb.updateDoc(tkRef('rooms', r.id), { hostAt: Date.now() }).catch(() => {});
+        });
+      }
+      if (TK.room && TK.roomsLoaded && !TK.rooms[TK.room] && !TK.opening) { talkCloseRoom(true); toast('💬 채팅방에서 나왔어요'); }
+      talkDot();
+      if (document.getElementById('view-talk').classList.contains('active')) {
+        if (TK.room) { const t = document.getElementById('tlkHead'); if (t) t.innerHTML = talkHead(TK.rooms[TK.room]); } else renderTalk();
+      }
+    }
+    function talkUnread() {
+      const me = tkMe(), rd = tkData().read || {};
+      return Object.values(TK.rooms).filter(r => roomAlive(r) && r.last && r.last.uid !== me && r.last.at > (rd[r.id] || 0) && r.id !== TK.room).length;
+    }
+    function talkDot() {
+      const n = talkUnread() + Object.values(TK.inv).filter(roomAlive).length + Object.values(TK.reqN).reduce((a, b) => a + b, 0);
+      const el = document.getElementById('talkDot'); if (el) { el.style.display = n ? 'inline-block' : 'none'; el.innerText = n > 9 ? '9+' : n; }
+    }
+    // 1분마다: 내 접속 표시 · 접속자 · 입장 요청 수 · ⏰ 방이 열렸는지
+    async function talkBeat() {
+      if (!fb || !cloudUser || document.hidden || !TK.started) return;
+      const me = tkMe(), d = tkData(), nick = lsGet(K_NICK, '');
+      if (!d.hide && nick) fb.setDoc(tkRef('presence', me), { nick, at: Date.now() }).catch(() => {});
+      Object.values(TK.rooms).forEach(r => {
+        if (!r.sched) return; const o = schedWin(r).open;
+        if (o && TK.wasOpen[r.id] === false) toast(`🔔 「${r.name}」 채팅방이 열렸어요`);
+        if (TK.wasOpen[r.id] !== undefined && TK.wasOpen[r.id] !== o && TK.room === r.id) renderTalk();
+        TK.wasOpen[r.id] = o;
+      });
+      for (const r of Object.values(TK.rooms).filter(r => r.host === me && roomAlive(r)).slice(0, 8)) {
+        try { const s = await fb.getDocs(fb.query(fb.collection(fb.db, 'rooms', r.id, 'reqs'), fb.limit(20))); TK.reqN[r.id] = s.docs.length; } catch (e) {}
+      }
+      talkDot();
+      if (document.getElementById('view-talk').classList.contains('active') && !TK.room) talkOnline();
+    }
+    async function talkOnline() {
+      if (!fb || !cloudUser || !talkAgeOk()) return;
+      try {
+        const s = await fb.getDocs(fb.query(fb.collection(fb.db, 'presence'), fb.where('at', '>', Date.now() - ONLINE_MS), fb.limit(60)));
+        TK.online = s.docs.map(x => ({ id: x.id, ...x.data() }));
+      } catch (e) { console.log('접속자를 불러오지 못했어요:', e); }
+      if (!TK.room && document.getElementById('view-talk').classList.contains('active')) renderTalk();
+    }
+    function talkHide(on) {
+      const d = tkData(); d.hide = !!on; tkSave(d);
+      if (on) fb.deleteDoc(tkRef('presence', tkMe())).catch(() => {}); else talkBeat();
+      toast(on ? '🙈 다른 사람에게 내 접속이 안 보여요' : '🟢 내 접속이 보여요');
+    }
+
+    // 💬 첫 화면: 접속 중 · 받은 초대 · 내 채팅방
+    function renderTalk() {
+      const box = document.getElementById('talkBox'); if (!box) return;
+      if (!fb || !cloudUser) { box.innerHTML = `<div class="tlk-safe">💬 아트톡은 앱에서 로그인한 뒤에 쓸 수 있어요.</div>`; return; }
+      const age = lsGet(K_AGE, null);
+      if (age && age.ok === false) { box.innerHTML = `<div class="tlk-gate"><div class="i">🔒</div><b>아트톡은 만 14세 이상부터 쓸 수 있어요</b>
+          <p>갤러리 관람 · 아트컬러링 · 아트쏭 · 말씀카드 · 아트퐁은 그대로 즐길 수 있어요.<br>친구와 이야기하고 싶다면 보호자와 함께, 보호자 계정으로 써 주세요.</p></div>`; return; }
+      if (!age) { box.innerHTML = `<div class="tlk-gate"><div class="i">💬</div><b>아트톡은 만 14세 이상부터 쓸 수 있어요</b>
+          <p>아트톡은 다른 사람과 이야기하는 곳이라 나이를 한 번 확인해요.<br>생년월일은 받지 않고, 확인했다는 표시만 저장해요.</p>
+          <button class="tk-btn" onclick="talkAgeSet(true)">네, 만 14세 이상이에요</button>
+          <button class="tlk-ghost" onclick="talkAgeSet(false)">아니요, 만 14세 미만이에요</button>
+          <small>한 번 고르면 바꿀 수 없어요. 정확하게 골라 주세요.</small></div>`; return; }
+      if (!lsGet(K_NICK, '')) { box.innerHTML = `<div class="tlk-safe">💬 아트톡에서는 닉네임으로 이야기해요. <button class="tlk-new" onclick="askNick().then(renderTalk)">닉네임 정하기</button></div>`; return; }
+      if (TK.room) return renderRoom();
+      const d = tkData(), me = tkMe(), block = new Set(d.block || []);
+      const online = TK.online.filter(o => o.id !== me && !block.has(o.id));
+      const lastAt = r => (r.last && r.last.at) || r.at || 0;
+      const rooms = Object.values(TK.rooms).filter(roomAlive).sort((a, b) => lastAt(b) - lastAt(a));
+      const inv = Object.values(TK.inv).filter(roomAlive);
+      box.innerHTML = `
+        <div class="tlk-safe">🛡 <b>초대받은 사람끼리만</b> 이야기해요. 모르는 사람의 초대는 받지 마세요. 전화번호·바깥 링크는 보낼 수 없어요.</div>
+        <div class="tlk-sec">🟢 지금 접속 중 <span>${online.length}</span>
+          <label class="tlk-hide"><input type="checkbox" ${d.hide ? 'checked' : ''} onchange="talkHide(this.checked)"> 내 접속 숨기기</label></div>
+        <div class="tlk-online">${online.length ? online.map(o => `<button onclick="talkInviteUser('${sid(o.id)}')"><i></i>${esc(o.nick)}</button>`).join('')
+          : '<span class="tlk-none">지금은 접속한 사람이 없어요.</span>'}</div>
+        ${inv.length ? `<div class="tlk-sec">💌 받은 초대</div>` + inv.map(r => `<div class="tlk-room inv"><div class="tlk-av">💌</div>
+            <div class="tlk-rb"><b>${esc(r.name)}</b><small>👑 ${esc((r.nicks || {})[r.host] || '방장')}님의 초대 · ${(r.members || []).length}명</small></div>
+            <button class="tlk-ok" onclick="talkAccept('${sid(r.id)}')">입장</button><button class="tlk-no" onclick="talkDecline('${sid(r.id)}')">거절</button></div>`).join('') : ''}
+        <div class="tlk-sec">💬 내 채팅방 <span>${rooms.length}</span>
+          <button class="tlk-new" onclick="talkNewRoom()">＋ 새 채팅방</button><button class="tlk-new alt" onclick="talkCodeAsk()">🔑 초대 코드</button></div>
+        ${rooms.length ? rooms.map(talkRoomRow).join('') : '<div class="tlk-none">아직 채팅방이 없어요. 새 채팅방을 만들고, 접속 중인 친구를 눌러 초대해 보세요.</div>'}`;
+    }
+    function talkRoomRow(r) {
+      const me = tkMe(), rd = tkData().read || {}, un = r.last && r.last.uid !== me && r.last.at > (rd[r.id] || 0);
+      const prev = r.last ? `${r.last.uid === me ? '나' : esc(r.last.nick)}: ${esc(r.last.text)}` : '아직 대화가 없어요';
+      return `<button class="tlk-room" onclick="talkOpen('${sid(r.id)}')"><div class="tlk-av">${r.sched ? '⏰' : r.fixed ? '📌' : '💬'}</div>
+        <div class="tlk-rb"><b>${esc(r.name)} <small>${(r.members || []).length}명</small></b><small>${prev}</small><em>${talkBadges(r)}</em></div>
+        ${r.host === me && TK.reqN[r.id] ? `<span class="tlk-rq">🙋 ${TK.reqN[r.id]}</span>` : ''}${un ? '<i class="tlk-un"></i>' : ''}</button>`;
+    }
+
+    // ＋ 새 채팅방 / ⚙ 설정 (방장)
+    function talkNewRoom(edit) {
+      const r = edit ? TK.rooms[edit] : null, s = (r && r.sched) || { days: [6], h: 20, m: 0, dur: 2 };
+      const type = r ? (r.sched ? 'sched' : r.fixed ? 'fixed' : 'basic') : 'basic';
+      const opt = (v, t, sub) => `<label><input type="radio" name="tnType" value="${v}" ${type === v ? 'checked' : ''} onchange="talkTypeUI()"><span><b>${t}</b><small>${sub}</small></span></label>`;
+      talkSheet(`<div class="tk-title">${r ? '⚙ 채팅방 설정' : '＋ 새 채팅방'}</div>
+        <input id="tnName" class="tlk-in" maxlength="20" placeholder="채팅방 이름 (예: 예성이 친구들)" value="${r ? esc(r.name) : ''}">
+        <div class="tlk-types">
+          ${opt('basic', '💬 일반방', '방장이 마지막으로 앱에 들어온 뒤 3일 동안 유지돼요')}
+          ${opt('fixed', '📌 고정방', '멤버 그대로 계속 유지돼요. 언제든 들어와 이야기해요')}
+          ${opt('sched', '⏰ 정해진 시간 방', '멤버 그대로, 정한 요일·시간에만 열려요. 열리면 알려 드려요')}
+        </div>
+        <div class="tlk-sched" id="tnSched">
+          <div class="tlk-days">${[...TALK_DAYS].map((c, i) => `<label><input type="checkbox" value="${i}" ${s.days.includes(i) ? 'checked' : ''}><span>${c}</span></label>`).join('')}</div>
+          <div class="tlk-time"><input type="time" id="tnTime" value="${pad2(s.h)}:${pad2(s.m)}"> 부터
+            <select id="tnDur">${[1, 2, 3, 6, 12].map(h => `<option value="${h}" ${h === s.dur ? 'selected' : ''}>${h}시간</option>`).join('')}</select> 동안</div>
+        </div>
+        <div class="tk-sub" id="tnMsg" style="color:#fca5a5;margin:8px 0"></div>
+        <button class="tk-btn" onclick="talkSaveRoom('${sid(edit)}')">${r ? '저장' : '만들기'}</button>
+        <button class="tk-cancel" onclick="TK.pending=null; closeModal('talkSheet')">닫기</button>`);
+      talkTypeUI();
+    }
+    function talkTypeUI() { const v = (document.querySelector('input[name=tnType]:checked') || {}).value; const el = document.getElementById('tnSched'); if (el) el.style.display = v === 'sched' ? 'block' : 'none'; }
+    async function talkSaveRoom(edit) {
+      const msg = document.getElementById('tnMsg'), name = document.getElementById('tnName').value.trim();
+      if (!name) { msg.innerText = '채팅방 이름을 써 주세요.'; return; }
+      const chk = talkCheck(name); if (chk.err) { msg.innerText = chk.err; return; }
+      const type = document.querySelector('input[name=tnType]:checked').value;
+      let sched = null;
+      if (type === 'sched') {
+        const days = [...document.querySelectorAll('#tnSched .tlk-days input:checked')].map(x => +x.value);
+        if (!days.length) { msg.innerText = '열릴 요일을 하나 이상 골라 주세요.'; return; }
+        const [h, m] = (document.getElementById('tnTime').value || '20:00').split(':').map(Number);
+        sched = { days, h: h || 0, m: m || 0, dur: +document.getElementById('tnDur').value || 2 };
+      }
+      const me = tkMe(), now = Date.now(), data = { name: chk.text, fixed: type !== 'basic', sched, hostAt: now };
+      try {
+        if (edit) { await fb.updateDoc(tkRef('rooms', edit), data); closeModal('talkSheet'); toast('⚙ 설정을 저장했어요'); return; }
+        const rid = talkNewCode();
+        const room = { ...data, host: me, members: [me], invited: [], nicks: { [me]: lsGet(K_NICK, '') }, at: now, last: null };
+        await fb.setDoc(tkRef('rooms', rid), room);
+        TK.rooms[rid] = { id: rid, ...room };
+        closeModal('talkSheet'); toast('💬 채팅방을 만들었어요');
+        if (TK.pending) { const u = TK.pending; TK.pending = null; await talkSendInvite(rid, u); }
+        talkOpen(rid);
+      } catch (e) { msg.innerText = '만들지 못했어요. 잠시 뒤 다시 해 주세요.'; console.log(e); }
+    }
+
+    // 💌 접속 중인 사람 초대하기
+    function talkInviteUser(uid) {
+      const o = TK.online.find(x => x.id === uid); if (!o) return;
+      const mine = Object.values(TK.rooms).filter(r => r.host === tkMe() && roomAlive(r));
+      talkSheet(`<div class="tk-title">💌 ${esc(o.nick)}님</div>
+        <div class="tk-sub">어느 채팅방으로 초대할까요? ${esc(o.nick)}님이 '입장'을 누르면 함께 이야기할 수 있어요.</div>
+        <div class="tlk-pick">${mine.map(r => { const inR = (r.members || []).includes(uid), iv = (r.invited || []).includes(uid);
+          return `<button ${inR || iv ? 'disabled' : ''} onclick="talkSendInvite('${sid(r.id)}','${sid(uid)}')">${esc(r.name)}<small>${inR ? '이미 멤버' : iv ? '초대했어요' : (r.members || []).length + '명'}</small></button>`; }).join('')}</div>
+        <button class="tk-btn" onclick="TK.pending='${sid(uid)}'; talkNewRoom()">＋ 새 채팅방 만들어 초대</button>
+        <button class="tlk-ghost" onclick="talkBlock('${sid(uid)}', '${esc(o.nick)}')">🚫 차단하기</button>
+        <button class="tk-cancel" onclick="closeModal('talkSheet')">닫기</button>`);
+    }
+    async function talkSendInvite(rid, uid) {
+      const o = TK.online.find(x => x.id === uid) || {};
+      try { await fb.updateDoc(tkRef('rooms', rid), { invited: fb.arrayUnion(uid), ['nicks.' + uid]: o.nick || '' }); closeModal('talkSheet'); toast(`💌 ${o.nick || ''}님을 초대했어요`); }
+      catch (e) { toast('초대하지 못했어요'); console.log(e); }
+    }
+    async function talkAccept(rid) {
+      const me = tkMe();
+      try { await fb.updateDoc(tkRef('rooms', rid), { members: fb.arrayUnion(me), invited: fb.arrayRemove(me), ['nicks.' + me]: lsGet(K_NICK, '') }); closeModal('talkSheet'); talkOpen(rid); }
+      catch (e) { toast('입장하지 못했어요'); console.log(e); }
+    }
+    async function talkDecline(rid) { try { await fb.updateDoc(tkRef('rooms', rid), { invited: fb.arrayRemove(tkMe()) }); toast('초대를 거절했어요'); } catch (e) {} }
+
+    // 🔑 초대 코드로 들어가기 → 방장 허락
+    function talkCodeAsk() {
+      talkSheet(`<div class="tk-title">🔑 초대 코드</div><div class="tk-sub">친구에게 받은 8자리 코드를 넣어 주세요.<br>방장이 허락하면 들어갈 수 있어요.</div>
+        <input id="tcIn" class="tlk-in code" maxlength="9" placeholder="ABCD-1234" autocapitalize="characters">
+        <div class="tk-sub" id="tcMsg" style="color:#fca5a5;margin:8px 0"></div>
+        <button class="tk-btn" onclick="talkJoinCode(document.getElementById('tcIn').value)">확인</button><button class="tk-cancel" onclick="closeModal('talkSheet')">닫기</button>`);
+      setTimeout(() => document.getElementById('tcIn').focus(), 200);
+    }
+    async function talkJoinCode(code) {
+      const c = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, ''), m = document.getElementById('tcMsg');
+      if (c.length !== 8) { if (m) m.innerText = '8자리 코드를 넣어 주세요.'; return; }
+      if (!fb || !cloudUser) { showMsg('💬 아트톡', '앱에서 로그인한 뒤에 들어갈 수 있어요.'); return; }
+      try {
+        const sn = await fb.getDoc(tkRef('rooms', c)), r = sn.exists() ? sn.data() : null;
+        if (!roomAlive(r)) { if (m) m.innerText = '채팅방을 찾지 못했어요. 코드를 다시 확인해 주세요.'; else showMsg('💬 채팅방이 없어요', '채팅방이 닫혔거나 코드가 달라요.'); return; }
+        if (document.getElementById('view-talk').classList.contains('active') === false) switchView('talk');
+        if ((r.members || []).includes(tkMe())) { closeModal('talkSheet'); talkOpen(c); return; }
+        if ((r.invited || []).includes(tkMe())) { talkAccept(c); return; }
+        talkSheet(`<div class="tk-title">💬 「${esc(r.name)}」</div>
+          <div class="tk-sub">👑 ${esc((r.nicks || {})[r.host] || '방장')}님의 채팅방 · ${(r.members || []).length}명<br>입장을 요청하면 방장이 허락한 뒤에 들어갈 수 있어요.<br><b style="color:#fde68a">아는 사람의 채팅방인지 꼭 확인해 주세요.</b></div>
+          <button class="tk-btn" onclick="talkRequest('${c}')">🙋 입장 요청하기</button><button class="tk-cancel" onclick="closeModal('talkSheet')">닫기</button>`);
+      } catch (e) { if (m) m.innerText = '채팅방을 불러오지 못했어요.'; console.log(e); }
+    }
+    async function talkRequest(rid) {
+      try { await fb.setDoc(tkRef('rooms', rid, 'reqs', tkMe()), { nick: lsGet(K_NICK, ''), at: Date.now() }); closeModal('talkSheet');
+        showMsg('🙋 입장 요청을 보냈어요', '방장이 허락하면 💬 아트톡 목록에 채팅방이 보여요.'); }
+      catch (e) { toast('요청하지 못했어요'); console.log(e); }
+    }
+    async function talkApprove(uid) {
+      const q = TK.reqs.find(x => x.id === uid); if (!q || !TK.room) return;
+      try { await fb.updateDoc(tkRef('rooms', TK.room), { members: fb.arrayUnion(uid), ['nicks.' + uid]: q.nick || '' }); await fb.deleteDoc(tkRef('rooms', TK.room, 'reqs', uid)); toast(`🙌 ${q.nick}님이 들어왔어요`); }
+      catch (e) { toast('허락하지 못했어요'); console.log(e); }
+    }
+    async function talkReject(uid) { try { await fb.deleteDoc(tkRef('rooms', TK.room, 'reqs', uid)); } catch (e) {} }
+
+    // 채팅방 안
+    async function talkOpen(rid) {
+      talkCloseRoom(true);
+      let r = TK.rooms[rid];
+      if (!r) { try { const sn = await fb.getDoc(tkRef('rooms', rid)); if (sn.exists()) r = TK.rooms[rid] = { id: rid, ...sn.data() }; } catch (e) {} }
+      if (!r) return;
+      TK.room = rid; TK.msgs = []; TK.reqs = []; TK.scrolled = false; TK.opening = true; setTimeout(() => { TK.opening = false; }, 4000);
+      if (!document.getElementById('view-talk').classList.contains('active')) switchView('talk');
+      TK.roomSubs.push(fb.onSnapshot(fb.query(fb.collection(fb.db, 'rooms', rid, 'msgs'), fb.orderBy('at', 'desc'), fb.limit(100)), s => {
+        TK.msgs = s.docs.map(d => ({ id: d.id, ...d.data() })).reverse(); renderMsgs(); talkMarkRead();
+      }, e => console.log('메시지를 불러오지 못했어요:', e)));
+      if (r.host === tkMe()) TK.roomSubs.push(fb.onSnapshot(fb.collection(fb.db, 'rooms', rid, 'reqs'), s => {
+        TK.reqs = s.docs.map(d => ({ id: d.id, ...d.data() })); TK.reqN[rid] = TK.reqs.length; renderReqs(); talkDot();
+      }, e => {}));
+      renderTalk();
+    }
+    function talkCloseRoom(quiet) {
+      TK.roomSubs.forEach(u => { try { u(); } catch (e) {} }); TK.roomSubs = [];
+      if (TK.room) talkMarkRead(); TK.room = null;
+      if (!quiet) { renderTalk(); talkOnline(); }
+    }
+    function talkMarkRead() { if (!TK.room) return; const d = tkData(); d.read[TK.room] = Date.now(); tkSave(d); talkDot(); }
+    function talkHead(r) {
+      if (!r) return '';
+      return `<button class="tlk-back" onclick="talkCloseRoom()">←</button><div class="tlk-tt"><b>${esc(r.name)}</b><small>${(r.members || []).length}명 · ${talkBadges(r)}</small></div>
+        <button class="tlk-back" onclick="talkRoomMenu()">⚙</button>`;
+    }
+    function renderRoom() {
+      const r = TK.rooms[TK.room]; if (!r) return;
+      const w = schedWin(r);
+      document.getElementById('talkBox').innerHTML = `<div class="tlk-top" id="tlkHead">${talkHead(r)}</div>
+        <div id="tlkReqs"></div>
+        <div class="tlk-msgs" id="tlkMsgs"></div>
+        ${w.open ? `<div class="tlk-input"><button class="tlk-plus" onclick="talkShare()" aria-label="보내기 더보기">＋</button>
+            <input id="tlkIn" maxlength="300" placeholder="메시지 보내기" enterkeyhint="send" onkeydown="if (event.key === 'Enter' && !event.isComposing) talkSend()">
+            <button class="tlk-send" onclick="talkSend()">보내기</button></div>`
+          : `<div class="tlk-closed">⏰ 지금은 닫혀 있어요 · <b>${fmtNext(w.next)}</b>에 열려요<br><small>지난 이야기는 볼 수 있어요</small></div>`}`;
+      renderReqs(); renderMsgs();
+    }
+    function renderReqs() {
+      const el = document.getElementById('tlkReqs'); if (!el) return;
+      el.innerHTML = TK.reqs.map(q => `<div class="tlk-req">🙋 <b>${esc(q.nick)}</b>님이 입장을 요청했어요
+        <button onclick="talkApprove('${sid(q.id)}')">허락</button><button class="no" onclick="talkReject('${sid(q.id)}')">거절</button></div>`).join('');
+    }
+    function talkBody(m) {
+      const a = m.art ? allArtworks.find(x => x.id === m.art) : null, aid = sid(m.art);
+      if (m.k === 'art' && a) return `<img class="tlk-img" src="${a.src}" alt="" loading="lazy" onclick="event.stopPropagation(); talkViewArt('${aid}')"><div class="tlk-cap">🖼 ${esc(a.title)}</div>`;
+      if (m.k === 'song' && a) return `<div class="tlk-card"><img src="${a.src}" alt="" loading="lazy"><div><b>🎶 아트쏭</b><br>${esc(a.title)}</div></div>
+        <button class="tlk-play" onclick="event.stopPropagation(); talkPlaySong('${aid}')">▶ 들어보기</button>`;
+      if (m.k === 'word') return `<div class="tlk-word">${a ? `<img src="${a.src}" alt="" loading="lazy">` : ''}<div><p>${esc(m.text)}</p><b>${esc(m.ref)}</b></div></div>`;
+      return esc(m.text).replace(/\n/g, '<br>');
+    }
+    function renderMsgs() {
+      const el = document.getElementById('tlkMsgs'); if (!el) return;
+      const me = tkMe(), block = new Set(tkData().block || []), r = TK.rooms[TK.room] || {};
+      const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 90;
+      let lastDay = '';
+      el.innerHTML = TK.msgs.filter(m => !block.has(m.uid)).map(m => {
+        const dt = new Date(m.at), day = `${dt.getMonth() + 1}월 ${dt.getDate()}일 ${TALK_DAYS[dt.getDay()]}요일`;
+        const sep = day !== lastDay ? `<div class="tlk-day">${day}</div>` : ''; lastDay = day;
+        const mine = m.uid === me, cnt = {}; Object.values(m.rx || {}).forEach(e => { cnt[e] = (cnt[e] || 0) + 1; });
+        return sep + `<div class="tlk-m ${mine ? 'me' : ''}">
+          ${mine ? '' : `<div class="tlk-n">${m.uid === r.host ? '👑 ' : ''}${esc(m.nick)}</div>`}
+          <div class="tlk-bub ${m.k !== 'text' ? 'rich' : ''}" onclick="talkMsgMenu('${sid(m.id)}')">${talkBody(m)}</div>
+          <div class="tlk-meta">${Object.entries(cnt).map(([e, n]) => `<span>${e}${n > 1 ? n : ''}</span>`).join('')}<time>${dt.getHours() < 12 ? '오전' : '오후'} ${(dt.getHours() % 12) || 12}:${pad2(dt.getMinutes())}</time></div></div>`;
+      }).join('') || '<div class="tlk-none" style="text-align:center;margin-top:30px">첫 인사를 남겨 보세요 👋</div>';
+      if (atBottom || !TK.scrolled) { el.scrollTop = el.scrollHeight; TK.scrolled = true; }
+    }
+    async function talkSend(extra) {
+      const r = TK.rooms[TK.room]; if (!r || !schedWin(r).open) return;
+      const inp = document.getElementById('tlkIn');
+      let text = extra ? String(extra.text || '') : (inp ? inp.value.trim() : '');
+      if (!extra && !text) return;
+      if (!extra) { const c = talkCheck(text); if (c.err) { toast(c.err); return; } text = c.text; }
+      const now = Date.now(), me = tkMe();
+      if (TK.lastSend && now - TK.lastSend < 800) { toast('천천히 보내 주세요 🙂'); return; } TK.lastSend = now;       // 도배 막기
+      const m = { uid: me, nick: lsGet(K_NICK, ''), k: extra ? extra.k : 'text', text: text.slice(0, 300), at: now, rx: {} };
+      if (extra && extra.art) m.art = extra.art; if (extra && extra.ref) m.ref = String(extra.ref).slice(0, 40);
+      if (!extra && inp) inp.value = '';
+      try {
+        await fb.setDoc(tkRef('rooms', TK.room, 'msgs', now.toString(36) + me.slice(0, 6)), m);
+        const prev = { text: m.k === 'text' ? m.text.slice(0, 40) : { art: '🖼 그림', song: '🎶 아트쏭', word: '📜 말씀카드' }[m.k], nick: m.nick, uid: me, at: now };
+        const upd = { last: prev }; if (r.host === me) upd.hostAt = now;
+        fb.updateDoc(tkRef('rooms', TK.room), upd).catch(() => {});
+        TK.scrolled = false;
+      } catch (e) { toast('보내지 못했어요'); console.log(e); if (!extra && inp) inp.value = text; }
+    }
+    // ＋ 보내기: 내 그림 · 아트쏭 · 말씀카드
+    function talkShare(tab = 'art') {
+      const lobby = (EXCFG && EXCFG.lobby) || [], ids = [...new Set([...(getBox().ids || []), ...lobby])];
+      const arts = ids.map(id => allArtworks.find(a => a.id === id)).filter(Boolean);
+      const cards = lsGet(K_CARDS, []), byId = Object.fromEntries(allArtworks.map(a => [a.id, a]));
+      const tabs = [['art', '🖼 내 그림'], ['song', '🎶 아트쏭'], ['word', '📜 말씀카드']];
+      let body = '';
+      if (tab === 'art') body = `<div class="tlk-grid">${arts.map(a => `<button onclick="talkSendRich('art','${sid(a.id)}')"><img src="${a.src}" alt="" loading="lazy"><small>${esc(a.title)}</small></button>`).join('')}</div>`;
+      if (tab === 'song') { const ok = arts.filter(a => songOpen(a.id)); body = ok.length ? `<div class="tlk-grid">${ok.map(a => `<button onclick="talkSendRich('song','${sid(a.id)}')"><img src="${a.src}" alt="" loading="lazy"><small>🎶 ${esc(a.title)}</small></button>`).join('')}</div>` : '<div class="tlk-none">열린 아트쏭이 없어요.</div>'; }
+      if (tab === 'word') body = cards.length ? `<div class="tlk-list">${cards.slice(0, 40).map((c, i) => `<button onclick="talkSendRich('word', ${i})">${byId[c.art] ? `<img src="${byId[c.art].src}" alt="">` : ''}<span><b>${esc(c.ref)}</b><small>${esc(String(c.text || '').slice(0, 40))}…</small></span></button>`).join('')}</div>`
+        : '<div class="tlk-none">아직 뽑은 말씀카드가 없어요. ✨ Play → 📜 말씀카드에서 뽑아 보세요.</div>';
+      talkSheet(`<div class="tk-title">＋ 보내기</div><div class="tlk-tabs">${tabs.map(([k, t]) => `<button class="${k === tab ? 'on' : ''}" onclick="talkShare('${k}')">${t}</button>`).join('')}</div>
+        ${body}<button class="tk-cancel" onclick="closeModal('talkSheet')">닫기</button>`);
+    }
+    function talkSendRich(k, v) {
+      closeModal('talkSheet');
+      if (k === 'word') { const c = lsGet(K_CARDS, [])[v]; if (c) talkSend({ k, art: c.art, ref: c.ref, text: c.text }); return; }
+      talkSend({ k, art: v, text: '' });
+    }
+    function talkViewArt(id) {
+      const a = allArtworks.find(x => x.id === id); if (!a) return;
+      talkSheet(`<img src="${a.src}" alt="" style="width:100%;border-radius:12px;max-height:60vh;object-fit:contain;background:#000"><div class="tk-title" style="margin-top:10px">${esc(a.title)}</div>
+        <div class="tk-sub">© J.J (장예성)</div><button class="tk-cancel" onclick="closeModal('talkSheet')">닫기</button>`);
+    }
+    function talkPlaySong(id) {            // 친구가 보낸 아트쏭은 선물: 물감 없이 들어요
+      const a = allArtworks.find(x => x.id === id); if (!a) return;
+      document.getElementById('songTitle').innerText = '🎶 ' + a.title;
+      document.getElementById('songFrame').src = `${SONG_URL}?art=${encodeURIComponent(id)}&embed=1&autoplay=1`;
+      document.getElementById('songPlayer').classList.add('on');
+    }
+    // 메시지 누르기: 반응 · 지우기 · 신고 · 차단
+    function talkMsgMenu(mid) {
+      const m = TK.msgs.find(x => x.id === mid); if (!m) return;
+      const me = tkMe(), r = TK.rooms[TK.room] || {}, mine = m.uid === me, my = (m.rx || {})[me];
+      talkSheet(`<div class="tlk-rx">${TALK_RX.map(e => `<button class="${my === e ? 'on' : ''}" onclick="talkReact('${mid}','${e}')">${e}</button>`).join('')}</div>
+        ${mine || r.host === me ? `<button class="tlk-ghost" onclick="talkDelMsg('${mid}')">🗑 메시지 지우기</button>` : ''}
+        ${mine ? '' : `<button class="tlk-ghost" onclick="talkReport('${mid}')">🚩 신고하기</button><button class="tlk-ghost" onclick="talkBlock('${sid(m.uid)}', '${esc(m.nick)}')">🚫 ${esc(m.nick)}님 차단하기</button>`}
+        <button class="tk-cancel" onclick="closeModal('talkSheet')">닫기</button>`);
+    }
+    async function talkReact(mid, e) {
+      const m = TK.msgs.find(x => x.id === mid), me = tkMe(); closeModal('talkSheet'); if (!m) return;
+      try { await fb.updateDoc(tkRef('rooms', TK.room, 'msgs', mid), { ['rx.' + me]: (m.rx || {})[me] === e ? fb.deleteField() : e }); } catch (er) { toast('반응을 남기지 못했어요'); }
+    }
+    async function talkDelMsg(mid) { closeModal('talkSheet'); try { await fb.deleteDoc(tkRef('rooms', TK.room, 'msgs', mid)); } catch (e) { toast('지우지 못했어요'); } }
+    async function talkReport(mid) {
+      const m = TK.msgs.find(x => x.id === mid); if (!m) return;
+      try {
+        await fb.addDoc(fb.collection(fb.db, 'reports'), { room: TK.room, mid, who: m.uid, nick: m.nick || '', k: m.k, text: String(m.text || '').slice(0, 300), by: tkMe(), at: Date.now() });
+        talkSheet(`<div class="tk-title">🚩 신고했어요</div><div class="tk-sub">운영자가 확인할게요. 이 사람의 메시지를 더 보지 않으려면 차단해 주세요.</div>
+          <button class="tk-btn" onclick="talkBlock('${sid(m.uid)}', '${esc(m.nick)}')">🚫 차단하기</button><button class="tk-cancel" onclick="closeModal('talkSheet')">닫기</button>`);
+      } catch (e) { toast('신고하지 못했어요'); console.log(e); }
+    }
+    function talkBlock(uid, nick) {
+      const d = tkData(); if (!d.block.includes(uid)) d.block.push(uid); tkSave(d);
+      closeModal('talkSheet'); toast(`🚫 ${nick || ''}님을 차단했어요. 메시지와 접속이 안 보여요`);
+      if (TK.room) renderMsgs(); else renderTalk();
+    }
+    // ⚙ 채팅방 메뉴
+    function talkRoomMenu() {
+      const r = TK.rooms[TK.room]; if (!r) return;
+      const me = tkMe(), host = r.host === me, nk = r.nicks || {}, block = tkData().block || [];
+      const mem = (r.members || []).map(u => `<div class="tlk-mem">${u === r.host ? '👑 ' : ''}${esc(nk[u] || '이름 없음')}${u === me ? ' (나)' : ''}
+          ${host && u !== me ? `<button onclick="talkKick('${sid(u)}')">내보내기</button>` : ''}${!host && u !== me && !block.includes(u) ? `<button onclick="talkBlock('${sid(u)}','${esc(nk[u] || '')}')">차단</button>` : ''}</div>`).join('')
+        + (r.invited || []).map(u => `<div class="tlk-mem dim">💌 ${esc(nk[u] || '')} · 초대 중 ${host ? `<button onclick="talkUninvite('${sid(u)}')">초대 취소</button>` : ''}</div>`).join('');
+      talkSheet(`<div class="tk-title">⚙ ${esc(r.name)}</div>
+        <div class="tlk-code">🔑 초대 코드 <b>${talkCodeFmt(r.id)}</b></div>
+        <div class="tk-sub" style="margin:4px 0 10px">코드를 받은 사람이 입장을 요청하면${host ? ' 내가' : ' 방장이'} 허락해야 들어와요.</div>
+        <button class="tk-btn blue" onclick="talkShareCode()">📤 초대 코드 보내기</button>
+        <div class="tlk-sec" style="margin-top:14px">👥 멤버 ${(r.members || []).length}명</div><div class="tlk-mems">${mem}</div>
+        ${host ? `<button class="tlk-ghost" onclick="talkNewRoom('${sid(r.id)}')">⚙ 이름 · 종류(일반/고정/시간) 바꾸기</button>
+                  <button class="tlk-ghost red" onclick="talkDeleteAsk()">🗑 채팅방 없애기</button>`
+               : `<button class="tlk-ghost red" onclick="talkLeave()">🚪 채팅방 나가기</button>`}
+        <button class="tk-cancel" onclick="closeModal('talkSheet')">닫기</button>`);
+    }
+    function talkShareCode() {
+      const r = TK.rooms[TK.room]; if (!r) return;
+      const text = `💬 AGJJ 아트톡 「${r.name}」 채팅방에 초대해요!\n앱 → 💬 아트톡 → 🔑 초대 코드에\n${talkCodeFmt(r.id)} 를 넣어 주세요.\n\n📱 AGJJ 앱 받기: https://github.com/hannaj1763-sketch/gallery2026/releases/latest/download/atelier-archive.apk`;
+      if (NativeApp && NativeApp.shareText) { NativeApp.shareText(text); return; }
+      if (navigator.share) { navigator.share({ text }).catch(() => {}); return; }
+      try { navigator.clipboard.writeText(text); toast('📋 초대 글을 복사했어요'); } catch (e) {}
+    }
+    async function talkKick(uid) { try { await fb.updateDoc(tkRef('rooms', TK.room), { members: fb.arrayRemove(uid) }); closeModal('talkSheet'); toast('내보냈어요'); } catch (e) { toast('내보내지 못했어요'); } }
+    async function talkUninvite(uid) { try { await fb.updateDoc(tkRef('rooms', TK.room), { invited: fb.arrayRemove(uid) }); closeModal('talkSheet'); } catch (e) {} }
+    async function talkLeave() {
+      const rid = TK.room, me = tkMe(); closeModal('talkSheet');
+      try { await fb.updateDoc(tkRef('rooms', rid), { members: fb.arrayRemove(me) }); delete TK.rooms[rid]; talkCloseRoom(); toast('🚪 채팅방에서 나왔어요'); } catch (e) { toast('나가지 못했어요'); }
+    }
+    function talkDeleteAsk() {
+      talkSheet(`<div class="tk-title">🗑 채팅방을 없앨까요?</div><div class="tk-sub">모든 대화가 지워지고 되돌릴 수 없어요.</div>
+        <button class="tk-btn" style="background:#ef4444;color:#fff" onclick="talkDeleteRoom(TK.room)">없애기</button><button class="tk-cancel" onclick="closeModal('talkSheet')">취소</button>`);
+    }
+    async function talkDeleteRoom(rid, quiet) {
+      if (!rid) return; closeModal('talkSheet');
+      try {
+        for (const sub of ['msgs', 'reqs']) { for (let k = 0; k < 10; k++) { const s = await fb.getDocs(fb.query(fb.collection(fb.db, 'rooms', rid, sub), fb.limit(100))); if (!s.docs.length) break; await Promise.all(s.docs.map(d => fb.deleteDoc(tkRef('rooms', rid, sub, d.id)))); } }
+        await fb.deleteDoc(tkRef('rooms', rid));
+        delete TK.rooms[rid]; if (TK.room === rid) talkCloseRoom(); if (!quiet) toast('🗑 채팅방을 없앴어요');
+      } catch (e) { if (!quiet) toast('없애지 못했어요'); console.log(e); }
+    }
+
     function switchView(mode) {
       setTimeout(() => { const t = document.querySelector('.tab-btn.active'); if (t && t.scrollIntoView) t.scrollIntoView({ inline: 'center', block: 'nearest' }); }, 0);   // 메뉴가 많아 넘치면 고른 메뉴가 보이게
+      if (mode !== 'talk' && typeof TK !== 'undefined' && TK.room) talkCloseRoom(true);     // 아트톡을 떠나면 채팅방 실시간 연결은 끊어요
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
       if(mode === '3d') {
@@ -2956,6 +3765,10 @@
         document.querySelectorAll('.tab-btn')[5].classList.add('active');
         document.getElementById('view-senior').classList.add('active');
         renderSenior();
+      } else if (mode === 'talk') {
+        document.querySelectorAll('.tab-btn')[6].classList.add('active');
+        document.getElementById('view-talk').classList.add('active');
+        renderTalk(); talkOnline();
       } else if (mode === 'store') {
         document.querySelectorAll('.tab-btn')[3].classList.add('active');
         document.getElementById('view-store').classList.add('active');
