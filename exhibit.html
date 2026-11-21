@@ -102,6 +102,7 @@
   #rotateTip.on { opacity: 1; }
   .msg { color: var(--muted); font-size: clamp(14px, 2.4vmin, 20px); line-height: 1.8; }
 </style>
+  <script src="firebase-config.js"></script>   <!-- 🔑 Firebase 키는 이 파일 하나에만 (키를 바꿀 땐 이 파일만 고쳐요) -->
 </head>
 <body>
 <div id="stage">
@@ -374,7 +375,7 @@
       if (localStorage.getItem(seenKey)) return;                                // 이 폰에서 이미 한 번 들어옴
       const V = '10.14.1', base = `https://www.gstatic.com/firebasejs/${V}/`;
       const [appM, fsM] = await Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-firestore.js')]);
-      const app = appM.initializeApp({ apiKey: "AIzaSyBwlcopOmwqdoZZcXwVIDOPtds85xTJfRM", authDomain: "agjj-adb63.firebaseapp.com", projectId: "agjj-adb63",
+      const app = appM.initializeApp({ apiKey: (window.AGJJ_FIREBASE || {}).apiKey || "", authDomain: "agjj-adb63.firebaseapp.com", projectId: "agjj-adb63",
         storageBucket: "agjj-adb63.firebasestorage.app", messagingSenderId: "83235290466", appId: "1:83235290466:web:56aec1eebc3eae0a11403b" }, 'ref');
       await fsM.addDoc(fsM.collection(fsM.getFirestore(app), 'referrals'), { ref, ex: String(ex || '').slice(0, 20), at: Date.now() });
       localStorage.setItem(seenKey, '1');

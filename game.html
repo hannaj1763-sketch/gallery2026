@@ -87,6 +87,7 @@
   .rk-me, .rk-empty { text-align: center; font-size: 13px; color: #c9b8f0; margin-top: 6px; line-height: 1.5; }
   .rk-me b { color: #ffe27a; }
 </style>
+  <script src="firebase-config.js"></script>   <!-- 🔑 Firebase 키는 이 파일 하나에만 (키를 바꿀 땐 이 파일만 고쳐요) -->
 </head>
 <body>
 <div class="wrap">
@@ -442,7 +443,7 @@
   //   pong/s{단계}/w{월요일날짜}/{uid}  이번 주 최고 점수 (매주 월요일 0시, 한국 시간에 새로 시작)
   //   이름은 닉네임만 보여요 (구글 실명 X)
   // =====================================================================
-  const FIREBASE_CONFIG = { apiKey: "AIzaSyBwlcopOmwqdoZZcXwVIDOPtds85xTJfRM", authDomain: "agjj-adb63.firebaseapp.com", projectId: "agjj-adb63",
+  const FIREBASE_CONFIG = { apiKey: (window.AGJJ_FIREBASE || {}).apiKey || "", authDomain: "agjj-adb63.firebaseapp.com", projectId: "agjj-adb63",
     storageBucket: "agjj-adb63.firebasestorage.app", messagingSenderId: "83235290466", appId: "1:83235290466:web:56aec1eebc3eae0a11403b" };
   const FB_VER = '10.14.1', K_NICK = 'agjj_nick_v1', RANK_TOP = 10;
   const escH = t => String(t || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

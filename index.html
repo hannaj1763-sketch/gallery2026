@@ -711,6 +711,7 @@
     @keyframes spSnow { to { transform: translateY(110vh) translateX(20px); } }
     @media (prefers-reduced-motion: reduce) { .sp-door { animation-duration: .01s; animation-delay: 0s; } .sp-snow { display: none; } }
   </style>
+  <script src="firebase-config.js"></script>   <!-- 🔑 Firebase 키는 이 파일 하나에만 (키를 바꿀 땐 이 파일만 고쳐요) -->
 </head>
 <body>
 
@@ -1047,6 +1048,7 @@
       </div>
       <div class="wc-box-pick" id="wcBoxPick"></div>
       <button class="tk-btn" onclick="saveWordCard()">사진첩에 저장</button>
+      <button class="tk-btn" style="background:linear-gradient(135deg,#ec4899,#8b5cf6);color:#fff" onclick="verseShorts()">🎬 말씀 쇼츠 영상 만들기</button>
       <button class="tk-cancel" onclick="shareWordCard()">📤 카톡 등으로 보내기</button>
       <button class="tk-cancel" onclick="closeModal('wcModal')">닫기</button>
     </div>
@@ -1628,7 +1630,7 @@
     //  - FIREBASE_CONFIG 가 비어 있으면(null) 로그인 없이 예전처럼 휴대폰 안에만 저장해요.
     // =====================================================================
     const FIREBASE_CONFIG = {
-      apiKey: "AIzaSyBwlcopOmwqdoZZcXwVIDOPtds85xTJfRM",
+      apiKey: (window.AGJJ_FIREBASE || {}).apiKey || "",
       authDomain: "agjj-adb63.firebaseapp.com",
       projectId: "agjj-adb63",
       storageBucket: "agjj-adb63.firebasestorage.app",
@@ -3112,7 +3114,18 @@
       g.fillText('© jj', W - 36, H - 22); g.restore();
       return cv.toDataURL('image/png');
     }
+    let wcShown = 0;
+    // 🎬 말씀 쇼츠: 이 카드의 그림이 노래하고, 말씀이 한 글자씩 나타나는 세로 영상 (JJ-MUSIC에서 만들어요)
+    function verseShorts() {
+      const c = lsGet(K_CARDS, [])[wcShown]; if (!c) return;
+      const a = allArtworks.find(x => x.id === c.art);
+      closeModal('wcModal');
+      document.getElementById('songTitle').innerText = '🎬 말씀 쇼츠 · ' + c.ref;
+      document.getElementById('songFrame').src = `${SONG_URL}?art=${encodeURIComponent(c.art)}&embed=1&style=ballad&verse=${encodeURIComponent(c.text)}&ref=${encodeURIComponent(c.ref)}`;
+      document.getElementById('songPlayer').classList.add('on');
+    }
     async function showWordCard(i, fresh) {
+      wcShown = i;
       const card = lsGet(K_CARDS, [])[i];
       if (!card) return;
       const img = document.getElementById('wcImg');
