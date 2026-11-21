@@ -1655,9 +1655,9 @@
     const SKIP_ADS_FOR_TEST = true;
 
     // 광고 보여 주기 → 결과는 window.onAtelierAd(tag, result) 로 돌아와요
-    const adWaiters = {}; //
-    window.onAtelierAd = (tag, result) => { const f = adWaiters[tag]; delete adWaiters[tag]; if (f) f(result); }; //
-    function showAd(tag) { //
+    const adWaiters = {}; 
+    window.onAtelierAd = (tag, result) => { const f = adWaiters[tag]; delete adWaiters[tag]; if (f) f(result); }; 
+    function showAd(tag) { 
       // 🔖 [BOOKMARK: 광고 테스트 우회 시작]
       if (SKIP_ADS_FOR_TEST) {
         console.log(`[테스트 모드] 광고('${tag}')를 건너뛰고 보상을 지급합니다.`);
