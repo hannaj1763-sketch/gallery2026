@@ -1668,9 +1668,15 @@
       return new Promise(resolve => { //
         if (NativeApp && NativeApp.showRewardedAd) { adWaiters[tag] = resolve; NativeApp.showRewardedAd(tag); } //
         else resolve('noad');           // 광고 기능이 없는 옛 앱: 그냥 통과
-      }); //[cite: 1]
-    } //[cite: 1]
-    
+      });
+    }
+
+    // 특별전 입장: 입장권 모달의 [시청 후 입장하기] 버튼
+    async function enterWithAd() {
+      if (!pickedEx) return;
+      const go = document.getElementById('tkGo');
+      go.disabled = true; go.innerText = '광고 불러오는 중…';
+      const r = await showAd('enter');
       // 광고를 끝까지 보든 중간에 닫든(closed), 못 불러오든(error) 입장 — 끝까지 보기는 강제하지 않아요
       const now = Date.now();
       lsSet(K_TICKET, { exId: pickedEx.id, enteredAt: now, lastSeen: now });
