@@ -1920,6 +1920,7 @@
       const best = Math.max(0, ...[1, 2, 3, 4].map(n => lsGet('agjj_pang_best_' + n, 0)));
       const n = v => v ? `<span class="n">${v}</span>` : '';
       const songs = lsGet(K_EMO, []).filter(k => k.startsWith('song:')).length, memBest = lsGet(K_MEM, {}).best || 0;
+      const thrDone = Object.keys(lsGet('agjj_throw_v1', {}).done || {}).length;
       // 큰 타일 하나 = 아이콘 · 이름 · 한 줄 설명 · 오른쪽 위 배지(💧 값이나 내 기록)
       const T = (fn, i, t, d, badge, cls = '') => `<button class="pt ${cls}" onclick="${fn}"><span class="pt-b">${badge || ''}</span><div class="pt-i">${i}</div><div class="pt-t">${t}</div><div class="pt-d">${d}</div></button>`;
       const free = `<em class="free">${t('free')}</em>`, p1 = '<em>💧 1</em>';
@@ -1933,6 +1934,7 @@
         <div class="pg">
           ${T('openPang()', '💎', t('pongT'), t('pongD'), best ? '🏆 ' + best.toLocaleString() : p1)}
           ${T('openMem()', '🧠', t('memT'), t('memD'), memBest ? '🏆 ' + memBest.toLocaleString() : free)}
+          ${T('openThrow()', '🎯', t('thrT'), t('thrD'), thrDone ? '🖼 ' + thrDone : free)}
         </div>
 
         <div class="pl-cat">${t('catMusic')}</div>
@@ -2263,7 +2265,7 @@
       if (!n) return;
       try { localStorage.removeItem('agjj_pending_paint'); } catch (e) {}
       addPaint(n);
-      showMsg('💧 페인트를 받았어요', `아트퐁 목표 점수를 넘겨서 💧 ${n}개가 들어왔어요.`);
+      showMsg('💧 페인트를 받았어요', `게임 보상으로 💧 ${n}개가 들어왔어요.`);
     }
 
     // =====================================================================
@@ -3281,6 +3283,7 @@
       addCopyFooters();
       if (IS_APP && EXCFG) collectPendingPaint();
       if (new URLSearchParams(location.search).get('open') === 'pang' && EXCFG) { history.replaceState(null, '', location.pathname); openPang(); }
+      if (new URLSearchParams(location.search).get('open') === 'play') { history.replaceState(null, '', location.pathname); openPlay(); }
 
       hideSplash();
       renderArchive();
@@ -3427,6 +3430,14 @@
       memStart(Math.min(rec.lv ?? u, u));
       document.getElementById('memModal').classList.add('on');
       if (NativeApp && NativeApp.setSecure) NativeApp.setSecure(true);
+    }
+    // 🎯 JJ 물감볼: 무료 대표작 + 내 컬렉션 그림을 도안으로 넘겨주고 throw.html 로
+    function openThrow() {
+      const lobby = ((EXCFG && EXCFG.lobby) || []).map(id => allArtworks.find(a => a.id === id)).filter(a => a && !a.isProfile).slice(0, 6);
+      const mine = memOwned();
+      const arts = [...lobby.map(a => ({ id: a.id, src: a.src, title: a.title, free: true })), ...mine.map(a => ({ id: a.id, src: a.src, title: a.title, free: false }))];
+      lsSet('agjj_throw_list', { arts, locked: Math.max(0, 3 - mine.length), t: Date.now() }, true);
+      location.href = 'throw.html';
     }
     function closeMem() {
       if (MEM && MEM.t) clearInterval(MEM.t); MEM = null;
@@ -4022,6 +4033,7 @@
       paintSub: ['🎨 오늘의 물감 {a} + 모은 페인트 {b}', "🎨 Today's {a} + saved {b}", '🎨 今日颜料 {a} + 已存 {b}', '🎨 今日の絵の具 {a} + 貯めた分 {b}'],
       howPaint: ['💧 페인트 모으는 법', '💧 How to get paint', '💧 如何获得颜料', '💧 絵の具の集め方'],
       pongT: ['J.J 아트퐁', 'J.J Art Pong', 'J.J 艺术碰碰', 'J.J アートポン'], pongD: ['그림 보석 맞추기', 'Match the art gems', '画作宝石消除', '絵の宝石そろえ'],
+      thrT: ['JJ 물감볼', 'JJ Paint Splash', 'JJ 颜料球', 'JJ ペイントボール'], thrD: ['물감을 던져 그림 색칠', 'Throw paint, color the art', '扔颜料给画上色', '絵の具を投げて色ぬり'],
       memT: ['아트메모리게임', 'Art Memory', '艺术记忆游戏', 'アートメモリー'], memD: ['같은 그림 짝 찾기', 'Find matching pairs', '找出相同的画', '同じ絵のペア探し'],
       songT: ['아트쏭', 'Art Song', '艺术之歌', 'アートソング'], songD: ['그림이 노래해요', 'Paintings that sing', '画会唱歌', '絵が歌います'],
       colorT: ['아트컬러링', 'Art Coloring', '艺术涂色', 'アートぬりえ'], colorD: ['색칠하면 노래가 돼요', 'Color it into a song', '涂上颜色就变成歌', '塗ると歌になります'],
