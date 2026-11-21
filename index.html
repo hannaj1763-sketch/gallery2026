@@ -735,6 +735,24 @@
     .sp-snow { position: absolute; top: -10px; color: #fff; text-shadow: 0 0 3px #e6b7b0; animation: spSnow linear infinite; pointer-events: none; }
     @keyframes spSnow { to { transform: translateY(110vh) translateX(20px); } }
     @media (prefers-reduced-motion: reduce) { .sp-door { animation-duration: .01s; animation-delay: 0s; } .sp-snow { display: none; } }
+  
+    /* === 통합 개선 CSS: 모바일 터치·레이아웃·모달·3D 조작감 === */
+    @media (max-width: 480px) {
+      .cbar { gap: 4px; }
+      .cb-home { padding: 7px 10px; font-size: 12px; }
+      .cb-r { gap: 0; }
+      .cb-r button { padding: 3px 5px; min-width: 40px; }
+      .cb-r button b { font-size: 17px; }
+      .cb-r button span { font-size: 10px; }
+      .gal-seg button { padding: 7px 2px; font-size: 12px; }
+    }
+    .pt:hover { border-color: rgba(139, 92, 246, 0.55); box-shadow: 0 8px 22px rgba(0,0,0,0.28); }
+    .pt.drive-tile { border-color: rgba(56, 189, 248, 0.35); background: linear-gradient(160deg, #161b24, #10202e); }
+    .pt.drive-tile:hover { border-color: rgba(56, 189, 248, 0.75); }
+    .view-container { -webkit-overflow-scrolling: touch; }
+    .tk-modal.active { overscroll-behavior: contain; }
+    #view-3d { touch-action: none; user-select: none; -webkit-user-select: none; }
+
   </style>
   <script src="firebase-config.js"></script>   <!-- 🔑 Firebase 키는 이 파일 하나에만 (키를 바꿀 땐 이 파일만 고쳐요) -->
 </head>
@@ -1395,6 +1413,18 @@
       throw new Error('저장소 목록을 불러오지 못했습니다');
     }
 
+
+    const BUILTIN_ARTWORK_NOTES = {"01":{"title":"화가 JJ (Artist JJ)","meta":"아티스트 프로필","notes":{"ko":"안녕하세요! 그림 그리기를 가장 좋아하는 JJ입니다. 새하얀 종이 위에 제가 바라보는 세상과 마음속 상상들을 그려낼 때 가장 행복합니다. 사람들의 마음에 따뜻한 울림을 주는 멋진 화가가 되는 것이 저의 꿈입니다. 제 작은 온라인 전시관에 와주셔서 감사합니다!","en":"Hello! I am JJ, and painting is what I love most. I am happiest when filling blank paper with the world I see and the dreams in my imagination. My dream is to become a wonderful painter who touches people's hearts with warmth. Thank you for visiting my little online gallery!","ja":"こんにちは！絵を描くことが何よりも大好きなJJです。真っ白な紙の上に自分の目に映る世界や心の中の想像を描いている時が一番幸せです。人々の心に温かい響きを届ける素敵な画家になることが私の夢です。私の小さなオンライン展示館へようこそ！","zh":"大家好！我是JJ，画画是我最喜欢的事情。当在白纸上描绘我眼中的世界和心中的想象时，是我最幸福的时刻。我的梦想是成为一名能够温暖人心的优秀画家。感谢大家来到我的小小在线展览馆！","es":"¡Hola! Soy JJ, y pintar es lo que más amo en el mundo. Me siento más feliz cuando lleno el papel en blanco con el mundo que veo y la imaginación en mi corazón. Mi sueño es convertirme en un pintor maravilloso que toque los corazones de las personas con calidez. ¡Gracias por visitar mi pequeña galería virtual!"}},"03":{"title":"오렌지 스니커즈","date":"2026-08","meta":"스케치북위 수채화 | 2026-08","notes":{"ko":"주황색 운동화의 모양과 끈을 유심히 보면서 스케치북에 수채화로 그려봤어요.","en":"Artwork: 오렌지 스니커즈. Created by artist JJ.","ja":"作品：오렌지 스니커즈。作家JJの作品です。","zh":"作品：《오렌지 스니커즈》。JJ艺术家的画作。","es":"Obra: 오렌지 스니커즈. Creada por el artista JJ."},"genre":"수채화"},"04":{"title":"Refreshing Fragments","date":"2026-08","meta":"종이 위 원화 | 2026-08","notes":{"ko":"시원한 조각들이 모여서 답답한 마음까지 뻥 뚫리는 느낌을 주고 싶었어요.","en":"Artwork: Refreshing Fragments. Created by artist JJ.","ja":"作品：Refreshing Fragments。作家JJの作品です。","zh":"作品：《Refreshing Fragments》。JJ艺术家的画作。","es":"Obra: Refreshing Fragments. Creada por el artista JJ."},"genre":"수채화"},"05":{"title":"Beneath the Quiet Afternoon","date":"2026-08","meta":"종이 위 원화 | 2026-08","notes":{"ko":"조용하고 평화로운 오후의 햇살 아래 머무는 기분을 그렸어요.","en":"Artwork: Beneath the Quiet Afternoon. Created by artist JJ.","ja":"作品：Beneath the Quiet Afternoon。作家JJの作品です。","zh":"作品：《Beneath the Quiet Afternoon》。JJ艺术家的画作。","es":"Obra: Beneath the Quiet Afternoon. Creada por el artista JJ."},"genre":"수채화"},"06":{"title":"Rosy Chill","date":"2026-08","meta":"종이 위 원화 | 2026-08","notes":{"ko":"살짝 서늘한 바람 속에 분홍빛 설렘이 섞인 느낌을 담아보았어요.","en":"Artwork: Rosy Chill. Created by artist JJ.","ja":"作品：Rosy Chill。作家JJの作品です。","zh":"作品：《Rosy Chill》。JJ艺术家的画作。","es":"Obra: Rosy Chill. Creada por el artista JJ."},"genre":"수채화"},"07":{"title":"The Sprouting Earth","date":"2026-07","meta":"종이 위 원화 | 2026-07","notes":{"ko":"땅속에서 새싹이 고개를 쏙 내미는 순간이 참 신기해서 그렸어요.","en":"Artwork: The Sprouting Earth. Created by artist JJ.","ja":"作品：The Sprouting Earth。作家JJの作品です。","zh":"作品：《The Sprouting Earth》。JJ艺术家的画作。","es":"Obra: The Sprouting Earth. Creada por el artista JJ."},"genre":"수채화"},"08":{"title":"snowman","date":"2024-12","meta":"종이 위 원화 | 2025-12","notes":{"ko":"동글동글 눈사람을 만들 때의 차갑고 폭신한 느낌을 그렸어요.","en":"Artwork: snowman. Created by artist JJ.","ja":"作品：snowman。作家JJの作品です。","zh":"作品：《snowman》。JJ艺术家的画作。","es":"Obra: snowman. Creada por el artista JJ."},"genre":"자유작"},"09":{"title":"Bridge of yearning Over the Milky Way","date":"2024-12","meta":"종이 위 원화 | 2025-12","notes":{"ko":"은하수 위로 그리운 마음을 건너가는 다리가 있다면 꼭 건너가 보고 싶어요.","en":"Artwork: Bridge of yearning Over the Milky Way. Created by artist JJ.","ja":"作品：Bridge of yearning Over the Milky Way。作家JJの作品です。","zh":"作品：《Bridge of yearning Over the Milky Way》。JJ艺术家的画作。","es":"Obra: Bridge of yearning Over the Milky Way. Creada por el artista JJ."},"genre":"발상과 표현"},"10":{"title":"Cozy Christmas Bite","date":"2024-12","meta":"종이 위 원화 | 2025-12","notes":{"ko":"크리스마스에 한 입 먹으면 기분이 포근해질 것 같은 달콤한 그림이에요.","en":"Artwork: Cozy Christmas Bite. Created by artist JJ.","ja":"作品：Cozy Christmas Bite。作家JJの作品です。","zh":"作品：《Cozy Christmas Bite》。JJ艺术家的画作。","es":"Obra: Cozy Christmas Bite. Creada por el artista JJ."},"genre":"자유작"},"11":{"title":"Prism of Cherries","date":"2024-12","meta":"종이 위 원화 | 2025-12","notes":{"ko":"반짝이는 체리들이 빛을 받아 영롱하게 빛나는 것처럼 그렸어요.","en":"Artwork: Prism of Cherries. Created by artist JJ.","ja":"作品：Prism of Cherries。作家JJの作品です。","zh":"作品：《Prism of Cherries》。JJ艺术家的画作。","es":"Obra: Prism of Cherries. Creada por el artista JJ."},"genre":"자유작"},"12":{"title":"Homage of Matisse (Cat and Goldfish)","date":"2024-12","meta":"종이 위 원화 | 2025-12","notes":{"ko":"마티스 화가님 그림처럼 고양이와 금붕어가 한 화면에서 어울리는 모습을 상상했어요.","en":"Artwork: Homage of Matisse (Cat and Goldfish). Created by artist JJ.","ja":"作品：Homage of Matisse (Cat and Goldfish)。作家JJの作品です。","zh":"作品：《Homage of Matisse (Cat and Goldfish)》。JJ艺术家的画作。","es":"Obra: Homage of Matisse (Cat and Goldfish). Creada por el artista JJ."},"genre":"발상과 표현"},"13":{"title":"Wings in the dark","date":"2025-02","meta":"종이 위 원화 | 2026-02","notes":{"ko":"어두운 밤하늘 속에서도 날개를 펼치면 길을 찾을 수 있을 것 같아서 그렸어요.","en":"Artwork: Wings in the dark. Created by artist JJ.","ja":"作品：Wings in the dark。作家JJの作品です。","zh":"作品：《Wings in the dark》。JJ艺术家的画作。","es":"Obra: Wings in the dark. Creada por el artista JJ."},"genre":"발상과 표현"},"14":{"title":"Slient Symmetry","date":"2025-02","meta":"종이 위 원화 | 2025-02","notes":{"ko":"왼쪽과 오른쪽이 조용히 맞닿아 있는 모습을 맞추는 게 은근히 재미있었어요.","en":"Artwork: Slient Symmetry. Created by artist JJ.","ja":"作品：Slient Symmetry。作家JJの作品です。","zh":"作品：《Slient Symmetry》。JJ艺术家的画作。","es":"Obra: Slient Symmetry. Creada por el artista JJ."},"genre":"소묘"},"15":{"title":"Ink Magpie","date":"2025-02","meta":"종이 위 원화 | 2025-02","notes":{"ko":"까치의 까맣고 하얀 털 느낌이 선으로 잘 살아나도록 조심조심 그렸어요.","en":"Artwork: Ink Magpie. Created by artist JJ.","ja":"作品：Ink Magpie。作家JJの作品です。","zh":"作品：《Ink Magpie》。JJ艺术家的画作。","es":"Obra: Ink Magpie. Creada por el artista JJ."},"genre":"소묘"},"16":{"title":"Yellow Tulips in a Vase","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"꽃병 속 노란 튤립이 봄볕을 받아 환하게 웃는 것처럼 칠했어요.","en":"Artwork: Yellow Tulips in a Vase. Created by artist JJ.","ja":"作品：Yellow Tulips in a Vase。作家JJの作品です。","zh":"作品：《Yellow Tulips in a Vase》。JJ艺术家的画作。","es":"Obra: Yellow Tulips in a Vase. Creada por el artista JJ."},"genre":"수채화"},"17":{"title":"Crispy&Savory","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"바삭하고 고소한 간식이 눈앞에 있는 것처럼 맛있게 그려보았어요.","en":"Artwork: Crispy&Savory. Created by artist JJ.","ja":"作品：Crispy&Savory。作家JJの作品です。","zh":"作品：《Crispy&Savory》。JJ艺术家的画作。","es":"Obra: Crispy&Savory. Creada por el artista JJ."},"genre":"자유작"},"18":{"title":"Autumn over the Stone Wall","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"돌담 너머로 가을빛이 스며드는 풍경을 떠올리며 색을 골랐어요.","en":"Artwork: Autumn over the Stone Wall. Created by artist JJ.","ja":"作品：Autumn over the Stone Wall。作家JJの作品です。","zh":"作品：《Autumn over the Stone Wall》。JJ艺术家的画作。","es":"Obra: Autumn over the Stone Wall. Creada por el artista JJ."},"genre":"수채화"},"19":{"title":"Chasing Cherry Blossoms","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"바람에 흩날리는 벚꽃을 따라가듯 가벼운 마음으로 물감을 얹었어요.","en":"Artwork: Chasing Cherry Blossoms. Created by artist JJ.","ja":"作品：Chasing Cherry Blossoms。作家JJの作品です。","zh":"作品：《Chasing Cherry Blossoms》。JJ艺术家的画作。","es":"Obra: Chasing Cherry Blossoms. Creada por el artista JJ."},"genre":"수채화"},"20":{"title":"Ball","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"통통 튀는 공처럼 마음도 가볍게 뛰는 느낌으로 그렸어요.","en":"Artwork: Ball. Created by artist JJ.","ja":"作品：Ball。作家JJの作品です。","zh":"作品：《Ball》。JJ艺术家的画作。","es":"Obra: Ball. Creada por el artista JJ."},"genre":"자유작"},"21":{"title":"Three Pea Brothers","date":"2025-05","meta":"종이 위 원화 | 2025-05","notes":{"ko":"콩깍지 속 세 형제가 나란히 붙어 있는 모습이 귀엽고 다정했어요.","en":"Artwork: Three Pea Brothers. Created by artist JJ.","ja":"作品：Three Pea Brothers。作家JJの作品です。","zh":"作品：《Three Pea Brothers》。JJ艺术家的画作。","es":"Obra: Three Pea Brothers. Creada por el artista JJ."},"genre":"자유작"},"22":{"title":"choco","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"달콤한 초콜릿처럼 기분을 부드럽게 만들어 주는 그림이에요.","en":"Artwork: choco. Created by artist JJ.","ja":"作品：choco。作家JJの作品です。","zh":"作品：《choco》。JJ艺术家的画作。","es":"Obra: choco. Creada por el artista JJ."},"genre":"자유작"},"23":{"title":"Sea animals","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"바다 속에 사는 여러 친구들을 한자리에 모아 그려보았어요.","en":"Artwork: Sea animals. Created by artist JJ.","ja":"作品：Sea animals。作家JJの作品です。","zh":"作品：《Sea animals》。JJ艺术家的画作。","es":"Obra: Sea animals. Creada por el artista JJ."},"genre":"자유작"},"24":{"title":"The Starfish on the Beach","date":"2025-10","meta":"종이 위 원화 | 2025-10","notes":{"ko":"모래사장 위에 누워 있던 불가사리를 발견했을 때처럼 그렸어요.","en":"Artwork: The Starfish on the Beach. Created by artist JJ.","ja":"作品：The Starfish on the Beach。作家JJの作品です。","zh":"作品：《The Starfish on the Beach》。JJ艺术家的画作。","es":"Obra: The Starfish on the Beach. Creada por el artista JJ."},"genre":"자유작"},"25":{"title":"Robo Bird","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"로봇과 새가 만나면 어떤 모습일까 생각하면서 재미있게 꾸몄어요.","en":"Artwork: Robo Bird. Created by artist JJ.","ja":"作品：Robo Bird。作家JJの作品です。","zh":"作品：《Robo Bird》。JJ艺术家的画作。","es":"Obra: Robo Bird. Creada por el artista JJ."},"genre":"발상과 표현"},"26":{"title":"Hello, New York!","date":"2025-06","meta":"종이 위 원화 | 2025-06","notes":{"ko":"언젠가 가보고 싶은 뉴욕의 활기찬 풍경을 상상하며 반갑게 인사하듯 그렸어요.","en":"Artwork: Hello, New York!. Created by artist JJ.","ja":"作品：Hello, New York!。作家JJの作品です。","zh":"作品：《Hello, New York!》。JJ艺术家的画作。","es":"Obra: Hello, New York!. Creada por el artista JJ."},"genre":"발상과 표현"},"27":{"title":"Rose of Sharon","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"우리나라 무궁화의 꽃잎 결이 예쁘게 보이도록 색을 겹쳐 칠했어요.","en":"Artwork: Rose of Sharon. Created by artist JJ.","ja":"作品：Rose of Sharon。作家JJの作品です。","zh":"作品：《Rose of Sharon》。JJ艺术家的画作。","es":"Obra: Rose of Sharon. Creada por el artista JJ."},"genre":"수채화"},"28":{"title":"Let's Move!","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"가만히 있지 말고 몸을 움직이며 신나게 놀아보자는 마음을 담았어요.","en":"Artwork: Let's Move!. Created by artist JJ.","ja":"作品：Let's Move!。作家JJの作品です。","zh":"作品：《Let's Move!》。JJ艺术家的画作。","es":"Obra: Let's Move!. Creada por el artista JJ."},"genre":"자유작"},"29":{"title":"Yummy Dessert","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"보기만 해도 군침이 도는 맛있는 디저트들을 골라 그렸어요.","en":"Artwork: Yummy Dessert. Created by artist JJ.","ja":"作品：Yummy Dessert。作家JJの作品です。","zh":"作品：《Yummy Dessert》。JJ艺术家的画作。","es":"Obra: Yummy Dessert. Creada por el artista JJ."},"genre":"자유작"},"30":{"title":"Spring Church","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"봄날의 포근한 공기 속에서 반짝이는 교회의 모습을 담았어요.","en":"Artwork: Spring Church. Created by artist JJ.","ja":"作品：Spring Church。作家JJの作品です。","zh":"作品：《Spring Church》。JJ艺术家的画作。","es":"Obra: Spring Church. Creada por el artista JJ."},"genre":"수채화"},"31":{"title":"Bamboo Forest","date":"2025-05","meta":"종이 위 원화 | 2025-05","notes":{"ko":"쭉쭉 뻗은 대나무 숲에 들어가면 바람 소리만 들릴 것 같아서 그렸어요.","en":"Artwork: Bamboo Forest. Created by artist JJ.","ja":"作品：Bamboo Forest。作家JJの作品です。","zh":"作品：《Bamboo Forest》。JJ艺术家的画作。","es":"Obra: Bamboo Forest. Creada por el artista JJ."},"genre":"수채화"},"32":{"title":"One Rose","date":"2025-05","meta":"종이 위 원화 | 2025-05","notes":{"ko":"장미 한 송이가 가진 붉고 깊은 느낌을 한껏 담아보았어요.","en":"Artwork: One Rose. Created by artist JJ.","ja":"作品：One Rose。作家JJの作品です。","zh":"作品：《One Rose》。JJ艺术家的画作。","es":"Obra: One Rose. Creada por el artista JJ."},"genre":"수채화"},"33":{"title":"Magpie and Persimmons","date":"2026-01","meta":"종이 위 원화 | 2026-01","notes":{"ko":"주렁주렁 열린 감과 까치가 함께 있으니 기분 좋은 복이 오는 것 같아요.","en":"Artwork: Magpie and Persimmons. Created by artist JJ.","ja":"作品：Magpie and Persimmons。作家JJの作品です。","zh":"作品：《Magpie and Persimmons》。JJ艺术家的画作。","es":"Obra: Magpie and Persimmons. Creada por el artista JJ."},"genre":"수채화"},"34":{"title":"Winter Fun","date":"2026-01","meta":"종이 위 원화 | 2026-01","notes":{"ko":"추운 겨울날에도 신나게 놀던 기억을 떠올리며 차가운 색과 따뜻한 색을 섞었어요.","en":"Artwork: Winter Fun. Created by artist JJ.","ja":"作品：Winter Fun。作家JJの作品です。","zh":"作品：《Winter Fun》。JJ艺术家的画作。","es":"Obra: Winter Fun. Creada por el artista JJ."},"genre":"수채화"},"35":{"title":"Hiss Hiss!","date":"2026-02","meta":"종이 위 원화 | 2026-02","notes":{"ko":"장난기 가득한 소리와 표정이 살아나게 재미있게 그려보았어요.","en":"Artwork: Hiss Hiss!. Created by artist JJ.","ja":"作品：Hiss Hiss!。作家JJの作品です。","zh":"作品：《Hiss Hiss!》。JJ艺术家的画作。","es":"Obra: Hiss Hiss!. Creada por el artista JJ."},"genre":"자유작"},"36":{"title":"Rainbow Bouquet","date":"2026-02","meta":"종이 위 원화 | 2026-02","notes":{"ko":"무지개처럼 여러 색깔 꽃다발을 묶으면 보는 사람도 기분이 좋아질 것 같았어요.","en":"Artwork: Rainbow Bouquet. Created by artist JJ.","ja":"作品：Rainbow Bouquet。作家JJの作品です。","zh":"作品：《Rainbow Bouquet》。JJ艺术家的画作。","es":"Obra: Rainbow Bouquet. Creada por el artista JJ."},"genre":"수채화"},"37":{"title":"My Kitchen","date":"2026-02","meta":"종이 위 원화 | 2026-02","notes":{"ko":"내가 좋아하는 것들로 가득 채운 나만의 작은 부엌을 상상했어요.","en":"Artwork: My Kitchen. Created by artist JJ.","ja":"作品：My Kitchen。作家JJの作品です。","zh":"作品：《My Kitchen》。JJ艺术家的画作。","es":"Obra: My Kitchen. Creada por el artista JJ."},"genre":"자유작"},"38":{"title":"Red Hat Lady","date":"2026-03","meta":"종이 위 원화 | 2026-03","notes":{"ko":"빨간 모자가 딱 눈에 띄도록 당당하고 멋지게 그려보았어요.","en":"Artwork: Red Hat Lady. Created by artist JJ.","ja":"作品：Red Hat Lady。作家JJの作品です。","zh":"作品：《Red Hat Lady》。JJ艺术家的画作。","es":"Obra: Red Hat Lady. Creada por el artista JJ."},"genre":"자유작"},"39":{"title":"Sail Away!","date":"2026-03","meta":"종이 위 원화 | 2026-03","notes":{"ko":"돛을 달고 새로운 바다로 떠나는 설레는 마음을 담았어요.","en":"Artwork: Sail Away!. Created by artist JJ.","ja":"作品：Sail Away!。作家JJの作品です。","zh":"作品：《Sail Away!》。JJ艺术家的画作。","es":"Obra: Sail Away!. Creada por el artista JJ."},"genre":"자유작"},"40":{"title":"Under the Green Tree","date":"2026-05","meta":"종이 위 원화 | 2026-05","notes":{"ko":"초록빛 나무 아래 앉아 쉬면 금방 시원해질 것 같은 장면을 그렸어요.","en":"Artwork: Under the Green Tree. Created by artist JJ.","ja":"作品：Under the Green Tree。作家JJの作品です。","zh":"作品：《Under the Green Tree》。JJ艺术家的画作。","es":"Obra: Under the Green Tree. Creada por el artista JJ."},"genre":"수채화"},"41":{"title":"A Walk in the Garden","date":"2026-05","meta":"종이 위 원화 | 2026-05","notes":{"ko":"정원을 천천히 산책하면서 만난 작은 풀과 꽃들을 하나씩 담았어요.","en":"Artwork: A Walk in the Garden. Created by artist JJ.","ja":"作品：A Walk in the Garden。作家JJの作品です。","zh":"作品：《A Walk in the Garden》。JJ艺术家的画作。","es":"Obra: A Walk in the Garden. Creada por el artista JJ."},"genre":"수채화"},"42":{"title":"My Rainbow Bird","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"무지개 빛깔 날개를 가진 새가 하늘을 날면 얼마나 예쁠까 상상했어요.","en":"Artwork: My Rainbow Bird. Created by artist JJ.","ja":"作品：My Rainbow Bird。作家JJの作品です。","zh":"作品：《My Rainbow Bird》。JJ艺术家的画作。","es":"Obra: My Rainbow Bird. Creada por el artista JJ."},"genre":"수채화"},"43":{"title":"A Puppy Made of Shapes","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"세모, 네모, 동그라미 같은 도형들을 모으니까 귀여운 강아지가 되었어요.","en":"Artwork: A Puppy Made of Shapes. Created by artist JJ.","ja":"作品：A Puppy Made of Shapes。作家JJの作品です。","zh":"作品：《A Puppy Made of Shapes》。JJ艺术家的画作。","es":"Obra: A Puppy Made of Shapes. Creada por el artista JJ."},"genre":"소묘"},"44":{"title":"Korean Patterns","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"우리나라 전통 문양의 무늬들이 이어지면서 만드는 리듬이 멋있었어요.","en":"Artwork: Korean Patterns. Created by artist JJ.","ja":"作品：Korean Patterns。作家JJの作品です。","zh":"作品：《Korean Patterns》。JJ艺术家的画作。","es":"Obra: Korean Patterns. Creada por el artista JJ."},"genre":"발상과 표현"},"45":{"title":"my home","date":"2022-11","meta":"종이 위 원화 | 2022-11","notes":{"ko":"내가 가장 편하고 안전한 우리 집의 모습을 따뜻하게 그렸어요.","en":"Artwork: my home. Created by artist JJ.","ja":"作品：my home。作家JJの作品です。","zh":"作品：《my home》。JJ艺术家的画作。","es":"Obra: my home. Creada por el artista JJ."},"genre":"자유작"},"46":{"title":"나의 장래희망","date":"2026-11","meta":"종이 위 원화 | 2026-11","notes":{"ko":"앞으로 내가 어떤 사람이 되고 싶은지, 어떤 꿈을 키우고 있는지 담았어요.","en":"Artwork: 나의 장래희망. Created by artist JJ.","ja":"作品：나의 장래희망。作家JJの作品です。","zh":"作品：《나의 장래희망》。JJ艺术家的画作。","es":"Obra: 나의 장래희망. Creada por el artista JJ."},"genre":"발상과 표현"},"47":{"title":"Let's smile!","date":"2025-11","meta":"2025-11","notes":{"ko":"그림을 보는 사람도, 그리는 나도 같이 웃게 되길 바라며 그렸어요.","en":"Artwork: Let's smile!. Created by artist JJ.","ja":"作品：Let's smile!。作家JJの作品です。","zh":"作品：《Let's smile!》。JJ艺术家的画作。","es":"Obra: Let's smile!. Creada por el artista JJ."},"genre":"자유작"},"48":{"title":"Protect Earth!","date":"2025-12","meta":"2025-12","notes":{"ko":"우리가 사는 지구를 소중하게 지키자는 마음을 그림에 꼭 담고 싶었어요.","en":"Artwork: Protect Earth!. Created by artist JJ.","ja":"作品：Protect Earth!。作家JJの作品です。","zh":"作品：《Protect Earth!》。JJ艺术家的画作。","es":"Obra: Protect Earth!. Creada por el artista JJ."},"genre":"발상과 표현"},"49":{"title":"My Autumn Leaves","date":"2025-11","meta":"2025-11","notes":{"ko":"주워 모은 낙엽들처럼 색색깔 가을의 조각들을 모았어요.","en":"Artwork: My Autumn Leaves. Created by artist JJ.","ja":"作品：My Autumn Leaves。作家JJの作品です。","zh":"作品：《My Autumn Leaves》。JJ艺术家的画作。","es":"Obra: My Autumn Leaves. Creada por el artista JJ."},"genre":"자유작"},"50":{"title":"Stripes, Stripes!","date":"2025-11","meta":"2025-11","notes":{"ko":"줄무늬가 가득한 화면을 보면서 리듬감을 느껴보았어요.","en":"Artwork: Stripes, Stripes!. Created by artist JJ.","ja":"作品：Stripes, Stripes!。作家JJの作品です。","zh":"作品：《Stripes, Stripes!》。JJ艺术家的画作。","es":"Obra: Stripes, Stripes!. Creada por el artista JJ."},"genre":"자유작"},"51":{"title":"sun flower","date":"2025-11","meta":"2025-11","notes":{"ko":"해바라기처럼 밝고 환한 에너지를 담아서 그려보았어요.","en":"Artwork: sun flower. Created by artist JJ.","ja":"作品：sun flower。作家JJの作品です。","zh":"作品：《sun flower》。JJ艺术家的画作。","es":"Obra: sun flower. Creada por el artista JJ."},"genre":"자유작"},"52":{"title":"Pine tree","date":"2025-10","meta":"2025-10","notes":{"ko":"사계절 내내 푸른 소나무의 단단한 모습을 담고 싶었어요.","en":"Artwork: Pine tree. Created by artist JJ.","ja":"作品：Pine tree。作家JJの作品です。","zh":"作品：《Pine tree》。JJ艺术家的画作。","es":"Obra: Pine tree. Creada por el artista JJ."},"genre":"자유작"},"53":{"title":"Window Cat","date":"2025-09","meta":"2025-09","notes":{"ko":"창가에 기대어 바깥을 구경하던 고양이의 모습이 조용하고 귀여웠어요.","en":"Artwork: Window Cat. Created by artist JJ.","ja":"作品：Window Cat。作家JJの作品です。","zh":"作品：《Window Cat》。JJ艺术家的画作。","es":"Obra: Window Cat. Creada por el artista JJ."},"genre":"자유작"},"54":{"title":"Shiny Glass","date":"2025-10","meta":"2025-10","notes":{"ko":"유리컵이나 창문에서 반짝이는 빛을 어떻게 표현할지 고민하며 그렸어요.","en":"Artwork: Shiny Glass. Created by artist JJ.","ja":"作品：Shiny Glass。作家JJの作品です。","zh":"作品：《Shiny Glass》。JJ艺术家的画作。","es":"Obra: Shiny Glass. Creada por el artista JJ."},"genre":"소묘"},"55":{"title":"Halloween","date":"2025-10","meta":"2025-10","notes":{"ko":"무섭기보다는 장난기 가득한 할로윈 파티 분위기를 살려보았어요.","en":"Artwork: Halloween. Created by artist JJ.","ja":"作品：Halloween。作家JJの作品です。","zh":"作品：《Halloween》。JJ艺术家的画作。","es":"Obra: Halloween. Creada por el artista JJ."},"genre":"발상과 표현"},"56":{"title":"Milk","date":"2025-07","meta":"2025-07","notes":{"ko":"하얗고 고소한 우유 한 잔처럼 깔끔하고 담백하게 그려보았어요.","en":"Artwork: Milk. Created by artist JJ.","ja":"作品：Milk。作家JJの作品です。","zh":"作品：《Milk》。JJ艺术家的画作。","es":"Obra: Milk. Creada por el artista JJ."},"genre":"자유작"},"57":{"title":"morol","date":"2025-08","meta":"2025-08","notes":{"ko":"그때 떠오른 느낌을 그대로 손끝으로 옮겨 적은 자유로운 그림이에요.","en":"Artwork: morol. Created by artist JJ.","ja":"作品：morol。作家JJの作品です。","zh":"作品：《morol》。JJ艺术家的画作。","es":"Obra: morol. Creada por el artista JJ."},"genre":"자유작"},"58":{"title":"Rabbit","date":"2025-07","meta":"2025-07","notes":{"ko":"긴 귀가 매력적인 토끼의 모습을 편안하게 담아보았어요.","en":"Artwork: Rabbit. Created by artist JJ.","ja":"作品：Rabbit。作家JJの作品です。","zh":"作品：《Rabbit》。JJ艺术家的画作。","es":"Obra: Rabbit. Creada por el artista JJ."},"genre":"자유작"},"59":{"title":"P","date":"2025-08","meta":"2025-08","notes":{"ko":"알파벳 'P' 하나에서도 새로운 모양과 상상을 꺼내 보았어요.","en":"Artwork: P. Created by artist JJ.","ja":"作品：P。作家JJの作品です。","zh":"作品：《P》。JJ艺术家的画作。","es":"Obra: P. Creada por el artista JJ."},"genre":"자유작"},"60":{"title":"My Irworobongdo","date":"2025-07","meta":"2025-07","notes":{"ko":"일월오봉도의 멋진 모습을 나만의 색과 느낌으로 다시 그려보았어요.","en":"Artwork: My Irworobongdo. Created by artist JJ.","ja":"作品：My Irworobongdo。作家JJの作品です。","zh":"作品：《My Irworobongdo》。JJ艺术家的画作。","es":"Obra: My Irworobongdo. Creada por el artista JJ."},"genre":"발상과 표현"},"61":{"title":"watermelon","date":"2025-07","meta":"2025-07","notes":{"ko":"여름에 시원하게 먹던 수박의 빨간 속살과 씨를 떠올리며 그렸어요.","en":"Artwork: watermelon. Created by artist JJ.","ja":"作品：watermelon。作家JJの作品です。","zh":"作品：《watermelon》。JJ艺术家的画作。","es":"Obra: watermelon. Creada por el artista JJ."},"genre":"자유작"},"62":{"title":"The Whale in My Dream","date":"2025-08","meta":"2025-08","notes":{"ko":"꿈속에서 커다란 고래와 함께 헤엄치던 신기한 장면을 떠올렸어요.","en":"Artwork: The Whale in My Dream. Created by artist JJ.","ja":"作品：The Whale in My Dream。作家JJの作品です。","zh":"作品：《The Whale in My Dream》。JJ艺术家的画作。","es":"Obra: The Whale in My Dream. Creada por el artista JJ."},"genre":"발상과 표현"},"63":{"title":"Derpy","date":"2025-08","meta":"2025-08","notes":{"ko":"어딘가 엉뚱하고 귀여운 표정이 살아나도록 재미있게 그렸어요.","en":"Artwork: Derpy. Created by artist JJ.","ja":"作品：Derpy。作家JJの作品です。","zh":"作品：《Derpy》。JJ艺术家的画作。","es":"Obra: Derpy. Creada por el artista JJ."},"genre":"자유작"},"64":{"title":"Zipline","date":"2022-11","meta":"2022-11","notes":{"ko":"짚라인을 타고 휙 날아갈 때의 짜릿한 기분을 그림으로 남겨보았어요.","en":"Artwork: Zipline. Created by artist JJ.","ja":"作品：Zipline。作家JJの作品です。","zh":"作品：《Zipline》。JJ艺术家的画作。","es":"Obra: Zipline. Creada por el artista JJ."},"genre":"자유작"},"65":{"title":"My Unicorn World","date":"2022-06","meta":"2022-06","notes":{"ko":"유니콘이 사는 동화 속 세상이 있다면 꼭 놀러 가고 싶어서 그렸어요.","en":"Artwork: My Unicorn World. Created by artist JJ.","ja":"作品：My Unicorn World。作家JJの作品です。","zh":"作品：《My Unicorn World》。JJ艺术家的画作。","es":"Obra: My Unicorn World. Creada por el artista JJ."},"genre":"자유작"},"66":{"title":"Snack Time with Mom","date":"2022-06","meta":"2022-06","notes":{"ko":"엄마랑 맛있는 간식을 먹으면서 이야기 나누던 시간이 참 좋았어요.","en":"Artwork: Snack Time with Mom. Created by artist JJ.","ja":"作品：Snack Time with Mom。作家JJの作品です。","zh":"作品：《Snack Time with Mom》。JJ艺术家的画作。","es":"Obra: Snack Time with Mom. Creada por el artista JJ."},"genre":"자유작"},"67":{"title":"Bunny Garden","date":"2022-07","meta":"2022-07","notes":{"ko":"토끼들이 모여 노는 정원을 생각하니까 저절로 미소가 나왔어요.","en":"Artwork: Bunny Garden. Created by artist JJ.","ja":"作品：Bunny Garden。作家JJの作品です。","zh":"作品：《Bunny Garden》。JJ艺术家的画作。","es":"Obra: Bunny Garden. Creada por el artista JJ."},"genre":"자유작"},"68":{"title":"Meow Meow, Let's Go!","date":"2022-08","meta":"2022-08","notes":{"ko":"고양이랑 함께 신나게 출발하는 기분으로 씩씩하게 그렸어요.","en":"Artwork: Meow Meow, Let's Go!. Created by artist JJ.","ja":"作品：Meow Meow, Let's Go!。作家JJの作品です。","zh":"作品：《Meow Meow, Let's Go!》。JJ艺术家的画作。","es":"Obra: Meow Meow, Let's Go!. Creada por el artista JJ."},"genre":"자유작"},"69":{"title":"Welcome to the Bee House!","date":"2022-10","meta":"2022-10","notes":{"ko":"꿀벌 친구들의 집에 초대받은 것처럼 아기자기하게 채워 넣었어요.","en":"Artwork: Welcome to the Bee House!. Created by artist JJ.","ja":"作品：Welcome to the Bee House!。作家JJの作品です。","zh":"作品：《Welcome to the Bee House!》。JJ艺术家的画作。","es":"Obra: Welcome to the Bee House!. Creada por el artista JJ."},"genre":"자유작"},"70":{"title":"Dancing on the Music Box","date":"2022-09","meta":"2022-09","notes":{"ko":"오르골 음악에 맞춰 작은 인형이 춤추는 것처럼 그려보았어요.","en":"Artwork: Dancing on the Music Box. Created by artist JJ.","ja":"作品：Dancing on the Music Box。作家JJの作品です。","zh":"作品：《Dancing on the Music Box》。JJ艺术家的画作。","es":"Obra: Dancing on the Music Box. Creada por el artista JJ."},"genre":"자유작"},"71":{"title":"Horse","date":"2026-01","meta":"2026-01","notes":{"ko":"말의 씩씩한 몸짓과 움직임이 느껴지게 선을 써 보았어요.","en":"Artwork: Horse. Created by artist JJ.","ja":"作品：Horse。作家JJの作品です。","zh":"作品：《Horse》。JJ艺术家的画作。","es":"Obra: Horse. Creada por el artista JJ."},"genre":"소묘"},"72":{"title":"Boy","date":"2026-01","meta":"2026-01","notes":{"ko":"한 소년의 표정과 모습을 차분하게 바라보며 완성한 그림이에요.","en":"Artwork: Boy. Created by artist JJ.","ja":"作品：Boy。作家JJの作品です。","zh":"作品：《Boy》。JJ艺术家的画作。","es":"Obra: Boy. Creada por el artista JJ."},"genre":"소묘"},"73":{"title":"Sea city","date":"2026-01","meta":"2026-01","notes":{"ko":"바다 속에 도시가 있다면 물고기들과 어떻게 살아갈지 상상해 보았어요.","en":"Artwork: Sea city. Created by artist JJ.","ja":"作品：Sea city。作家JJの作品です。","zh":"作品：《Sea city》。JJ艺术家的画作。","es":"Obra: Sea city. Creada por el artista JJ."},"genre":"발상과 표현"}};
+    function applyBuiltinNote(id, noteData) {
+      const b = BUILTIN_ARTWORK_NOTES[id];
+      if (!b) return noteData;
+      const merged = Object.assign({}, b, noteData || {});
+      merged.notes = Object.assign({}, b.notes || {}, (noteData && noteData.notes) || {});
+      if (!merged.title && b.title) merged.title = b.title;
+      if (!merged.meta && b.meta) merged.meta = b.meta;
+      return merged;
+    }
+
     async function fetchArtworkList() {
       const { branch, tree } = await fetchRepoTree();
 
@@ -1413,20 +1443,27 @@
       // [속도개선] note.json을 동시에(병렬) 받기
       const entries = Object.entries(folders).filter(([, f]) => f.img && f.note);
       const results = await Promise.all(entries.map(async ([folder, f]) => {
+        let noteData = BUILTIN_ARTWORK_NOTES[folder] || null;
         try {
           const noteRes = await fetch(rawUrl(branch, f.note));
-          const noteData = await noteRes.json();
-          return {
-            id: folder,
-            isProfile: folder === '01' || (noteData.title && noteData.title.includes('프로필')),
-            title: noteData.title || folder,
-            date: noteData.date || "9999-99",
-            meta: noteData.meta || '',
-            src: rawUrl(branch, f.img),
-            notes: noteData.notes || { ko: "작품 설명이 없습니다." },
-            theme: detectTheme(noteData.title, noteData.notes)
-          };
-        } catch (e) { return null; }
+          if (noteRes && noteRes.ok) {
+            const fetched = await noteRes.json();
+            noteData = applyBuiltinNote(folder, fetched);
+          }
+        } catch (e) {
+          noteData = noteData ? applyBuiltinNote(folder, noteData) : null;
+        }
+        if (!noteData) return null;
+        return {
+          id: folder,
+          isProfile: folder === '01' || (noteData.title && noteData.title.includes('프로필')),
+          title: noteData.title || folder,
+          date: noteData.date || "9999-99",
+          meta: noteData.meta || '',
+          src: rawUrl(branch, f.img),
+          notes: noteData.notes || { ko: "작품 설명이 없습니다." },
+          theme: detectTheme(noteData.title, noteData.notes)
+        };
       }));
 
       const list = results.filter(Boolean);
@@ -1551,8 +1588,22 @@
       bar.innerHTML = html;
     }
 
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function syncModalScrollLock() {
+      const anyActive = !!document.querySelector('.tk-modal.active') || !!document.getElementById('songPlayer')?.classList.contains('on');
+      document.body.style.overflow = anyActive ? 'hidden' : '';
+    }
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.add('active');
+      syncModalScrollLock();
+    }
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('active');
+      syncModalScrollLock();
+    }
     function showMsg(title, sub, onOk) {
       document.getElementById('msgTitle').innerText = title;
       document.getElementById('msgSub').innerHTML = sub;
@@ -1980,6 +2031,11 @@
           ${T("switchView('store')", '📦', t('storeT'), t('storeD'), free)}
         </div>
 
+        <div class="pl-cat">${t('catDrive')}</div>
+        <div class="pg">
+          ${T("openDrive()", '🛴', t('driveT'), t('driveD'), free, 'drive-tile')}
+        </div>
+
 `;
     }
 
@@ -2147,6 +2203,8 @@
       document.getElementById('songFrame').src = 'about:blank';           // 소리 멈추기
       if (NativeApp && NativeApp.setSecure) NativeApp.setSecure(!!activeTicket());
       if (document.getElementById('view-play').classList.contains('active')) renderPlay();
+    
+      syncModalScrollLock();
     }
     // 아트쏭 안에서 '저장'을 누르면 앱이 대신 저장해요 (선 악보 PNG · 소리 WAV)
     window.addEventListener('message', e => {
@@ -4081,7 +4139,24 @@
       beamT: ['아트빔', 'Art Beam', '艺术投影', 'アートビーム'], beamD: ['특별전을 영사하듯', 'Project an exhibition', '像放映一样展示特展', '特別展を映すように'],
       emoT: ['이모티콘 공방', 'Emoticon Studio', '表情工坊', 'スタンプ工房'], emoD: ['그림으로 이모티콘 만들기', 'Make emoticons from art', '用画作做表情', '絵でスタンプを作る'],
       storeT: ['이모티콘 저장소', 'Emoticon Library', '表情库', 'スタンプ倉庫'], storeD: ['받아서 카톡으로 보내기', 'Save and send in chats', '保存后在聊天中发送', '保存してチャットで送る'],
+      catDrive: ['🛴 3D 드라이브', '🛴 3D Drive', '🛴 3D 兜风', '🛴 3D ドライブ'],
+      driveT: ['네온 킥보드 3D', 'Neon Scooter 3D', '霓虹滑板车 3D', 'ネオンスクーター 3D'],
+      driveD: ['삼김·바나나우유 3D 라이딩', '3D scooter ride with snacks', '3D 滑板车冒险', '3D スクーターライド'],
     };
+    const DRIVE_URL = 'https://hannaj1763-sketch.github.io/Drive-3D/';
+    function openDrive() {
+      const titleEl = document.getElementById('songTitle');
+      const frameEl = document.getElementById('songFrame');
+      const playerEl = document.getElementById('songPlayer');
+      if (playerEl && frameEl) {
+        if (titleEl) titleEl.innerText = '🛴 ' + t('driveT');
+        frameEl.src = DRIVE_URL;
+        playerEl.classList.add('on');
+        document.body.style.overflow = 'hidden';
+      } else {
+        window.open(DRIVE_URL, '_blank', 'noopener,noreferrer');
+      }
+    }
     const LANG_IDX = { ko: 0, en: 1, zh: 2, ja: 3 };
     let appLang = (() => { try { return localStorage.getItem('agjj_lang') || ''; } catch (e) { return ''; } })();
     if (!appLang) { const nl = (navigator.language || 'ko').slice(0, 2); appLang = LANG_IDX[nl] !== undefined ? nl : 'ko'; }   // 처음엔 휴대폰 언어로
@@ -4445,34 +4520,45 @@
       const TOTAL = N * SPACING_Y;
       const clampY = (y) => LOOP ? y : 0;
 
+      let velY = 0;
       container.addEventListener('wheel', (e) => {
-        targetCameraY -= e.deltaY * 0.006;
+        const delta = -e.deltaY * 0.0065;
+        velY = delta * 0.45;
+        targetCameraY = clampY(targetCameraY + delta);
         pauseAutoBriefly();
-        targetCameraY = clampY(targetCameraY);
       }, { passive: true });
 
-      let touchStartY = 0, isTouchDragging = false, lastTouchY = 0;
+      let touchStartY = 0, isTouchDragging = false, lastTouchY = 0, lastTouchTime = 0;
       container.addEventListener('touchstart', (e) => {
+        if (!e.touches || !e.touches[0]) return;
         touchStartY = e.touches[0].clientY;
         lastTouchY = e.touches[0].clientY;
+        lastTouchTime = performance.now();
+        velY = 0;
         isTouchDragging = true;
         userHolding = true;
       }, { passive: true });
 
       container.addEventListener('touchmove', (e) => {
-        if (!isTouchDragging) return;
+        if (!isTouchDragging || !e.touches || !e.touches[0]) return;
+        const nowT = performance.now();
+        const dtMs = Math.max(8, nowT - lastTouchTime);
         const deltaY = e.touches[0].clientY - lastTouchY;
-        targetCameraY += deltaY * 0.015;
-        targetCameraY = clampY(targetCameraY);
+        const step = deltaY * 0.0165;
+        velY = (step / dtMs) * 16;
+        targetCameraY = clampY(targetCameraY + step);
         lastTouchY = e.touches[0].clientY;
+        lastTouchTime = nowT;
       }, { passive: true });
 
       container.addEventListener('touchend', (e) => {
         isTouchDragging = false;
         userHolding = false;
         pauseAutoBriefly();
-        if (Math.abs(e.changedTouches[0].clientY - touchStartY) < 10) {
-          handleCanvasClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        const ch = e.changedTouches && e.changedTouches[0];
+        if (ch && Math.abs(ch.clientY - touchStartY) < 10) {
+          velY = 0;
+          handleCanvasClick(ch.clientX, ch.clientY);
         }
       });
 
@@ -4511,6 +4597,17 @@
         }
       }
 
+      window.addEventListener('resize', () => {
+        if (!container || !renderer || !camera) return;
+        const w = container.clientWidth || window.innerWidth;
+        const h = container.clientHeight || window.innerHeight;
+        if (w > 0 && h > 0) {
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+          renderer.setSize(w, h);
+        }
+      });
       let lastTime = performance.now();
       function animate(now) {
         requestAnimationFrame(animate);
@@ -4524,7 +4621,13 @@
           targetCameraY -= AUTO_SPEED * dt;
         }
 
-        camera.position.y += (targetCameraY - camera.position.y) * 0.1;
+        if (!userHolding && Math.abs(velY) > 0.0005) {
+          targetCameraY = clampY(targetCameraY + velY);
+          velY *= 0.9;
+        } else if (!userHolding) {
+          velY = 0;
+        }
+        camera.position.y += (targetCameraY - camera.position.y) * 0.12;
 
         if (LOOP) {
           // 숫자가 끝없이 커지지 않도록 한 바퀴마다 위치를 되돌림 (화면 변화 없음)
