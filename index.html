@@ -366,6 +366,24 @@
     .cb-r button { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; background: none; border: none; color: #b4c2d4; padding: 3px 7px; border-radius: 10px; cursor: pointer; font-family: inherit; }
     .cb-r button b { font-size: 19px; line-height: 1.1; } .cb-r button span { font-size: 11px; font-weight: 700; white-space: nowrap; }
     .cb-r button.on { color: #fbbf24; background: rgba(251,191,36,.1); }
+    /* ❓ 도움말 말풍선 */
+    body.help-on .help-btn { color: #1d1d1f !important; background: #ffe066 !important; border-color: #ffe066 !important; }
+    #helpLayer { position: fixed; inset: 0; z-index: 400; pointer-events: none; display: none; }
+    body.help-on #helpLayer { display: block; }
+    #helpLayer svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    .hb { position: absolute; max-width: 150px; background: #fffbea; color: #2b2410; border: 1.5px solid #f5c542; border-radius: 12px; padding: 6px 9px; font-size: 12.5px; line-height: 1.35; font-weight: 700; box-shadow: 0 6px 18px rgba(0,0,0,.22); pointer-events: auto; cursor: pointer; animation: hbIn .25s ease-out; word-break: keep-all; }
+    .hb::before { content: ''; position: absolute; top: -7px; left: var(--tx, 50%); margin-left: -6px; border: 6px solid transparent; border-top: 0; border-bottom: 7px solid #f5c542; }
+    .hb.up::before { top: auto; bottom: -7px; border-bottom: 0; border-top: 7px solid #f5c542; }
+    .hb-dot { position: absolute; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: #f5c542; box-shadow: 0 0 0 4px rgba(245,197,66,.35); animation: hbPing 1.4s ease-out infinite; }
+    .help-note { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); z-index: 401; background: #2b2410; color: #fffbea; border-radius: 999px; padding: 6px 6px 6px 16px; font-size: 14px; font-weight: 700; white-space: nowrap; display: none; align-items: center; gap: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.3); }
+    body.help-on .help-note { display: flex; }
+    .help-note button { border: 0; border-radius: 999px; background: rgba(255,251,234,.14); color: #fffbea; font: inherit; padding: 7px 12px; cursor: pointer; }
+    .help-note .hn-off { background: #ffe066; color: #2b2410; }
+    .hb-dot { pointer-events: auto; cursor: pointer; } .hb-dot::after { content: ''; position: absolute; inset: -12px; }
+    .hb-dot.dim { background: #fff3c4; box-shadow: 0 0 0 3px rgba(245,197,66,.3); animation: none; }
+    @keyframes hbIn { from { opacity: 0; transform: translateY(-4px) scale(.96); } to { opacity: 1; transform: none; } }
+    @keyframes hbPing { 0% { box-shadow: 0 0 0 0 rgba(245,197,66,.6); } 100% { box-shadow: 0 0 0 10px rgba(245,197,66,0); } }
+    @media (prefers-reduced-motion: reduce) { .hb, .hb-dot { animation: none; } }
     .cb-r .tlk-dot { position: absolute; top: 0; right: 2px; margin: 0; }
     .jj-row { display: flex; align-items: center; gap: 10px; }
     .jj-name { font-family: Georgia, serif; font-size: 20px; letter-spacing: 2px; color: #f8fafc; padding: 0 2px; }
@@ -381,7 +399,8 @@
     @media (max-width: 640px) { .jj-row .nav-tabs { display: grid; grid-template-columns: repeat(3, 1fr); } .jj-name { font-size: 17px; } }
     .ah-common { display: flex; gap: 2px; margin-top: 8px; }
     .ah-common button { display: flex; align-items: center; gap: 4px; background: #fff; border: 1px solid #e2e0da; border-radius: 16px; padding: 6px 10px; font-size: 12.5px; font-weight: 700; color: #3f3f46; cursor: pointer; font-family: inherit; }
-    .bbb-top .cb-r button { color: #cbd5e1; }
+    .bbb-top .cb-r button { color: #cbd5e1; flex: none; }
+    .bbb-top > b { flex: none; white-space: nowrap; } .bbb-top .cb-r { min-width: 0; overflow-x: auto; scrollbar-width: none; } .bbb-top .cb-r::-webkit-scrollbar { display: none; }
     /* ← 돌아가기는 언제나 왼쪽 위 한 곳 (화면 안의 따로 있던 뒤로 버튼은 숨겨요) */
     .back-gallery { display: none !important; }
     .tlk-top > .tlk-back:first-child { display: none; }
@@ -449,11 +468,17 @@
     .ah-bbb { background: radial-gradient(circle at 30% 30%, #3b4f8f, #121a33 70%) !important; display: flex; align-items: center; justify-content: center; }
     .ah-bbb div { text-align: center; color: #fff; } .ah-bbb b { display: block; font-family: Georgia, serif; font-size: 64px; letter-spacing: 8px; text-shadow: 0 4px 24px rgba(120,160,255,.6); }
     .ah-bbb span { font-size: 15px; color: #c7d2fe; letter-spacing: 1px; }
+    .ah-ex { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; background: #fff; border: 1px solid #e8e5de; border-radius: 18px; padding: 12px 16px 12px 12px; cursor: pointer; font-family: inherit; color: inherit; box-shadow: 0 4px 14px rgba(0,0,0,.05); }
+    .ah-ex-img { flex: none; width: 64px; height: 64px; border-radius: 12px; background: #f1ede4 center / cover no-repeat; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+    .ah-ex-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .ah-ex-t b { font-size: 17px; font-weight: 900; } .ah-ex-t small { color: #6b6b72; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ah-ex i { font-style: normal; font-size: 24px; color: #b5b5bb; }
+    .ah-badge.ex { align-self: flex-start; background: linear-gradient(90deg, #0ea5a4, #3b82f6); font-size: 10.5px; padding: 2px 9px; }
     .ah-badge.bbb { background: linear-gradient(90deg, #4f6bd8, #8b5cf6); }
     .bbb-full { display: none; position: fixed; inset: 0; z-index: 124; background: #0d1117; flex-direction: column; }
     .bbb-full.on { display: flex; }
     .bbb-top { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.08); color: #e2e8f0; }
-    .bbb-top button { background: #222733; color: #fff; border: 1px solid rgba(255,255,255,.15); border-radius: 18px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .bbb-top > button { flex: none; white-space: nowrap; background: #222733; color: #fff; border: 1px solid rgba(255,255,255,.15); border-radius: 18px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
     .bbb-full iframe { flex: 1; width: 100%; border: 0; background: #0d1117; }
     /* 🧠 아트메모리게임 */
     .mem { display: none; position: fixed; inset: 0; z-index: 160; overflow-y: auto; background: radial-gradient(circle at 50% 0%, #fff6ec, #fbe3e3 60%, #f6dbe6); padding: 14px 10px 30px; }
@@ -760,9 +785,9 @@
       <div class="cb-r">
         <button data-c="talk" onclick="openCommon('talk')"><b>💬</b><span data-i18n="talk">아트톡</span><i class="tlk-dot" id="talkDot"></i></button>
         <button data-c="senior" onclick="openCommon('senior')"><b>🌿</b><span data-i18n="care">Art Care</span></button>
-        <button data-c="out" onclick="openCommon('out')"><b>🗞</b><span data-i18n="out">전시</span></button>
         <button data-c="my" onclick="openCommon('my')"><b>👤</b><span data-i18n="my">My</span></button>
         <button onclick="openLang()"><b>🌐</b><span class="langCode">KO</span></button>
+        <button class="help-btn" onclick="toggleHelp()" aria-pressed="false"><b>❓</b><span data-i18n="help">도움말</span></button>
       </div>
     </div>
     <!-- JJ 갤러리 메뉴: 그 작가의 것만 -->
@@ -1128,8 +1153,12 @@
   <!-- 👥 작가 고르기 -->
   <div id="artistHub" role="dialog" aria-label="작가 고르기">
     <div class="ah-top"><b>ARTISTS</b><small data-i18n="hubSub">작가를 골라 갤러리에 들어가요</small>
-      <div class="ah-common"><button onclick="openCommon('talk')">💬 <span data-i18n="talk">아트톡</span></button><button onclick="openCommon('senior')">🌿 <span data-i18n="care">Art Care</span></button><button onclick="openCommon('out')">🗞 <span data-i18n="out">전시</span></button><button onclick="openCommon('my')">👤 <span data-i18n="my">My</span></button><button onclick="openLang()">🌐 <span class="langCode">KO</span></button></div></div>
+      <div class="ah-common"><button onclick="openCommon('talk')">💬 <span data-i18n="talk">아트톡</span></button><button onclick="openCommon('senior')">🌿 <span data-i18n="care">Art Care</span></button><button onclick="openCommon('my')">👤 <span data-i18n="my">My</span></button><button onclick="openLang()">🌐 <span class="langCode">KO</span></button><button class="help-btn" onclick="toggleHelp()" aria-pressed="false">❓ <span data-i18n="help">도움말</span></button></div></div>
     <div class="ah-list">
+      <button class="ah-ex" id="ahEx" onclick="openCommon('out')">
+        <div class="ah-ex-img" id="ahExImg">🗞</div>
+        <div class="ah-ex-t"><span class="ah-badge ex">EXHIBITIONS</span><b data-i18n="exT">지금 열리는 전시</b><small id="ahExSub" data-i18n="exD">가까운 미술관·전시 소식을 모아 봐요</small></div><i>›</i>
+      </button>
       <button class="ah-card" id="ahJJ" onclick="enterArtist(this)">
         <div class="ah-img" id="ahJJimg"></div>
         <div class="ah-info"><div><span class="ah-badge">ARTIST</span><div class="ah-name">JJ</div>
@@ -1147,7 +1176,7 @@
     try { if (sessionStorage.getItem('agjj_hub') || location.search) document.getElementById('artistHub').style.display = 'none'; } catch (e) {}
   </script>
   <!-- 📖 BBB (작가 목록에서 들어가는 별도 공간) -->
-  <div id="bbbFull" class="bbb-full"><div class="bbb-top"><button onclick="goBack()">← <span data-i18n="back">돌아가기</span></button><b>📖 BBB</b><div class="cb-r"><button onclick="openCommon('talk')"><b>💬</b><span data-i18n="talk">아트톡</span></button><button onclick="openCommon('senior')"><b>🌿</b><span data-i18n="care">Art Care</span></button><button onclick="openCommon('out')"><b>🗞</b><span data-i18n="out">전시</span></button><button onclick="openCommon('my')"><b>👤</b><span data-i18n="my">My</span></button><button onclick="openLang()"><b>🌐</b><span class="langCode">KO</span></button></div></div><iframe id="bbbFrame2" title="BBB 말씀 갤러리" allow="autoplay; fullscreen"></iframe></div>
+  <div id="bbbFull" class="bbb-full"><div class="bbb-top"><button onclick="goBack()">← <span data-i18n="back">돌아가기</span></button><b>📖 BBB</b><div class="cb-r"><button onclick="openCommon('talk')"><b>💬</b><span data-i18n="talk">아트톡</span></button><button onclick="openCommon('senior')"><b>🌿</b><span data-i18n="care">Art Care</span></button><button onclick="openCommon('my')"><b>👤</b><span data-i18n="my">My</span></button><button onclick="openLang()"><b>🌐</b><span class="langCode">KO</span></button><button class="help-btn" onclick="toggleHelp()" aria-pressed="false"><b>❓</b><span data-i18n="help">도움말</span></button></div></div><iframe id="bbbFrame2" title="BBB 말씀 갤러리" allow="autoplay; fullscreen"></iframe></div>
   <!-- 🧠 아트메모리게임 -->
   <div id="memModal" class="mem" role="dialog" aria-label="아트메모리게임"><div class="mem-box">
     <button class="mem-x" onclick="closeMem()">← <span data-i18n="back">돌아가기</span></button>
@@ -3279,7 +3308,7 @@
       visitTick();
       checkGalleryGate();
       setInterval(visitTick, 20000);
-      startOutBanner();                   // 갤러리 아래 '지금 열리는 전시' 배너 (앱)
+      // 전시 소식은 작가 목록(ARTISTS) 위 카드로 옮겼어요 — 작가 갤러리 안 배너는 띄우지 않아요
       addCopyFooters();
       if (IS_APP && EXCFG) collectPendingPaint();
       if (new URLSearchParams(location.search).get('open') === 'pang' && EXCFG) { history.replaceState(null, '', location.pathname); openPang(); }
@@ -3345,6 +3374,15 @@
       const prof = allArtworks.find(a => a.isProfile), n = allArtworks.filter(a => !a.isProfile).length;
       if (prof) document.getElementById('ahJJimg').style.backgroundImage = `url('${prof.src}')`;
       document.getElementById('ahJJdesc').innerHTML = t('jjDesc') + (n ? ' · ' + t('works', { n }) : '');
+      hubExhibit();
+    }
+    async function hubExhibit() {
+      try {
+        const f = await loadOutFeed(); if (!f.items.length) return;
+        const pics = f.items.filter(x => x.thumb), one = pics[Math.floor(Math.random() * pics.length)];
+        if (one) { const im = document.getElementById('ahExImg'); im.style.backgroundImage = `url('${https(one.thumb)}')`; im.innerText = ''; }
+        document.getElementById('ahExSub').innerText = t('exN', { n: f.items.length }) + (one ? ' · ' + one.title : '');
+      } catch (e) {}
     }
     function openHub() {
       navPush('hub');
@@ -4019,6 +4057,8 @@
       out: ['전시', 'Exhibits', '展览', '展示'], my: ['My', 'My', '我的', 'マイ'],
       gallery: ['갤러리', 'Gallery', '画廊', 'ギャラリー'], play: ['Play', 'Play', '玩乐', 'Play'], box: ['컬렉션', 'Collection', '收藏', 'コレクション'],
       walk: ['🏛 걸어보기', '🏛 Walk', '🏛 漫步', '🏛 歩いて見る'], grid: ['▦ 모아보기', '▦ All', '▦ 全部', '▦ 一覧'], swipe: ['▶ 넘겨보기', '▶ Swipe', '▶ 滑动', '▶ めくる'],
+      help: ['도움말', 'Help', '帮助', 'ヘルプ'], helpOff: ['끄기 ✕', 'Off ✕', '关闭 ✕', '閉じる ✕'],
+      exT: ['지금 열리는 전시', 'Exhibitions now', '正在举办的展览', '開催中の展示'], exD: ['가까운 미술관·전시 소식을 모아 봐요', 'Museums and shows near you', '附近的美术馆和展览', '近くの美術館・展示'], exN: ['전시 {n}곳', '{n} shows', '{n} 个展览', '展示 {n}件'],
       hubSub: ['작가를 골라 갤러리에 들어가요', 'Choose an artist to enter the gallery', '选择艺术家，进入画廊', 'アーティストを選んでギャラリーへ'],
       jjDesc: ['이 갤러리 그림을 그린 작가예요', 'The artist behind this gallery', '本画廊作品的作者', 'このギャラリーの絵を描いた作家'],
       works: ['작품 {n}점', '{n} works', '作品 {n} 幅', '作品 {n} 点'],
@@ -4890,6 +4930,105 @@
     }
 
     window.onload = loadArtworksFromGitHub;
+  </script>
+  <div id="helpLayer"><svg id="helpSvg"></svg></div>
+  <div class="help-note" id="helpNote"><span id="helpPg">❓ 1/1</span><button onclick="helpGo(-1)" aria-label="이전 도움말">◀</button><button onclick="helpGo(1)" aria-label="다음 도움말">▶</button><button class="hn-off" onclick="toggleHelp(false)" data-i18n="helpOff">끄기 ✕</button></div>
+  <script>
+    // =====================================================================
+    // ❓ 도움말: 켜면 지금 화면에 보이는 메뉴마다 말풍선이 떠요 (말풍선을 누르면 그것만 닫혀요)
+    // =====================================================================
+    const HELP = [
+      ['.ah-common button[onclick*="talk"]', '초대받은 친구와 그림 이야기를 나누는 채팅방', 'Chat about art with invited friends'],
+      ['.ah-common button[onclick*="senior"]', '색·노래·기억 놀이로 하는 하루 활동', 'Daily color, song & memory activities'],
+      ['.ah-common button[onclick*="my"]', '내 계정·물감·기록', 'My account, paint & records'],
+      ['.ah-common button[onclick*="openLang"]', '앱 언어 바꾸기', 'Change language'],
+      ['#ahEx', '가까운 미술관·전시 소식을 모아 봐요', 'Exhibitions and museums near you'],
+      ['#ahJJ', '눌러서 JJ의 그림 갤러리로 들어가요', "Tap to enter JJ's gallery"],
+      ['#ahBBB', '말씀 암송 카드를 3D로 돌려 봐요', 'Bible verse cards in 3D'],
+      ['header .cb-home', '바로 전 화면으로 돌아가요', 'Go back to the previous screen'],
+      ['header [data-c="talk"]', '초대받은 친구와 채팅', 'Chat with invited friends'],
+      ['header [data-c="senior"]', '색·노래·기억 하루 활동', 'Daily art & music activities'],
+      ['header [data-c="my"]', '내 계정·물감·기록', 'My account & records'],
+      ['header .cb-r button[onclick*="openLang"]', '언어 바꾸기', 'Language'],
+      ['header .tab-btn[data-v="gallery"]', '그림 감상 · 보는 방법 3가지', 'View the artworks'],
+      ['header .tab-btn[data-v="play"]', '게임·노래·만들기', 'Games, songs & making'],
+      ['header .tab-btn[data-v="box"]', '내가 모은 그림', 'Artworks I collected'],
+      ['#galSeg [data-g="3d"]', '3D 전시관을 걸으며 감상', 'Walk through a 3D hall'],
+      ['#galSeg [data-g="archive"]', '모든 그림을 한눈에', 'See all works at once'],
+      ['#galSeg [data-g="shorts"]', '한 장씩 넘기며 보기', 'Swipe one by one'],
+      ['.bbb-top > button', '작가 목록으로 돌아가요', 'Back to artists'],
+      ['.bbb-top [onclick*="talk"]', '친구와 채팅', 'Chat with friends'],
+      ['.bbb-top [onclick*="senior"]', '하루 활동', 'Daily activities'],
+      ['.bbb-top [onclick*="my"]', '내 계정·기록', 'My account'],
+      ['.pt[onclick*="openPang"]', '물감 1개로 한 판 · 목표 점수를 넘기면 보상', 'Costs 1 paint · beat the target for a reward'],
+      ['.pt[onclick*="openMem"]', '컬렉션을 모을수록 단계가 열려요', 'More levels open as you collect'],
+      ['.pt[onclick*="openThrow"]', '공을 던져 그림을 색칠해요', 'Throw paint to color art'],
+      ['.pt[onclick*="openSong"]', '그림 위에 길을 그리면 노래가 돼요', 'Draw a path, hear a song'],
+      ['.pt[onclick*="openColoring"]', 'JJ 도안에 색칠 · 색이 음이 돼요', 'Color JJ art; colors become notes'],
+      ['.pl-paint', '💧 물감으로 게임·작품을 열어요', 'Paint unlocks games and works'],
+    ];
+    let helpTimer = null;
+    function helpOn() { return document.body.classList.contains('help-on'); }
+    function toggleHelp(force) {
+      const on = force ?? !helpOn();
+      document.body.classList.toggle('help-on', on);
+      document.querySelectorAll('.help-btn').forEach(b => b.setAttribute('aria-pressed', on));
+      clearInterval(helpTimer); helpTimer = null; helpClosed.clear(); helpPage = 0; helpSig = '';
+      if (on) { drawHelp(); helpTimer = setInterval(drawHelp, 700); }
+      else { document.querySelectorAll('#helpLayer .hb, #helpLayer .hb-dot').forEach(e => e.remove()); document.getElementById('helpSvg').innerHTML = ''; }
+    }
+    const helpClosed = new Set(); let helpSig = '', helpPage = 0, helpPages = 1;
+    const HELP_PER = 4;     // 한 번에 말풍선 4개까지 (◀ ▶ 로 넘겨요)
+    function helpGo(d) { helpPage = (helpPage + d + helpPages) % helpPages; helpSig = ''; drawHelp(); }
+    function helpVisible(el) {
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height || r.bottom < 0 || r.top > innerHeight || r.right < 0 || r.left > innerWidth) return null;
+      const cx = Math.min(innerWidth - 2, Math.max(2, r.left + r.width / 2)), cy = Math.min(innerHeight - 2, Math.max(2, r.top + Math.min(r.height / 2, 20)));
+      const hit = document.elementsFromPoint(cx, cy).find(e => !e.closest('#helpLayer, .help-note'));
+      return hit && (el === hit || el.contains(hit)) ? r : null;
+    }
+    function drawHelp() {
+      if (!helpOn()) return;
+      const lang = (typeof appLang !== 'undefined' && appLang !== 'ko') ? 2 : 1;
+      const items = [];
+      HELP.forEach(([sel, ko, en], i) => { if (helpClosed.has(i)) return; const el = document.querySelector(sel); if (!el) return; const r = helpVisible(el); if (r) items.push({ i, r, txt: lang === 1 ? ko : en }); });
+      items.sort((a, b) => Math.round(a.r.top / 24) - Math.round(b.r.top / 24) || a.r.left - b.r.left);   // 위에서 아래, 왼쪽에서 오른쪽
+      helpPages = Math.max(1, Math.ceil(items.length / HELP_PER)); if (helpPage >= helpPages) helpPage = 0;
+      const sig = helpPage + '/' + items.map(o => o.i + ':' + Math.round(o.r.left) + ',' + Math.round(o.r.top)).join('|') + innerWidth + 'x' + innerHeight;
+      if (sig === helpSig) return; helpSig = sig;
+      document.getElementById('helpPg').innerText = `❓ ${helpPage + 1}/${helpPages}`;
+      document.querySelectorAll('#helpNote button:not(.hn-off)').forEach(b => b.style.display = helpPages > 1 ? '' : 'none');
+      const layer = document.getElementById('helpLayer'), svg = document.getElementById('helpSvg');
+      layer.querySelectorAll('.hb, .hb-dot').forEach(e => e.remove()); svg.innerHTML = '';
+      const placed = [], pad = 8;
+      items.forEach((o, n) => {          // 모든 메뉴에 노란 점 (누르면 그 말풍선으로)
+        if (Math.floor(n / HELP_PER) === helpPage) return;
+        const d = document.createElement('div'); d.className = 'hb-dot dim'; d.style.left = (o.r.left + o.r.width / 2) + 'px'; d.style.top = (o.r.top + 4) + 'px';
+        d.onclick = () => { helpPage = Math.floor(n / HELP_PER); helpSig = ''; drawHelp(); }; layer.appendChild(d);
+      });
+      items.slice(helpPage * HELP_PER, helpPage * HELP_PER + HELP_PER).forEach(o => {
+        const b = document.createElement('div'); b.className = 'hb'; b.innerText = o.txt;
+        b.onclick = () => { helpClosed.add(o.i); helpSig = ''; drawHelp(); };
+        layer.appendChild(b);
+        const w = b.offsetWidth, h = b.offsetHeight, ex = o.r.left + o.r.width / 2;
+        const up = o.r.bottom + h + 30 > innerHeight;                     // 화면 아래쪽 메뉴는 위로
+        let x = Math.min(innerWidth - w - pad, Math.max(pad, ex - w / 2));
+        let y = up ? o.r.top - h - 10 : o.r.bottom + 10;
+        for (let k = 0; k < 30; k++) {                                     // 다른 말풍선과 겹치면 비켜 놓기
+          const hit = placed.find(p => x < p.x + p.w + 4 && x + w + 4 > p.x && y < p.y + p.h + 4 && y + h + 4 > p.y);
+          if (!hit) break;
+          y = up ? hit.y - h - 6 : hit.y + hit.h + 6;
+        }
+        placed.push({ x, y, w, h });
+        b.style.left = x + 'px'; b.style.top = y + 'px'; if (up) b.classList.add('up');
+        const tx = Math.min(w - 12, Math.max(12, ex - x)); b.style.setProperty('--tx', tx + 'px');
+        const ey = up ? o.r.top + 2 : o.r.bottom - 2, by = up ? y + h + 6 : y - 6;
+        if (Math.abs(by - ey) > 14) svg.insertAdjacentHTML('beforeend', `<line x1="${ex}" y1="${ey}" x2="${x + tx}" y2="${by}" stroke="#f5c542" stroke-width="2" stroke-dasharray="3 4"/>`);
+        const d = document.createElement('div'); d.className = 'hb-dot'; d.style.left = ex + 'px'; d.style.top = ey + 'px'; layer.appendChild(d);
+      });
+    }
+    addEventListener('resize', () => { helpSig = ''; drawHelp(); });
+    document.addEventListener('scroll', () => { if (helpOn()) { helpSig = ''; requestAnimationFrame(drawHelp); } }, true);
   </script>
 </body>
 </html>
