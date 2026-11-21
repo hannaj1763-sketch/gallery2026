@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>JJ 물감볼</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #8fd3ff; color: #2b2340; font-family: 'Jua', sans-serif; touch-action: none; user-select: none; -webkit-user-select: none; }
+  #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+
+  /* 위쪽 막대: 돌아가기는 항상 왼쪽 위 */
+  .top { position: fixed; left: 0; right: 0; top: 0; z-index: 9; display: flex; align-items: center; gap: 8px;
+         padding: calc(env(safe-area-inset-top, 0px) + 10px) max(12px, env(safe-area-inset-right, 0px)) 8px max(12px, env(safe-area-inset-left, 0px)); }
+  .top button { background: rgba(255,255,255,.92); border: 0; color: #2b2340; border-radius: 999px; padding: 8px 14px; font-family: inherit; font-size: 15px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+  .top .ttl { flex: 1; text-align: center; font-size: 20px; color: #fff; text-shadow: 0 2px 0 #2d7bb8, 0 0 8px rgba(0,0,0,.2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .top .sp { width: 96px; }
+  .hud { position: fixed; left: 50%; transform: translateX(-50%); z-index: 4; top: calc(env(safe-area-inset-top, 0px) + 56px); display: none; gap: 8px; }
+  .hud .b { background: rgba(255,255,255,.92); border-radius: 12px; padding: 4px 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,.12); min-width: 84px; }
+  .hud .k { font-size: 11px; color: #7a6f95; }
+  .hud .v { font-size: 20px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .bar { height: 6px; background: #ece6f7; border-radius: 3px; overflow: hidden; margin-top: 2px; }
+  .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #ff5d8f, #ffb347, #ffe14d, #4cd47a, #45b3ff, #a46bff); transition: width .3s; }
+  .tip { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); z-index: 4; background: rgba(43,35,64,.72); color: #fff; font-size: 14px; padding: 7px 14px; border-radius: 999px; white-space: nowrap; display: none; pointer-events: none; }
+
+  /* 그림 고르기 · 결과 */
+  .panel { position: fixed; inset: 0; z-index: 8; display: none; align-items: flex-start; justify-content: center; overflow-y: auto;
+           background: rgba(30,22,52,.55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+           padding: calc(env(safe-area-inset-top, 0px) + 64px) max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 24px) max(16px, env(safe-area-inset-left, 0px)); touch-action: pan-y; }
+  .panel.on { display: flex; }
+  .card { background: #fffdf8; border-radius: 22px; padding: 20px 18px; width: 100%; max-width: 520px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
+  .card h2 { margin: 0 0 4px; font-size: 24px; font-weight: 400; color: #e8476c; text-align: center; }
+  .card p { margin: 0; text-align: center; color: #6d6385; font-size: 14px; line-height: 1.5; }
+  .how { display: flex; justify-content: center; gap: 14px; margin: 12px 0 14px; font-size: 13px; color: #4b4166; flex-wrap: wrap; }
+  .how span { background: #f3eefc; border-radius: 999px; padding: 5px 11px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .pic { position: relative; aspect-ratio: 1; border-radius: 14px; overflow: hidden; border: 0; padding: 0; background: #eee; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); font-family: inherit; }
+  .pic img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(.8) brightness(1.15); }
+  .pic.done img { filter: none; }
+  .pic .st { position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(transparent, rgba(0,0,0,.55)); color: #ffe14d; font-size: 14px; padding: 10px 0 4px; letter-spacing: 1px; }
+  .pic .fr { position: absolute; top: 6px; left: 6px; background: #4cd47a; color: #fff; font-size: 11px; border-radius: 999px; padding: 2px 7px; }
+  .pic.lock { background: repeating-linear-gradient(45deg, #f3eefc 0 10px, #ebe4f8 10px 20px); display: flex; align-items: center; justify-content: center; flex-direction: column; color: #9a8fb5; font-size: 12px; gap: 2px; cursor: default; }
+  .pic.lock b { font-size: 24px; font-weight: 400; }
+  .guide { margin-top: 12px; background: #fff6d6; border-radius: 12px; padding: 9px 12px; font-size: 13px; color: #7a5a00; text-align: center; line-height: 1.5; }
+  .res-img { width: 100%; border-radius: 14px; display: block; margin: 10px 0; box-shadow: 0 4px 14px rgba(0,0,0,.15); }
+  .stars { text-align: center; font-size: 40px; letter-spacing: 4px; color: #ffcf33; text-shadow: 0 2px 0 #c98a00; }
+  .stars .off { color: #e5def2; text-shadow: none; }
+  .row { display: flex; gap: 8px; margin-top: 14px; }
+  .row button { flex: 1; border: 0; border-radius: 14px; padding: 13px 8px; font-family: inherit; font-size: 16px; cursor: pointer; }
+  .go { background: linear-gradient(135deg, #ff5d8f, #ff9a3c); color: #fff; box-shadow: 0 4px 0 #c43c63; }
+  .ghost { background: #f3eefc; color: #4b4166; }
+  .copy { text-align: center; font-size: 11.5px; color: #9a8fb5; margin-top: 12px; }
+  .reward { text-align: center; color: #2d7bb8; font-size: 15px; margin-top: 4px; }
+  .loading { text-align: center; padding: 30px 0; color: #6d6385; }
+  button:focus-visible { outline: 3px solid #45b3ff; outline-offset: 2px; }
+  @media (max-width: 380px) { .top .ttl { font-size: 17px; } .top .sp { width: 60px; } }
+</style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<div class="top">
+  <button id="backBtn" onclick="goBack()">← 돌아가기</button>
+  <div class="ttl" id="ttl">🎯 JJ 물감볼</div>
+  <div class="sp"></div>
+</div>
+<div class="hud" id="hud">
+  <div class="b"><div class="k">던진 공</div><div class="v" id="hThrows">0</div></div>
+  <div class="b"><div class="k">색칠</div><div class="v" id="hPct">0%</div><div class="bar"><i id="hBar"></i></div></div>
+</div>
+<div class="tip" id="tip">공을 위로 밀어 던지거나, 그림을 톡 눌러요</div>
+
+<div class="panel" id="pick"><div class="card">
+  <h2>🎯 JJ 물감볼</h2>
+  <p>물감 공을 던져서 JJ의 그림을 색칠해요.<br>공이 맞은 자리마다 물감이 터지며 원래 색이 살아나요.</p>
+  <div class="how"><span>👆 공을 위로 밀기</span><span>🖼 그림 톡 누르기</span><span>⭐ 적게 던질수록 별</span></div>
+  <div class="grid" id="picGrid"><div class="loading" style="grid-column:1/-1">그림을 불러오고 있어요…</div></div>
+  <div class="guide" id="pickGuide"></div>
+  <div class="copy">그림 © JJ · 무단 사용·복제 금지 · AGJJ</div>
+</div></div>
+
+<div class="panel" id="result"><div class="card">
+  <h2 id="resTtl">완성! 🎉</h2>
+  <div class="stars" id="resStars"></div>
+  <p id="resInfo"></p>
+  <div class="reward" id="resReward"></div>
+  <img class="res-img" id="resImg" alt="완성한 그림">
+  <div class="row">
+    <button class="ghost" onclick="openPick()">그림 고르기</button>
+    <button class="ghost" onclick="startLevel(CUR)">다시 하기</button>
+    <button class="go" id="nextBtn" onclick="nextLevel()">다음 그림 →</button>
+  </div>
+  <div class="copy">그림 © JJ · 무단 사용·복제 금지 · AGJJ</div>
+</div></div>
+
+<script>
+/* =====================================================================
+   JJ 물감볼 — 공을 던져 JJ 그림을 색칠하는 게임
+   - 처음엔 그림의 선만 보이는 도안, 물감 공이 맞은 자리가 원래 색으로 살아나요
+   - 무료 대표작이 기본, My Collection에 담은 그림이 새 도안으로 추가돼요
+   - 각 그림을 처음 완성하면 💧 1개 (갤러리로 돌아가면 받기)
+   ===================================================================== */
+const USERNAME = 'hannaj1763-sketch', REPO = 'gallery2026';
+const K_REC = 'agjj_throw_v1', K_LIST = 'agjj_throw_list', K_PENDING = 'agjj_pending_paint';
+const GOAL = 0.8;                       // 80% 칠하면 완성 (나머지는 자동으로 채워져요)
+const STAR3 = 12, STAR2 = 18;            // 던진 공 수 기준 별
+const BALL_COLORS = ['#ff5d8f', '#ffb347', '#ffe14d', '#4cd47a', '#45b3ff', '#a46bff', '#ff7a45', '#2ed1c4'];
+const ls = { get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+             set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+const $ = id => document.getElementById(id);
+const NativeApp = window.AtelierApp || null;
+
+let ARTS = [], LOCKED = 0, CUR = 0;
+let L = null;           // 지금 판: {img, lineC, maskC, workC, compC, w, h, throws, pct, done, colorIdx}
+const balls = [], parts = [], flashes = [], drips = [];
+let aim = null;         // 끌고 있는 동안 {sx, sy, x, y}
+let W = 0, H = 0, DPR = 1, BOX = null;   // 그림이 놓인 화면 위치 {x, y, w, h}
+
+/* ---------- 그림 목록 ---------- */
+function toLocal(src) {   // raw.githubusercontent 주소 → 같은 사이트 경로 (캔버스에서 색을 읽을 수 있게)
+  const pre = `https://raw.githubusercontent.com/${USERNAME}/${REPO}/main/`;
+  return src && src.startsWith(pre) ? src.slice(pre.length) : src;
+}
+async function loadList() {
+  const tk = ls.get(K_LIST, null);
+  if (tk && tk.arts && tk.arts.length) { ARTS = tk.arts; LOCKED = tk.locked || 0; return; }
+  // 갤러리를 거치지 않고 바로 열었을 때: 무료 대표작만
+  let ids = [];
+  try { ids = ((await (await fetch('exhibitions.json', { cache: 'no-store' })).json()).lobby || []).slice(0, 6); } catch (e) {}
+  let files = [];
+  try { const r = await fetch(`files.json?t=${Math.floor(Date.now() / 60000)}`); if (r.ok) files = (await r.json()).files || []; } catch (e) {}
+  const imgOf = {};
+  files.forEach(p => { const s = p.split('/'); if (s.length === 3 && s[0] === 'artworks' && /\.(jpe?g|png|webp)$/i.test(s[2]) && !imgOf[s[1]]) imgOf[s[1]] = p; });
+  if (ids.length < 6) ids = ids.concat(Object.keys(imgOf).filter(k => k !== '01' && !ids.includes(k)).sort());
+  ARTS = ids.filter(id => imgOf[id]).slice(0, 6).map(id => ({ id, src: imgOf[id], title: '', free: true }));
+  LOCKED = 3;
+}
+
+/* ---------- 그림 고르기 ---------- */
+function starsOf(id) { return ((ls.get(K_REC, {}).best) || {})[id] || 0; }
+function starStr(n) { return '★'.repeat(n) + '☆'.repeat(3 - n); }
+function openPick() {
+  $('result').classList.remove('on');
+  $('hud').style.display = 'none'; $('tip').style.display = 'none';
+  $('ttl').innerText = '🎯 JJ 물감볼';
+  L = null;
+  const g = $('picGrid');
+  if (!ARTS.length) { g.innerHTML = '<div class="loading" style="grid-column:1/-1">그림을 불러오지 못했어요. 잠시 뒤 다시 열어 주세요.</div>'; }
+  else {
+    g.innerHTML = ARTS.map((a, i) => {
+      const s = starsOf(a.id);
+      return `<button class="pic ${s ? 'done' : ''}" onclick="startLevel(${i})" aria-label="${i + 1}번 그림">
+        <img src="${toLocal(a.src)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${a.src}'">
+        ${a.free ? '<span class="fr">무료</span>' : ''}<span class="st">${s ? starStr(s) : '도전!'}</span></button>`;
+    }).join('') + Array.from({ length: LOCKED }, () => '<div class="pic lock"><b>🖼</b>컬렉션 그림</div>').join('');
+  }
+  const mine = ARTS.filter(a => !a.free).length;
+  $('pickGuide').innerHTML = mine
+    ? `🎁 내 컬렉션 그림 ${mine}점이 도안으로 들어왔어요. 그림을 더 담으면 도안이 늘어나요.`
+    : '🎁 My Collection에 그림을 담으면 그 그림도 물감볼 도안으로 추가돼요.';
+  $('pick').classList.add('on');
+}
+
+/* ---------- 도안(선) 만들기 ---------- */
+function loadImg(a) {
+  return new Promise((res, rej) => {
+    const tryLoad = (src, next) => { const im = new Image(); im.crossOrigin = 'anonymous'; im.onload = () => res(im); im.onerror = next; im.src = src; };
+    tryLoad(toLocal(a.src), () => tryLoad(a.src, rej));
+  });
+}
+function makeLineArt(img, w, h) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d', { willReadFrequently: true });
+  x.drawImage(img, 0, 0, w, h);
+  try {
+    const d = x.getImageData(0, 0, w, h), p = d.data, n = w * h, Lm = new Float32Array(n);
+    for (let i = 0; i < n; i++) Lm[i] = .3 * p[i * 4] + .59 * p[i * 4 + 1] + .11 * p[i * 4 + 2];
+    const sorted = Array.from(Lm.filter((_, i) => i % 7 === 0)).sort((a, b) => a - b);
+    const paper = Math.max(120, sorted[Math.floor(sorted.length * .85)]);
+    for (let yy = 0; yy < h; yy++) for (let xx = 0; xx < w; xx++) {
+      const i = yy * w + xx, g = (dx, dy) => Lm[Math.min(h - 1, Math.max(0, yy + dy)) * w + Math.min(w - 1, Math.max(0, xx + dx))];
+      const gx = -g(-1, -1) - 2 * g(-1, 0) - g(-1, 1) + g(1, -1) + 2 * g(1, 0) + g(1, 1);
+      const gy = -g(-1, -1) - 2 * g(0, -1) - g(1, -1) + g(-1, 1) + 2 * g(0, 1) + g(1, 1);
+      const edge = Math.min(1, Math.hypot(gx, gy) / (paper * 1.1));
+      const dark = Math.max(0, (paper * .5 - Lm[i]) / (paper * .5));
+      let ink = Math.max(dark, edge * .95); if (ink < .22) ink = 0;
+      const v = 252 - ink * 205;
+      p[i * 4] = v; p[i * 4 + 1] = v - 2; p[i * 4 + 2] = v - 6; p[i * 4 + 3] = 255;
+    }
+    x.putImageData(d, 0, 0);
+  } catch (e) {   // 색을 읽을 수 없는 그림이면 흐린 흑백으로
+    x.clearRect(0, 0, w, h); x.fillStyle = '#fcfaf4'; x.fillRect(0, 0, w, h);
+    x.filter = 'grayscale(1) contrast(.55) brightness(1.45)'; x.drawImage(img, 0, 0, w, h); x.filter = 'none';
+  }
+  return c;
+}
+
+/* ---------- 판 시작 ---------- */
+async function startLevel(i) {
+  CUR = i; const a = ARTS[i]; if (!a) return;
+  $('pick').classList.remove('on'); $('result').classList.remove('on');
+  $('ttl').innerText = '불러오는 중…';
+  let img; try { img = await loadImg(a); } catch (e) { $('ttl').innerText = '🎯 JJ 물감볼'; alertTip('그림을 불러오지 못했어요'); openPick(); return; }
+  const k = Math.min(1, 640 / Math.max(img.naturalWidth, img.naturalHeight));
+  const w = Math.round(img.naturalWidth * k), h = Math.round(img.naturalHeight * k);
+  const mk = () => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+  L = { a, img, w, h, lineC: makeLineArt(img, w, h), maskC: mk(), workC: mk(), compC: mk(), throws: 0, pct: 0, done: false, dirty: true, colorIdx: Math.floor(Math.random() * BALL_COLORS.length), fill: 0 };
+  balls.length = parts.length = flashes.length = drips.length = 0;
+  $('ttl').innerText = `🎯 ${i + 1}번 그림`;
+  $('hud').style.display = 'flex'; $('tip').style.display = 'block';
+  setTimeout(() => { if (L && L.throws === 0) $('tip').style.display = 'block'; }, 10);
+  updHud(); layout();
+}
+function nextLevel() { startLevel((CUR + 1) % ARTS.length); }
+
+/* ---------- 화면 배치 ---------- */
+function layout() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = innerWidth; H = innerHeight;
+  const c = $('scene'); c.width = W * DPR; c.height = H * DPR;
+  if (!L) { BOX = null; return; }
+  const top = 126;
+  const maxW = Math.min(W - 40, 560), maxH = H * .6 - 150;
+  const k = Math.min(maxW / L.w, maxH / L.h);
+  const bw = L.w * k, bh = L.h * k;
+  BOX = { x: (W - bw) / 2, y: top + Math.max(0, (H * .6 - top - bh) / 2) * .4, w: bw, h: bh };
+}
+addEventListener('resize', layout);
+function ballHome() { return { x: W / 2, y: H - 70 - (window.visualViewport ? 0 : 0) }; }
+
+/* ---------- 던지기 ---------- */
+function throwTo(tx, ty, power) {
+  if (!L || L.done) return;
+  const home = ballHome(), color = BALL_COLORS[L.colorIdx];
+  L.colorIdx = (L.colorIdx + 1 + Math.floor(Math.random() * 3)) % BALL_COLORS.length;
+  balls.push({ x0: home.x, y0: home.y, tx, ty, t: 0, dur: .5, color, power: Math.max(.7, Math.min(1.3, power || 1)) });
+  L.throws++; updHud(); $('tip').style.display = 'none';
+  sfxWhoosh();
+}
+function hit(b) {
+  if (!L || !BOX) return;
+  const inside = b.tx > BOX.x - 20 && b.tx < BOX.x + BOX.w + 20 && b.ty > BOX.y - 20 && b.ty < BOX.y + BOX.h + 20;
+  // 물감 파편 (그림 밖에 맞아도 터져요)
+  for (let i = 0; i < 26; i++) {
+    const a = Math.random() * Math.PI * 2, v = 120 + Math.random() * 320;
+    parts.push({ x: b.tx, y: b.ty, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 80, r: 2 + Math.random() * 5, c: b.color, life: .7 + Math.random() * .4, t: 0 });
+  }
+  sfxSplat(inside);
+  if (!inside) return;
+  // 그림 좌표로 바꿔서 물감 자국(마스크) 찍기
+  const s = L.w / BOX.w, mx = (b.tx - BOX.x) * s, my = (b.ty - BOX.y) * s;
+  const R = Math.min(L.w, L.h) * (.2 + Math.random() * .04) * b.power;
+  const shape = splatShape(R);
+  stampSplat(L.maskC.getContext('2d'), mx, my, shape, '#fff');
+  flashes.push({ x: mx, y: my, shape, c: b.color, t: 0 });
+  // 흘러내리는 물감
+  const nd = 1 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < nd; i++) drips.push({ x: mx + (Math.random() - .5) * R * 1.2, y: my + R * (.3 + Math.random() * .4), len: 0, max: R * (.5 + Math.random() * 1.1), w: R * (.08 + Math.random() * .08) });
+  if (navigator.vibrate) try { navigator.vibrate(18); } catch (e) {}
+  L.dirty = true; measure();
+}
+function splatShape(R) {   // 들쭉날쭉한 물감 자국 + 튄 방울
+  const n = 14 + Math.floor(Math.random() * 6), pts = [];
+  for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, r = R * (.72 + Math.random() * .38) * (Math.random() < .25 ? 1.25 : 1); pts.push([Math.cos(a) * r, Math.sin(a) * r]); }
+  const drops = Array.from({ length: 5 + Math.floor(Math.random() * 6) }, () => { const a = Math.random() * Math.PI * 2, d = R * (1.15 + Math.random() * .7); return [Math.cos(a) * d, Math.sin(a) * d, R * (.06 + Math.random() * .12)]; });
+  return { pts, drops };
+}
+function stampSplat(x, cx, cy, sh, col, scale = 1) {
+  x.save(); x.translate(cx, cy); x.scale(scale, scale); x.fillStyle = col;
+  x.beginPath();
+  const p = sh.pts, n = p.length;
+  x.moveTo((p[0][0] + p[n - 1][0]) / 2, (p[0][1] + p[n - 1][1]) / 2);
+  for (let i = 0; i < n; i++) { const q = p[(i + 1) % n]; x.quadraticCurveTo(p[i][0], p[i][1], (p[i][0] + q[0]) / 2, (p[i][1] + q[1]) / 2); }
+  x.fill();
+  sh.drops.forEach(d => { x.beginPath(); x.arc(d[0], d[1], d[2], 0, Math.PI * 2); x.fill(); });
+  x.restore();
+}
+function measure() {
+  const S = 60, c = measure.c || (measure.c = Object.assign(document.createElement('canvas'), { width: S, height: S }));
+  const x = c.getContext('2d', { willReadFrequently: true }); x.clearRect(0, 0, S, S); x.drawImage(L.maskC, 0, 0, S, S);
+  const d = x.getImageData(0, 0, S, S).data; let on = 0;
+  for (let i = 3; i < d.length; i += 4) if (d[i] > 110) on++;
+  L.pct = on / (S * S); updHud();
+  if (L.pct >= GOAL && !L.done) finish();
+}
+function updHud() {
+  if (!L) return;
+  const p = Math.min(100, Math.round((L.done ? 1 : L.pct / GOAL) * 100));
+  $('hThrows').innerText = L.throws; $('hPct').innerText = p + '%'; $('hBar').style.width = p + '%';
+}
+
+/* ---------- 완성 ---------- */
+function finish() {
+  L.done = true; L.fill = 0.001; updHud(); sfxWin();
+  const stars = L.throws <= STAR3 ? 3 : L.throws <= STAR2 ? 2 : 1;
+  const rec = ls.get(K_REC, {}); rec.best = rec.best || {}; rec.done = rec.done || {};
+  const first = !rec.done[L.a.id];
+  rec.best[L.a.id] = Math.max(rec.best[L.a.id] || 0, stars); rec.done[L.a.id] = 1;
+  rec.total = (rec.total || 0) + 1; ls.set(K_REC, rec);
+  if (first) ls.set(K_PENDING, (ls.get(K_PENDING, 0) || 0) + 1);
+  // 마지막 빈 곳까지 물감으로 채우는 연출 후 결과
+  setTimeout(() => {
+    $('resStars').innerHTML = '★'.repeat(stars) + `<span class="off">${'★'.repeat(3 - stars)}</span>`;
+    $('resInfo').innerText = `공 ${L.throws}개로 완성했어요 · 별 3개는 ${STAR3}개 이하`;
+    $('resReward').innerText = first ? '💧 처음 완성 보상 1개 · 갤러리로 돌아가면 받아요' : '';
+    try { $('resImg').src = L.compC.toDataURL('image/jpeg', .85); } catch (e) { $('resImg').src = toLocal(L.a.src); }
+    $('nextBtn').style.display = ARTS.length > 1 ? '' : 'none';
+    $('hud').style.display = 'none';
+    $('result').classList.add('on');
+  }, 1500);
+}
+
+/* ---------- 그리기 ---------- */
+function compose() {
+  const { w, h, workC, compC, maskC, lineC, img } = L;
+  const wx = workC.getContext('2d');
+  wx.globalCompositeOperation = 'source-over'; wx.clearRect(0, 0, w, h); wx.drawImage(img, 0, 0, w, h);
+  wx.globalCompositeOperation = 'destination-in'; wx.drawImage(maskC, 0, 0);
+  wx.globalCompositeOperation = 'source-over';
+  const cx = compC.getContext('2d'); cx.drawImage(lineC, 0, 0); cx.drawImage(workC, 0, 0);
+  L.dirty = false;
+}
+function draw(dt) {
+  const x = $('scene').getContext('2d');
+  x.setTransform(DPR, 0, 0, DPR, 0, 0);
+  // 하늘 · 잔디 · 줄무늬 (야외 연습장)
+  const horizon = H * .62;
+  let g = x.createLinearGradient(0, 0, 0, horizon); g.addColorStop(0, '#6cc4ff'); g.addColorStop(1, '#d4f0ff'); x.fillStyle = g; x.fillRect(0, 0, W, horizon);
+  x.fillStyle = 'rgba(255,255,255,.85)'; [[.18, .2, 1], [.78, .14, .8], [.55, .3, .6]].forEach(([cx, cy, s]) => { const X = W * cx, Y = H * cy; [[-30, 0, 22], [0, -10, 28], [30, 0, 22]].forEach(([dx, dy, r]) => { x.beginPath(); x.arc(X + dx * s, Y + dy * s, r * s, 0, Math.PI * 2); x.fill(); }); });
+  g = x.createLinearGradient(0, horizon, 0, H); g.addColorStop(0, '#7ccf5a'); g.addColorStop(1, '#4aa83a'); x.fillStyle = g; x.fillRect(0, horizon, W, H - horizon);
+  x.fillStyle = 'rgba(255,255,255,.08)';
+  for (let i = -6; i <= 6; i += 2) { x.beginPath(); x.moveTo(W / 2 + i * 14, horizon); x.lineTo(W / 2 + (i + 1) * 14, horizon); x.lineTo(W / 2 + (i + 1) * W * .25, H); x.lineTo(W / 2 + i * W * .25, H); x.fill(); }
+
+  if (L && BOX) {
+    if (L.dirty) compose();
+    // 전광판 기둥 · 틀
+    x.fillStyle = '#6b5a8e'; const pw = 10;
+    x.fillRect(BOX.x + BOX.w * .18 - pw / 2, BOX.y + BOX.h, pw, horizon - BOX.y - BOX.h + 30);
+    x.fillRect(BOX.x + BOX.w * .82 - pw / 2, BOX.y + BOX.h, pw, horizon - BOX.y - BOX.h + 30);
+    x.fillStyle = 'rgba(0,0,0,.15)'; x.beginPath(); x.ellipse(W / 2, horizon + 32, BOX.w * .42, 8, 0, 0, Math.PI * 2); x.fill();
+    x.fillStyle = '#fff'; x.shadowColor = 'rgba(0,0,0,.25)'; x.shadowBlur = 18; x.shadowOffsetY = 6;
+    roundRect(x, BOX.x - 10, BOX.y - 10, BOX.w + 20, BOX.h + 30, 14); x.fill();
+    x.shadowColor = 'transparent';
+    x.drawImage(L.compC, BOX.x, BOX.y, BOX.w, BOX.h);
+    // 맞은 순간 공 색으로 번쩍 (서서히 사라짐)
+    const s = BOX.w / L.w;
+    for (let i = flashes.length - 1; i >= 0; i--) {
+      const f = flashes[i]; f.t += dt; const k = f.t / .7; if (k >= 1) { flashes.splice(i, 1); continue; }
+      x.save(); x.beginPath(); x.rect(BOX.x, BOX.y, BOX.w, BOX.h); x.clip(); x.globalAlpha = (1 - k) * .75;
+      stampSplat(x, BOX.x + f.x * s, BOX.y + f.y * s, f.shape, f.c, s * (.85 + Math.min(1, k * 4) * .15));
+      x.restore();
+    }
+    // 완성 연출: 남은 곳을 물감이 덮어요
+    if (L.fill) {
+      L.fill = Math.min(1, L.fill + dt / 1.1);
+      const mx = L.maskC.getContext('2d'); mx.globalAlpha = Math.min(1, L.fill * 1.3); mx.fillStyle = '#fff'; mx.fillRect(0, 0, L.w, L.h); mx.globalAlpha = 1; L.dirty = true;
+      if (L.fill >= 1) L.fill = 0;
+    }
+    x.fillStyle = '#9a8fb5'; x.font = '12px Jua, sans-serif'; x.textAlign = 'right'; x.fillText('© JJ · AGJJ', BOX.x + BOX.w + 4, BOX.y + BOX.h + 15);
+    x.textAlign = 'left'; x.fillStyle = '#e8476c'; x.fillText('JJ 물감볼', BOX.x - 4, BOX.y + BOX.h + 15);
+
+    // 조준선
+    if (aim && aim.on) {
+      const t = aimTarget(aim);
+      x.strokeStyle = 'rgba(255,255,255,.9)'; x.lineWidth = 3; x.setLineDash([6, 8]);
+      const h0 = ballHome(); x.beginPath(); x.moveTo(h0.x, h0.y); x.quadraticCurveTo((h0.x + t.x) / 2, Math.min(h0.y, t.y) - 80, t.x, t.y); x.stroke(); x.setLineDash([]);
+      x.strokeStyle = BALL_COLORS[L.colorIdx]; x.lineWidth = 4; x.beginPath(); x.arc(t.x, t.y, 16, 0, Math.PI * 2); x.stroke();
+      x.beginPath(); x.moveTo(t.x - 24, t.y); x.lineTo(t.x - 8, t.y); x.moveTo(t.x + 8, t.y); x.lineTo(t.x + 24, t.y); x.moveTo(t.x, t.y - 24); x.lineTo(t.x, t.y - 8); x.moveTo(t.x, t.y + 8); x.lineTo(t.x, t.y + 24); x.stroke();
+    }
+    // 흘러내리는 물감
+    if (drips.length) {
+      const mx = L.maskC.getContext('2d'); mx.fillStyle = '#fff';
+      for (let i = drips.length - 1; i >= 0; i--) {
+        const d = drips[i]; const step = Math.min(d.max - d.len, dt * d.max * 1.6); d.len += step;
+        mx.beginPath(); mx.arc(d.x, d.y + d.len, d.w * (1 - d.len / d.max * .4), 0, Math.PI * 2); mx.fill();
+        mx.fillRect(d.x - d.w * .8, d.y, d.w * 1.6, d.len);
+        if (d.len >= d.max) drips.splice(i, 1);
+      }
+      L.dirty = true;
+      if (!drips.length) measure();
+    }
+    // 대기 중인 공
+    if (!L.done) {
+      const h0 = ballHome(), bob = aim && aim.on ? 0 : Math.sin(performance.now() / 300) * 3;
+      x.fillStyle = 'rgba(0,0,0,.18)'; x.beginPath(); x.ellipse(h0.x, h0.y + 26, 22, 6, 0, 0, Math.PI * 2); x.fill();
+      drawBall(x, h0.x, h0.y + bob, 22, BALL_COLORS[L.colorIdx]);
+    }
+  }
+  // 날아가는 공 (멀어질수록 작게)
+  for (let i = balls.length - 1; i >= 0; i--) {
+    const b = balls[i]; b.t += dt; const k = Math.min(1, b.t / b.dur);
+    const e = 1 - Math.pow(1 - k, 2);
+    const bx = b.x0 + (b.tx - b.x0) * e, by = b.y0 + (b.ty - b.y0) * e - Math.sin(k * Math.PI) * Math.min(160, H * .18);
+    drawBall(x, bx, by, 22 - 13 * e, b.color);
+    if (k >= 1) { balls.splice(i, 1); hit(b); }
+  }
+  // 물감 파편
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const p = parts[i]; p.t += dt; if (p.t >= p.life) { parts.splice(i, 1); continue; }
+    p.vy += 900 * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+    x.globalAlpha = 1 - p.t / p.life; x.fillStyle = p.c; x.beginPath(); x.arc(p.x, p.y, p.r, 0, Math.PI * 2); x.fill();
+  }
+  x.globalAlpha = 1;
+}
+function drawBall(x, cx, cy, r, c) {
+  const g = x.createRadialGradient(cx - r * .35, cy - r * .4, r * .1, cx, cy, r);
+  g.addColorStop(0, '#fff'); g.addColorStop(.25, c); g.addColorStop(1, shade(c, -.35));
+  x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.fill();
+}
+function shade(hex, k) { const n = parseInt(hex.slice(1), 16), f = v => Math.max(0, Math.min(255, Math.round(v * (1 + k)))); return `rgb(${f(n >> 16)},${f(n >> 8 & 255)},${f(n & 255)})`; }
+function roundRect(x, a, b, w, h, r) { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); }
+
+let last = 0;
+function loop(ts) { const dt = Math.min(.05, (ts - last) / 1000 || 0); last = ts; draw(dt); requestAnimationFrame(loop); }
+
+/* ---------- 손가락 · 마우스 ---------- */
+function aimTarget(a) {   // 공을 위로 민 방향과 거리 → 그림 위 목표 지점
+  const dx = a.x - a.sx, dy = Math.min(0, a.y - a.sy);
+  const reach = Math.min(1, -dy / (H * .35));
+  return { x: W / 2 + dx * 2.2, y: BOX.y + BOX.h - reach * BOX.h * 1.05 + BOX.h * .02 };
+}
+const scene = $('scene');
+scene.addEventListener('pointerdown', e => {
+  if (!L || L.done || !BOX) return; snd();
+  aim = { sx: e.clientX, sy: e.clientY, x: e.clientX, y: e.clientY, on: false, t: performance.now() };
+  scene.setPointerCapture && scene.setPointerCapture(e.pointerId);
+});
+scene.addEventListener('pointermove', e => { if (!aim) return; aim.x = e.clientX; aim.y = e.clientY; if (Math.hypot(aim.x - aim.sx, aim.y - aim.sy) > 18 && aim.y < aim.sy) aim.on = true; });
+scene.addEventListener('pointerup', e => {
+  if (!aim) return; const a = aim; aim = null;
+  const moved = Math.hypot(a.x - a.sx, a.y - a.sy);
+  if (a.on && a.y < a.sy - 18) {
+    const t = aimTarget(a), sp = moved / Math.max(60, performance.now() - a.t) * 1000;
+    throwTo(t.x + (Math.random() - .5) * 14, t.y + (Math.random() - .5) * 14, .85 + Math.min(.4, sp / 3000));
+  } else if (moved < 12 && a.sx > BOX.x && a.sx < BOX.x + BOX.w && a.sy > BOX.y && a.sy < BOX.y + BOX.h) {
+    throwTo(a.sx + (Math.random() - .5) * BOX.w * .05, a.sy + (Math.random() - .5) * BOX.h * .05, 1);   // 그림을 톡: 그 자리로
+  }
+});
+scene.addEventListener('pointercancel', () => { aim = null; });
+
+/* ---------- 소리 (Web Audio) ---------- */
+let AC = null;
+function snd() { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume(); } catch (e) {} }
+function noise(dur, type, f, q, vol) {
+  if (!AC) return; const t = AC.currentTime, n = AC.sampleRate * dur, buf = AC.createBuffer(1, n, AC.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2);
+  const s = AC.createBufferSource(); s.buffer = buf; const fl = AC.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q;
+  const g = AC.createGain(); g.gain.value = vol; s.connect(fl); fl.connect(g); g.connect(AC.destination); s.start(t);
+}
+function tone(f0, f1, dur, vol, type = 'sine', at = 0) {
+  if (!AC) return; const t = AC.currentTime + at, o = AC.createOscillator(), g = AC.createGain(); o.type = type;
+  o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + dur + .02);
+}
+function sfxWhoosh() { noise(.35, 'bandpass', 900, .8, .25); }
+function sfxSplat(onArt) { noise(.25, 'lowpass', onArt ? 700 : 500, 1, .7); tone(onArt ? 420 : 300, 90, .18, .35); }
+function sfxWin() { [523, 659, 784, 1047].forEach((f, i) => tone(f, f, .35, .22, 'triangle', i * .12)); }
+
+/* ---------- 기타 ---------- */
+function alertTip(t) { const tip = $('tip'); tip.innerText = t; tip.style.display = 'block'; setTimeout(() => { tip.style.display = 'none'; tip.innerText = '공을 위로 밀어 던지거나, 그림을 톡 눌러요'; }, 2200); }
+function goBack() {
+  if ($('result').classList.contains('on') || (L && !$('pick').classList.contains('on'))) { openPick(); return; }
+  location.href = './?open=play';
+}
+
+(async function init() {
+  layout(); requestAnimationFrame(loop);
+  await loadList(); openPick();
+})();
+</script>
+</body>
+</html>
