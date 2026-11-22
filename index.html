@@ -1211,7 +1211,7 @@
   <!-- 🎶 아트쏭: 연주 화면 (J.J Color Music) -->
   <div id="songPlayer">
     <div class="sp-top"><button onclick="closeSong()">← <span data-i18n="back">돌아가기</span></button><span id="songTitle"></span></div>
-    <iframe id="songFrame" allow="autoplay" title="J.J Color Music"></iframe>
+    <iframe id="songFrame" allow="autoplay; microphone; speaker-selection" title="J.J Color Music"></iframe>
   </div>
 
   <div id="boxModal" class="tk-modal" onclick="if (event.target === this) closeModal('boxModal')">
