@@ -2032,6 +2032,9 @@
           ${T('openMem()', '🧠', t('memT'), t('memD'), memBest ? '🏆 ' + memBest.toLocaleString() : free)}
           ${T('openThrow()', '🎯', t('thrT'), t('thrD'), thrDone ? '🖼 ' + thrDone : free)}
           ${T('openColorMerge()', '🎨', t('cmT'), t('cmD'), free)}
+          ${T("openExtGame('https://hannaj1763-sketch.github.io/art-flight/', '✈️ ' + t('afT'))", '✈️', t('afT'), t('afD'), free)}
+          ${T("openExtGame('https://hannaj1763-sketch.github.io/korean-word-chain/', '🔤 ' + t('kwcT'))", '🔤', t('kwcT'), t('kwcD'), free)}
+          ${T("openExtGame('https://hannaj1763-sketch.github.io/k-snack-combo-tycoon/', '🍢 ' + t('kscT'))", '🍢', t('kscT'), t('kscD'), free)}
         </div>
 
         <div class="pl-cat">${t('catMusic')}</div>
@@ -4150,6 +4153,9 @@
       pongT: ['J.J 아트퐁', 'J.J Art Pong', 'J.J 艺术碰碰', 'J.J アートポン'], pongD: ['그림 보석 맞추기', 'Match the art gems', '画作宝石消除', '絵の宝石そろえ'],
       thrT: ['JJ 물감볼', 'JJ Paint Splash', 'JJ 颜料球', 'JJ ペイントボール'], thrD: ['물감을 던져 그림 색칠', 'Throw paint, color the art', '扔颜料给画上色', '絵の具を投げて色ぬり'],
       cmT: ['예성이 컬러머지', 'Yeseong Color Merge', '颜色合并', 'カラーマージ'], cmD: ['물감 섞어 대왕 만들기', 'Mix colors & merge', '混合颜料变大王', '絵の具を混ぜて合体'],
+      afT: ['아트 플라이트', 'Art Flight', '艺术飞行', 'アートフライト'], afD: ['그림 속 하늘을 나는 비행 게임', 'Fly through the art sky', '在画作天空中飞翔', '絵の空を飛ぶゲーム'],
+      kwcT: ['한글 끝말잇기', 'Korean Word Chain', '韩语词语接龙', '韓国語しりとり'], kwcD: ['단어를 이어가는 두뇌 게임', 'Connect Korean words', '连接韩语单词', '言葉をつなぐゲーム'],
+      kscT: ['K-간식 콤보 타이쿤', 'K-Snack Combo Tycoon', '韩式小吃大亨', 'K-おやつコンボタイクーン'], kscD: ['맛있는 분식 콤보 만들기', 'Make Korean snack combos', '制作美味韩式小吃组合', '韓国おやつコンボ作り'],
       memT: ['아트메모리게임', 'Art Memory', '艺术记忆游戏', 'アートメモリー'], memD: ['같은 그림 짝 찾기', 'Find matching pairs', '找出相同的画', '同じ絵のペア探し'],
       songT: ['아트쏭', 'Art Song', '艺术之歌', 'アートソング'], songD: ['그림이 노래해요', 'Paintings that sing', '画会唱歌', '絵が歌います'],
       colorT: ['아트컬러링', 'Art Coloring', '艺术涂色', 'アートぬりえ'], colorD: ['색칠하면 노래가 돼요', 'Color it into a song', '涂上颜色就变成歌', '塗ると歌になります'],
@@ -4192,6 +4198,19 @@
         document.body.style.overflow = 'hidden';
       } else {
         window.open(targetUrl, '_blank', 'noopener,noreferrer');
+      }
+    }
+    function openExtGame(url, title) {
+      const titleEl = document.getElementById('songTitle');
+      const frameEl = document.getElementById('songFrame');
+      const playerEl = document.getElementById('songPlayer');
+      if (playerEl && frameEl) {
+        if (titleEl) titleEl.innerText = title;
+        frameEl.src = url;
+        playerEl.classList.add('on');
+        document.body.style.overflow = 'hidden';
+      } else {
+        window.open(url, '_blank', 'noopener,noreferrer');
       }
     }
     const LANG_IDX = { ko: 0, en: 1, zh: 2, ja: 3 };
