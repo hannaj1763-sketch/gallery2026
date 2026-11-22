@@ -2031,6 +2031,7 @@
           ${T('openPang()', '💎', t('pongT'), t('pongD'), best ? '🏆 ' + best.toLocaleString() : p1)}
           ${T('openMem()', '🧠', t('memT'), t('memD'), memBest ? '🏆 ' + memBest.toLocaleString() : free)}
           ${T('openThrow()', '🎯', t('thrT'), t('thrD'), thrDone ? '🖼 ' + thrDone : free)}
+          ${T('openColorMerge()', '🎨', t('cmT'), t('cmD'), free)}
         </div>
 
         <div class="pl-cat">${t('catMusic')}</div>
@@ -4148,6 +4149,7 @@
       howPaint: ['💧 페인트 모으는 법', '💧 How to get paint', '💧 如何获得颜料', '💧 絵の具の集め方'],
       pongT: ['J.J 아트퐁', 'J.J Art Pong', 'J.J 艺术碰碰', 'J.J アートポン'], pongD: ['그림 보석 맞추기', 'Match the art gems', '画作宝石消除', '絵の宝石そろえ'],
       thrT: ['JJ 물감볼', 'JJ Paint Splash', 'JJ 颜料球', 'JJ ペイントボール'], thrD: ['물감을 던져 그림 색칠', 'Throw paint, color the art', '扔颜料给画上色', '絵の具を投げて色ぬり'],
+      cmT: ['예성이 컬러머지', 'Yeseong Color Merge', '颜色合并', 'カラーマージ'], cmD: ['물감 섞어 대왕 만들기', 'Mix colors & merge', '混合颜料变大王', '絵の具を混ぜて合体'],
       memT: ['아트메모리게임', 'Art Memory', '艺术记忆游戏', 'アートメモリー'], memD: ['같은 그림 짝 찾기', 'Find matching pairs', '找出相同的画', '同じ絵のペア探し'],
       songT: ['아트쏭', 'Art Song', '艺术之歌', 'アートソング'], songD: ['그림이 노래해요', 'Paintings that sing', '画会唱歌', '絵が歌います'],
       colorT: ['아트컬러링', 'Art Coloring', '艺术涂色', 'アートぬりえ'], colorD: ['색칠하면 노래가 돼요', 'Color it into a song', '涂上颜色就变成歌', '塗ると歌になります'],
@@ -4171,6 +4173,25 @@
         document.body.style.overflow = 'hidden';
       } else {
         window.open(DRIVE_URL, '_blank', 'noopener,noreferrer');
+      }
+    }
+    const COLOR_MERGE_URL = 'https://hannaj1763-sketch.github.io/color-merge/';
+    function openColorMerge() {
+      const ids = (getBox().ids || []);
+      const urls = ids.map(id => (allArtworks.find(a => a.id === id) || {}).src).filter(Boolean);
+      const targetUrl = urls.length
+        ? `${COLOR_MERGE_URL}?arts=${encodeURIComponent(JSON.stringify(urls))}`
+        : COLOR_MERGE_URL;
+      const titleEl = document.getElementById('songTitle');
+      const frameEl = document.getElementById('songFrame');
+      const playerEl = document.getElementById('songPlayer');
+      if (playerEl && frameEl) {
+        if (titleEl) titleEl.innerText = '🎨 ' + t('cmT');
+        frameEl.src = targetUrl;
+        playerEl.classList.add('on');
+        document.body.style.overflow = 'hidden';
+      } else {
+        window.open(targetUrl, '_blank', 'noopener,noreferrer');
       }
     }
     const LANG_IDX = { ko: 0, en: 1, zh: 2, ja: 3 };
