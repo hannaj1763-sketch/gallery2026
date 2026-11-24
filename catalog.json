@@ -1,0 +1,549 @@
+{
+ "_설명": "genre: 작품 폴더 번호 → 장르 / jjNote: 작가노트(JJ의 말) / years: 연도별 한 줄 / genres: 장르 설명. 고치고 싶은 글을 바꿔서 올리면 앱에 바로 반영돼요.",
+ "genres": {
+  "소묘": {
+   "ko": "연필 하나로 빛과 그림자를 그려요",
+   "en": "Light and shadow with a single pencil"
+  },
+  "수채화": {
+   "ko": "물과 물감이 번지며 만드는 색",
+   "en": "Colors that bloom with water"
+  },
+  "발상과 표현": {
+   "ko": "상상한 이야기를 그림으로 풀어요",
+   "en": "Imagined stories turned into pictures"
+  },
+  "자유작": {
+   "ko": "그리고 싶은 걸 마음껏",
+   "en": "Whatever I felt like drawing"
+  }
+ },
+ "years": {
+  "2022": {
+   "ko": "크레파스와 물감으로 상상 속 세상을 화면 가득 채우던 해",
+   "en": "A year of filling the page with imagined worlds in crayon and paint"
+  },
+  "2023": {
+   "ko": "생활 속에서 그리고 싶은 것을 찾기 시작한 해",
+   "en": "A year of finding things to draw in everyday life"
+  },
+  "2024": {
+   "ko": "물감과 색연필로 계절의 장면을 담은 해",
+   "en": "A year of capturing the seasons in paint and colored pencil"
+  },
+  "2025": {
+   "ko": "연필 소묘로 빛과 그림자를 익히고 수채화·수묵까지 넓혀 간 해",
+   "en": "A year of learning light and shadow in pencil, then branching into watercolor and ink"
+  },
+  "2026": {
+   "ko": "관찰과 상상을 섞어 나만의 표현을 찾아가는 해",
+   "en": "A year of mixing observation and imagination into a style of my own"
+  }
+ },
+ "works": {
+  "02": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "탁자 위에 있던 요구르트가 너무 맛있어 보여서 그렸어요. 하트도 같이 그려 줬어요.",
+    "en": "The yogurt on the table looked so yummy that I drew it. I added hearts too."
+   }
+  },
+  "03": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "내가 좋아하는 주황색 운동화예요. 신발 끈이 꼬인 모양을 그리는 게 제일 어려웠어요.",
+    "en": "These are my favorite orange sneakers. The tangled laces were the hardest part."
+   }
+  },
+  "04": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "과일을 반으로 자르면 안쪽이 꼭 무늬 같아요. 새콤한 색을 많이 썼어요.",
+    "en": "When you cut fruit in half, the inside looks like a pattern. I used lots of sour colors."
+   }
+  },
+  "05": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "조용한 오후에 나무 아래 벤치에 앉아 있고 싶어서 그렸어요. 나뭇잎 색을 여러 번 섞었어요.",
+    "en": "I wanted to sit on a bench under a tree on a quiet afternoon. I mixed the leaf colors many times."
+   }
+  },
+  "06": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "딸기 빙수를 그리면서 먹고 싶어졌어요. 유리 그릇이 반짝이게 하얀 부분을 남겼어요.",
+    "en": "Drawing strawberry shaved ice made me hungry. I left white spots so the glass bowl would shine."
+   }
+  },
+  "07": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "새싹이 자라는 넓은 들판이에요. 길을 따라 걸어가면 어디가 나올지 궁금해요.",
+    "en": "This is a wide field where sprouts grow. I wonder where the path leads."
+   }
+  },
+  "08": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "눈사람이랑 빨간 새가 친구가 됐어요. 목도리를 꼭 해 주고 싶었어요.",
+    "en": "The snowman and the red bird became friends. I really wanted to give him a scarf."
+   }
+  },
+  "09": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "견우와 직녀가 오작교에서 만나는 장면이에요. 까치들이 다리가 되어 주는 게 멋있었어요.",
+    "en": "Gyeonu and Jiknyeo meet on the magpie bridge. I loved how the magpies became a bridge."
+   }
+  },
+  "10": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "크리스마스 컵케이크예요. 위에 올린 잎이랑 열매를 그릴 때 제일 신났어요.",
+    "en": "A Christmas cupcake! Painting the holly leaves and berries on top was the most fun."
+   }
+  },
+  "11": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "체리를 작은 조각으로 나눠서 색칠했어요. 모자이크처럼 보이게 하고 싶었어요.",
+    "en": "I split the cherries into little pieces and colored them, like a mosaic."
+   }
+  },
+  "12": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "마티스 그림을 보고 따라 그려 봤어요. 고양이가 금붕어를 보는 모습이 귀여웠어요.",
+    "en": "I painted this after looking at a Matisse picture. The cat watching the goldfish was cute."
+   }
+  },
+  "13": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "까만 종이에 하얀 날개를 그렸어요. 어두운 곳에서도 날개가 빛나는 것 같아요.",
+    "en": "I drew white wings on black paper. They look like they glow in the dark."
+   }
+  },
+  "14": {
+   "genre": "소묘",
+   "jjNote": {
+    "ko": "나비 날개는 양쪽이 똑같아야 해서 천천히 그렸어요. 연필로 진하고 연한 부분을 나눴어요.",
+    "en": "Butterfly wings must match on both sides, so I drew slowly. I made dark and light parts with my pencil."
+   }
+  },
+  "15": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "먹으로 새를 그렸어요. 붓에 물을 얼마나 묻히느냐에 따라 색이 달라져서 신기했어요.",
+    "en": "I painted a bird with ink. The color changed with how much water was on the brush. So cool!"
+   }
+  },
+  "16": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "노란 튤립을 꽃병에 꽂았어요. 꽃병 무늬도 내 마음대로 꾸몄어요.",
+    "en": "Yellow tulips in a vase. I decorated the vase pattern my own way."
+   }
+  },
+  "17": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "핫도그랑 감자튀김이에요. 소시지가 반짝이게 칠하려고 노력했어요.",
+    "en": "A hot dog and fries. I tried to make the sausage look shiny."
+   }
+  },
+  "18": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "돌담 옆에 가을이 왔어요. 돌을 하나하나 다른 색으로 칠했어요.",
+    "en": "Autumn came by the stone wall. I painted every stone a different color."
+   }
+  },
+  "19": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "벚꽃 보러 가는 분홍 자동차예요. 나무에 내가 좋아하는 색을 다 넣었어요.",
+    "en": "A pink car going to see cherry blossoms. I put all my favorite colors in the tree."
+   }
+  },
+  "20": {
+   "genre": "소묘",
+   "jjNote": {
+    "ko": "축구공을 보고 그렸어요. 동그란 공이 진짜 둥글어 보이게 그림자를 넣었어요.",
+    "en": "I drew a soccer ball. I added shadows so it looks really round."
+   }
+  },
+  "21": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "완두콩 삼형제예요. 콩깍지 안에서 사이좋게 있는 모습이 귀여웠어요.",
+    "en": "Three pea brothers, cozy together in their pod."
+   }
+  },
+  "22": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "곰돌이 초코가 리본을 달고 옷을 입었어요. 귀엽게 꾸며 주고 싶었어요.",
+    "en": "My bear Choco wears a ribbon and a uniform. I wanted to make him cute."
+   }
+  },
+  "23": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "바닷속 친구들을 모았어요. 문어가 제일 커서 가운데에 그렸어요.",
+    "en": "I gathered my sea friends. The octopus is the biggest, so it's in the middle."
+   }
+  },
+  "24": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "바닷가에서 파도가 밀려오는 모습이에요. 모래 위에 작은 불가사리를 숨겨 놨어요.",
+    "en": "Waves rolling onto the beach. I hid a tiny starfish on the sand."
+   }
+  },
+  "25": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "반은 새, 반은 로봇인 새예요. 기계 부분을 꼼꼼하게 그렸어요.",
+    "en": "Half bird, half robot. I drew the machine parts carefully."
+   }
+  },
+  "26": {
+   "genre": "소묘",
+   "jjNote": {
+    "ko": "뉴욕의 높은 빌딩들을 연필로 그렸어요. 건물마다 창문이 너무 많았어요!",
+    "en": "Tall New York buildings in pencil. There were so many windows!"
+   }
+  },
+  "27": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "우리나라 꽃 무궁화예요. 꽃잎 가운데 진한 분홍색을 칠하는 게 좋았어요.",
+    "en": "Rose of Sharon, Korea's flower. I liked painting the dark pink in the middle."
+   }
+  },
+  "28": {
+   "genre": "소묘",
+   "jjNote": {
+    "ko": "스케이트 타는 사람이랑 허들 넘는 사람이에요. 움직이는 몸을 그리는 연습을 했어요.",
+    "en": "A skater and a hurdler. I practiced drawing bodies in motion."
+   }
+  },
+  "29": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "마카롱이랑 블루베리를 잔뜩 올린 디저트예요. 보기만 해도 달콤해요.",
+    "en": "A dessert piled with macarons and blueberries. It looks sweet just to see."
+   }
+  },
+  "30": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "벚꽃이 핀 봄날의 교회예요. 분홍 꽃이 교회를 감싸 주는 것 같아요.",
+    "en": "A church on a spring day with cherry blossoms hugging it."
+   }
+  },
+  "31": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "대나무 숲이에요. 마디를 그리고 잎을 붓으로 쓱쓱 그렸어요.",
+    "en": "A bamboo forest. I drew the joints and swished the leaves with my brush."
+   }
+  },
+  "32": {
+   "genre": "소묘",
+   "jjNote": {
+    "ko": "장미 한 송이를 연필로 그렸어요. 꽃잎이 겹쳐진 곳이 어려웠지만 재미있었어요.",
+    "en": "One rose in pencil. The overlapping petals were hard but fun."
+   }
+  },
+  "33": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "까치랑 감이에요. 감이 주렁주렁 열린 가을 나무가 좋아요.",
+    "en": "A magpie and persimmons. I love autumn trees full of persimmons."
+   }
+  },
+  "34": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "스키 타는 겨울이에요. 바람에 목도리가 날리는 걸 그렸어요.",
+    "en": "Skiing in winter. I drew the scarves blowing in the wind."
+   }
+  },
+  "35": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "놀란 뱀이에요. 쉬익쉬익! 비늘을 하나하나 그렸어요.",
+    "en": "A surprised snake. Hiss hiss! I drew every scale."
+   }
+  },
+  "36": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "여러 색 꽃을 한 다발로 모았어요. 꽃병도 파란 줄무늬로 꾸몄어요.",
+    "en": "A bouquet of many colors in a blue striped vase."
+   }
+  },
+  "37": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "내가 상상한 부엌이에요. 노란 벽이랑 하늘색 냉장고가 마음에 들어요.",
+    "en": "A kitchen I imagined. I like the yellow walls and the sky-blue fridge."
+   }
+  },
+  "38": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "빨간 모자를 쓴 멋쟁이 아가씨예요. 옷 무늬를 꾸미는 게 제일 재미있었어요.",
+    "en": "A stylish lady in a red hat. Decorating her dress was the most fun."
+   }
+  },
+  "39": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "바다로 떠나는 배예요. 파도와 하늘을 알록달록한 모양으로 나눠서 칠했어요.",
+    "en": "A boat sailing away. I split the waves and sky into colorful shapes."
+   }
+  },
+  "40": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "초록 나무 아래 벤치예요. 나무 그늘에서 쉬고 싶어서 그렸어요.",
+    "en": "A bench under a green tree. I wanted to rest in its shade."
+   }
+  },
+  "41": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "정원을 산책하는 아이예요. 나비가 따라오고 파란 꽃이 가득해요.",
+    "en": "A child walking in a garden, with butterflies and lots of blue flowers."
+   }
+  },
+  "42": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "무지개 색 새예요. 깃털마다 다른 색을 섞어서 칠했어요.",
+    "en": "A rainbow bird. I mixed a different color into every feather."
+   }
+  },
+  "43": {
+   "genre": "소묘",
+   "jjNote": {
+    "ko": "세모랑 네모 같은 도형으로 강아지를 만들었어요. 면마다 진하기를 다르게 했어요.",
+    "en": "I made a puppy out of shapes. Each side has a different shade."
+   }
+  },
+  "44": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "우리나라 전통 무늬를 크게 그렸어요. 색이 화려해서 축제 같아요.",
+    "en": "Big Korean traditional patterns. The bright colors feel like a festival."
+   }
+  },
+  "45": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "우리 집이에요. 하늘에 풍선이랑 나비를 많이 날려 줬어요.",
+    "en": "This is my home. I filled the sky with balloons and butterflies."
+   }
+  },
+  "46": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "나의 장래희망은 화가예요! 팔레트랑 붓을 든 나를 만들었어요.",
+    "en": "My dream is to be an artist! I made myself holding a palette and brush."
+   }
+  },
+  "47": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "피자를 먹으면 웃음이 나요. 그래서 '얼굴을 피자'라고 썼어요.",
+    "en": "Pizza makes me smile, so I wrote 'Smile like a pizza!'"
+   }
+  },
+  "48": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "펭귄이 쓰레기가 가득한 바다에서 페트병 배를 타고 있어요. 지구를 지켜 주세요!",
+    "en": "A penguin rides a plastic-bottle boat in a trash-filled sea. Please protect the Earth!"
+   }
+  },
+  "49": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "가을 낙엽을 모아서 그렸어요. 빨강, 주황, 노랑이 다 달라요.",
+    "en": "I gathered autumn leaves. Every red, orange, and yellow is different."
+   }
+  },
+  "50": {
+   "genre": "소묘",
+   "jjNote": {
+    "ko": "줄무늬만으로 그림을 그렸어요. 줄을 휘게 하니까 물건이 튀어나와 보여요.",
+    "en": "A picture made only of stripes. Bending the lines makes things pop out."
+   }
+  },
+  "51": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "해바라기예요. 꽃 가운데 씨앗을 촘촘하게 그렸어요.",
+    "en": "A sunflower. I drew the seeds in the middle close together."
+   }
+  },
+  "52": {
+   "genre": "소묘",
+   "jjNote": {
+    "ko": "구불구불한 소나무예요. 솔잎을 한 줄 한 줄 그렸어요.",
+    "en": "A twisty pine tree. I drew the needles line by line."
+   }
+  },
+  "53": {
+   "genre": "소묘",
+   "jjNote": {
+    "ko": "창밖을 보는 고양이예요. 고양이는 무슨 생각을 할까요?",
+    "en": "A cat looking out the window. What is it thinking?"
+   }
+  },
+  "54": {
+   "genre": "소묘",
+   "jjNote": {
+    "ko": "유리병이랑 유리잔이에요. 반짝이는 부분을 남기는 게 포인트예요.",
+    "en": "A glass bottle and a glass. The trick is leaving the shiny parts white."
+   }
+  },
+  "55": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "핼러윈 밤에 호박 위에 앉은 친구예요. 보름달이랑 박쥐도 그렸어요.",
+    "en": "A friend sitting on a pumpkin on Halloween night, with a full moon and bats."
+   }
+  },
+  "56": {
+   "genre": "소묘",
+   "jjNote": {
+    "ko": "우유갑을 보고 그렸어요. 글씨만 빨간색으로 칠했어요.",
+    "en": "I drew a milk carton. Only the letters are red."
+   }
+  },
+  "57": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "튜브를 타고 노는 강아지 친구예요. 여름 바다 느낌으로 칠했어요.",
+    "en": "A puppy friend floating on a tube. I painted it like a summer sea."
+   }
+  },
+  "58": {
+   "genre": "소묘",
+   "jjNote": {
+    "ko": "꽃 속에 숨은 토끼예요. 털이 부드러워 보이게 살살 그렸어요.",
+    "en": "A rabbit hiding in flowers. I drew gently so the fur looks soft."
+   }
+  },
+  "59": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "녹아내리는 알파벳 P예요. 아이스크림처럼 뚝뚝 떨어지게 그렸어요.",
+    "en": "A melting letter P, dripping like ice cream."
+   }
+  },
+  "60": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "나만의 일월오봉도예요. 해와 달, 산과 소나무를 그렸어요.",
+    "en": "My own Irworobongdo, with the sun, the moon, mountains, and pine trees."
+   }
+  },
+  "61": {
+   "genre": "수채화",
+   "jjNote": {
+    "ko": "수박 화채예요. 여름에 시원하게 먹고 싶어서 그렸어요.",
+    "en": "Watermelon punch. I wanted something cool to eat in summer."
+   }
+  },
+  "62": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "꿈에서 본 고래예요. 보라색 달 앞을 헤엄쳐요.",
+    "en": "A whale from my dream, swimming past a purple moon."
+   }
+  },
+  "63": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "조금 엉뚱한 호랑이예요. 민화 속 호랑이처럼 그려 봤어요.",
+    "en": "A goofy tiger, drawn like the tigers in Korean folk paintings."
+   }
+  },
+  "64": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "짚라인을 타는 상상을 했어요. 하늘에 별이랑 무지개가 가득해요.",
+    "en": "I imagined riding a zipline across a sky full of stars and rainbows."
+   }
+  },
+  "65": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "유니콘이 사는 나라예요. 무지개 집에서 살고 싶어요.",
+    "en": "A world where unicorns live. I want to live in the rainbow house."
+   }
+  },
+  "66": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "엄마랑 같이 간식 먹는 시간이에요. 식탁에 맛있는 걸 잔뜩 그렸어요.",
+    "en": "Snack time with Mom. I filled the table with yummy food."
+   }
+  },
+  "67": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "토끼들이 사는 정원이에요. 꽃이랑 벌레 친구들도 같이 살아요.",
+    "en": "A garden where bunnies live with flowers and bug friends."
+   }
+  },
+  "68": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "고양이 버스를 타고 출발! 다 같이 여행 가는 그림이에요.",
+    "en": "All aboard the cat bus! We're going on a trip together."
+   }
+  },
+  "69": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "꿀벌의 집에 놀러 왔어요. 육각형 방마다 꿀벌이 있어요.",
+    "en": "Welcome to the bee house! A bee lives in every hexagon room."
+   }
+  },
+  "70": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "오르골 위에서 춤추는 공주예요. 사람들이 박수를 쳐 줘요.",
+    "en": "A princess dancing on a music box while everyone claps."
+   }
+  },
+  "71": {
+   "genre": "소묘",
+   "jjNote": {
+    "ko": "앞발을 든 말이에요. 갈기가 바람에 날리는 모습을 그렸어요.",
+    "en": "A horse lifting its front leg, its mane blowing in the wind."
+   }
+  },
+  "72": {
+   "genre": "자유작",
+   "jjNote": {
+    "ko": "파란 머리 소년이에요. 눈을 반짝이게 그리는 게 제일 중요했어요.",
+    "en": "A boy with blue hair. Making his eyes sparkle was the most important part."
+   }
+  },
+  "73": {
+   "genre": "발상과 표현",
+   "jjNote": {
+    "ko": "자동차가 물고기처럼 하늘을 헤엄치는 도시예요. 펜으로 꼼꼼하게 그렸어요.",
+    "en": "A city where cars swim through the sky like fish. I drew it carefully with a pen."
+   }
+  }
+ }
+}

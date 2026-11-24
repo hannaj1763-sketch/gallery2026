@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Atelier Archive - 아티스트 JJ 갤러리</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
@@ -35,11 +36,11 @@
     .tab-btn .ti { font-size: 16px; }
     .tab-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
     
-    .view-container { display: none; min-height: calc(100vh - 65px); }
+    .view-container { display: none; min-height: calc(100vh - var(--hdrH, 65px)); }
     .view-container.active { display: block; }
 
     /* 3D 세로 스크롤 아틀리에 */
-    #view-3d { position: relative; height: calc(100vh - 65px); touch-action: none; overflow: hidden; }
+    #view-3d { position: relative; min-height: 0; height: calc(100vh - var(--hdrH, 65px)); height: calc(100dvh - var(--hdrH, 65px)); touch-action: none; overflow: hidden; }
     #canvas3d { width: 100%; height: 100%; display: block; }
     .auto-btn { position: absolute; top: 14px; right: 14px; z-index: 11; background: rgba(0,0,0,0.6); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.18); padding: 7px 14px; border-radius: 18px; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); }
     .studio-tab { color: #fbbf24 !important; border-color: rgba(251,191,36,0.45) !important; text-decoration: none; }
@@ -145,6 +146,37 @@
     .lang-switcher { display: flex; gap: 6px; margin-bottom: 12px; justify-content: center; flex-wrap: wrap; }
     .lang-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #94a3b8; padding: 4px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; }
     .lang-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+    /* 📅 성장 타임라인 · 🎨 장르별 · ✏️ 작가노트 */
+    .ar-seg { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ar-seg button { border: 1px solid rgba(255,255,255,.16); background: #1c212c; color: #cbd5e1; border-radius: 999px; padding: 9px 15px; font-size: 14px; font-weight: 800; cursor: pointer; font-family: inherit; }
+    .ar-seg button.on { background: #f8fafc; color: #0f172a; border-color: #f8fafc; }
+    #arBody { margin-top: 20px; }
+    .tl-year { position: relative; padding: 0 0 30px 26px; }
+    .tl-year::before { content: ''; position: absolute; left: 6px; top: 10px; bottom: 0; width: 2px; background: linear-gradient(#fbbf24, rgba(251,191,36,.15)); }
+    .tl-year::after { content: ''; position: absolute; left: 0; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: #fbbf24; box-shadow: 0 0 0 4px rgba(251,191,36,.2); }
+    .tl-y { font-size: 30px; font-weight: 900; color: #f8fafc; line-height: 1; letter-spacing: .5px; font-variant-numeric: tabular-nums; }
+    .tl-y small { font-size: 14px; color: #94a3b8; font-weight: 700; margin-left: 8px; letter-spacing: 0; }
+    .tl-cap { color: #fde68a; font-size: 14.5px; margin: 8px 0 6px; line-height: 1.5; }
+    .tl-gs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+    .tl-gs span { font-size: 11.5px; font-weight: 800; border-radius: 999px; padding: 3px 9px; background: rgba(255,255,255,.07); color: #cbd5e1; }
+    .tl-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x proximity; scrollbar-width: thin; }
+    .tl-card { flex: none; width: 132px; scroll-snap-align: start; text-align: left; background: #1c212c; border: 1px solid rgba(255,255,255,.08); border-radius: 12px; overflow: hidden; padding: 0; cursor: pointer; font-family: inherit; color: inherit; }
+    .tl-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: #0f141c; }
+    .tl-card div { padding: 6px 8px 8px; }
+    .tl-card .m { font-size: 11px; color: #94a3b8; font-weight: 700; }
+    .tl-card .t { font-size: 13px; font-weight: 800; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .g-tag { display: inline-block; font-size: 10.5px; font-weight: 800; border-radius: 6px; padding: 1px 6px; margin-top: 3px; }
+    .g-소묘 { background: #e2e8f0; color: #1e293b; } .g-수채화 { background: #bae6fd; color: #075985; }
+    .g-발상과표현 { background: #fbcfe8; color: #9d174d; } .g-자유작 { background: #fde68a; color: #854d0e; }
+    .gn-sec { margin-bottom: 30px; }
+    .gn-h { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+    .gn-h b { font-size: 22px; font-weight: 900; color: #f8fafc; } .gn-h small { color: #94a3b8; font-size: 13.5px; font-weight: 700; }
+    .gn-d { color: #cbd5e1; font-size: 14px; margin-bottom: 10px; }
+    .gn-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+    .gn-grid .tl-card { width: auto; }
+    .jj-note { max-width: 720px; margin: 14px auto 0; background: #fffbea; color: #3b2f0b; border-radius: 14px; padding: 12px 16px; font-size: 15px; line-height: 1.6; text-align: left; position: relative; }
+    .jj-note b { display: block; font-size: 12px; color: #a16207; letter-spacing: .3px; margin-bottom: 2px; }
+    .art-jj { font-size: 13px; color: #fde68a; margin-top: 6px; line-height: 1.5; }
     .note-content { font-size: 14px; color: #e2e8f0; line-height: 1.6; max-width: 720px; margin: 0 auto; text-align: center; }
 
     /* 이모티콘 창고 */
@@ -283,6 +315,7 @@
     .out-banner .ob-p { font-size: 11px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .out-banner .ob-x { color: #64748b; font-size: 16px; padding: 4px; }
     #view-3d.has-banner .hint-3d { bottom: 86px; }
+    .hint-3d { max-width: calc(100% - 24px); white-space: normal !important; line-height: 1.4; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
     #view-out { max-width: 900px; margin: 0 auto; padding: 104px 16px 40px; }
     body.has-visit #view-out { padding-top: var(--vb, 96px); }
     .out-tabs { display: flex; gap: 8px; margin: 12px 0; }
@@ -1258,7 +1291,12 @@
 
   <!-- 도록 뷰 -->
   <div id="view-archive" class="view-container">
-    <h2 style="font-size: 20px; font-weight: 600;">All Works</h2>
+    <div class="ar-seg" id="arSeg">
+      <button data-m="time" onclick="setArMode('time')" data-i18n="arTime">📅 성장 타임라인</button>
+      <button data-m="genre" onclick="setArMode('genre')" data-i18n="arGenre">🎨 장르별</button>
+      <button data-m="all" onclick="setArMode('all')" data-i18n="arAll">▦ 전체</button>
+    </div>
+    <div id="arBody"></div>
     <div id="artGrid" class="gallery-grid"></div>
   </div>
 
@@ -1377,6 +1415,7 @@
       </div>
 
       <div id="viewerNote" class="note-content"></div>
+      <div id="viewerJJ" class="jj-note" style="display:none"></div>
     </div>
   </div>
 
@@ -3481,6 +3520,7 @@
 
       // 입장권 규칙에 따라 지금 볼 수 있는 작품만 남기기
       allArtworks = artworks;
+      await loadCatalog();
       await loadExhibitions();
       await cloudStart();                 // 앱: 구글 로그인 + 서버에 저장된 입장권·My Collection 불러오기
       artworks = visibleArtworks(allArtworks);
@@ -3522,8 +3562,59 @@
       });
       return html ? `<div class="lock-intro">✨ 지금 볼 수 있는 작품 <b>${artworks.filter(a => !a.isProfile).length}점</b> · 특별전에서 만날 작품 <b>${nLocked}점</b> (모두 ${allArtworks.filter(a => !a.isProfile).length}점)<br>흐린 작품은 특별전에 입장하거나 <span class="easel"></span> My Collection에 담으면 또렷하게 보여요.</div>` + html : '';
     }
+    // =====================================================================
+    // 📅 성장 타임라인 · 🎨 장르별 · ✏️ 작가노트 — 저장소의 catalog.json 에서 읽어요
+    // =====================================================================
+    let CATALOG = { works: {}, years: {}, genres: {} };
+    const GENRES = ['소묘', '수채화', '발상과 표현', '자유작'];
+    const GENRE_EN = { '소묘': 'Drawing', '수채화': 'Watercolor', '발상과 표현': 'Imagination', '자유작': 'Free work' };
+    async function loadCatalog() {
+      const v = Math.floor(Date.now() / 600000);
+      for (const u of [`https://raw.githubusercontent.com/${USERNAME}/${REPO}/main/catalog.json?v=${v}`, `catalog.json?v=${v}`]) {
+        try { const r = await fetch(u, { cache: 'no-store' }); if (r.ok) { CATALOG = await r.json(); break; } } catch (e) {}
+      }
+      CATALOG.works = CATALOG.works || {};
+      (allArtworks || []).forEach(a => { const w = CATALOG.works[a.id] || {}; a.genre = w.genre || ''; a.jjNote = w.jjNote || null; });
+    }
+    const isKo = () => !appLang || appLang === 'ko';
+    const gName = g => isKo() ? g : (GENRE_EN[g] || g);
+    const gTag = g => g ? `<span class="g-tag g-${g.replace(/\s/g, '')}">${gName(g)}</span>` : '';
+    const loc = o => o ? (isKo() ? o.ko : (o.en || o.ko)) : '';
+    function jjNoteText(a) { return a && a.jjNote ? loc(a.jjNote) : ''; }
+    function arMode() { return lsGet('agjj_ar_mode', 'time'); }
+    function setArMode(m) { lsSet('agjj_ar_mode', m, true); renderArchive(); }
+    function miniCard(a) {
+      const idx = artworks.indexOf(a), [y, mo] = (a.date || '').split('-');
+      const when = mo && mo !== '99' ? (isKo() ? `${y}년 ${+mo}월` : `${y}.${mo}`) : '';
+      return `<button class="tl-card" onclick="openViewerByIndex(${idx})"><img src="${a.src}" alt="" loading="lazy" decoding="async">
+        <div><div class="m">${when}</div><div class="t">${esc(a.title)}</div>${gTag(a.genre)}</div></button>`;
+    }
+    function renderTimeline(list) {
+      const by = {};
+      list.forEach(a => { const y = (a.date || '').slice(0, 4); if (/^\d{4}$/.test(y)) (by[y] = by[y] || []).push(a); });
+      return Object.keys(by).sort().map(y => {
+        const ws = by[y].sort((a, b) => a.date.localeCompare(b.date));
+        const cnt = GENRES.map(g => [g, ws.filter(a => a.genre === g).length]).filter(x => x[1]);
+        return `<div class="tl-year"><div class="tl-y">${y}<small>${isKo() ? ws.length + '점' : ws.length + ' works'}</small></div>
+          ${CATALOG.years && CATALOG.years[y] ? `<div class="tl-cap">${esc(loc(CATALOG.years[y]))}</div>` : ''}
+          <div class="tl-gs">${cnt.map(([g, n]) => `<span>${gName(g)} ${n}</span>`).join('')}</div>
+          <div class="tl-row">${ws.map(miniCard).join('')}</div></div>`;
+      }).join('') || `<p style="color:#94a3b8">${isKo() ? '날짜가 있는 작품이 아직 없어요.' : 'No dated works yet.'}</p>`;
+    }
+    function renderGenres(list) {
+      return GENRES.concat(['']).map(g => {
+        const ws = list.filter(a => (a.genre || '') === g); if (!ws.length) return '';
+        const d = g && CATALOG.genres ? loc(CATALOG.genres[g]) : '';
+        return `<div class="gn-sec"><div class="gn-h"><b>${g ? gName(g) : (isKo() ? '분류 전' : 'Unsorted')}</b><small>${isKo() ? ws.length + '점' : ws.length + ' works'}</small></div>
+          ${d ? `<div class="gn-d">${esc(d)}</div>` : ''}<div class="gn-grid">${ws.map(miniCard).join('')}</div></div>`;
+      }).join('');
+    }
     function renderArchive() {
+      const m = arMode(), works = artworks.filter(a => !a.isProfile);
+      document.querySelectorAll('#arSeg button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+      document.getElementById('arBody').innerHTML = m === 'time' ? renderTimeline(works) : m === 'genre' ? renderGenres(works) : '';
       const grid = document.getElementById('artGrid');
+      if (m !== 'all') { grid.innerHTML = ''; let lk0 = document.getElementById('lockedWorks'); if (!lk0) { lk0 = document.createElement('div'); lk0.id = 'lockedWorks'; grid.after(lk0); } lk0.innerHTML = lockedSections(); return; }
       // [속도개선] 도록 썸네일은 화면에 보일 때만 로드
       grid.innerHTML = artworks.map((art, idx) => `
         <div class="art-card" onclick="openViewerByIndex(${idx})">
@@ -3532,10 +3623,11 @@
             <div class="thumb-watermark">J.J</div>
           </div>
           <div class="art-info">
-            <span class="art-theme-tag" style="color: ${art.theme.tagColor}">${art.theme.name}</span>
+            <span class="art-theme-tag" style="color: ${art.theme.tagColor}">${art.theme.name}</span> ${gTag(art.genre)}
             <div class="art-title">${art.title}</div>
             <div class="art-meta">${art.meta}</div>
             <div class="art-note">${art.notes.ko || art.notes.en || ''}</div>
+            ${jjNoteText(art) ? `<div class="art-jj">✏️ “${esc(jjNoteText(art))}”</div>` : ''}
             <div class="card-reactions" id="card-react-${idx}">${reactionSummary(art.id)}</div>
           </div>
         </div>
@@ -4237,6 +4329,7 @@
       out: ['전시', 'Exhibits', '展览', '展示'], my: ['My', 'My', '我的', 'マイ'],
       gallery: ['갤러리', 'Gallery', '画廊', 'ギャラリー'], play: ['Play', 'Play', '玩乐', 'Play'], box: ['컬렉션', 'Collection', '收藏', 'コレクション'],
       walk: ['🏛 걸어보기', '🏛 Walk', '🏛 漫步', '🏛 歩いて見る'], grid: ['▦ 모아보기', '▦ All', '▦ 全部', '▦ 一覧'], swipe: ['▶ 넘겨보기', '▶ Swipe', '▶ 滑动', '▶ めくる'],
+      arTime: ['📅 성장 타임라인', '📅 Growth timeline', '📅 成长时间线', '📅 成長タイムライン'], arGenre: ['🎨 장르별', '🎨 By genre', '🎨 按类型', '🎨 ジャンル別'], arAll: ['▦ 전체', '▦ All', '▦ 全部', '▦ すべて'],
       help: ['도움말', 'Help', '帮助', 'ヘルプ'], helpOff: ['끄기 ✕', 'Off ✕', '关闭 ✕', '閉じる ✕'],
       exT: ['지금 열리는 전시', 'Exhibitions now', '正在举办的展览', '開催中の展示'], exD: ['가까운 미술관·전시 소식을 모아 봐요', 'Museums and shows near you', '附近的美术馆和展览', '近くの美術館・展示'], exN: ['전시 {n}곳', '{n} shows', '{n} 个展览', '展示 {n}件'],
       hubSub: ['작가를 골라 갤러리에 들어가요', 'Choose an artist to enter the gallery', '选择艺术家，进入画廊', 'アーティストを選んでギャラリーへ'],
@@ -4254,7 +4347,7 @@
       howPaint: ['💧 페인트 모으는 법', '💧 How to get paint', '💧 如何获得颜料', '💧 絵の具の集め方'],
       pongT: ['J.J 아트퐁', 'J.J Art Pong', 'J.J 艺术碰碰', 'J.J アートポン'], pongD: ['그림 보석 맞추기', 'Match the art gems', '画作宝石消除', '絵の宝石そろえ'],
       thrT: ['JJ 물감볼', 'JJ Paint Splash', 'JJ 颜料球', 'JJ ペイントボール'], thrD: ['물감을 던져 그림 색칠', 'Throw paint, color the art', '扔颜料给画上色', '絵の具を投げて色ぬり'],
-      cmT: ['예성이 컬러머지', 'Yeseong Color Merge', '颜色合并', 'カラーマージ'], cmD: ['물감 섞어 대왕 만들기', 'Mix colors & merge', '混合颜料变大王', '絵の具を混ぜて合体'],
+      cmT: ['JJ 컬러머지', 'JJ Color Merge', 'JJ 颜色合并', 'JJ カラーマージ'], cmD: ['물감 섞어 대왕 만들기', 'Mix colors & merge', '混合颜料变大王', '絵の具を混ぜて合体'],
       afT: ['아트 플라이트', 'Art Flight', '艺术飞行', 'アートフライト'], afD: ['그림 속 하늘을 나는 비행 게임', 'Fly through the art sky', '在画作天空中飞翔', '絵の空を飛ぶゲーム'],
       kwcT: ['한글 끝말잇기', 'Korean Word Chain', '韩语词语接龙', '韓国語しりとり'], kwcD: ['단어를 이어가는 두뇌 게임', 'Connect Korean words', '连接韩语单词', '言葉をつなぐゲーム'],
       kscT: ['K-간식 콤보 타이쿤', 'K-Snack Combo Tycoon', '韩式小吃大亨', 'K-おやつコンボタイクーン'], kscD: ['맛있는 분식 콤보 만들기', 'Make Korean snack combos', '制作美味韩式小吃组合', '韓国おやつコンボ作り'],
@@ -4383,7 +4476,7 @@
     }
     function goHub() { if (TK && TK.room) talkCloseRoom(true); openHub(); }
     // 위 메뉴가 두 줄이 되어도 Exhibitions·Play·My 알약이 그 아래에 오도록
-    (function () { let last = 0; const set = () => { const h = document.querySelector('header'); if (!h) return; document.documentElement.style.setProperty('--hdrH', h.offsetHeight + 'px'); if (h.offsetHeight !== last) { last = h.offsetHeight; try { renderVisitBar(); } catch (e) {} } };
+    (function () { let last = 0; const set = () => { const h = document.querySelector('header'); if (!h) return; document.documentElement.style.setProperty('--hdrH', h.offsetHeight + 'px'); if (h.offsetHeight !== last) { last = h.offsetHeight; try { renderVisitBar(); } catch (e) {} setTimeout(() => window.dispatchEvent(new Event('resize')), 0); } };
       window.addEventListener('resize', set); window.addEventListener('load', set); setTimeout(set, 0); try { new ResizeObserver(set).observe(document.querySelector('header')); } catch (e) {} })();
     function switchView(mode) {
       setTimeout(() => { const t = document.querySelector('.tab-btn.active'); if (t && t.scrollIntoView) t.scrollIntoView({ inline: 'center', block: 'nearest' }); }, 0);   // 메뉴가 많아 넘치면 고른 메뉴가 보이게
@@ -4479,6 +4572,9 @@
       if (art && art.notes) {
         document.getElementById('viewerNote').innerText = art.notes[lang] || art.notes.ko || '설명이 없습니다.';
       }
+      const jj = document.getElementById('viewerJJ'), jn = art && art.jjNote ? (lang === 'ko' ? art.jjNote.ko : (art.jjNote.en || art.jjNote.ko)) : '';
+      jj.style.display = jn ? '' : 'none';
+      if (jn) jj.innerHTML = `<b>✏️ ${lang === 'ko' ? '작가노트 · JJ' : "Artist's note · JJ"}</b>“${esc(jn)}”`;
     }
 
     function closeViewer() {
