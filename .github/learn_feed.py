@@ -66,6 +66,7 @@ def grade_subject(kw):
 
 def normalize(raw):
     out = []
+    date = ''
     for it in raw:
         title = pick(it, ['lrnDataNm', 'lernDataNm', 'learnDataNm', 'lrnMtrlNm', 'dataNm', '학습자료명'])
         kws = pick(it, ['kwrdNm', 'keywordNm', 'kwrd', '키워드명'], lambda v: v.count(';') >= 2)
@@ -86,19 +87,31 @@ def main():
     if not KEY:
         print('::error::DATA_GO_KR_KEY 가 없어요 (Settings > Secrets and variables > Actions 에 넣어 주세요)'); raise SystemExit(1)
     rows = 1000
-    first, total = items_of(get(1, rows))
+    js = get(1, rows)
+    print('응답 모양:', json.dumps(js, ensure_ascii=False)[:600])
+    first, total = items_of(js)
     raw = list(first)
     pages = (total + rows - 1) // rows if total else 1
     for p in range(2, pages + 1):
         raw += items_of(get(p, rows))[0]
     if raw: print('첫 항목 이름들:', sorted(raw[0].keys()))
     data, date = normalize(raw)
+    if not raw:
+        print('::error::응답에 자료(items)가 없어요. 응답 앞부분: ' + json.dumps(js, ensure_ascii=False)[:250]); raise SystemExit(1)
     if len(data) < 100:
-        print(f'::error::받은 자료가 너무 적어요({len(data)}개). 기존 파일은 그대로 둘게요.'); raise SystemExit(1)
+        print(f'::error::받은 자료가 너무 적어요({len(data)}개). 항목 이름: {sorted(raw[0].keys())[:15]}'); raise SystemExit(1)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, 'w', encoding='utf-8') as f:
         json.dump({'updated': date or time.strftime('%Y-%m-%d'), 'count': len(data), 'items': data}, f, ensure_ascii=False, separators=(',', ':'))
     print('저장 완료:', len(data), '개')
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        print(f'::error::프로그램 오류 {type(e).__name__}: {str(e)[:250]}')
+        raise SystemExit(1)
