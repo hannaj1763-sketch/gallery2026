@@ -92,6 +92,13 @@ jobs:
           import android.os.CancellationSignal;
           import android.provider.MediaStore;
           import android.speech.tts.TextToSpeech;
+          import android.speech.RecognitionListener;
+          import android.speech.RecognizerIntent;
+          import android.speech.SpeechRecognizer;
+          import android.Manifest;
+          import android.content.pm.PackageManager;
+          import java.util.ArrayList;
+          import org.json.JSONArray;
           import android.util.Base64;
           import android.webkit.JavascriptInterface;
           import android.webkit.WebView;
@@ -138,6 +145,11 @@ jobs:
               private TextToSpeech tts;
               private boolean ttsReady = false;
 
+              // 음성 인식(말하기): 휴대폰의 음성 인식으로 듣고 결과를 웹 화면에 알려 줘요 (끝말잇기 마이크)
+              private SpeechRecognizer recognizer;
+              private String pendingListenLang = null;
+              private static final int REQ_MIC = 7001;
+
               @Override
               public void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
@@ -182,6 +194,7 @@ jobs:
               @Override
               public void onDestroy() {
                   if (tts != null) { tts.stop(); tts.shutdown(); }
+                  if (recognizer != null) { recognizer.destroy(); recognizer = null; }
                   super.onDestroy();
               }
 
@@ -297,6 +310,22 @@ jobs:
                       if (tts != null) tts.stop();
                   }
 
+                  // 말하기 듣기 시작 (lang 예: "ko-KR"). 결과는 window.onAtelierSpeech(type, text, alts) 로 와요
+                  @JavascriptInterface
+                  public void listen(String lang) {
+                      runOnUiThread(() -> startListen(lang == null || lang.isEmpty() ? "ko-KR" : lang));
+                  }
+
+                  @JavascriptInterface
+                  public void stopListen() {
+                      runOnUiThread(() -> { if (recognizer != null) recognizer.stopListening(); });
+                  }
+
+                  @JavascriptInterface
+                  public String canListen() {
+                      return SpeechRecognizer.isRecognitionAvailable(MainActivity.this) ? "yes" : "no";
+                  }
+
                   // 글(링크)만 카카오톡 등으로 보내기 (아트카드 전시 링크)
                   @JavascriptInterface
                   public String shareText(String text) {
@@ -369,6 +398,60 @@ jobs:
                           });
               }
 
+              private void startListen(String lang) {
+                  if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                      pendingListenLang = lang;
+                      requestPermissions(new String[]{ Manifest.permission.RECORD_AUDIO }, REQ_MIC);
+                      return;
+                  }
+                  if (!SpeechRecognizer.isRecognitionAvailable(this)) { speechEvent("error", "unavailable", null); return; }
+                  if (tts != null) tts.stop();
+                  if (recognizer != null) { recognizer.destroy(); recognizer = null; }
+                  recognizer = SpeechRecognizer.createSpeechRecognizer(this);
+                  recognizer.setRecognitionListener(new RecognitionListener() {
+                      @Override public void onReadyForSpeech(Bundle b) { speechEvent("ready", "", null); }
+                      @Override public void onBeginningOfSpeech() {}
+                      @Override public void onRmsChanged(float v) {}
+                      @Override public void onBufferReceived(byte[] b) {}
+                      @Override public void onEndOfSpeech() { speechEvent("end", "", null); }
+                      @Override public void onError(int code) { speechEvent("error", String.valueOf(code), null); }
+                      @Override public void onResults(Bundle r) {
+                          ArrayList<String> l = r.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                          speechEvent("final", (l != null && !l.isEmpty()) ? l.get(0) : "", l);
+                      }
+                      @Override public void onPartialResults(Bundle r) {
+                          ArrayList<String> l = r.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                          if (l != null && !l.isEmpty()) speechEvent("partial", l.get(0), null);
+                      }
+                      @Override public void onEvent(int t, Bundle b) {}
+                  });
+                  Intent it = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                  it.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                  it.putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang);
+                  it.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+                  it.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
+                  it.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
+                  try { recognizer.startListening(it); }
+                  catch (Exception e) { speechEvent("error", "unavailable", null); }
+              }
+
+              @Override
+              public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+                  super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                  if (requestCode != REQ_MIC) return;
+                  String lang = pendingListenLang;
+                  pendingListenLang = null;
+                  if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && lang != null) startListen(lang);
+                  else speechEvent("error", "permission", null);
+              }
+
+              private void speechEvent(String type, String text, ArrayList<String> alts) {
+                  JSONArray a = new JSONArray();
+                  if (alts != null) for (String x : alts) a.put(x);
+                  String js = "window.onAtelierSpeech && window.onAtelierSpeech(" + JSONObject.quote(type) + "," + JSONObject.quote(text == null ? "" : text) + "," + a.toString() + ")";
+                  runOnUiThread(() -> getBridge().getWebView().evaluateJavascript(js, null));
+              }
+
               private void loginResult(String result, String value) {
                   runOnUiThread(() -> getBridge().getWebView().evaluateJavascript(
                           "window.onAtelierLogin && window.onAtelierLogin(" + JSONObject.quote(result) + "," + JSONObject.quote(value) + ")", null));
@@ -406,6 +489,8 @@ jobs:
           sed -i 's#</application>#    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-3940256099942544~3347511713"/>\n    </application>#' app-build/android/app/src/main/AndroidManifest.xml
           # 내 주변 전시를 먼저 보여 주려고 위치 권한(대략 위치) 요청
           grep -q ACCESS_COARSE_LOCATION app-build/android/app/src/main/AndroidManifest.xml || sed -i 's#<application#<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <application#' app-build/android/app/src/main/AndroidManifest.xml
+          # 끝말잇기 마이크: 마이크 권한 + 휴대폰 음성 인식 서비스 찾기(안드로이드 11 이상)
+          grep -q RECORD_AUDIO app-build/android/app/src/main/AndroidManifest.xml || sed -i 's#<application#<uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <queries>\n        <intent>\n            <action android:name="android.speech.RecognitionService" />\n        </intent>\n    </queries>\n    <application#' app-build/android/app/src/main/AndroidManifest.xml
           cat app-build/android/app/src/main/AndroidManifest.xml
 
       - name: 같은 서명 키 쓰기 (업데이트 설치가 되도록)
