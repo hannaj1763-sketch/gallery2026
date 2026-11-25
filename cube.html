@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>JJ 그림 주사위</title>
+<style>
+  :root { --bg1: #2b1d52; --bg2: #6b3fa0; --ink: #fff; --sub: #d9ccff; --pri: #ffcf5a; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    background: radial-gradient(circle at 50% 35%, rgba(107,63,160,.82), rgba(43,29,82,.95) 70%), url('thumbs/mosaic.webp') center / cover, var(--bg1);
+    color: var(--ink);
+    font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+    touch-action: none;
+  }
+  .top { display: flex; align-items: center; gap: 10px; }
+  .top h1 { font-size: clamp(18px, 5vw, 22px); font-weight: 900; flex: 1; }
+  .back { text-decoration: none; color: var(--sub); font-size: 14px; font-weight: 700; padding: 6px 10px; border-radius: 99px; background: rgba(255,255,255,.1); }
+  body.in-app .back { display: none; }
+  .hint { color: var(--sub); font-size: 13px; margin-top: 6px; text-align: center; }
+
+  .stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; perspective: 1000px; position: relative; }
+  .cube {
+    --s: min(58vw, 38dvh, 300px);
+    width: var(--s); height: var(--s); position: relative; transform-style: preserve-3d; cursor: grab;
+  }
+  @supports not (height: 1dvh) { .cube { --s: min(58vw, 38vh, 300px); } }
+  .face {
+    position: absolute; inset: 0; border-radius: 14px; overflow: hidden; background: #fff;
+    border: 5px solid #fff; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  }
+  .face img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; border-radius: 9px; }
+  .face .dot {
+    position: absolute; left: 6px; top: 6px; background: rgba(43, 29, 82, .78); color: #fff;
+    font-size: 12px; font-weight: 900; border-radius: 99px; padding: 2px 8px;
+  }
+  .f0 { transform: rotateY(0deg) translateZ(calc(var(--s) / 2)); }
+  .f1 { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); }
+  .f2 { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); }
+  .f3 { transform: rotateY(-90deg) translateZ(calc(var(--s) / 2)); }
+  .f4 { transform: rotateX(90deg) translateZ(calc(var(--s) / 2)); }
+  .f5 { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); }
+  .shadow {
+    position: absolute; bottom: 8%; left: 50%; width: min(48vw, 240px); height: 26px; transform: translateX(-50%);
+    background: radial-gradient(ellipse, rgba(0,0,0,.45), transparent 70%); pointer-events: none;
+  }
+
+  .result { text-align: center; min-height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .result .k { font-size: 12px; color: var(--sub); letter-spacing: 1px; }
+  .result .t { font-size: clamp(18px, 5.5vw, 24px); font-weight: 900; margin-top: 2px; text-shadow: 0 2px 10px rgba(0,0,0,.3); }
+  .result .t.pop { animation: pop .5s; }
+  @keyframes pop { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); } }
+
+  .row { display: flex; gap: 10px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+  .btn {
+    border: none; border-radius: 16px; padding: 13px 20px; font-size: 16px; font-weight: 900; cursor: pointer;
+    background: linear-gradient(135deg, #ffcf5a, #ff8f5a); color: #3b1d00; box-shadow: 0 5px 16px rgba(255, 160, 80, .4);
+  }
+  .btn.ghost { background: rgba(255,255,255,.12); color: #fff; box-shadow: none; border: 1.5px solid rgba(255,255,255,.25); }
+  .btn:active { transform: scale(.95); }
+  .count { font-size: 12px; color: var(--sub); text-align: center; margin-top: 8px; }
+
+  .big { position: fixed; inset: 0; background: rgba(20, 12, 40, .85); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 30; padding: 20px; }
+  .big.on { display: flex; }
+  .big img { width: min(88vw, 70dvh, 460px); aspect-ratio: 1; object-fit: cover; border-radius: 18px; border: 6px solid #fff; }
+  .big p { margin-top: 12px; font-weight: 800; font-size: 17px; text-align: center; }
+  .big small { color: var(--sub); margin-top: 6px; }
+
+  @media (orientation: landscape) and (max-height: 500px) {
+    body { flex-direction: row; flex-wrap: wrap; align-content: flex-start; }
+    .top { width: 100%; }
+    .hint { display: none; }
+    .stage { flex: 1 1 55%; height: calc(100dvh - 60px); }
+    .cube { --s: min(56dvh, 40vw, 260px); }
+    .panel { flex: 1 1 40%; display: flex; flex-direction: column; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+  <div class="top">
+    <a class="back" href="index.html?open=play">← 갤러리</a>
+    <h1>🎲 JJ 그림 주사위</h1>
+  </div>
+  <div class="hint">손가락으로 큐브를 돌려 보세요 · 그림을 톡 누르면 크게 보여요</div>
+
+  <div class="stage" id="stage">
+    <div class="cube" id="cube"></div>
+    <div class="shadow"></div>
+  </div>
+
+  <div class="panel">
+    <div class="result"><div class="k" id="rk">주사위를 굴려 봐요!</div><div class="t" id="rt"></div></div>
+    <div class="row">
+      <button class="btn" id="rollBtn">🎲 굴리기</button>
+      <button class="btn ghost" id="newBtn">🔄 그림 바꾸기</button>
+    </div>
+    <div class="count" id="count"></div>
+  </div>
+
+  <div class="big" id="big"><img id="bigImg" alt=""><p id="bigT"></p><small>아무 곳이나 누르면 닫혀요</small></div>
+
+<script>
+  try { if (window.self !== window.top) document.body.classList.add('in-app'); } catch (e) { document.body.classList.add('in-app'); }
+  const $ = id => document.getElementById(id);
+  const KEY = 'agjj_cube_v1';
+  let works = [], faces = [], rx = -18, ry = 28, vx = 0, vy = 0, rolling = false, idle = true;
+  // 면 번호 → 그 면을 정면으로 보는 각도
+  const VIEW = [[0, 0], [0, 180], [0, -90], [0, 90], [-90, 0], [90, 0]];
+
+  async function boot() {
+    try { works = (await (await fetch('thumbs/index.json?v=1')).json()).works || []; } catch (e) { works = []; }
+    newFaces();
+    loop();
+  }
+
+  function newFaces() {
+    const pool = works.slice();
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    faces = pool.slice(0, 6);
+    $('cube').innerHTML = faces.map((w, i) => `
+      <div class="face f${i}" data-i="${i}"><img src="thumbs/${w.id}.webp" alt=""><span class="dot">${i + 1}</span></div>`).join('');
+    $('rk').textContent = '주사위를 굴려 봐요!'; $('rt').textContent = '';
+    showCount();
+  }
+
+  function apply() { $('cube').style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`; }
+
+  // 드래그로 돌리기 (+관성)
+  let drag = null, moved = 0;
+  $('stage').addEventListener('pointerdown', e => {
+    if (rolling) return;
+    drag = { x: e.clientX, y: e.clientY, t: performance.now() }; moved = 0; idle = false;
+    $('cube').style.cursor = 'grabbing';
+  });
+  window.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    moved += Math.abs(dx) + Math.abs(dy);
+    ry += dx * 0.5; rx -= dy * 0.5;
+    vx = -dy * 0.5; vy = dx * 0.5;
+    drag.x = e.clientX; drag.y = e.clientY;
+    apply();
+  });
+  window.addEventListener('pointerup', e => {
+    if (!drag) return;
+    const wasTap = moved < 8;
+    drag = null; $('cube').style.cursor = 'grab';
+    if (wasTap) {
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const f = el && el.closest && el.closest('.face');
+      if (f) openBig(+f.dataset.i);
+    }
+    clearTimeout(window._idleT); window._idleT = setTimeout(() => { idle = true; }, 3500);
+  });
+
+  function loop() {
+    requestAnimationFrame(loop);
+    if (rolling || drag) return;
+    if (Math.abs(vx) > 0.05 || Math.abs(vy) > 0.05) {
+      rx += vx; ry += vy; vx *= 0.94; vy *= 0.94; apply();
+    } else if (idle) {
+      ry += 0.25; apply();
+    }
+  }
+
+  const ease = t => 1 - Math.pow(1 - t, 4);
+  function roll() {
+    if (rolling || !faces.length) return;
+    rolling = true; idle = false; vx = vy = 0;
+    $('rk').textContent = '데구르르...'; $('rt').textContent = '';
+    const k = Math.floor(Math.random() * 6);
+    const [tx, ty] = VIEW[k];
+    // 현재 각도에서 여러 바퀴 돈 뒤 목표 면에서 멈추기
+    const norm = (a, target, spins) => {
+      const base = Math.round((a - target) / 360) * 360 + target;
+      return base + spins * 360;
+    };
+    const sx = rx, sy = ry;
+    const ex = norm(rx, tx, 2 + Math.floor(Math.random() * 2));
+    const ey = norm(ry, ty, (Math.random() < 0.5 ? -1 : 1) * (2 + Math.floor(Math.random() * 2)));
+    const dur = 1700, t0 = performance.now();
+    let lastTick = 0;
+    const step = now => {
+      const p = Math.min(1, (now - t0) / dur), e = ease(p);
+      rx = sx + (ex - sx) * e; ry = sy + (ey - sy) * e;
+      const bounce = Math.sin(p * Math.PI) * 60;
+      $('cube').style.transform = `translateY(${-bounce}px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      if (p < 0.85 && now - lastTick > 90 + p * 220) { lastTick = now; tick(); }
+      if (p < 1) requestAnimationFrame(step);
+      else {
+        rx = tx + Math.round((ex - tx) / 360) * 360; ry = ey; apply();
+        rolling = false;
+        land(k);
+      }
+    };
+    requestAnimationFrame(step);
+  }
+
+  function land(k) {
+    const w = faces[k];
+    $('rk').textContent = `${k + 1}번 면 · 오늘의 그림`;
+    const el = $('rt');
+    el.textContent = '「' + (w.title || 'JJ의 그림') + '」';
+    el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+    [700, 940].forEach((f, i) => setTimeout(() => beep(f, .12), i * 110));
+    try {
+      const st = JSON.parse(localStorage.getItem(KEY) || '{}');
+      st.seen = st.seen || {}; st.seen[w.id] = (st.seen[w.id] || 0) + 1;
+      localStorage.setItem(KEY, JSON.stringify(st));
+    } catch (e) {}
+    showCount();
+    clearTimeout(window._idleT); window._idleT = setTimeout(() => { idle = true; }, 5000);
+  }
+
+  function showCount() {
+    let n = 0;
+    try { n = Object.keys((JSON.parse(localStorage.getItem(KEY) || '{}').seen) || {}).length; } catch (e) {}
+    $('count').textContent = works.length ? `주사위로 만난 그림 ${n} / ${works.length}점` : '';
+  }
+
+  function openBig(i) {
+    const w = faces[i];
+    $('bigImg').src = `thumbs/${w.id}.webp`;
+    $('bigT').textContent = '「' + (w.title || 'JJ의 그림') + '」';
+    $('big').classList.add('on');
+  }
+  $('big').onclick = () => $('big').classList.remove('on');
+
+  let ac = null;
+  function beep(f, d) {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'triangle'; o.frequency.value = f;
+      g.gain.setValueAtTime(.1, ac.currentTime); g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + d + .06);
+      o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + d + .08);
+    } catch (e) {}
+  }
+  const tick = () => beep(300 + Math.random() * 120, .03);
+
+  $('rollBtn').onclick = roll;
+  $('newBtn').onclick = () => { if (!rolling) newFaces(); };
+  apply();
+  boot();
+</script>
+</body>
+</html>

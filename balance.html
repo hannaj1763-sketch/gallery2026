@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>JJ 밸런스 게임</title>
+<style>
+  :root { --bg: #fdf3ff; --ink: #33244a; --sub: #8b7aa3; --a: #ff6b8b; --a2: #ffb36b; --b: #4f8cff; --b2: #59d6c4; --line: #eadcf7; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column;
+    padding: max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  }
+  .top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .top h1 { font-size: clamp(18px, 5vw, 22px); font-weight: 900; flex: 1; }
+  .back { text-decoration: none; color: var(--sub); font-size: 14px; font-weight: 700; padding: 6px 10px; border-radius: 99px; background: #fff; border: 1px solid var(--line); }
+  body.in-app .back { display: none; }
+  .scr { display: none; flex: 1; flex-direction: column; min-height: 0; }
+  .scr.on { display: flex; }
+  .btn {
+    border: none; border-radius: 16px; padding: 14px 18px; font-size: 16px; font-weight: 900; cursor: pointer;
+    background: linear-gradient(135deg, #a66bff, #ff6b8b); color: #fff; box-shadow: 0 5px 14px rgba(166, 107, 255, .3);
+  }
+  .btn.ghost { background: #fff; color: var(--ink); border: 1.5px solid var(--line); box-shadow: none; }
+  .btn:active { transform: scale(.96); }
+
+  /* 시작 */
+  #sIntro { margin: 0 -4px; border-radius: 22px; background: linear-gradient(rgba(253,243,255,.86), rgba(253,243,255,.9)), url('thumbs/mosaic.webp') center / cover; }
+  .intro { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 12px; }
+  .intro .big { font-size: 64px; }
+  .intro p { color: var(--sub); font-size: 15px; line-height: 1.6; max-width: 340px; }
+  .modes { display: grid; gap: 10px; width: min(340px, 100%); margin-top: 6px; }
+  .modes .btn { text-align: left; display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+  .modes .btn span { font-size: 28px; }
+  .modes .btn small { display: block; font-size: 12.5px; font-weight: 600; opacity: .9; margin-top: 2px; }
+
+  /* 문제 */
+  .meta { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--sub); font-weight: 800; margin-bottom: 8px; }
+  .turn { padding: 5px 12px; border-radius: 99px; font-weight: 900; color: #fff; background: var(--a); font-size: 13px; }
+  .turn.p2 { background: var(--b); }
+  .prog { height: 6px; background: var(--line); border-radius: 9px; overflow: hidden; margin-bottom: 10px; }
+  .prog i { display: block; height: 100%; background: linear-gradient(90deg, #a66bff, #ff6b8b); width: 0; transition: width .3s; }
+  .q { text-align: center; font-size: 14px; color: var(--sub); font-weight: 800; margin-bottom: 8px; }
+  .choices { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; position: relative; }
+  .ch {
+    flex: 1; min-height: 120px; border: none; border-radius: 22px; color: #fff; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 14px;
+    font-size: clamp(18px, 5.4vw, 24px); font-weight: 900; line-height: 1.3; text-align: center;
+    box-shadow: 0 6px 18px rgba(51, 36, 74, .15); transition: transform .15s, opacity .2s;
+    word-break: keep-all;
+  }
+  .ch .e { font-size: clamp(38px, 11vw, 54px); line-height: 1; }
+  .ch.A { background: linear-gradient(135deg, var(--a), var(--a2)); }
+  .ch.B { background: linear-gradient(135deg, var(--b), var(--b2)); }
+  .ch:active { transform: scale(.97); }
+  .ch.picked { transform: scale(1.03); box-shadow: 0 0 0 5px #fff, 0 0 0 9px #ffd166; }
+  .ch.dim { opacity: .35; }
+  .vs {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 2;
+    width: 54px; height: 54px; border-radius: 50%; background: #fff; color: var(--ink);
+    display: flex; align-items: center; justify-content: center; font-weight: 1000; font-size: 18px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15); pointer-events: none;
+  }
+  .reveal { text-align: center; min-height: 44px; font-weight: 900; font-size: 16px; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .tag { padding: 4px 10px; border-radius: 99px; color: #fff; font-size: 13px; }
+  .tag.a { background: var(--a); } .tag.b { background: var(--b); }
+
+  /* 가림막 (둘이서 모드) */
+  .cover { position: fixed; inset: 0; background: linear-gradient(135deg, #4f8cff, #59d6c4); color: #fff; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 14px; z-index: 30; text-align: center; padding: 24px; }
+  .cover.on { display: flex; }
+  .cover .e { font-size: 64px; }
+  .cover h2 { font-size: 22px; }
+  .cover p { opacity: .9; font-size: 15px; }
+  .cover .btn { background: #fff; color: #2b5fcc; }
+
+  /* 결과 */
+  .res { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; overflow-y: auto; padding-bottom: 8px; }
+  .res .big { font-size: 56px; margin-top: 8px; }
+  .res h2 { font-size: 22px; }
+  .res p { color: var(--sub); font-size: 15px; line-height: 1.5; }
+  .meter { width: min(320px, 100%); height: 18px; background: var(--line); border-radius: 99px; overflow: hidden; }
+  .meter i { display: block; height: 100%; background: linear-gradient(90deg, #ff6b8b, #a66bff); width: 0; transition: width 1s; }
+  .list { width: min(420px, 100%); text-align: left; background: #fff; border-radius: 16px; padding: 10px 14px; border: 1px solid var(--line); }
+  .list div { padding: 7px 0; border-bottom: 1px dashed var(--line); font-size: 14px; display: flex; gap: 8px; align-items: center; }
+  .list div:last-child { border-bottom: none; }
+  .list .m { margin-left: auto; font-size: 16px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+  @media (orientation: landscape) and (max-height: 520px) {
+    .choices { flex-direction: row; }
+    .ch { min-height: 0; }
+    .intro .big { font-size: 44px; }
+    .modes { grid-template-columns: 1fr 1fr; width: min(560px, 100%); }
+  }
+  @media (max-height: 600px) and (orientation: portrait) { .ch { min-height: 96px; } .ch .e { font-size: 34px; } }
+</style>
+</head>
+<body>
+  <div class="top">
+    <a class="back" href="index.html?open=play">← 갤러리</a>
+    <h1>⚖️ JJ 밸런스 게임</h1>
+  </div>
+
+  <section class="scr on" id="sIntro">
+    <div class="intro">
+      <div class="big">⚖️</div>
+      <p>둘 중에 하나만 골라야 한다면? 정답은 없어요.<br>마음 가는 쪽을 골라 보세요!</p>
+      <div class="modes">
+        <button class="btn" id="soloBtn"><span>🙋</span><div>혼자 하기<small>10문제 · 내 선택을 모아 봐요</small></div></button>
+        <button class="btn" id="duoBtn" style="background:linear-gradient(135deg,#4f8cff,#59d6c4)"><span>👫</span><div>둘이서 하기<small>친구·엄마랑 몰래 고르고 · 찰떡궁합 확인!</small></div></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="scr" id="sQ">
+    <div class="meta"><span id="qNum">1 / 10</span><span class="turn" id="turn">🙋 나</span></div>
+    <div class="prog"><i id="prog"></i></div>
+    <div class="q" id="qHint">둘 중 하나만 고른다면?</div>
+    <div class="choices">
+      <button class="ch A" id="chA"><span class="e" id="eA"></span><span id="tA"></span></button>
+      <div class="vs">VS</div>
+      <button class="ch B" id="chB"><span class="e" id="eB"></span><span id="tB"></span></button>
+    </div>
+    <div class="reveal" id="reveal"></div>
+  </section>
+
+  <section class="scr" id="sRes"><div class="res" id="res"></div></section>
+
+  <div class="cover" id="cover">
+    <div class="e" id="cvE">🙈</div>
+    <h2 id="cvT">이제 친구 차례!</h2>
+    <p id="cvP">앞 사람이 고른 건 비밀이에요. 휴대폰을 친구에게 건네주세요.</p>
+    <button class="btn" id="cvBtn">준비됐어요!</button>
+  </div>
+
+<script>
+  try { if (window.self !== window.top) document.body.classList.add('in-app'); } catch (e) { document.body.classList.add('in-app'); }
+  const $ = id => document.getElementById(id);
+
+  // [A이모지, A, B이모지, B, 카테고리]  카테고리: food, power, life, fun
+  const Q = [
+    ['🍕', '평생 피자만 먹기', '🍗', '평생 치킨만 먹기', 'food'],
+    ['🍫', '초콜릿 아이스크림', '🍓', '딸기 아이스크림', 'food'],
+    ['🍜', '라면', '🍚', '김밥', 'food'],
+    ['🍬', '사탕 100개', '🎂', '케이크 한 판', 'food'],
+    ['🥤', '탄산음료 금지', '🍟', '감자튀김 금지', 'food'],
+    ['🍉', '수박', '🍇', '포도', 'food'],
+    ['🍳', '아침밥 맛있게', '🌙', '야식 맛있게', 'food'],
+    ['🥦', '브로콜리 한 접시 먹기', '🥕', '당근 한 접시 먹기', 'food'],
+    ['🕊️', '하늘을 나는 능력', '🫥', '투명인간 되는 능력', 'power'],
+    ['⏪', '과거로 가기', '⏩', '미래로 가기', 'power'],
+    ['🐶', '동물이랑 말하기', '🌍', '모든 나라 말하기', 'power'],
+    ['⚡', '순간이동', '🧠', '모든 시험 100점', 'power'],
+    ['🦖', '공룡 키우기', '🦄', '유니콘 키우기', 'power'],
+    ['🤖', '숙제 도와주는 로봇', '🧹', '방 청소해 주는 로봇', 'power'],
+    ['🎨', '그림 천재', '🎵', '노래 천재', 'power'],
+    ['⚽', '축구 천재', '🏊', '수영 천재', 'power'],
+    ['📱', '하루 종일 게임', '📺', '하루 종일 만화', 'fun'],
+    ['🏖️', '바다로 여행', '⛰️', '산으로 여행', 'fun'],
+    ['❄️', '평생 겨울', '☀️', '평생 여름', 'life'],
+    ['🌧️', '매일 비 오는 날', '💨', '매일 바람 부는 날', 'life'],
+    ['🐱', '고양이 키우기', '🐶', '강아지 키우기', 'life'],
+    ['🏠', '아주 큰 집', '🏝️', '나만의 작은 섬', 'life'],
+    ['🌅', '아침 6시에 일어나기', '🌌', '밤 12시에 자기', 'life'],
+    ['📚', '숙제 2배', '🧹', '청소 2배', 'life'],
+    ['🎒', '방학 한 달 더', '🎁', '용돈 2배', 'life'],
+    ['🎢', '롤러코스터', '🎠', '회전목마', 'fun'],
+    ['🏰', '놀이공원 하루', '🐠', '아쿠아리움 하루', 'fun'],
+    ['🎮', '친구랑 게임', '🛝', '친구랑 놀이터', 'fun'],
+    ['🎤', '노래방', '🎳', '볼링장', 'fun'],
+    ['🧩', '퍼즐 맞추기', '🧱', '블록 쌓기', 'fun'],
+    ['🚀', '우주 여행', '🌊', '깊은 바다 탐험', 'fun'],
+    ['🎄', '크리스마스 매일', '🎂', '생일 매일', 'fun'],
+    ['🐢', '엄청 느린 거북이', '🐇', '엄청 빠른 토끼', 'life'],
+    ['👻', '귀신의 집 혼자', '🕷️', '거미 열 마리 만지기', 'fun'],
+    ['😂', '웃음 못 참기', '🤧', '재채기 못 참기', 'life'],
+    ['📖', '만화책 100권', '🧸', '인형 100개', 'fun'],
+    ['🚲', '자전거', '🛴', '킥보드', 'fun'],
+    ['🦸', '슈퍼히어로', '🧙', '마법사', 'power'],
+    ['🔍', '탐정', '🧪', '과학자', 'power'],
+    ['🍦', '여름에 아이스크림', '🍠', '겨울에 군고구마', 'food'],
+    ['🖍️', '크레파스로 그리기', '🖌️', '물감으로 그리기', 'fun'],
+    ['🐼', '판다랑 하루', '🐧', '펭귄이랑 하루', 'fun'],
+    ['🏆', '1등 하고 혼자', '🤝', '3등 하고 친구랑', 'life'],
+    ['🙊', '하루 동안 말 못 하기', '🙈', '하루 동안 TV 못 보기', 'life'],
+    ['🌈', '무지개 보기', '🌠', '별똥별 보기', 'life'],
+    ['🎈', '풍선 타고 날기', '🚁', '헬리콥터 타기', 'fun']
+  ];
+
+  let mode = 'solo', set = [], idx = 0, picks1 = [], picks2 = [], player = 1, busy = false;
+  const N = 10;
+
+  function show(id) { document.querySelectorAll('.scr').forEach(s => s.classList.toggle('on', s.id === id)); }
+
+  function begin(m) {
+    mode = m; idx = 0; picks1 = []; picks2 = []; player = 1;
+    const pool = Q.slice();
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    set = pool.slice(0, N).map(q => Math.random() < .5 ? q : [q[2], q[3], q[0], q[1], q[4]]);
+    show('sQ');
+    if (mode === 'duo') cover('🙋', '첫 번째 사람 차례!', '친구는 화면을 보지 말아요 🙈', ask);
+    else ask();
+  }
+
+  function ask() {
+    busy = false;
+    const q = set[idx];
+    $('eA').textContent = q[0]; $('tA').textContent = q[1];
+    $('eB').textContent = q[2]; $('tB').textContent = q[3];
+    $('chA').className = 'ch A'; $('chB').className = 'ch B';
+    $('qNum').textContent = `${idx + 1} / ${N}`;
+    $('prog').style.width = (idx / N * 100) + '%';
+    $('reveal').innerHTML = '';
+    const t = $('turn');
+    t.textContent = mode === 'solo' ? '🙋 나' : (player === 1 ? '🙋 1번 사람' : '🙋‍♀️ 2번 사람');
+    t.className = 'turn' + (player === 2 ? ' p2' : '');
+  }
+
+  function pick(c) {
+    if (busy) return;
+    busy = true;
+    beep(c === 'A' ? 620 : 520, .08);
+    $('ch' + c).classList.add('picked');
+    $('ch' + (c === 'A' ? 'B' : 'A')).classList.add('dim');
+    if (mode === 'solo') {
+      picks1.push(c);
+      setTimeout(next, 650);
+    } else if (player === 1) {
+      picks1.push(c);
+      setTimeout(() => cover('🙈', '이제 2번 사람 차례!', '1번 사람이 고른 건 비밀! 휴대폰을 건네주세요.', () => { player = 2; ask(); }), 450);
+    } else {
+      picks2.push(c);
+      const same = picks1[idx] === c;
+      const q = set[idx];
+      const nm = x => x === 'A' ? q[1] : q[3];
+      $('reveal').innerHTML = same
+        ? `💞 찰떡! 둘 다 <span class="tag ${c.toLowerCase()}">${nm(c)}</span>`
+        : `🙃 달라요! <span class="tag ${picks1[idx].toLowerCase()}">1번: ${nm(picks1[idx])}</span><span class="tag ${c.toLowerCase()}">2번: ${nm(c)}</span>`;
+      $('ch' + picks1[idx]).classList.add('picked'); $('ch' + picks1[idx]).classList.remove('dim');
+      if (same) [780, 1040].forEach((f, i) => setTimeout(() => beep(f, .1), i * 110));
+      setTimeout(() => {
+        player = 1;
+        if (idx + 1 < N) { idx++; cover('🙋', '다음 문제! 1번 사람 차례', '2번 사람은 눈을 감아요 🙈', ask); }
+        else result();
+      }, 1900);
+    }
+  }
+
+  function next() {
+    if (idx + 1 < N) { idx++; ask(); } else result();
+  }
+
+  function cover(e, t, p, after) {
+    $('cvE').textContent = e; $('cvT').textContent = t; $('cvP').textContent = p;
+    $('cover').classList.add('on');
+    $('cvBtn').onclick = () => { $('cover').classList.remove('on'); after(); };
+  }
+
+  function result() {
+    $('prog').style.width = '100%';
+    show('sRes');
+    const nm = (q, x) => x === 'A' ? q[0] + ' ' + q[1] : q[2] + ' ' + q[3];
+    if (mode === 'solo') {
+      $('res').innerHTML = `
+        <div class="big">🏅</div>
+        <h2>밸런스 10문제 완료!</h2>
+        <p>내가 고른 것들이에요. 왜 그걸 골랐는지 이야기해 봐요!<br>엄마·친구랑 <b>둘이서 하기</b>로 궁합도 확인해 봐요 💞</p>
+        <div class="list">${set.map((q, i) => `<div>${i + 1}. ${nm(q, picks1[i])}</div>`).join('')}</div>
+        <div class="row"><button class="btn" onclick="begin('solo')">🔁 새 문제로 다시</button><button class="btn ghost" onclick="show('sIntro')">처음으로</button></div>`;
+    } else {
+      const same = picks1.filter((c, i) => c === picks2[i]).length;
+      const pct = Math.round(same / N * 100);
+      const msg = pct >= 80 ? ['💞', '찰떡궁합!', '생각이 거의 똑같아요. 마음이 통하는 사이!']
+        : pct >= 50 ? ['😊', '꽤 잘 맞아요!', '비슷한 듯 다른 매력이 있는 사이!']
+        : ['🌈', '서로 다른 매력!', '달라서 더 재미있는 사이! 서로 이유를 물어봐요.'];
+      $('res').innerHTML = `
+        <div class="big">${msg[0]}</div>
+        <h2>${msg[1]} ${pct}%</h2>
+        <div class="meter"><i id="mt"></i></div>
+        <p>${N}문제 중 ${same}문제 같은 걸 골랐어요.<br>${msg[2]}</p>
+        <div class="list">${set.map((q, i) => `<div>${i + 1}. ${picks1[i] === picks2[i] ? nm(q, picks1[i]) : `1번 ${q[picks1[i] === 'A' ? 0 : 2]} · 2번 ${q[picks2[i] === 'A' ? 0 : 2]}`}<span class="m">${picks1[i] === picks2[i] ? '💞' : '🙃'}</span></div>`).join('')}</div>
+        <div class="row"><button class="btn" onclick="begin('duo')">🔁 둘이서 다시</button><button class="btn ghost" onclick="show('sIntro')">처음으로</button></div>`;
+      setTimeout(() => { const m = $('mt'); if (m) m.style.width = pct + '%'; }, 50);
+    }
+    [660, 880, 1100].forEach((f, i) => setTimeout(() => beep(f, .12), i * 120));
+  }
+
+  let ac = null;
+  function beep(f, d) {
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'triangle'; o.frequency.value = f;
+      g.gain.setValueAtTime(.1, ac.currentTime); g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + d + .06);
+      o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + d + .08);
+    } catch (e) {}
+  }
+
+  $('soloBtn').onclick = () => begin('solo');
+  $('duoBtn').onclick = () => begin('duo');
+  $('chA').onclick = () => pick('A');
+  $('chB').onclick = () => pick('B');
+</script>
+</body>
+</html>

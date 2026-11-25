@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>JJ 공부방</title>
+<style>
+  :root { --bg: #f4f6ff; --ink: #24264a; --sub: #6f7397; --pri: #5b6cff; --pri2: #8a5bff; --line: #e1e5fb; --card: #fff; --star: #ffb703; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { min-height: 100%; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    min-height: 100vh; min-height: 100dvh; overflow-x: hidden;
+    padding: max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  .top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .top h1 { font-size: clamp(18px, 5vw, 22px); font-weight: 900; flex: 1; }
+  .back { text-decoration: none; color: var(--sub); font-size: 14px; font-weight: 700; padding: 6px 10px; border-radius: 99px; background: #fff; border: 1px solid var(--line); }
+  body.in-app .back { display: none; }
+
+  .today {
+    border-radius: 20px; padding: 16px; color: #fff; margin-bottom: 12px; position: relative; overflow: hidden;
+    background: linear-gradient(135deg, var(--pri), var(--pri2));
+    box-shadow: 0 8px 22px rgba(91, 108, 255, .28);
+  }
+  .today::after { content: '📚'; position: absolute; right: 10px; bottom: -6px; font-size: 64px; opacity: .2; }
+  .today .k { font-size: 12px; font-weight: 800; letter-spacing: 1px; opacity: .9; }
+  .today .t { font-size: clamp(19px, 5.4vw, 24px); font-weight: 900; margin: 6px 0 8px; line-height: 1.3; word-break: keep-all; }
+  .today .tags span { background: rgba(255,255,255,.22); color: #fff; }
+  .today .row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .today a, .today button { border: none; border-radius: 12px; padding: 9px 14px; font-size: 14px; font-weight: 900; cursor: pointer; text-decoration: none; }
+  .today a { background: #fff; color: var(--pri); }
+  .today button { background: rgba(255,255,255,.2); color: #fff; }
+
+  .search { display: flex; gap: 8px; margin-bottom: 8px; }
+  .search input { flex: 1; min-width: 0; border: 1.5px solid var(--line); border-radius: 14px; padding: 11px 14px; font-size: 15px; background: #fff; color: var(--ink); outline: none; }
+  .search input:focus { border-color: var(--pri); }
+  .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 6px; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chips button { flex: none; border: 1.5px solid var(--line); background: #fff; color: var(--sub); border-radius: 99px; padding: 7px 13px; font-size: 13.5px; font-weight: 800; cursor: pointer; }
+  .chips button.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .count { font-size: 12.5px; color: var(--sub); margin: 6px 2px 8px; font-weight: 700; }
+
+  .list { display: grid; gap: 8px; }
+  .item { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px 12px 12px 14px; display: flex; gap: 10px; align-items: flex-start; }
+  .item .body { flex: 1; min-width: 0; }
+  .item .t { font-size: 15.5px; font-weight: 800; line-height: 1.35; word-break: keep-all; }
+  .item .t a { color: inherit; text-decoration: none; }
+  .meta { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+  .meta .g { background: #eceeff; color: var(--pri); font-size: 11.5px; font-weight: 900; border-radius: 6px; padding: 2px 6px; }
+  .meta .s { background: #f1eaff; color: var(--pri2); font-size: 11.5px; font-weight: 900; border-radius: 6px; padding: 2px 6px; }
+  .tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+  .tags span { font-size: 12px; background: #f3f4fb; color: var(--sub); border-radius: 99px; padding: 3px 8px; cursor: pointer; }
+  .fav { border: none; background: none; font-size: 22px; cursor: pointer; line-height: 1; color: #c9cce3; padding: 2px; }
+  .fav.on { color: var(--star); }
+  .more { display: block; width: 100%; margin: 12px 0; border: 1.5px solid var(--line); background: #fff; border-radius: 14px; padding: 12px; font-size: 15px; font-weight: 800; color: var(--ink); cursor: pointer; }
+  .empty { text-align: center; color: var(--sub); padding: 30px 10px; font-size: 14px; line-height: 1.6; }
+  .src { font-size: 11.5px; color: var(--sub); text-align: center; margin-top: 14px; line-height: 1.6; }
+  .src a { color: var(--sub); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="back" href="index.html?open=play">← 갤러리</a>
+    <h1>📚 JJ 공부방</h1>
+  </div>
+
+  <div class="today" id="today" style="display:none">
+    <div class="k" id="todayK">오늘의 공부</div>
+    <div class="t" id="todayT"></div>
+    <div class="tags" id="todayTags"></div>
+    <div class="row">
+      <a id="todayGo" target="_blank" rel="noopener">자료 보러 가기 →</a>
+      <button id="todayNext">🔄 다른 거</button>
+    </div>
+  </div>
+
+  <div class="search"><input id="q" type="search" placeholder="궁금한 걸 찾아봐요 (예: 태양계, 지도, 날씨)" enterkeyhint="search"></div>
+  <div class="chips" id="gradeChips"></div>
+  <div class="chips" id="subChips"></div>
+  <div class="count" id="count"></div>
+  <div class="list" id="list"></div>
+  <button class="more" id="more" style="display:none">더 보기</button>
+  <div class="src">자료: 공공데이터포털 「전국초중등교과주제별학습자료」 · 에듀넷·티-클리어<br><span id="upd"></span></div>
+</div>
+
+<script>
+  try { if (window.self !== window.top) document.body.classList.add('in-app'); } catch (e) { document.body.classList.add('in-app'); }
+  const $ = id => document.getElementById(id);
+  const FAV = 'agjj_study_fav';
+  let all = [], view = [], shown = 0, grade = '전체', subj = '전체', favs = new Set(), todayIdx = 0;
+  try { favs = new Set(JSON.parse(localStorage.getItem(FAV) || '[]')); } catch (e) {}
+  const saveFav = () => { try { localStorage.setItem(FAV, JSON.stringify([...favs])); } catch (e) {} };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const GRADES = ['전체', '⭐ 찜', '초3', '초4', '초5', '초6', '중', '고'];
+  const GL = { '초2': '초2', '초3': '초3', '초4': '초4', '초5': '초5', '초6': '초6', '중': '중학교', '고': '고등학교' };
+
+  async function boot() {
+    try {
+      const d = await (await fetch('data/learn.json?v=' + new Date().toISOString().slice(0, 7))).json();
+      all = d.items || [];
+      $('upd').textContent = d.updated ? `자료 기준일 ${d.updated} · ${all.length.toLocaleString()}개` : '';
+    } catch (e) { all = []; }
+    renderChips(); apply(); pickToday(0);
+  }
+
+  function renderChips() {
+    $('gradeChips').innerHTML = GRADES.map(g => `<button class="${g === grade ? 'on' : ''}" data-g="${g}">${GL[g] || g}</button>`).join('');
+    $('gradeChips').querySelectorAll('button').forEach(b => b.onclick = () => { grade = b.dataset.g; renderChips(); apply(); });
+    const cnt = {};
+    all.forEach(it => it.s.forEach(s => cnt[s] = (cnt[s] || 0) + 1));
+    const subs = ['전체', ...Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a]).filter(s => cnt[s] >= 3)];
+    $('subChips').innerHTML = subs.map(s => `<button class="${s === subj ? 'on' : ''}" data-s="${s}">${s}</button>`).join('');
+    $('subChips').querySelectorAll('button').forEach(b => b.onclick = () => { subj = b.dataset.s; renderChips(); apply(); });
+  }
+
+  function apply() {
+    const q = $('q').value.trim().toLowerCase();
+    view = all.filter(it => {
+      if (grade === '⭐ 찜' && !favs.has(it.u)) return false;
+      if (grade !== '전체' && grade !== '⭐ 찜' && !it.g.includes(grade)) return false;
+      if (subj !== '전체' && !it.s.includes(subj)) return false;
+      if (q && !(it.t + ' ' + it.k.join(' ')).toLowerCase().includes(q)) return false;
+      return true;
+    });
+    shown = 0; $('list').innerHTML = '';
+    $('count').textContent = view.length ? `${view.length.toLocaleString()}개 자료` : '';
+    more();
+  }
+
+  function card(it) {
+    const meta = it.g.map(g => `<span class="g">${GL[g] || g}</span>`).join('') + it.s.map(s => `<span class="s">${esc(s)}</span>`).join('');
+    return `<div class="item">
+      <div class="body">
+        <div class="t"><a href="${esc(it.u)}" target="_blank" rel="noopener">${esc(it.t)}</a></div>
+        ${meta ? `<div class="meta">${meta}</div>` : ''}
+        <div class="tags">${it.k.slice(0, 4).map(k => `<span data-k="${esc(k)}">#${esc(k)}</span>`).join('')}</div>
+      </div>
+      <button class="fav ${favs.has(it.u) ? 'on' : ''}" data-u="${esc(it.u)}" aria-label="찜">★</button>
+    </div>`;
+  }
+
+  function more() {
+    const next = view.slice(shown, shown + 30);
+    shown += next.length;
+    if (!view.length) {
+      $('list').innerHTML = `<div class="empty">${grade === '⭐ 찜' ? '아직 찜한 자료가 없어요.<br>마음에 드는 자료의 ★을 눌러 보세요!' : '찾는 자료가 없어요.<br>다른 말로 찾아보거나 학년·과목을 바꿔 보세요.'}</div>`;
+    } else {
+      $('list').insertAdjacentHTML('beforeend', next.map(card).join(''));
+    }
+    $('more').style.display = shown < view.length ? '' : 'none';
+    $('more').textContent = `더 보기 (${(view.length - shown).toLocaleString()}개 남음)`;
+  }
+
+  $('list').addEventListener('click', e => {
+    const f = e.target.closest('.fav');
+    if (f) {
+      const u = f.dataset.u;
+      favs.has(u) ? favs.delete(u) : favs.add(u);
+      f.classList.toggle('on', favs.has(u)); saveFav();
+      return;
+    }
+    const tag = e.target.closest('.tags span');
+    if (tag) { $('q').value = tag.dataset.k; apply(); window.scrollTo({ top: $('q').offsetTop - 10, behavior: 'smooth' }); }
+  });
+
+  // 오늘의 공부: 날짜마다 바뀌고, 초등 자료를 먼저 골라요
+  function pickToday(step) {
+    const pool = all.filter(it => it.g.some(g => g.startsWith('초')));
+    const list = pool.length ? pool : all;
+    if (!list.length) return;
+    const d = new Date(); const seed = d.getFullYear() * 400 + d.getMonth() * 32 + d.getDate();
+    todayIdx = (seed * 37 + step) % list.length;
+    const it = list[todayIdx];
+    $('today').style.display = '';
+    $('todayK').textContent = step ? '이건 어때요?' : `오늘의 공부 · ${d.getMonth() + 1}월 ${d.getDate()}일`;
+    $('todayT').textContent = it.t;
+    $('todayTags').innerHTML = [...it.g.map(g => GL[g] || g), ...it.s].map(x => `<span>${esc(x)}</span>`).join('') + it.k.slice(0, 3).map(k => `<span>#${esc(k)}</span>`).join('');
+    $('todayGo').href = it.u;
+  }
+  let stepN = 0;
+  $('todayNext').onclick = () => pickToday(++stepN);
+  $('more').onclick = more;
+  let qt = null;
+  $('q').addEventListener('input', () => { clearTimeout(qt); qt = setTimeout(apply, 200); });
+  boot();
+</script>
+</body>
+</html>
