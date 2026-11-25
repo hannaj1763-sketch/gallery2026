@@ -482,7 +482,7 @@ jobs:
               }
           }
           JAVA
-          sed -i "s/__BUILD__/${{ github.run_number }}/" app-build/android/app/src/main/java/io/github/hannaj1763/gallery/MainActivity.java
+          sed -i "s/__BUILD__/$GITHUB_RUN_NUMBER/" app-build/android/app/src/main/java/io/github/hannaj1763/gallery/MainActivity.java
           # 구글 광고(AdMob) 도구 추가
           printf '\ndependencies {\n    implementation "com.google.android.gms:play-services-ads:24.+"\n    implementation "androidx.credentials:credentials:1.3.0"\n    implementation "androidx.credentials:credentials-play-services-auth:1.3.0"\n    implementation "com.google.android.libraries.identity.googleid:googleid:1.1.1"\n}\n' >> app-build/android/app/build.gradle
           # AdMob 앱 ID (지금은 구글 시험용 ID). 출시할 때 진짜 ID로 바꿔요.
