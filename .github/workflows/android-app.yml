@@ -1,4 +1,4 @@
-# 예성이 갤러리 안드로이드 앱(APK) 자동 만들기
+# JJ 갤러리(AGJJ) 안드로이드 앱(APK) 자동 만들기
 # - 이 파일을 저장소의 .github/workflows/android-app.yml 로 올리면 GitHub이 앱을 만들어요.
 # - 다시 만들고 싶으면: 저장소 > Actions > "Android 앱 만들기" > Run workflow
 # - 완성된 앱: https://github.com/hannaj1763-sketch/gallery2026/releases/latest/download/atelier-archive.apk

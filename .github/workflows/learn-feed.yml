@@ -1,0 +1,30 @@
+# 공부방 자료 자동 수집: 매달 1일 공공데이터포털에서 '교과주제별 학습자료'를 받아 data/learn.json 으로 저장해요.
+# 인증키는 Settings > Secrets and variables > Actions 의 DATA_GO_KR_KEY 를 써요.
+# 처음 한 번은 Actions 탭 > "공부방 자료 받기" > Run workflow 로 직접 돌려 보세요.
+name: 공부방 자료 받기
+on:
+  schedule:
+    - cron: '23 20 1 * *'      # 매달 1일 한국 시간 새벽 5시 23분
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  feed:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 공공데이터포털에서 학습자료 받기
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          OUT: data/learn.json
+        run: |
+          python .github/learn_feed.py
+      - name: 바뀐 내용 저장하기
+        run: |
+          git config user.name "agjj-bot"
+          git config user.email "agjj-bot@users.noreply.github.com"
+          git add data/learn.json
+          git diff --cached --quiet && echo "바뀐 것 없음" || (git commit -m "공부방 자료 업데이트" && git push)
