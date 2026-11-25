@@ -2173,15 +2173,20 @@
           ${T('openMem()', '🧠', t('memT'), t('memD'), memBest ? '🏆 ' + memBest.toLocaleString() : free)}
           ${T('openThrow()', '🎯', t('thrT'), t('thrD'), thrDone ? '🖼 ' + thrDone : free)}
           ${T('openColorMerge()', '🎨', t('cmT'), t('cmD'), free)}
-          ${T("openExtGame('https://hannaj1763-sketch.github.io/art-flight/', '✈️ ' + t('afT'))", '✈️', t('afT'), t('afD'), free)}
-          ${T("openExtGame('https://hannaj1763-sketch.github.io/korean-word-chain/', '🔤 ' + t('kwcT'))", '🔤', t('kwcT'), t('kwcD'), free)}
           ${T("openExtGame('https://hannaj1763-sketch.github.io/k-snack-combo-tycoon/', '🍢 ' + t('kscT'))", '🍢', t('kscT'), t('kscD'), free)}
           ${T("openExtGame('puzzle.html', '🧩 ' + t('pzT'))", '🧩', t('pzT'), t('pzD'), free)}
           ${T("openExtGame('cube.html', '🎲 ' + t('cbT'))", '🎲', t('cbT'), t('cbD'), free)}
           ${T("openExtGame('balance.html', '⚖️ ' + t('blT'))", '⚖️', t('blT'), t('blD'), free)}
           ${T("openExtGame('nunchi.html', '👀 ' + t('ncT'))", '👀', t('ncT'), t('ncD'), free)}
           ${T("openExtGame('hidden.html', '🔍 ' + t('hdT'))", '🔍', t('hdT'), t('hdD'), free)}
+          ${T("openDrive()", '🛴', t('driveT'), t('driveD'), free, 'drive-tile')}
+        </div>
+
+        <div class="pl-cat">${t('catSmart')}</div>
+        <div class="pg">
+          ${T("openExtGame('https://hannaj1763-sketch.github.io/korean-word-chain/', '🔤 ' + t('kwcT'))", '🔤', t('kwcT'), t('kwcD'), free)}
           ${T("openExtGame('study.html', '📚 ' + t('stT'))", '📚', t('stT'), t('stD'), free)}
+          ${T("openExtGame('https://hannaj1763-sketch.github.io/art-flight/', '✈️ ' + t('afT'))", '✈️', t('afT'), t('afD'), free)}
         </div>
 
         <div class="pl-cat">${t('catMusic')}</div>
@@ -2198,10 +2203,6 @@
           ${T("switchView('store')", '📦', t('storeT'), t('storeD'), free)}
         </div>
 
-        <div class="pl-cat">${t('catDrive')}</div>
-        <div class="pg">
-          ${T("openDrive()", '🛴', t('driveT'), t('driveD'), free, 'drive-tile')}
-        </div>
 
 `;
     }
@@ -4371,6 +4372,7 @@
       beamT: ['아트빔', 'Art Beam', '艺术投影', 'アートビーム'], beamD: ['특별전을 영사하듯', 'Project an exhibition', '像放映一样展示特展', '特別展を映すように'],
       emoT: ['이모티콘 공방', 'Emoticon Studio', '表情工坊', 'スタンプ工房'], emoD: ['그림으로 이모티콘 만들기', 'Make emoticons from art', '用画作做表情', '絵でスタンプを作る'],
       storeT: ['이모티콘 저장소', 'Emoticon Library', '表情库', 'スタンプ倉庫'], storeD: ['받아서 카톡으로 보내기', 'Save and send in chats', '保存后在聊天中发送', '保存してチャットで送る'],
+      catSmart: ['🧠 똑똑해지기', '🧠 Get Smarter', '🧠 变聪明', '🧠 かしこくなる'],
       catDrive: ['🛴 3D 드라이브', '🛴 3D Drive', '🛴 3D 兜风', '🛴 3D ドライブ'],
       driveT: ['네온 킥보드 3D', 'Neon Scooter 3D', '霓虹滑板车 3D', 'ネオンスクーター 3D'],
       driveD: ['삼김·바나나우유 3D 라이딩', '3D scooter ride with snacks', '3D 滑板车冒险', '3D スクーターライド'],
