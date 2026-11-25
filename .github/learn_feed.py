@@ -33,8 +33,9 @@ def get(page, rows):
     raise SystemExit(1)
 
 def items_of(js):
-    body = (js.get('response') or {}).get('body') or {}
-    head = (js.get('response') or {}).get('header') or {}
+    root = js.get('response') if isinstance(js.get('response'), dict) else js   # response 상자가 있든 없든
+    body = root.get('body') or {}
+    head = root.get('header') or {}
     if head.get('resultCode') not in (None, '00', '0', 0):
         print('::error::API 오류: ' + str(head)); raise SystemExit(1)
     it = body.get('items')
@@ -69,11 +70,11 @@ def normalize(raw):
     date = ''
     for it in raw:
         title = pick(it, ['lrnDataNm', 'lernDataNm', 'learnDataNm', 'lrnMtrlNm', 'dataNm', '학습자료명'])
-        kws = pick(it, ['kwrdNm', 'keywordNm', 'kwrd', '키워드명'], lambda v: v.count(';') >= 2)
+        kws = pick(it, ['kwdNm', 'kwrdNm', 'keywordNm', 'kwrd', '키워드명'], lambda v: v.count(';') >= 2 or v.count(',') >= 2)
         url = pick(it, ['hmpgAddr', 'homepageUrl', 'hmpgUrl', '홈페이지주소'], lambda v: v.startswith('http'))
-        date = pick(it, ['referenceDate', 'dataStdrDe', '데이터기준일자'])
+        date = pick(it, ['crtrYmd', 'referenceDate', 'dataStdrDe', '데이터기준일자']) or date
         if not title or not url: continue
-        kw = [k.strip() for k in kws.split(';') if k.strip()]
+        kw = [k.strip() for k in re.split(r'[;,]', kws) if k.strip()]
         g, s = grade_subject(kw)
         topic = []
         for k in kw:
