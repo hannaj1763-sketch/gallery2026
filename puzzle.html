@@ -85,6 +85,7 @@
     .bar { flex-direction: column; }
   }
 </style>
+<script src="luckyball.js"></script>
 </head>
 <body>
   <div class="top">
@@ -94,7 +95,7 @@
 
   <section id="pick">
     <p class="lead">JJ의 그림을 하나 골라요. 9조각으로 섞이면 <b>두 조각을 차례로 눌러 자리를 바꿔</b> 그림을 완성해요!</p>
-    <div class="pick-row"><button class="btn" id="randBtn">🎲 아무 그림이나</button></div>
+    <div class="pick-row"><button class="btn" id="randBtn">🔮 럭키볼로 그림 뽑기</button></div>
     <div class="grid" id="grid"></div>
   </section>
 
@@ -257,7 +258,18 @@
   }
   const randomWork = () => works[Math.floor(Math.random() * works.length)];
 
-  $('randBtn').onclick = () => works.length && start(randomWork());
+  // 🔮 JJ 럭키볼: 캡슐 속 그림이 그대로 이번 판 그림이 돼요 (아직 안 한 그림이 더 잘 나와요)
+  function luckyWork() {
+    const st = load(), left = works.filter(w => !st.done[w.id]), from = left.length && Math.random() < .75 ? left : works;
+    return from[Math.floor(Math.random() * from.length)];
+  }
+  $('randBtn').onclick = () => {
+    if (!works.length) return;
+    if (!window.JJLucky) return start(luckyWork());
+    JJLucky.open({ title: '퍼즐 그림 뽑기', sub: '캡슐 속 그림으로 바로 시작해요', balls: 3, goText: '🔮 그림 뽑기!', okText: '이 그림으로 시작!',
+      prizes: () => { const w = luckyWork(); return { icon: '🖼', title: w.title || 'JJ의 그림', desc: '이 그림으로 9조각 퍼즐을 맞춰요!', art: w.id, label: '럭키볼에서 나온 그림은', say: (w.title || 'JJ의 그림') + '!', data: w }; },
+      onPick: p => start(p.data) });
+  };
   $('shufBtn').onclick = () => cur && start(cur);
   $('otherBtn').onclick = backToPick;
   $('againBtn').onclick = () => start(cur);
@@ -272,5 +284,6 @@
   };
   boot();
 </script>
+<script src="paint-icon.js"></script>
 </body>
 </html>

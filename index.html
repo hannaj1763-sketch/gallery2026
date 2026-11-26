@@ -894,9 +894,7 @@
     </style>
   <script src="firebase-config.js"></script>   <!-- 🔑 Firebase 키는 이 파일 하나에만 (키를 바꿀 땐 이 파일만 고쳐요) -->
   <script src="luckyball.js"></script>
-  <script src="luckyball.js"></script>
-  <script src="luckyball.js"></script>
-  <script src="luckyball.js"></script>
+  <script src="paint-icon.js"></script>
   <style id="jx-style">
     /* ===================== 🎨 팔레트 메뉴 · 오늘 · 나의 기록 · JJ 극장 ===================== */
     .jx-today { margin-top: 14px; padding: 14px 15px 12px; border-radius: 18px; background: linear-gradient(135deg, #1e1b3a, #241a33); border: 1px solid #3b2f5c; color: #ede9fe; }
@@ -1156,13 +1154,14 @@
   <div class="visit-bar" id="visitBar"></div>
 
   <!-- 갤러리 입장권 (앱을 열 때, 하루 동안 자유 입장) -->
-  <div id="loginModal" class="tk-modal" style="background:#0b0d12; z-index:150">
+  <div id="loginModal" class="tk-modal" style="background:rgba(11,13,18,.94); z-index:150">
     <div class="tk-box">
-      <div style="font-size:40px; margin-bottom:6px">🖼️</div>
-      <div class="tk-title">AGJJ 아그짜</div>
-      <div class="tk-sub">Art Gallery of J.J</div>
-      <div class="tk-rules">· 구글 계정으로 로그인하면 입장권과 <b>My Collection</b>이 계정에 저장돼요.<br>· 앱을 지우거나 휴대폰을 바꿔도 그대로 남아요.<br>· 이름과 이메일 외에는 아무것도 가져오지 않아요.</div>
-      <button class="tk-btn" id="loginGo" onclick="startLogin()">Google로 로그인</button>
+      <div style="font-size:44px; margin-bottom:4px">🎁</div>
+      <div class="tk-title">지금 로그인하면 💧 10 선물!</div>
+      <div class="tk-sub" id="loginWhy" style="margin-top:6px"></div>
+      <div class="tk-rules">· 모은 💧 물감 · My Collection · 도감이 <b>계정에 저장</b>돼요.<br>· 앱을 지우거나 휴대폰을 바꿔도 그대로 남아요.<br>· 💬 아트톡과 아트퐁 순위에 참여할 수 있어요.<br>· 이름과 이메일 외에는 아무것도 가져오지 않아요.</div>
+      <button class="tk-btn" id="loginGo" onclick="startLogin()">Google로 3초 로그인</button>
+      <button class="nick-later" id="loginLater" onclick="loginLater()" style="display:inline-block; margin-top:10px">둘러보고 나중에 할게요</button>
       <div class="tk-sub" id="loginMsg" style="margin:10px 0 0"></div>
       <div class="copy-foot" style="margin:12px 0 0" onclick="openModal('copyModal')">© J.J All rights reserved · <u>저작권 안내</u></div>
       <div id="loginVer" style="margin-top:8px; font-size:10px; color:#475569"></div>
@@ -2167,8 +2166,12 @@
       if (!cloudOn()) return;
       try { fb = await loadFirebase(); }
       catch (e) { console.log('Firebase를 불러오지 못해 이 폰에만 저장해요:', e); fb = null; return; }
-      let user = await new Promise(res => { const off = fb.authM.onAuthStateChanged(fb.auth, u => { off(); res(u); }); });
-      if (!user) user = await askLogin();
+      const user = await new Promise(res => { const off = fb.authM.onAuthStateChanged(fb.auth, u => { off(); res(u); }); });
+      if (!user) { guestStart(); return; }      // 👋 로그인 없이 바로 둘러보기 (로그인은 필요한 기능에서만)
+      await afterLogin(user);
+    }
+    // 로그인 직후: 서버 기록 합치기 → (처음이면) 닉네임 → 선물 · 아트톡
+    async function afterLogin(user) {
       cloudUser = user;
       // 다른 계정으로 바꿔 로그인했으면 이 폰에 남은 앞사람 기록은 지움
       const prev = lsGet(K_UID, '');
@@ -2180,9 +2183,60 @@
         currentEx = (lsGet(K_TICKET, null) || {}).exId ? findEx(lsGet(K_TICKET, null).exId) : null;
         await cloudSaveNow();
       } catch (e) { console.log('서버 기록을 불러오지 못했어요(이 폰 기록으로 계속):', e); }
-      if (!lsGet(K_NICK, '')) await askNick(true);     // 처음 가입(또는 닉네임 없는 예전 계정): 닉네임 정하기
+      if (!lsGet(K_NICK, '')) await askNick(true);     // 처음 가입(또는 닉네임 없는 예전 계정): 추천 닉네임이 미리 들어 있어 한 번만 누르면 돼요
       grantDaily();                                      // 🎁 가입 선물 · 🎨 오늘의 물감 · 🔥 연속 출석 · 💌 친구 입장
       talkStart();                                       // 💬 아트톡 (내 채팅방 · 초대 · 접속 표시)
+      const nb = document.getElementById('loginNudge'); if (nb) nb.remove();
+      if (document.getElementById('view-account').classList.contains('active')) renderAccount();
+    }
+
+    // =====================================================================
+    // 👋 게스트 모드: 앱을 열면 가입 없이 바로 갤러리로
+    //  - 기록은 이 폰에 저장 → 나중에 로그인하면 계정 기록과 합쳐져요 (지워지지 않아요)
+    //  - 로그인은 꼭 필요한 기능(아트톡 · 기기 이동 저장)에서만 requireLogin()으로 물어봐요
+    //  - 두 번째 방문부터 하루 한 번, 40초 뒤 아래쪽에 작은 '💧10 선물' 안내 (✕ 3번 누르면 더 안 보여요)
+    // =====================================================================
+    var K_GUEST = 'agjj_guest_v1';
+    function guestStart() {
+      const g = lsGet(K_GUEST, {}), today = todayStr();
+      if (g.day !== today) { g.day = today; g.opens = (g.opens || 0) + 1; }
+      lsSet(K_GUEST, g, true);
+      grantDaily();
+      if (g.opens >= 2 && g.nudged !== today && (g.x || 0) < 3) setTimeout(showLoginNudge, 40000);
+    }
+    function showLoginNudge() {
+      if (cloudUser || document.getElementById('loginNudge')) return;
+      const g = lsGet(K_GUEST, {}); g.nudged = todayStr(); lsSet(K_GUEST, g, true);
+      const d = document.createElement('div'); d.id = 'loginNudge';
+      d.style.cssText = 'position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9000;width:min(92vw,420px);display:flex;align-items:center;gap:10px;padding:11px 12px 11px 14px;border-radius:16px;background:#1e1b2e;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.3);font-size:13.5px;line-height:1.4;animation:fadeIn .3s';
+      d.innerHTML = '<span style="font-size:24px">🎁</span><span style="flex:1"><b>로그인하면 💧 10 선물</b><br><span style="color:#cbd5e1;font-size:12px">모은 기록이 계정에 안전하게 저장돼요</span></span>' +
+        '<button style="border:none;border-radius:99px;padding:8px 12px;background:#f472b6;color:#fff;font-weight:800;font-size:13px">로그인</button>' +
+        '<button aria-label="닫기" style="border:none;background:none;color:#94a3b8;font-size:18px;padding:4px">✕</button>';
+      const [go, x] = d.querySelectorAll('button');
+      go.onclick = () => { d.remove(); requireLogin(); };
+      x.onclick = () => { d.remove(); const g2 = lsGet(K_GUEST, {}); g2.x = (g2.x || 0) + 1; lsSet(K_GUEST, g2, true); };
+      document.body.appendChild(d);
+      setTimeout(() => { if (d.isConnected) d.remove(); }, 15000);
+    }
+    // 로그인이 꼭 필요한 순간에만: 이유를 보여 주고, '나중에'도 고를 수 있어요 → 로그인한 user 또는 null
+    let loginCancel = null;
+    function requireLogin(why) {
+      if (cloudUser) return Promise.resolve(cloudUser);
+      if (!cloudOn()) { showMsg('📱 앱에서 로그인해요', 'AGJJ 앱에서 구글 계정으로 로그인할 수 있어요.'); return Promise.resolve(null); }
+      if (!fb) { showMsg('🌐 잠시 뒤 다시 해 주세요', '인터넷 연결을 확인해 주세요.'); return Promise.resolve(null); }
+      let ver = ''; try { ver = NativeApp && NativeApp.appBuild ? '앱 ' + NativeApp.appBuild() + '번' : ''; } catch (e) {}
+      document.getElementById('loginVer').innerText = ver;
+      document.getElementById('loginWhy').innerHTML = why || '';
+      document.getElementById('loginMsg').innerText = '';
+      return new Promise(res => {
+        loginResolve = async u => { try { await afterLogin(u); } catch (e) { console.log(e); } toast('🎉 로그인했어요! 기록이 계정에 저장돼요'); res(u); };
+        loginCancel = () => res(null);
+        openModal('loginModal');
+      });
+    }
+    function loginLater() {
+      closeModal('loginModal'); loginResolve = null;
+      if (loginCancel) { const f = loginCancel; loginCancel = null; f(null); }
     }
 
     // =====================================================================
@@ -2195,11 +2249,11 @@
     let nickResolve = null, nickFirst = false;
     function askNick(first) {
       nickFirst = !!first;
-      document.getElementById('nickTitle').innerText = first ? '갤러리에서 쓸 닉네임을 정해 주세요' : '닉네임 바꾸기';
+      document.getElementById('nickTitle').innerText = first ? '닉네임을 정해 주세요 (그대로 써도 돼요)' : '닉네임 바꾸기';
       document.getElementById('nickCancel').style.display = first ? 'none' : 'inline-block';
-      document.getElementById('nickIn').value = first ? '' : lsGet(K_NICK, '');
+      document.getElementById('nickIn').value = first ? ['그림친구', '아트친구', '물감친구', '꼬마화가', '별빛관람객'][Math.random() * 5 | 0] + (100 + Math.random() * 900 | 0) : lsGet(K_NICK, '');
       document.getElementById('nickMsg').innerText = '';
-      const go = document.getElementById('nickGo'); go.disabled = false; go.innerText = first ? '이 닉네임으로 할게요' : '바꾸기';
+      const go = document.getElementById('nickGo'); go.disabled = false; go.innerText = first ? '이대로 시작!' : '바꾸기';
       hideSplash();
       openModal('nickModal');
       setTimeout(() => document.getElementById('nickIn').focus(), 200);
@@ -2229,7 +2283,7 @@
         if (document.getElementById('view-account').classList.contains('active')) renderAccount();
         if (nickResolve) { const f = nickResolve; nickResolve = null; f(nick); }
       } catch (e) {
-        go.disabled = false; go.innerText = nickFirst ? '이 닉네임으로 할게요' : '바꾸기';
+        go.disabled = false; go.innerText = nickFirst ? '이대로 시작!' : '바꾸기';
         msg.innerText = e && e.taken || (e && e.code === 'permission-denied') ? '이미 누가 쓰고 있는 닉네임이에요. 다른 이름을 골라 주세요.' : '저장하지 못했어요. 잠시 뒤 다시 해 주세요. (' + ((e && (e.code || e.message)) || '') + ')';
       }
     }
@@ -2662,7 +2716,8 @@
         <div class="acc-card">
           ${u && u.photoURL ? `<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">` : '<div class="ph">👤</div>'}
           <div style="min-width:0"><div class="acc-name">${esc(u ? (lsGet(K_NICK, '') || u.displayName || '관람객') : '로그인 전')}${u ? '<button class="acc-edit" onclick="askNick(false)">✏️ 닉네임</button>' : ''}</div>
-            <div class="acc-sub">${u ? esc(u.email || '') + ' · Google 로그인' : '로그인하면 기록이 계정에 저장돼요'}</div>
+            <div class="acc-sub">${u ? esc(u.email || '') + ' · Google 로그인' : '지금은 이 폰에만 저장돼요'}</div>
+            ${!u && IS_APP ? '<button class="acc-edit" style="margin-top:6px;background:#f472b6;color:#fff;border-color:#f472b6" onclick="requireLogin(\'📦 기록을 계정에 저장해요\')">🎁 로그인하고 💧10 받기</button>' : ''}
             ${joined ? `<div class="acc-sub">가입일 ${joined}</div>` : ''}</div>
         </div>
         <button class="acc-col" onclick="openBox()"><span class="i"><span class="easel"></span></span><div><b>My Collection ${box.ids.length}/${box.slots}</b><span>담아 둔 JJ의 작품 보기 · 칸 늘리기</span></div></button>
@@ -3273,7 +3328,7 @@
       if (!IS_APP) return;
       const b = lsGet(K_BONUS, {}), today = todayStr(), got = [];
       let add = 0;
-      if (!b.welcome) { b.welcome = true; add += 10; got.push('🎁 가입 선물 💧 10'); }
+      if (!b.welcome && cloudUser) { b.welcome = true; add += 10; got.push('🎁 가입 선물 💧 10'); }
       if (b.lastDay !== today) {
         const y = new Date(); y.setDate(y.getDate() - 1);
         const yStr = `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, '0')}-${String(y.getDate()).padStart(2, '0')}`;
@@ -4197,7 +4252,7 @@
     // 💬 첫 화면: 접속 중 · 받은 초대 · 내 채팅방
     function renderTalk() {
       const box = document.getElementById('talkBox'); if (!box) return;
-      if (!fb || !cloudUser) { box.innerHTML = `<div class="tlk-safe">💬 아트톡은 앱에서 로그인한 뒤에 쓸 수 있어요.</div>`; return; }
+      if (!fb || !cloudUser) { box.innerHTML = `<div class="tlk-gate"><div class="i">💬</div><b>아트톡은 로그인하고 써요</b><p>닉네임으로만 이야기해요.<br>로그인하면 💧 10 선물도 받아요!</p><button class="tlk-new" onclick="requireLogin('💬 아트톡에 들어가려면 로그인이 필요해요').then(u => u && renderTalk())">Google로 로그인</button></div>`; return; }
       const age = lsGet(K_AGE, null);
       if (age && age.ok === false) { box.innerHTML = `<div class="tlk-gate"><div class="i">🔒</div><b>아트톡은 만 14세 이상부터 쓸 수 있어요</b>
           <p>갤러리 관람 · 아트컬러링 · 아트쏭 · 말씀카드 · 아트퐁은 그대로 즐길 수 있어요.<br>친구와 이야기하고 싶다면 보호자와 함께, 보호자 계정으로 써 주세요.</p></div>`; return; }
@@ -4317,7 +4372,7 @@
     async function talkJoinCode(code) {
       const c = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, ''), m = document.getElementById('tcMsg');
       if (c.length !== 8) { if (m) m.innerText = '8자리 코드를 넣어 주세요.'; return; }
-      if (!fb || !cloudUser) { showMsg('💬 아트톡', '앱에서 로그인한 뒤에 들어갈 수 있어요.'); return; }
+      if (!fb || !cloudUser) { const u = await requireLogin('💬 초대 코드로 들어가려면 로그인이 필요해요'); if (!u) return; }
       try {
         const sn = await fb.getDoc(tkRef('rooms', c)), r = sn.exists() ? sn.data() : null;
         if (!roomAlive(r)) { if (m) m.innerText = '채팅방을 찾지 못했어요. 코드를 다시 확인해 주세요.'; else showMsg('💬 채팅방이 없어요', '채팅방이 닫혔거나 코드가 달라요.'); return; }
@@ -5648,7 +5703,7 @@
         const keys = Object.keys(s.days).sort(); if (keys.length > 420) keys.slice(0, keys.length - 420).forEach(k => delete s.days[k]);
         put(K_ST, s);
       }
-      const PLAYKEYS = new Set(['lineup', 'catch', 'pang', 'mem', 'throw', 'cm', 'ksc', 'puzzle', 'cube', 'balance', 'nunchi', 'hidden', 'drive', 'kwc', 'study', 'af', 'shop', 'song', 'coloring', 'word', 'beam', 'emo', 'anim', 'show', 'recap', 'story', 'card', 'sheet']);
+      const PLAYKEYS = new Set(['lineup', 'catch', 'malang', 'squishy', 'pang', 'mem', 'throw', 'cm', 'ksc', 'puzzle', 'cube', 'balance', 'nunchi', 'hidden', 'drive', 'kwc', 'study', 'af', 'shop', 'song', 'coloring', 'word', 'beam', 'emo', 'anim', 'show', 'recap', 'story', 'card', 'sheet']);
       function track(key, n = 1) {
         const s = st(), d = today();
         const day = s.days[d] = s.days[d] || {};
@@ -5687,6 +5742,8 @@
         nunchi: { i: '👀', t: () => tt('ncT', '눈치 게임'), d: () => tt('ncD', ''), go: "openExtGame('nunchi.html', '👀 ' + t('ncT'))" },
         hidden: { i: '🔍', t: () => tt('hdT', '숨은그림찾기'), d: () => tt('hdD', ''), go: "openExtGame('hidden.html', '🔍 ' + t('hdT'))" },
         catch: { i: '🎒', t: () => 'JJ 그림 뽑기', d: () => '집게로 그림 키링을 뽑아 도감 채우기', go: "openExtGame('catch.html', '🎒 JJ 그림 뽑기')", nw: 1 },
+        malang: { i: '🍡', t: () => 'JJ 말랑꾹', d: () => '말랑이 쭉~ · 왁뿌 볼 와작 · 키캡 딸깍', go: "openExtGame('malang.html', '🍡 JJ 말랑꾹')", nw: 1 },
+        squishy: { i: '🫧', t: () => 'JJ 그림 말랑이', d: () => '그림이 프린트된 말랑이를 꾹꾹 · 꽉!', go: "openExtGame('squishy.html', '🫧 JJ 그림 말랑이')", nw: 1 },
         drive: { i: '🛴', t: () => tt('driveT', '네온 킥보드 3D'), d: () => tt('driveD', ''), go: 'openDrive()' },
         kwc: { i: '🔤', t: () => tt('kwcT', '끝말잇기'), d: () => tt('kwcD', ''), go: `openExtGame('${EXT.kwc}', '🔤 ' + t('kwcT'))` },
         study: { i: '📚', t: () => tt('stT', 'JJ 공부방'), d: () => tt('stD', ''), go: "openExtGame('study.html', '📚 ' + t('stT'))" },
@@ -5708,7 +5765,7 @@
         badge: { i: '🏅', t: () => '배지 도감', d: () => '모은 배지를 확인해요', go: "jxMyRecord('jxBadges')", nw: 1 }
       };
       const AREAS = [
-        { id: 'game', e: '🎮', l: '게임', c: '#ef4444', x: 21, y: 38, keys: ['catch', 'pang', 'mem', 'throw', 'cm', 'ksc', 'puzzle', 'cube', 'balance', 'nunchi', 'hidden', 'drive'] },
+        { id: 'game', e: '🎮', l: '게임', c: '#ef4444', x: 21, y: 38, keys: ['catch', 'malang', 'squishy', 'pang', 'mem', 'throw', 'cm', 'ksc', 'puzzle', 'cube', 'balance', 'nunchi', 'hidden', 'drive'] },
         { id: 'smart', e: '🧠', l: '똑똑해지기', c: '#f59e0b', x: 44, y: 24, keys: ['kwc', 'study', 'af', 'shop'] },
         { id: 'theater', e: '🎬', l: 'JJ 극장', c: '#a855f7', x: 67, y: 27, keys: ['anim', 'show', 'recap', 'story', 'card', 'sheet'] },
         { id: 'music', e: '🎵', l: '그림×음악', c: '#3b82f6', x: 23, y: 71, keys: ['song', 'coloring'] },
@@ -5721,7 +5778,7 @@
         if (u.includes('korean-word-chain')) return 'kwc'; if (u.includes('art-flight')) return 'af';
         if (u.includes('mode=shop')) return 'shop'; if (u.includes('k-snack')) return 'ksc';
         if (u.includes('Drive-3D')) return 'drive'; if (u.includes('color-merge')) return 'cm';
-        const m = u.match(/(puzzle|cube|balance|nunchi|hidden|study|catch)\.html/); return m ? m[1] : '';
+        const m = u.match(/(puzzle|cube|balance|nunchi|hidden|study|catch|squishy|malang)\.html/); return m ? m[1] : '';
       }
 
       // ---------------- 🎄 계절 ----------------
@@ -5742,10 +5799,10 @@
         kwc: { i: '🔤', tx: '끝말잇기 한 판', n: 1 }, study: { i: '📚', tx: '공부방 자료 보기', n: 1 }, af: { i: '✈️', tx: '아트 플라이트 속담 맞히기', n: 1 }, shop: { i: '🛒', tx: 'JJ 간식가게 손님 받기', n: 1 },
         hidden: { i: '🔍', tx: '숨은그림찾기 한 판', n: 1 }, puzzle: { i: '🧩', tx: '그림 퍼즐 맞추기', n: 1 }, cube: { i: '🧊', tx: '그림 큐브 돌리기', n: 1 }, balance: { i: '⚖️', tx: '밸런스 게임 하기', n: 1 },
         nunchi: { i: '👀', tx: '눈치 게임 하기', n: 1 }, mem: { i: '🧠', tx: '아트메모리 도전', n: 1 }, anim: { i: '✨', tx: '그림 움직여 보기', n: 1 }, story: { i: '📖', tx: 'JJ 그림책 읽기', n: 1 },
-        drive: { i: '🛴', tx: '킥보드 3D 타기', n: 1 }, sheet: { i: '🖨', tx: '색칠 도안 만들기', n: 1 }, catch: { i: '🎒', tx: 'JJ 그림 뽑기 한 판', n: 1 }
+        drive: { i: '🛴', tx: '킥보드 3D 타기', n: 1 }, sheet: { i: '🖨', tx: '색칠 도안 만들기', n: 1 }, catch: { i: '🎒', tx: 'JJ 그림 뽑기 한 판', n: 1 }, squishy: { i: '🫧', tx: 'JJ 그림 말랑이 꾹꾹', n: 1 }, malang: { i: '🍡', tx: 'JJ 말랑꾹 한 판', n: 1 }
       };
       function seedRand(str) { let h = 2166136261; for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 10000) / 10000; }; }
-      const MPOOLS = [['view', 'cheer'], ['kwc', 'study', 'af', 'shop'], ['hidden', 'puzzle', 'cube', 'balance', 'nunchi', 'mem', 'anim', 'story', 'drive', 'sheet', 'catch']];
+      const MPOOLS = [['view', 'cheer'], ['kwc', 'study', 'af', 'shop'], ['hidden', 'puzzle', 'cube', 'balance', 'nunchi', 'mem', 'anim', 'story', 'drive', 'sheet', 'catch', 'squishy', 'malang']];
       function missions(d = today()) {
         const s = get(K_ST, {}) || {}, mp = (s.mpick || {})[d];
         if (mp && mp.length === 3) return mp;

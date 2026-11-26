@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>JJ 그림 말랑이</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    overflow: hidden; user-select: none; -webkit-user-select: none; touch-action: none;
+    background: radial-gradient(circle at 50% 42%, #fff7fb 0%, #fbe7f3 45%, #e9e3ff 100%);
+    font-family: 'Jua', -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif; color: #3b2a45;
+  }
+  #cv { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  #top { position: fixed; top: max(10px, env(safe-area-inset-top)); left: 0; right: 0; z-index: 5; text-align: center; pointer-events: none; padding: 0 10px; }
+  .bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; pointer-events: auto; }
+  .pill { border: 2px solid #3b2a45; border-radius: 99px; padding: 4px 10px; font: 800 12.5px/1.2 inherit; font-family: inherit; background: #fff; color: #3b2a45; cursor: pointer; text-decoration: none; white-space: nowrap; }
+  .pill.dark { background: #3b2a45; color: #fde047; cursor: default; }
+  body.in-app .back { visibility: hidden; }
+  h1 { margin-top: 6px; font-size: clamp(21px, 6vw, 26px); color: #fff; letter-spacing: -.5px;
+    text-shadow: -2px -2px 0 #3b2a45, 2px -2px 0 #3b2a45, -2px 2px 0 #3b2a45, 2px 2px 0 #3b2a45, 0 4px 0 #3b2a45; }
+  h1 b { color: #f9a8d4; font-weight: inherit; }
+  .artbar { margin: 6px auto 0; display: flex; align-items: center; justify-content: center; gap: 6px; pointer-events: auto; max-width: 420px; }
+  .arw { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #3b2a45; background: #fff; font-size: 14px; cursor: pointer; flex: none; }
+  .artname { flex: 1; min-width: 0; background: rgba(255,255,255,.9); border: 2px solid #3b2a45; border-radius: 99px; padding: 5px 10px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lucky { flex: none; border: 2px solid #3b2a45; border-radius: 99px; padding: 6px 11px; font-family: inherit; font-size: 13px; color: #fff; cursor: pointer;
+    background: linear-gradient(90deg, #a855f7, #ec4899); box-shadow: 0 3px 0 #3b2a45; }
+  .lucky:active { transform: translateY(3px); box-shadow: none; }
+  #toast { position: fixed; left: 50%; top: 38%; transform: translate(-50%, -50%) scale(.8); z-index: 9; opacity: 0; transition: .25s; pointer-events: none;
+    background: rgba(59,42,69,.92); color: #fff; padding: 10px 18px; border-radius: 99px; font-size: 15px; white-space: nowrap; }
+  #toast.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+  #tool { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(14px, env(safe-area-inset-bottom)); z-index: 5;
+    width: min(96vw, 440px); background: rgba(255,255,255,.9); border: 2px solid #3b2a45; border-radius: 24px; padding: 9px 10px 10px;
+    box-shadow: 0 10px 30px rgba(74,59,71,.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .row { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
+  .row + .row { margin-top: 7px; }
+  .cbtn { width: 28px; height: 28px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px #3b2a45; cursor: pointer; }
+  .cbtn.on { box-shadow: 0 0 0 2px #3b2a45, 0 0 0 5px #f9a8d4; }
+  .div { width: 2px; height: 22px; background: #e5d7e3; border-radius: 2px; margin: 0 2px; }
+  .btn { padding: 7px 11px; border-radius: 16px; border: 2px solid #3b2a45; background: #fff; color: #3b2a45; font-family: inherit; font-size: 13px; cursor: pointer; }
+  .btn.on { background: #f472b6; color: #fff; }
+  .btn.sm { padding: 6px 9px; font-size: 12px; }
+  .squeeze { flex: 1; min-width: 150px; padding: 10px 0; border-radius: 18px; border: 2px solid #3b2a45; font-family: inherit; font-size: 17px; color: #fff; cursor: pointer;
+    background: linear-gradient(#a78bfa, #7c3aed); box-shadow: 0 5px 0 #3b2a45; touch-action: none; }
+  .squeeze.pressing { transform: translateY(4px); box-shadow: 0 1px 0 #3b2a45; background: linear-gradient(#8b5cf6, #6d28d9); }
+  .hint { font-size: 11.5px; color: #7a6875; text-align: center; margin-top: 6px; }
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<div id="top">
+  <div class="bar">
+    <a class="pill back" href="./">← 갤러리</a>
+    <span class="pill dark" id="cnt">말랑 0번</span>
+  </div>
+  <h1>🫧 JJ 그림 <b>말랑이</b></h1>
+  <div class="artbar">
+    <button class="arw" id="prevA" aria-label="이전 그림">◀</button>
+    <div class="artname" id="artName">그림을 불러오는 중…</div>
+    <button class="arw" id="nextA" aria-label="다음 그림">▶</button>
+    <button class="lucky" id="luckyA">🔮 뽑기</button>
+  </div>
+</div>
+
+<div id="tool">
+  <div class="row" id="colors">
+    <button class="cbtn on" style="background:#f9c6dc" data-color="#f9c6dc" title="딸기우유"></button>
+    <button class="cbtn" style="background:#fde8a8" data-color="#fde8a8" title="바닐라"></button>
+    <button class="cbtn" style="background:#bfe9d6" data-color="#bfe9d6" title="민트"></button>
+    <button class="cbtn" style="background:#c9c3f7" data-color="#c9c3f7" title="라벤더"></button>
+    <button class="cbtn" style="background:#bfe3fb" data-color="#bfe3fb" title="하늘"></button>
+    <div class="div"></div>
+    <button class="btn sm on" id="faceT">🙂 얼굴</button>
+    <button class="btn sm on" id="bagT">🛍️ 파우치</button>
+  </div>
+  <div class="row">
+    <button class="btn on" data-mode="squish">👆 꾹</button>
+    <button class="btn" data-mode="paint">🎨 물감방울</button>
+    <button class="btn" data-mode="star">⭐ 별</button>
+    <button class="btn sm" id="clearT">🧽</button>
+    <button class="btn sm" id="shotT">📸</button>
+  </div>
+  <div class="row"><button class="squeeze" id="squeezeBtn">✊ 꽉 쥐기</button></div>
+  <div class="hint">손가락으로 꾹 · 두 손가락이면 꽉! · 스티커는 말랑이에 붙어서 같이 찌그러져요</div>
+</div>
+<div id="toast"></div>
+
+<script src="luckyball.js"></script>
+<script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }</script>
+<script type="module">
+import * as THREE from 'three';
+// =====================================================================
+// 🫧 JJ 그림 말랑이 — JJ의 그림이 프린트된 말랑이를 꾹꾹 누르고 꽉 쥐어요
+//  · 그림: thumbs/index.json + thumbs/m/NN.webp (◀ ▶ / 🔮 럭키볼)
+//  · 스티커: 🎨 물감방울 · ⭐ 별 (표면 정점에 붙어서 같이 찌그러져요)
+//  · 기록: localStorage 'agjj_squishy_v1' { n, day, dayN, paid, art, color, face, bag }
+//  · 하루 처음 30번 말랑하면 💧 물감 +1 (갤러리로 돌아가면 받아요)
+// =====================================================================
+try { if (window.self !== window.top) document.body.classList.add('in-app'); } catch (e) { document.body.classList.add('in-app'); }
+const $ = id => document.getElementById(id);
+const KEY = 'agjj_squishy_v1';
+const todayS = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+let S = {}; try { S = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+S.n = S.n || 0; if (S.day !== todayS()) { S.day = todayS(); S.dayN = 0; S.paid = false; }
+if (S.face === undefined) S.face = true; if (S.bag === undefined) S.bag = true;
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+let toastT = 0;
+function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 1600); }
+function countUp() {
+  S.n++; S.dayN = (S.dayN || 0) + 1; $('cnt').textContent = `말랑 ${S.n}번`;
+  if (!S.paid && S.dayN >= 30) {
+    S.paid = true;
+    try { localStorage.setItem('agjj_pending_paint', String((parseInt(localStorage.getItem('agjj_pending_paint') || '0', 10) || 0) + 1)); } catch (e) {}
+    toast('💧 오늘의 말랑 30번! 물감 +1');
+  }
+  if (S.n % 10 === 0) save();
+}
+$('cnt').textContent = `말랑 ${S.n}번`;
+
+// ---------------- 🔊 말랑 + 비닐 바스락 소리 ----------------
+let audioCtx = null;
+function playSquish(intensity = .5, bag = true) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const now = audioCtx.currentTime;
+    if (bag) {
+      const n = audioCtx.sampleRate * .14 | 0, buf = audioCtx.createBuffer(1, n, audioCtx.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (n * .35));
+      const src = audioCtx.createBufferSource(); src.buffer = buf;
+      const f = audioCtx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 2800 + Math.random() * 1800; f.Q.value = 2.5;
+      const g = audioCtx.createGain(); g.gain.setValueAtTime(.16 * intensity, now); g.gain.exponentialRampToValueAtTime(.001, now + .14);
+      src.connect(f).connect(g).connect(audioCtx.destination); src.start(now);
+    }
+    const o = audioCtx.createOscillator(), og = audioCtx.createGain(); o.type = 'sine';
+    o.frequency.setValueAtTime(140 + intensity * 60, now); o.frequency.exponentialRampToValueAtTime(95, now + .12);
+    og.gain.setValueAtTime(.12 * intensity, now); og.gain.exponentialRampToValueAtTime(.001, now + .12);
+    o.connect(og).connect(audioCtx.destination); o.start(now); o.stop(now + .12);
+  } catch (e) {}
+}
+let lastFx = 0;
+function feedback(intensity = .6) {
+  const now = Date.now(); if (now - lastFx < 95) return; lastFx = now;
+  playSquish(intensity, S.bag); try { navigator.vibrate && navigator.vibrate(Math.floor(20 * intensity)); } catch (e) {}
+}
+
+// ---------------- 🎬 장면 ----------------
+const canvas = $('cv');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, .1, 100);
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+scene.add(new THREE.AmbientLight(0xffffff, 1.35));
+const key = new THREE.DirectionalLight(0xffffff, 2); key.position.set(2.5, 4, 5); scene.add(key);
+const rim = new THREE.DirectionalLight(0xf0abfc, 1.1); rim.position.set(-3, -3, 2); scene.add(rim);
+const group = new THREE.Group(); scene.add(group);
+
+// 화면 비율에 맞춰 말랑이가 위 제목·아래 도구 사이에 쏙 들어오게
+function fit() {
+  renderer.setSize(innerWidth, innerHeight, false);
+  camera.aspect = innerWidth / innerHeight;
+  const topH = $('top').getBoundingClientRect().bottom, botH = innerHeight - $('tool').getBoundingClientRect().top;
+  const freeH = Math.max(160, innerHeight - topH - botH) / innerHeight;
+  const t = Math.tan(THREE.MathUtils.degToRad(21));
+  const need = 1.9; // 말랑이 반지름 + 여유
+  const dist = Math.max(need / (t * freeH), need / (t * camera.aspect * .96));
+  camera.position.set(0, .3, dist);
+  // 빈 공간의 가운데로 옮기기
+  const midN = ((topH + (innerHeight - botH)) / 2) / innerHeight; // 0=위
+  const shiftY = (midN - .5) * 2 * dist * t;
+  camera.position.y += shiftY; camera.lookAt(0, shiftY, 0);
+  camera.updateProjectionMatrix();
+}
+
+// ---------------- 🖼 그림 프린트 텍스처 ----------------
+const texCv = document.createElement('canvas'); texCv.width = texCv.height = 1024;
+const decalTex = new THREE.CanvasTexture(texCv); decalTex.colorSpace = THREE.SRGBColorSpace; decalTex.anisotropy = 4;
+let artImg = null;
+function rr(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+function drawTex() {
+  const c = texCv.getContext('2d'); c.clearRect(0, 0, 1024, 1024);
+  // 크림 드리즐
+  c.strokeStyle = 'rgba(255,255,255,.9)'; c.lineWidth = 22; c.lineCap = 'round';
+  for (let i = 0; i < 14; i++) {
+    const a = i / 14 * Math.PI * 2, r1 = 330, r2 = 455;
+    c.beginPath(); c.moveTo(512 + Math.cos(a) * r1, 512 + Math.sin(a) * r1);
+    c.quadraticCurveTo(512 + Math.cos(a + .22) * 400, 512 + Math.sin(a + .22) * 400, 512 + Math.cos(a - .08) * r2, 512 + Math.sin(a - .08) * r2); c.stroke();
+  }
+  // 알록달록 스프링클
+  const SP = ['#f472b6', '#a78bfa', '#38bdf8', '#facc15', '#34d399'];
+  for (let i = 0; i < 46; i++) {
+    const a = (i * 2.399) % (Math.PI * 2), r = 360 + (i * 37 % 100);
+    c.save(); c.translate(512 + Math.cos(a) * r, 512 + Math.sin(a) * r); c.rotate(i * 1.3);
+    c.fillStyle = SP[i % SP.length]; rr(c, -14, -5, 28, 10, 5); c.fill(); c.restore();
+  }
+  // 그림 (흰 테두리 스티커처럼)
+  const S0 = 500, x0 = 512 - S0 / 2, y0 = 512 - S0 / 2 - 10;
+  c.save(); c.shadowColor = 'rgba(80,40,90,.35)'; c.shadowBlur = 24; c.shadowOffsetY = 8;
+  c.fillStyle = '#fff'; rr(c, x0 - 18, y0 - 18, S0 + 36, S0 + 36, 70); c.fill(); c.restore();
+  c.save(); rr(c, x0, y0, S0, S0, 56); c.clip();
+  if (artImg) { const iw = artImg.naturalWidth || artImg.width, ih = artImg.naturalHeight || artImg.height, k = Math.max(S0 / iw, S0 / ih); c.drawImage(artImg, 512 - iw * k / 2, y0 + S0 / 2 - ih * k / 2, iw * k, ih * k); }
+  else { c.fillStyle = '#fdf2f8'; c.fillRect(x0, y0, S0, S0); c.fillStyle = '#d8b4fe'; c.font = '700 60px sans-serif'; c.textAlign = 'center'; c.fillText('JJ', 512, 530); }
+  c.restore();
+  // 얼굴 (그림 아래쪽에 귀엽게)
+  if (S.face) {
+    const ey = y0 + S0 - 95;
+    for (const ex of [430, 594]) {
+      c.fillStyle = 'rgba(255,255,255,.9)'; c.beginPath(); c.ellipse(ex, ey, 30, 36, 0, 0, 7); c.fill();
+      c.fillStyle = '#2d1e24'; c.beginPath(); c.ellipse(ex, ey + 2, 22, 28, 0, 0, 7); c.fill();
+      c.fillStyle = '#fff'; c.beginPath(); c.arc(ex - 7, ey - 8, 8, 0, 7); c.arc(ex + 8, ey + 10, 4, 0, 7); c.fill();
+    }
+    c.fillStyle = 'rgba(255,107,157,.55)'; c.beginPath(); c.ellipse(380, ey + 38, 26, 15, 0, 0, 7); c.ellipse(644, ey + 38, 26, 15, 0, 0, 7); c.fill();
+    c.strokeStyle = '#2d1e24'; c.lineWidth = 7; c.lineCap = 'round'; c.beginPath(); c.arc(497, ey + 30, 15, .15 * Math.PI, .85 * Math.PI); c.arc(527, ey + 30, 15, .15 * Math.PI, .85 * Math.PI); c.stroke();
+  }
+  // JJ GALLERY 라벨
+  c.font = '800 34px "Apple SD Gothic Neo", sans-serif'; c.textAlign = 'center';
+  const lw = c.measureText('JJ GALLERY').width + 50;
+  c.fillStyle = '#3b2a45'; rr(c, 512 - lw / 2, y0 + S0 + 34, lw, 50, 25); c.fill();
+  c.fillStyle = '#fde047'; c.fillText('JJ GALLERY', 512, y0 + S0 + 71);
+  decalTex.needsUpdate = true;
+}
+
+// ---------------- 🍩 말랑이 몸체 ----------------
+const geometry = new THREE.SphereGeometry(1.5, 64, 64);
+const pos = geometry.attributes.position, uv = geometry.attributes.uv;
+const orig = new Float32Array(pos.count * 3), vel = new Float32Array(pos.count * 3);
+for (let i = 0; i < pos.count; i++) {
+  let x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i) * .42;
+  const w = 1 + Math.sin(Math.atan2(y, x) * 5) * .02; x *= w; y *= w;
+  pos.setXYZ(i, x, y, z); orig[i * 3] = x; orig[i * 3 + 1] = y; orig[i * 3 + 2] = z;
+  uv.setXY(i, x / 3.1 + .5, y / 3.1 + .5);
+}
+geometry.computeVertexNormals();
+const baseMat = new THREE.MeshPhysicalMaterial({ color: S.color || '#f9c6dc', roughness: .38, clearcoat: .45, sheen: .8, sheenColor: 0xffffff });
+const body = new THREE.Mesh(geometry, baseMat); group.add(body);
+const decal = new THREE.Mesh(geometry, new THREE.MeshPhysicalMaterial({ map: decalTex, transparent: true, roughness: .3, clearcoat: .6, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
+decal.renderOrder = 1; group.add(decal);
+
+// ---------------- 🛍️ 투명 파우치 ----------------
+const bagGeo = new THREE.PlaneGeometry(3.8, 4.1, 32, 32), bagPos = bagGeo.attributes.position, bagOrig = new Float32Array(bagPos.count * 3);
+for (let i = 0; i < bagPos.count; i++) {
+  const bx = bagPos.getX(i), by = bagPos.getY(i), bz = Math.max(0, (1.7 - Math.hypot(bx, by)) * .42) + .02;
+  bagPos.setZ(i, bz); bagOrig[i * 3] = bx; bagOrig[i * 3 + 1] = by; bagOrig[i * 3 + 2] = bz;
+}
+bagGeo.computeVertexNormals();
+const bag = new THREE.Mesh(bagGeo, new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: .24, roughness: .08, metalness: .05, clearcoat: 1, clearcoatRoughness: .05, side: THREE.DoubleSide, depthWrite: false }));
+bag.renderOrder = 3; group.add(bag);
+// 파우치 윗부분 고리 + 무지개 라벨
+const hang = new THREE.Mesh(new THREE.TorusGeometry(.16, .045, 12, 32), new THREE.MeshPhysicalMaterial({ color: 0xe9d5ff, metalness: .6, roughness: .2, clearcoat: 1 }));
+hang.position.set(0, 2.2, 0); group.add(hang);
+bag.visible = hang.visible = S.bag;
+
+// ---------------- ⭐ 스티커 ----------------
+const toppings = [];
+const PAINT = [0xf472b6, 0xa78bfa, 0x38bdf8, 0xfacc15, 0x34d399, 0xfb7185];
+const starShape = (() => { const s = new THREE.Shape(); for (let i = 0; i < 10; i++) { const r = i % 2 ? .07 : .17, a = i / 10 * Math.PI * 2 + Math.PI / 2; const x = Math.cos(a) * r, y = Math.sin(a) * r; i ? s.lineTo(x, y) : s.moveTo(x, y); } s.closePath(); return s; })();
+const starGeo = new THREE.ExtrudeGeometry(starShape, { depth: .06, bevelEnabled: true, bevelThickness: .025, bevelSize: .02, bevelSegments: 3 });
+const dropGeo = (() => { const g = new THREE.SphereGeometry(.12, 20, 16); g.scale(1, 1.15, .55); return g; })();
+function addTopping(lp, type) {
+  let best = 0, bd = Infinity;
+  for (let i = 0; i < pos.count; i++) {
+    const dz = orig[i * 3 + 2]; if ((dz >= 0) !== (lp.z >= 0)) continue;
+    const d = (orig[i * 3] - lp.x) ** 2 + (orig[i * 3 + 1] - lp.y) ** 2 + (dz - lp.z) ** 2;
+    if (d < bd) { bd = d; best = i; }
+  }
+  let mesh;
+  if (type === 'star') mesh = new THREE.Mesh(starGeo, new THREE.MeshPhysicalMaterial({ color: [0xfde047, 0xf9a8d4, 0xc4b5fd][toppings.length % 3], metalness: .35, roughness: .2, clearcoat: 1, iridescence: .6 }));
+  else mesh = new THREE.Mesh(dropGeo, new THREE.MeshPhysicalMaterial({ color: PAINT[Math.random() * PAINT.length | 0], roughness: .12, clearcoat: 1, clearcoatRoughness: .05 }));
+  mesh.rotation.z = Math.random() * Math.PI; mesh.renderOrder = 2;
+  if (lp.z < 0) mesh.rotation.y = Math.PI;
+  group.add(mesh); toppings.push({ mesh, vi: best, off: lp.z >= 0 ? .045 : -.045 });
+  if (toppings.length > 40) { const o = toppings.shift(); group.remove(o.mesh); o.mesh.material.dispose(); }
+}
+[[-1.05, .95, 'star'], [1.05, -1.0, 'star'], [1.1, .85, 'paint'], [-1.1, -.9, 'paint'], [0, -1.32, 'paint']].forEach(p => addTopping(new THREE.Vector3(p[0], p[1], .3), p[2]));
+
+// ---------------- 👆 조작 ----------------
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
+const pointers = new Map();
+let pressId = null, hit = null, btnSqueeze = false, mode = 'squish';
+const isSqueezing = () => btnSqueeze || pointers.size >= 2;
+function pick(e) {
+  const r = canvas.getBoundingClientRect();
+  ptr.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(ptr, camera);
+  const h = ray.intersectObject(body); return h.length ? h[0].point : null;
+}
+canvas.addEventListener('pointerdown', e => {
+  pointers.set(e.pointerId, 1); try { canvas.setPointerCapture(e.pointerId); } catch (er) {}
+  if (pointers.size >= 2) { hit = null; feedback(1); countUp(); return; }
+  const p = pick(e); if (!p) return;
+  if (mode !== 'squish') { addTopping(group.worldToLocal(p.clone()), mode); feedback(.4); return; }
+  pressId = e.pointerId; hit = p; feedback(.75); countUp();
+});
+canvas.addEventListener('pointermove', e => {
+  if (e.pointerId !== pressId || mode !== 'squish' || pointers.size >= 2) return;
+  const p = pick(e); hit = p; if (p) feedback(.55);
+});
+const up = e => { pointers.delete(e.pointerId); if (e.pointerId === pressId) { pressId = null; hit = null; } };
+canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+
+document.querySelectorAll('.cbtn').forEach(b => b.addEventListener('click', () => {
+  baseMat.color.set(b.dataset.color); S.color = b.dataset.color; save();
+  document.querySelectorAll('.cbtn').forEach(x => x.classList.toggle('on', x === b));
+}));
+document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
+  mode = b.dataset.mode; document.querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('on', x === b));
+  if (mode !== 'squish') toast(mode === 'star' ? '⭐ 말랑이를 톡 누르면 별이 붙어요' : '🎨 말랑이를 톡 누르면 물감방울이 붙어요');
+}));
+if (S.color) document.querySelectorAll('.cbtn').forEach(x => x.classList.toggle('on', x.dataset.color === S.color));
+$('faceT').classList.toggle('on', S.face);
+$('faceT').onclick = () => { S.face = !S.face; $('faceT').classList.toggle('on', S.face); drawTex(); save(); };
+$('bagT').classList.toggle('on', S.bag);
+$('bagT').onclick = () => { S.bag = !S.bag; bag.visible = hang.visible = S.bag; $('bagT').classList.toggle('on', S.bag); save(); };
+$('clearT').onclick = () => { toppings.splice(0).forEach(t => { group.remove(t.mesh); t.mesh.material.dispose(); }); toast('🧽 스티커를 모두 뗐어요'); };
+$('shotT').onclick = () => {
+  renderer.render(scene, camera);
+  canvas.toBlob(b => {
+    if (!b) return; const file = new File([b], 'jj-squishy.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file], title: 'JJ 그림 말랑이' }).catch(() => {});
+    else { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'jj-squishy.png'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
+  }, 'image/png');
+};
+const sq = $('squeezeBtn');
+const sqOn = e => { e.preventDefault(); btnSqueeze = true; sq.classList.add('pressing'); feedback(1); countUp(); };
+const sqOff = () => { btnSqueeze = false; sq.classList.remove('pressing'); };
+sq.addEventListener('pointerdown', sqOn); addEventListener('pointerup', sqOff); addEventListener('pointercancel', sqOff);
+addEventListener('keydown', e => { if (e.code === 'Space' && !btnSqueeze) sqOn(e); });
+addEventListener('keyup', e => { if (e.code === 'Space') sqOff(); });
+
+// ---------------- 🖼 그림 고르기 ----------------
+let WORKS = [], idx = 0;
+function loadImg(srcs) {
+  return new Promise((res, rej) => { let k = 0; const im = new Image(); im.decoding = 'async';
+    im.onload = () => res(im); im.onerror = () => { k++; k < srcs.length ? im.src = srcs[k] : rej(); }; im.src = srcs[0]; });
+}
+async function setArt(i, quiet) {
+  if (!WORKS.length) return; idx = (i + WORKS.length) % WORKS.length; const w = WORKS[idx];
+  $('artName').textContent = `🖼 ${w.title}`; S.art = w.id; save();
+  try { artImg = await loadImg([`thumbs/m/${w.id}.webp`, `thumbs/${w.id}.webp`]); } catch (e) { artImg = null; }
+  if (WORKS[idx] !== w) return; drawTex(); if (!quiet) { feedback(.5); bounce = 1; }
+}
+$('prevA').onclick = () => setArt(idx - 1); $('nextA').onclick = () => setArt(idx + 1);
+$('luckyA').onclick = () => {
+  if (!WORKS.length) return;
+  const rnd = () => WORKS[Math.random() * WORKS.length | 0];
+  if (window.JJLucky) {
+    JJLucky.open({ title: '말랑이 그림 뽑기', sub: '캡슐 속 그림이 말랑이에 프린트돼요', balls: 3, goText: '🔮 그림 뽑기!', okText: '이 그림으로 말랑!',
+      prizes: () => { const w = rnd(); return { icon: '🫧', title: w.title, desc: '이 그림으로 말랑이를 만들어요!', art: w.id, label: '럭키볼에서 나온 그림은', say: w.title + '!', data: w }; },
+      onPick: p => setArt(WORKS.indexOf(p.data)) });
+  } else setArt(WORKS.indexOf(rnd()));
+};
+(async () => {
+  drawTex();
+  try { const r = await fetch('thumbs/index.json', { cache: 'no-cache' }); const j = await r.json(); WORKS = (j.works || []).map(w => ({ id: w.id, title: w.title || ('JJ의 그림 ' + w.id) })); } catch (e) {}
+  if (!WORKS.length) { $('artName').textContent = 'JJ 말랑이'; return; }
+  const s = WORKS.findIndex(w => w.id === S.art);
+  setArt(s >= 0 ? s : Math.random() * WORKS.length | 0, true);
+})();
+
+// ---------------- 🌀 물리 ----------------
+const vP = new THREE.Vector3(), vO = new THREE.Vector3(), vV = new THREE.Vector3(), vD = new THREE.Vector3();
+let bounce = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  const sqz = isSqueezing(), t = Date.now();
+  group.rotation.y += ((sqz ? .55 : Math.sin(t * .0012) * .1) - group.rotation.y) * .12;
+  group.rotation.x += ((sqz ? -.2 : 0) - group.rotation.x) * .12;
+  if (bounce > 0) { bounce *= .9; group.scale.setScalar(1 + Math.sin(bounce * 12) * bounce * .06); if (bounce < .01) { bounce = 0; group.scale.setScalar(1); } }
+  const lh = (hit && mode === 'squish' && !sqz) ? group.worldToLocal(hit.clone()) : null;
+  for (let i = 0; i < pos.count; i++) {
+    const k = i * 3;
+    vP.set(pos.getX(i), pos.getY(i), pos.getZ(i)); vO.set(orig[k], orig[k + 1], orig[k + 2]); vV.set(vel[k], vel[k + 1], vel[k + 2]);
+    if (lh) {
+      const d = vP.distanceTo(lh), R = .72;
+      if (d < R) vV.z -= Math.pow(1 - d / R, 2) * .065 * Math.sign(vO.z || 1);
+      else if (d < R * 1.35) vV.z += (1 - Math.abs(d - R) / (R * .35)) * .012 * Math.sign(vO.z || 1);
+    }
+    if (sqz) { vV.y -= vO.y * .032; vV.x -= vO.x * .012; vV.z += Math.sign(vO.z || 1) * .028; }
+    vD.subVectors(vO, vP); vV.addScaledVector(vD, .055); vV.multiplyScalar(.82); vP.add(vV);
+    pos.setXYZ(i, vP.x, vP.y, vP.z); vel[k] = vV.x; vel[k + 1] = vV.y; vel[k + 2] = vV.z;
+  }
+  pos.needsUpdate = true; geometry.computeVertexNormals();
+  for (const tp of toppings) {
+    tp.mesh.position.set(pos.getX(tp.vi), pos.getY(tp.vi), pos.getZ(tp.vi) + tp.off);
+    tp.mesh.scale.set(sqz ? .85 : 1, sqz ? .75 : 1, 1);
+  }
+  if (bag.visible) {
+    const f = sqz ? .7 : 1, wob = (lh || sqz);
+    for (let i = 0; i < bagPos.count; i++) {
+      const bx = bagOrig[i * 3], by = bagOrig[i * 3 + 1];
+      bagPos.setXYZ(i, bx, by * f, bagOrig[i * 3 + 2] + (wob ? Math.sin(bx * 8 + t * .015) * .03 : 0));
+    }
+    bagPos.needsUpdate = true; bagGeo.computeVertexNormals();
+    hang.position.y = 2.2 * f;
+  }
+  renderer.render(scene, camera);
+}
+fit(); addEventListener('resize', fit); setTimeout(fit, 300);
+animate();
+addEventListener('pagehide', save); document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+</script>
+<script src="paint-icon.js"></script>
+</body>
+</html>
