@@ -5743,7 +5743,7 @@
         hidden: { i: '🔍', t: () => tt('hdT', '숨은그림찾기'), d: () => tt('hdD', ''), go: "openExtGame('hidden.html', '🔍 ' + t('hdT'))" },
         catch: { i: '🎒', t: () => 'JJ 그림 뽑기', d: () => '집게로 그림 키링을 뽑아 도감 채우기', go: "openExtGame('catch.html', '🎒 JJ 그림 뽑기')", nw: 1 },
         tama: { i: '🥚', t: () => 'JJ 아틀리에 다마고치', d: () => '알을 키워 꼬마화가로! 그림 포카 모으기', go: "openExtGame('tama.html', '🥚 JJ 다마고치')", nw: 1 },
-        malang: { i: '🍡', t: () => 'JJ 말랑꾹', d: () => '말랑이 쭉~ · 왁뿌 볼 와작 · 키캡 딸깍', go: "openExtGame('malang.html', '🍡 JJ 말랑꾹')", nw: 1 },
+        malang: { i: '🍡', t: () => 'JJ 꾸욱꾸욱', d: () => '말랑이 쭉~ · 왁뿌 볼 와작 · 키캡 딸깍', go: "openExtGame('malang.html', '🍡 JJ 꾸욱꾸욱')", nw: 1 },
         squishy: { i: '🫧', t: () => 'JJ 그림 말랑이', d: () => '그림이 프린트된 말랑이를 꾹꾹 · 꽉!', go: "openExtGame('squishy.html', '🫧 JJ 그림 말랑이')", nw: 1 },
         drive: { i: '🛴', t: () => tt('driveT', '네온 킥보드 3D'), d: () => tt('driveD', ''), go: 'openDrive()' },
         kwc: { i: '🔤', t: () => tt('kwcT', '끝말잇기'), d: () => tt('kwcD', ''), go: `openExtGame('${EXT.kwc}', '🔤 ' + t('kwcT'))` },
@@ -5800,7 +5800,7 @@
         kwc: { i: '🔤', tx: '끝말잇기 한 판', n: 1 }, study: { i: '📚', tx: '공부방 자료 보기', n: 1 }, af: { i: '✈️', tx: '아트 플라이트 속담 맞히기', n: 1 }, shop: { i: '🛒', tx: 'JJ 간식가게 손님 받기', n: 1 },
         hidden: { i: '🔍', tx: '숨은그림찾기 한 판', n: 1 }, puzzle: { i: '🧩', tx: '그림 퍼즐 맞추기', n: 1 }, cube: { i: '🧊', tx: '그림 큐브 돌리기', n: 1 }, balance: { i: '⚖️', tx: '밸런스 게임 하기', n: 1 },
         nunchi: { i: '👀', tx: '눈치 게임 하기', n: 1 }, mem: { i: '🧠', tx: '아트메모리 도전', n: 1 }, anim: { i: '✨', tx: '그림 움직여 보기', n: 1 }, story: { i: '📖', tx: 'JJ 그림책 읽기', n: 1 },
-        drive: { i: '🛴', tx: '킥보드 3D 타기', n: 1 }, sheet: { i: '🖨', tx: '색칠 도안 만들기', n: 1 }, catch: { i: '🎒', tx: 'JJ 그림 뽑기 한 판', n: 1 }, squishy: { i: '🫧', tx: 'JJ 그림 말랑이 꾹꾹', n: 1 }, malang: { i: '🍡', tx: 'JJ 말랑꾹 한 판', n: 1 }, tama: { i: '🥚', tx: '다마고치 돌보기', n: 1 }
+        drive: { i: '🛴', tx: '킥보드 3D 타기', n: 1 }, sheet: { i: '🖨', tx: '색칠 도안 만들기', n: 1 }, catch: { i: '🎒', tx: 'JJ 그림 뽑기 한 판', n: 1 }, squishy: { i: '🫧', tx: 'JJ 그림 말랑이 꾹꾹', n: 1 }, malang: { i: '🍡', tx: 'JJ 꾸욱꾸욱 한 판', n: 1 }, tama: { i: '🥚', tx: '다마고치 돌보기', n: 1 }
       };
       function seedRand(str) { let h = 2166136261; for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 10000) / 10000; }; }
       const MPOOLS = [['view', 'cheer'], ['kwc', 'study', 'af', 'shop'], ['hidden', 'puzzle', 'cube', 'balance', 'nunchi', 'mem', 'anim', 'story', 'drive', 'sheet', 'catch', 'squishy', 'malang', 'tama']];

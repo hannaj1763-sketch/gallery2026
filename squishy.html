@@ -46,6 +46,16 @@
     background: linear-gradient(#a78bfa, #7c3aed); box-shadow: 0 5px 0 #3b2a45; touch-action: none; }
   .squeeze.pressing { transform: translateY(4px); box-shadow: 0 1px 0 #3b2a45; background: linear-gradient(#8b5cf6, #6d28d9); }
   .hint { font-size: 11.5px; color: #7a6875; text-align: center; margin-top: 6px; }
+  /* 터치 중 UI 자동 숨김 (동영상 몰입 연출) */
+  #top, #tool { transition: opacity .22s ease, transform .22s ease; }
+  body.playing #top { opacity: 0; transform: translateY(-16px); pointer-events: none; }
+  body.playing #tool { opacity: 0; transform: translate(-50%, 16px); pointer-events: none; }
+  /* 왁스 파괴 COMBO 팝업 */
+  #combo { position: fixed; left: 50%; top: 26%; transform: translate(-50%, -50%) scale(.5); white-space: nowrap;
+    font-size: 32px; font-weight: 900; color: #fde047; pointer-events: none; opacity: 0; z-index: 8;
+    text-shadow: -2px -2px 0 #3b2a45, 2px -2px 0 #3b2a45, -2px 2px 0 #3b2a45, 2px 2px 0 #3b2a45, 0 5px 0 #3b2a45;
+    transition: transform .18s cubic-bezier(.18,.89,.32,1.28), opacity .25s; }
+  #combo.pop { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
 </style>
 </head>
 <body>
@@ -78,6 +88,8 @@
   </div>
   <div class="row">
     <button class="btn on" data-mode="squish">👆 꾹</button>
+    <button class="btn" id="waxT">🧊 왁스코팅</button>
+    <button class="btn sm" id="resetWaxT" title="코팅 다시 씌우기">🔄</button>
     <button class="btn" data-mode="paint">🎨 물감방울</button>
     <button class="btn" data-mode="star">⭐ 별</button>
     <button class="btn sm" id="clearT">🧽</button>
@@ -87,6 +99,7 @@
   <div class="hint">손가락으로 꾹 · 두 손가락이면 꽉! · 스티커는 말랑이에 붙어서 같이 찌그러져요</div>
 </div>
 <div id="toast"></div>
+<div id="combo"></div>
 
 <script src="luckyball.js"></script>
 <script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }</script>
@@ -122,6 +135,23 @@ $('cnt').textContent = `말랑 ${S.n}번`;
 
 // ---------------- 🔊 말랑 + 비닐 바스락 소리 ----------------
 let audioCtx = null;
+// 왁스 코팅이 깨질 때 날카로운 '파사삭' 크랙 사운드
+function playWaxCrack(n = 1) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const now = audioCtx.currentTime;
+    for (let k = 0; k < Math.min(4, n); k++) {
+      const at = now + k * .025 + Math.random() * .01;
+      const wn = audioCtx.sampleRate * .09 | 0, wbuf = audioCtx.createBuffer(1, wn, audioCtx.sampleRate), wd = wbuf.getChannelData(0);
+      for (let i = 0; i < wn; i++) wd[i] = (Math.random() > .3 ? 1 : -1) * Math.random() * Math.exp(-i / (wn * .25));
+      const wsrc = audioCtx.createBufferSource(); wsrc.buffer = wbuf;
+      const wf = audioCtx.createBiquadFilter(); wf.type = 'highpass'; wf.frequency.value = 3000 + Math.random() * 900;
+      const wg = audioCtx.createGain(); wg.gain.setValueAtTime(.28, at); wg.gain.exponentialRampToValueAtTime(.001, at + .09);
+      wsrc.connect(wf).connect(wg).connect(audioCtx.destination); wsrc.start(at);
+    }
+  } catch (e) {}
+}
 function playSquish(intensity = .5, bag = true) {
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -276,6 +306,90 @@ function addTopping(lp, type) {
 }
 [[-1.05, .95, 'star'], [1.05, -1.0, 'star'], [1.1, .85, 'paint'], [-1.1, -.9, 'paint'], [0, -1.32, 'paint']].forEach(p => addTopping(new THREE.Vector3(p[0], p[1], .3), p[2]));
 
+// ---------------- 🧊 왁스 코팅 (왁뿌) ----------------
+//  말랑이 겉에 반짝이는 왁스 조각들이 덮여 있어요. 누르면 파사삭! 깨져 떨어지고, 다 벗기면 다시 말랑말랑
+//  · 조각은 표면 정점에 붙어 있어서 말랑이와 같이 움직여요 · 🔄 로 다시 코팅
+const WAXC = [0xfbcfe8, 0xddd6fe, 0xbae6fd, 0xfef08a, 0xbbf7d0];
+const waxGeo = new THREE.CylinderGeometry(.15, .15, .05, 6); waxGeo.rotateX(Math.PI / 2);
+const waxMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: .05, metalness: 0, clearcoat: 1, clearcoatRoughness: .02, transparent: true, opacity: .78, iridescence: .85, sheen: .5 });
+const waxSlots = [];
+for (let i = 0; i < pos.count; i++) {
+  const x = orig[i * 3], y = orig[i * 3 + 1], z = orig[i * 3 + 2];
+  if (Math.abs(z) < .08) continue;
+  let ok = true; for (const j of waxSlots) { const dx = orig[j * 3] - x, dy = orig[j * 3 + 1] - y, dz = orig[j * 3 + 2] - z; if (dx * dx + dy * dy + dz * dz < .062) { ok = false; break; } }
+  if (ok) waxSlots.push(i);
+}
+const WN = waxSlots.length;
+const wax = new THREE.InstancedMesh(waxGeo, waxMat, WN); wax.renderOrder = 2; group.add(wax);
+const waxAlive = new Uint8Array(WN), waxRot = new Float32Array(WN);
+const nrm = geometry.attributes.normal, _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3(), _n = new THREE.Vector3(), _z = new THREE.Vector3(0, 0, 1), _c = new THREE.Color();
+const flying = []; // 떨어지는 조각 { mesh, v, spin }
+const flyGeo = new THREE.TetrahedronGeometry(.1);
+let waxOn = !!S.wax, waxLeft = 0, combo = 0, comboT = 0, comboHideT = 0;
+for (let i = 0; i < WN; i++) waxRot[i] = Math.random() * 6.28;
+// 왁스 색: 말랑이 색을 하얗게 섞고, 조각마다 살짝 무지갯빛이 돌아요
+function waxTint() { const base = new THREE.Color().copy(baseMat.color); for (let i = 0; i < WN; i++) wax.setColorAt(i, _c.copy(base).lerp(new THREE.Color(WAXC[i % WAXC.length]), .25).lerp(new THREE.Color(0xffffff), .45 + Math.random() * .15)); if (wax.instanceColor) wax.instanceColor.needsUpdate = true; }
+waxTint();
+function waxCoat() { for (let i = 0; i < WN; i++) waxAlive[i] = 1; waxLeft = WN; waxTint(); wax.visible = true; }
+function waxUpdate() {
+  if (!wax.visible) return;
+  for (let i = 0; i < WN; i++) {
+    if (!waxAlive[i]) { _m.makeScale(0, 0, 0); wax.setMatrixAt(i, _m); continue; }
+    const v = waxSlots[i];
+    _p.set(pos.getX(v), pos.getY(v), pos.getZ(v)); _n.set(nrm.getX(v), nrm.getY(v), nrm.getZ(v)).normalize();
+    _p.addScaledVector(_n, .03);
+    _q.setFromUnitVectors(_z, _n); _q.multiply(new THREE.Quaternion().setFromAxisAngle(_z, waxRot[i]));
+    _m.compose(_p, _q, _s.set(1, 1, 1)); wax.setMatrixAt(i, _m);
+  }
+  wax.instanceMatrix.needsUpdate = true;
+}
+function waxBreakNear(lp, rad, maxN) {
+  if (!waxOn || !waxLeft) return 0;
+  let n = 0;
+  const cand = [];
+  for (let i = 0; i < WN; i++) {
+    if (!waxAlive[i]) continue; const v = waxSlots[i];
+    const d = Math.hypot(pos.getX(v) - lp.x, pos.getY(v) - lp.y, pos.getZ(v) - lp.z);
+    if (d < rad) cand.push([d, i]);
+  }
+  cand.sort((a, b) => a[0] - b[0]);
+  for (const [, i] of cand.slice(0, maxN)) { waxAlive[i] = 0; waxLeft--; n++; spawnFly(i); }
+  if (n) onWaxBreak(n);
+  return n;
+}
+function spawnFly(i) {
+  const v = waxSlots[i]; wax.getColorAt(i, _c);
+  for (let k = 0; k < 2; k++) {
+    const m = new THREE.Mesh(flyGeo, new THREE.MeshPhysicalMaterial({ color: _c.clone(), roughness: .1, clearcoat: 1, transparent: true, opacity: .9 }));
+    m.position.set(pos.getX(v), pos.getY(v), pos.getZ(v)); m.scale.setScalar(.6 + Math.random() * .8);
+    const sz = Math.sign(orig[v * 3 + 2] || 1);
+    flying.push({ m, v: new THREE.Vector3(pos.getX(v) * .03 + (Math.random() - .5) * .06, .04 + Math.random() * .05, sz * (.05 + Math.random() * .06)), spin: new THREE.Vector3(Math.random() * .3, Math.random() * .3, Math.random() * .3), life: 1 });
+    group.add(m);
+  }
+}
+function flyUpdate() {
+  for (let i = flying.length - 1; i >= 0; i--) {
+    const f = flying[i]; f.v.y -= .006; f.m.position.add(f.v); f.m.rotation.x += f.spin.x; f.m.rotation.y += f.spin.y; f.life -= .02;
+    f.m.material.opacity = Math.max(0, f.life);
+    if (f.life <= 0) { group.remove(f.m); f.m.material.dispose(); flying.splice(i, 1); }
+  }
+}
+function onWaxBreak(n) {
+  playWaxCrack(n); try { navigator.vibrate && navigator.vibrate(n > 3 ? [30, 15, 40] : [18, 10, 22]); } catch (e) {}
+  const now = Date.now(); combo = now - comboT < 900 ? combo + n : n; comboT = now;
+  const c = $('combo');
+  c.textContent = waxLeft <= 0 ? '✨ 왁스 완전 정복! ✨' : combo >= 3 ? `와작! COMBO ×${combo}` : '파사삭!';
+  c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop');
+  clearTimeout(comboHideT); comboHideT = setTimeout(() => c.classList.remove('pop'), 650);
+  if (waxLeft <= 0) { wax.visible = false; bounce = 1; setTimeout(() => toast('🔄 를 누르면 다시 코팅돼요'), 900); }
+  for (let k = 0; k < n; k++) countUp();
+}
+function setWax(on) {
+  waxOn = on; S.wax = on; save(); $('waxT').classList.toggle('on', on);
+  if (on) { if (!waxLeft) waxCoat(); wax.visible = waxLeft > 0; toast('🧊 왁스 코팅! 꾹 눌러서 깨 보세요'); }
+  else wax.visible = false;
+}
+
 // ---------------- 👆 조작 ----------------
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
 const pointers = new Map();
@@ -289,26 +403,31 @@ function pick(e) {
 }
 canvas.addEventListener('pointerdown', e => {
   pointers.set(e.pointerId, 1); try { canvas.setPointerCapture(e.pointerId); } catch (er) {}
-  if (pointers.size >= 2) { hit = null; feedback(1); countUp(); return; }
+  clearTimeout(playT); document.body.classList.add('playing');
+  if (pointers.size >= 2) { hit = null; feedback(1); countUp(); if (waxOn) for (let k = 0; k < 3; k++) waxBreakNear(new THREE.Vector3((Math.random() - .5) * 2.4, (Math.random() - .5) * 2.4, (Math.random() < .5 ? -1 : 1) * .5), .9, 4); return; }
   const p = pick(e); if (!p) return;
+  if (mode === 'squish' && waxOn && waxLeft) waxBreakNear(group.worldToLocal(p.clone()), .42, 5);
   if (mode !== 'squish') { addTopping(group.worldToLocal(p.clone()), mode); feedback(.4); return; }
   pressId = e.pointerId; hit = p; feedback(.75); countUp();
 });
 canvas.addEventListener('pointermove', e => {
   if (e.pointerId !== pressId || mode !== 'squish' || pointers.size >= 2) return;
-  const p = pick(e); hit = p; if (p) feedback(.55);
+  const p = pick(e); hit = p; if (p) { feedback(.55); if (waxOn && waxLeft && Math.random() < .5) waxBreakNear(group.worldToLocal(p.clone()), .3, 2); }
 });
-const up = e => { pointers.delete(e.pointerId); if (e.pointerId === pressId) { pressId = null; hit = null; } };
+let playT = 0;
+const up = e => { pointers.delete(e.pointerId); if (e.pointerId === pressId) { pressId = null; hit = null; } if (!pointers.size && !btnSqueeze) { clearTimeout(playT); playT = setTimeout(() => document.body.classList.remove('playing'), 700); } };
 canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
 
 document.querySelectorAll('.cbtn').forEach(b => b.addEventListener('click', () => {
-  baseMat.color.set(b.dataset.color); S.color = b.dataset.color; save();
+  baseMat.color.set(b.dataset.color); S.color = b.dataset.color; save(); waxTint();
   document.querySelectorAll('.cbtn').forEach(x => x.classList.toggle('on', x === b));
 }));
 document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
   mode = b.dataset.mode; document.querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('on', x === b));
   if (mode !== 'squish') toast(mode === 'star' ? '⭐ 말랑이를 톡 누르면 별이 붙어요' : '🎨 말랑이를 톡 누르면 물감방울이 붙어요');
 }));
+$('waxT').onclick = () => setWax(!waxOn);
+$('resetWaxT').onclick = () => { waxCoat(); setWax(true); };
 if (S.color) document.querySelectorAll('.cbtn').forEach(x => x.classList.toggle('on', x.dataset.color === S.color));
 $('faceT').classList.toggle('on', S.face);
 $('faceT').onclick = () => { S.face = !S.face; $('faceT').classList.toggle('on', S.face); drawTex(); save(); };
@@ -324,7 +443,7 @@ $('shotT').onclick = () => {
   }, 'image/png');
 };
 const sq = $('squeezeBtn');
-const sqOn = e => { e.preventDefault(); btnSqueeze = true; sq.classList.add('pressing'); feedback(1); countUp(); };
+const sqOn = e => { e.preventDefault(); btnSqueeze = true; sq.classList.add('pressing'); feedback(1); countUp(); if (waxOn && waxLeft) setTimeout(() => { for (let k = 0; k < 4; k++) waxBreakNear(new THREE.Vector3((Math.random() - .5) * 2.6, (Math.random() < .5 ? -1 : 1) * (.6 + Math.random() * .7), (Math.random() < .5 ? -1 : 1) * .5), .8, 3); }, 120); };
 const sqOff = () => { btnSqueeze = false; sq.classList.remove('pressing'); };
 sq.addEventListener('pointerdown', sqOn); addEventListener('pointerup', sqOff); addEventListener('pointercancel', sqOff);
 addEventListener('keydown', e => { if (e.code === 'Space' && !btnSqueeze) sqOn(e); });
@@ -370,12 +489,13 @@ function animate() {
   group.rotation.x += ((sqz ? -.2 : 0) - group.rotation.x) * .12;
   if (bounce > 0) { bounce *= .9; group.scale.setScalar(1 + Math.sin(bounce * 12) * bounce * .06); if (bounce < .01) { bounce = 0; group.scale.setScalar(1); } }
   const lh = (hit && mode === 'squish' && !sqz) ? group.worldToLocal(hit.clone()) : null;
+  const waxStiff = waxOn && WN ? 1 - .6 * (waxLeft / WN) : 1;   // 코팅이 많이 남았을수록 단단해요
   for (let i = 0; i < pos.count; i++) {
     const k = i * 3;
     vP.set(pos.getX(i), pos.getY(i), pos.getZ(i)); vO.set(orig[k], orig[k + 1], orig[k + 2]); vV.set(vel[k], vel[k + 1], vel[k + 2]);
     if (lh) {
       const d = vP.distanceTo(lh), R = .72;
-      if (d < R) vV.z -= Math.pow(1 - d / R, 2) * .065 * Math.sign(vO.z || 1);
+      if (d < R) vV.z -= Math.pow(1 - d / R, 2) * .065 * waxStiff * Math.sign(vO.z || 1);
       else if (d < R * 1.35) vV.z += (1 - Math.abs(d - R) / (R * .35)) * .012 * Math.sign(vO.z || 1);
     }
     if (sqz) { vV.y -= vO.y * .032; vV.x -= vO.x * .012; vV.z += Math.sign(vO.z || 1) * .028; }
@@ -383,6 +503,7 @@ function animate() {
     pos.setXYZ(i, vP.x, vP.y, vP.z); vel[k] = vV.x; vel[k + 1] = vV.y; vel[k + 2] = vV.z;
   }
   pos.needsUpdate = true; geometry.computeVertexNormals();
+  waxUpdate(); flyUpdate();
   for (const tp of toppings) {
     tp.mesh.position.set(pos.getX(tp.vi), pos.getY(tp.vi), pos.getZ(tp.vi) + tp.off);
     tp.mesh.scale.set(sqz ? .85 : 1, sqz ? .75 : 1, 1);
@@ -398,6 +519,7 @@ function animate() {
   }
   renderer.render(scene, camera);
 }
+if (waxOn) waxCoat(); else wax.visible = false; $('waxT').classList.toggle('on', waxOn);
 fit(); addEventListener('resize', fit); setTimeout(fit, 300);
 animate();
 addEventListener('pagehide', save); document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
