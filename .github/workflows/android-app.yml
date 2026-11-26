@@ -491,6 +491,8 @@ jobs:
           grep -q ACCESS_COARSE_LOCATION app-build/android/app/src/main/AndroidManifest.xml || sed -i 's#<application#<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <application#' app-build/android/app/src/main/AndroidManifest.xml
           # 끝말잇기 마이크: 마이크 권한 + 휴대폰 음성 인식 서비스 찾기(안드로이드 11 이상)
           grep -q RECORD_AUDIO app-build/android/app/src/main/AndroidManifest.xml || sed -i 's#<application#<uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <queries>\n        <intent>\n            <action android:name="android.speech.RecognitionService" />\n        </intent>\n    </queries>\n    <application#' app-build/android/app/src/main/AndroidManifest.xml
+          # 말랑꾹·키캡·왁뿌 볼 진동: 웹(navigator.vibrate)에서 진동을 쓰려면 진동 권한이 필요해요
+          grep -q android.permission.VIBRATE app-build/android/app/src/main/AndroidManifest.xml || sed -i 's#<application#<uses-permission android:name="android.permission.VIBRATE" />\n    <application#' app-build/android/app/src/main/AndroidManifest.xml
           cat app-build/android/app/src/main/AndroidManifest.xml
 
       - name: 같은 서명 키 쓰기 (업데이트 설치가 되도록)
