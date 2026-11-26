@@ -5703,7 +5703,7 @@
         const keys = Object.keys(s.days).sort(); if (keys.length > 420) keys.slice(0, keys.length - 420).forEach(k => delete s.days[k]);
         put(K_ST, s);
       }
-      const PLAYKEYS = new Set(['lineup', 'catch', 'malang', 'squishy', 'pang', 'mem', 'throw', 'cm', 'ksc', 'puzzle', 'cube', 'balance', 'nunchi', 'hidden', 'drive', 'kwc', 'study', 'af', 'shop', 'song', 'coloring', 'word', 'beam', 'emo', 'anim', 'show', 'recap', 'story', 'card', 'sheet']);
+      const PLAYKEYS = new Set(['lineup', 'catch', 'tama', 'malang', 'squishy', 'pang', 'mem', 'throw', 'cm', 'ksc', 'puzzle', 'cube', 'balance', 'nunchi', 'hidden', 'drive', 'kwc', 'study', 'af', 'shop', 'song', 'coloring', 'word', 'beam', 'emo', 'anim', 'show', 'recap', 'story', 'card', 'sheet']);
       function track(key, n = 1) {
         const s = st(), d = today();
         const day = s.days[d] = s.days[d] || {};
@@ -5742,6 +5742,7 @@
         nunchi: { i: '👀', t: () => tt('ncT', '눈치 게임'), d: () => tt('ncD', ''), go: "openExtGame('nunchi.html', '👀 ' + t('ncT'))" },
         hidden: { i: '🔍', t: () => tt('hdT', '숨은그림찾기'), d: () => tt('hdD', ''), go: "openExtGame('hidden.html', '🔍 ' + t('hdT'))" },
         catch: { i: '🎒', t: () => 'JJ 그림 뽑기', d: () => '집게로 그림 키링을 뽑아 도감 채우기', go: "openExtGame('catch.html', '🎒 JJ 그림 뽑기')", nw: 1 },
+        tama: { i: '🥚', t: () => 'JJ 아틀리에 다마고치', d: () => '알을 키워 꼬마화가로! 그림 포카 모으기', go: "openExtGame('tama.html', '🥚 JJ 다마고치')", nw: 1 },
         malang: { i: '🍡', t: () => 'JJ 말랑꾹', d: () => '말랑이 쭉~ · 왁뿌 볼 와작 · 키캡 딸깍', go: "openExtGame('malang.html', '🍡 JJ 말랑꾹')", nw: 1 },
         squishy: { i: '🫧', t: () => 'JJ 그림 말랑이', d: () => '그림이 프린트된 말랑이를 꾹꾹 · 꽉!', go: "openExtGame('squishy.html', '🫧 JJ 그림 말랑이')", nw: 1 },
         drive: { i: '🛴', t: () => tt('driveT', '네온 킥보드 3D'), d: () => tt('driveD', ''), go: 'openDrive()' },
@@ -5765,7 +5766,7 @@
         badge: { i: '🏅', t: () => '배지 도감', d: () => '모은 배지를 확인해요', go: "jxMyRecord('jxBadges')", nw: 1 }
       };
       const AREAS = [
-        { id: 'game', e: '🎮', l: '게임', c: '#ef4444', x: 21, y: 38, keys: ['catch', 'malang', 'squishy', 'pang', 'mem', 'throw', 'cm', 'ksc', 'puzzle', 'cube', 'balance', 'nunchi', 'hidden', 'drive'] },
+        { id: 'game', e: '🎮', l: '게임', c: '#ef4444', x: 21, y: 38, keys: ['catch', 'tama', 'malang', 'squishy', 'pang', 'mem', 'throw', 'cm', 'ksc', 'puzzle', 'cube', 'balance', 'nunchi', 'hidden', 'drive'] },
         { id: 'smart', e: '🧠', l: '똑똑해지기', c: '#f59e0b', x: 44, y: 24, keys: ['kwc', 'study', 'af', 'shop'] },
         { id: 'theater', e: '🎬', l: 'JJ 극장', c: '#a855f7', x: 67, y: 27, keys: ['anim', 'show', 'recap', 'story', 'card', 'sheet'] },
         { id: 'music', e: '🎵', l: '그림×음악', c: '#3b82f6', x: 23, y: 71, keys: ['song', 'coloring'] },
@@ -5778,7 +5779,7 @@
         if (u.includes('korean-word-chain')) return 'kwc'; if (u.includes('art-flight')) return 'af';
         if (u.includes('mode=shop')) return 'shop'; if (u.includes('k-snack')) return 'ksc';
         if (u.includes('Drive-3D')) return 'drive'; if (u.includes('color-merge')) return 'cm';
-        const m = u.match(/(puzzle|cube|balance|nunchi|hidden|study|catch|squishy|malang)\.html/); return m ? m[1] : '';
+        const m = u.match(/(puzzle|cube|balance|nunchi|hidden|study|catch|squishy|malang|tama)\.html/); return m ? m[1] : '';
       }
 
       // ---------------- 🎄 계절 ----------------
@@ -5799,10 +5800,10 @@
         kwc: { i: '🔤', tx: '끝말잇기 한 판', n: 1 }, study: { i: '📚', tx: '공부방 자료 보기', n: 1 }, af: { i: '✈️', tx: '아트 플라이트 속담 맞히기', n: 1 }, shop: { i: '🛒', tx: 'JJ 간식가게 손님 받기', n: 1 },
         hidden: { i: '🔍', tx: '숨은그림찾기 한 판', n: 1 }, puzzle: { i: '🧩', tx: '그림 퍼즐 맞추기', n: 1 }, cube: { i: '🧊', tx: '그림 큐브 돌리기', n: 1 }, balance: { i: '⚖️', tx: '밸런스 게임 하기', n: 1 },
         nunchi: { i: '👀', tx: '눈치 게임 하기', n: 1 }, mem: { i: '🧠', tx: '아트메모리 도전', n: 1 }, anim: { i: '✨', tx: '그림 움직여 보기', n: 1 }, story: { i: '📖', tx: 'JJ 그림책 읽기', n: 1 },
-        drive: { i: '🛴', tx: '킥보드 3D 타기', n: 1 }, sheet: { i: '🖨', tx: '색칠 도안 만들기', n: 1 }, catch: { i: '🎒', tx: 'JJ 그림 뽑기 한 판', n: 1 }, squishy: { i: '🫧', tx: 'JJ 그림 말랑이 꾹꾹', n: 1 }, malang: { i: '🍡', tx: 'JJ 말랑꾹 한 판', n: 1 }
+        drive: { i: '🛴', tx: '킥보드 3D 타기', n: 1 }, sheet: { i: '🖨', tx: '색칠 도안 만들기', n: 1 }, catch: { i: '🎒', tx: 'JJ 그림 뽑기 한 판', n: 1 }, squishy: { i: '🫧', tx: 'JJ 그림 말랑이 꾹꾹', n: 1 }, malang: { i: '🍡', tx: 'JJ 말랑꾹 한 판', n: 1 }, tama: { i: '🥚', tx: '다마고치 돌보기', n: 1 }
       };
       function seedRand(str) { let h = 2166136261; for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 10000) / 10000; }; }
-      const MPOOLS = [['view', 'cheer'], ['kwc', 'study', 'af', 'shop'], ['hidden', 'puzzle', 'cube', 'balance', 'nunchi', 'mem', 'anim', 'story', 'drive', 'sheet', 'catch', 'squishy', 'malang']];
+      const MPOOLS = [['view', 'cheer'], ['kwc', 'study', 'af', 'shop'], ['hidden', 'puzzle', 'cube', 'balance', 'nunchi', 'mem', 'anim', 'story', 'drive', 'sheet', 'catch', 'squishy', 'malang', 'tama']];
       function missions(d = today()) {
         const s = get(K_ST, {}) || {}, mp = (s.mpick || {})[d];
         if (mp && mp.length === 3) return mp;

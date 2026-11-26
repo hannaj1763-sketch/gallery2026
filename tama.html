@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>JJ 아틀리에 다마고치</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+  body {
+    font-family: 'Jua', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    background: radial-gradient(circle at 50% 30%, #fff7fb 0%, #fce7f3 50%, #ede9fe 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    color: #4a2545;
+  }
+
+  /* 상단 툴바 */
+  .top-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 12px;
+    max-width: 400px;
+  }
+  .pill-btn {
+    background: #fff;
+    border: 2px solid #f472b6;
+    color: #be185d;
+    border-radius: 16px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .pill-btn:active { transform: scale(0.95); background: #fdf2f8; }
+
+  .color-dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid #fff; cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  /* 다마고치 본체 (경량 플랫 스타일) */
+  .device {
+    width: 340px;
+    max-width: 96vw;
+    background: var(--shell-bg, #f9a8d4);
+    border: 4px solid var(--shell-border, #ec4899);
+    border-radius: 140px 140px 115px 115px / 170px 170px 125px 125px;
+    padding: 24px 20px 26px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 8px 0 var(--shell-border, #ec4899);
+    position: relative;
+  }
+
+  .brand-title {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #fff;
+    background: var(--shell-border, #ec4899);
+    padding: 3px 12px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+
+  /* LCD 베젤 & 화면 */
+  .bezel {
+    width: 100%;
+    background: #fff1f2;
+    border: 4px solid #fbcfe8;
+    border-radius: 22px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .status-strip {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: bold;
+    color: #831843;
+    padding: 0 4px 4px;
+  }
+
+  .icon-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 2px;
+    margin-bottom: 4px;
+  }
+  .menu-icon {
+    text-align: center;
+    font-size: 14px;
+    padding: 3px 0;
+    border-radius: 6px;
+    opacity: 0.35;
+    cursor: pointer;
+  }
+  .menu-icon.active {
+    opacity: 1;
+    background: #fce7f3;
+    outline: 2px solid #f472b6;
+  }
+
+  .lcd-wrap {
+    width: 100%;
+    aspect-ratio: 128 / 88;
+    background: #fffbeb;
+    border: 3px solid #cbd5e1;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    image-rendering: pixelated;
+  }
+
+  .msg-bar {
+    width: 100%;
+    margin-top: 5px;
+    background: #fdf2f8;
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #9d174d;
+    text-align: center;
+    min-height: 24px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* 물리 버튼 3개 */
+  .buttons {
+    display: flex;
+    gap: 24px;
+    margin-top: 16px;
+  }
+  .btn-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .hw-btn {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #fef08a;
+    border: 3px solid #eab308;
+    box-shadow: 0 4px 0 #ca8a04;
+    font-weight: 900;
+    font-size: 14px;
+    color: #854d0e;
+    cursor: pointer;
+  }
+  .hw-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #ca8a04;
+  }
+  .btn-label {
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+  }
+
+  /* 팝업 오버레이 (경량 모달) */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(74, 37, 69, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    z-index: 50;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-card {
+    background: #fff;
+    border: 3px solid #f472b6;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 340px;
+    padding: 16px;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    border-bottom: 2px dashed #fbcfe8;
+    padding-bottom: 6px;
+  }
+  .modal-title { font-size: 16px; font-weight: 900; color: #be185d; }
+  .close-btn {
+    background: #fce7f3; border: none; border-radius: 50%;
+    width: 28px; height: 28px; font-weight: bold; color: #be185d; cursor: pointer;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .action-card {
+    background: #fdf2f8;
+    border: 2px solid #fbcfe8;
+    border-radius: 12px;
+    padding: 10px 8px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    color: #831843;
+  }
+  .action-card:active { background: #fce7f3; transform: scale(0.97); }
+  .action-card small { display: block; font-size: 11px; color: #db2777; margin-top: 2px; font-weight: normal; }
+
+  .stat-row {
+    display: flex; justify-content: space-between;
+    padding: 6px 8px; background: #fff1f2; border-radius: 8px;
+    margin-bottom: 6px; font-size: 13px; font-weight: bold;
+  }
+
+  .name-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid #f472b6;
+    border-radius: 12px;
+    outline: none;
+    color: #4a2545;
+    margin-bottom: 8px;
+  }
+  .chip-wrap { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 12px; }
+  .chip {
+    background: #fce7f3; border: 1px solid #f472b6; color: #be185d;
+    border-radius: 12px; padding: 4px 9px; font-size: 12px; font-weight: bold; cursor: pointer;
+  }
+  .primary-btn {
+    width: 100%; padding: 10px; background: #ec4899; color: #fff;
+    border: none; border-radius: 12px; font-size: 14px; font-weight: bold; cursor: pointer;
+  }
+
+  .quiz-q {
+    background: #fef9c3; border: 2px solid #fde047; border-radius: 12px;
+    padding: 12px; font-size: 15px; font-weight: bold; text-align: center;
+    margin-bottom: 10px; color: #713f12;
+  }
+  .quiz-opt {
+    width: 100%; padding: 9px; margin-bottom: 6px;
+    background: #f0fdf4; border: 2px solid #86efac; border-radius: 10px;
+    font-weight: bold; font-size: 13px; color: #166534; cursor: pointer;
+  }
+  .back-pill { text-decoration: none; }
+  body.in-app .back-pill { display: none; }
+  .poka-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
+  .poka-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 2px solid #f9a8d4; background: #fff; }
+  .poka-grid .empty { aspect-ratio: 1; border-radius: 8px; border: 2px dashed #fbcfe8; display: flex; align-items: center; justify-content: center; color: #f9a8d4; font-size: 16px; }
+  .art-q img { display: block; width: 62%; aspect-ratio: 1; object-fit: cover; margin: 0 auto 8px; border-radius: 14px; border: 4px solid #fff; box-shadow: 0 0 0 2px #f472b6, 0 6px 14px rgba(0,0,0,.12); }
+  .reward { margin-top: 8px; font-size: 12px; text-align: center; color: #9d174d; }
+</style>
+</head>
+<body>
+
+  <!-- 상단 편의 기능 바 -->
+  <div class="top-bar">
+    <a class="pill-btn back-pill" href="./">← 갤러리</a>
+    <button class="pill-btn" onclick="openEggSelect()">🥚 알 고르기</button>
+    <button class="pill-btn" onclick="openNamingModal(false)">✏️ 이름 변경</button>
+    <button class="pill-btn" id="soundBtn" onclick="toggleSound()">🔊 소리 ON</button>
+    <div class="color-dot" style="background:#f9a8d4" onclick="setTheme('#f9a8d4','#ec4899')" title="딸기핑크"></div>
+    <div class="color-dot" style="background:#93c5fd" onclick="setTheme('#93c5fd','#3b82f6')" title="소다블루"></div>
+    <div class="color-dot" style="background:#86efac" onclick="setTheme('#86efac','#16a34a')" title="민트그린"></div>
+    <div class="color-dot" style="background:#d8b4fe" onclick="setTheme('#d8b4fe','#9333ea')" title="라벤더"></div>
+  </div>
+
+  <!-- 다마고치 본체 -->
+  <div class="device" id="device">
+    <div class="brand-title">🎨 JJ ATELIER TAMAGOTCHI ✨</div>
+
+    <div class="bezel">
+      <div class="status-strip">
+        <span id="topName">모모 (알)</span>
+        <span id="topCoin">⭐ 100</span>
+      </div>
+
+      <!-- 8개 메뉴 아이콘 -->
+      <div class="icon-row" id="iconRow">
+        <div class="menu-icon active" data-idx="0" onclick="selectMenu(0)">📊</div>
+        <div class="menu-icon" data-idx="1" onclick="selectMenu(1)">🍙</div>
+        <div class="menu-icon" data-idx="2" onclick="selectMenu(2)">📚</div>
+        <div class="menu-icon" data-idx="3" onclick="selectMenu(3)">🎨</div>
+        <div class="menu-icon" data-idx="4" onclick="selectMenu(4)">🔮</div>
+        <div class="menu-icon" data-idx="5" onclick="selectMenu(5)">🚿</div>
+        <div class="menu-icon" data-idx="6" onclick="selectMenu(6)">💡</div>
+        <div class="menu-icon" data-idx="7" onclick="selectMenu(7)">💉</div>
+      </div>
+
+      <!-- 128x88 컬러 LCD 캔버스 -->
+      <div class="lcd-wrap">
+        <canvas id="lcd" width="128" height="88"></canvas>
+      </div>
+
+      <div class="msg-bar" id="msgBar">A:선택  B:확인  C:취소</div>
+    </div>
+
+    <!-- 물리 버튼 -->
+    <div class="buttons">
+      <div class="btn-unit">
+        <button class="hw-btn" onclick="pressA()">A</button>
+        <span class="btn-label">선택</span>
+      </div>
+      <div class="btn-unit">
+        <button class="hw-btn" onclick="pressB()">B</button>
+        <span class="btn-label">확인</span>
+      </div>
+      <div class="btn-unit">
+        <button class="hw-btn" onclick="pressC()">C</button>
+        <span class="btn-label">취소</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 통합 팝업 모달 -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-title" id="modalTitle">메뉴</span>
+        <button class="close-btn" onclick="closeModal()">✕</button>
+      </div>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+<script>
+/* =========================================================
+   1. 경량 사운드 (Web Audio API 단순 비프음)
+========================================================= */
+let audioCtx = null;
+let soundOn = true;
+function beep(freq = 600, dur = 0.06) {
+  if (!soundOn) return;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = freq;
+    gain.gain.value = 0.04;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch (e) {}
+}
+function toggleSound() {
+  soundOn = !soundOn;
+  document.getElementById('soundBtn').textContent = soundOn ? '🔊 소리 ON' : '🔇 소리 OFF';
+  if (soundOn) beep(700, 0.08);
+}
+
+/* =========================================================
+   2. 5종 동물 데이터 & 오프스크린 스프라이트 캐시 (고속 렌더링)
+========================================================= */
+const SPECIES = {
+  rabbit: {
+    label: '🐰 토끼',
+    eggName: '핑크 리본 토끼 알',
+    defaultName: '루비',
+    body: '#ffffff', ear: '#f9a8d4', accent: '#ec4899',
+    stages: ['토끼 알', '아기 몽글이', '꼬마화가 루비', '수채화 박사 아리아', '벽화 아티스트 체리', '팝아트 스타 루나']
+  },
+  dog: {
+    label: '🐶 강아지',
+    eggName: '구름 솜사탕 강아지 알',
+    defaultName: '코코',
+    body: '#fef3c7', ear: '#93c5fd', accent: '#3b82f6',
+    stages: ['강아지 알', '아기 뽀송이', '꼬마화가 코코', '세밀화 박사 코코', '조각 아티스트 스파이크', '일러스트 스타 맥스']
+  },
+  cat: {
+    label: '🐱 고양이',
+    eggName: '달빛 리본 고양이 알',
+    defaultName: '나비',
+    body: '#f3e8ff', ear: '#c084fc', accent: '#9333ea',
+    stages: ['고양이 알', '아기 모모', '꼬마화가 나비', '수묵화 박사 루나', '그래피티 아티스트 레오', '웹툰 스타 미유']
+  },
+  panda: {
+    label: '🐼 판다',
+    eggName: '대나무 숲 판다 알',
+    defaultName: '팡팡',
+    body: '#ffffff', ear: '#334155', accent: '#16a34a',
+    stages: ['판다 알', '아기 포포', '꼬마화가 팡팡', '연필화 박사 팡', '거리화가 아티스트 바오', '캐릭터 스타 판다']
+  },
+  platypus: {
+    label: '🦫 오리너구리',
+    eggName: '물감방울 오리너구리 모모 알',
+    defaultName: '모모',
+    body: '#67e8f9', ear: '#06b6d4', accent: '#facc15',
+    stages: ['오리너구리 알', '아기 모모', '꼬마화가 모모', '색연필 박사 모모', '바다벽화 아티스트 모모', '아쿠아 아트스타 모모']
+  }
+};
+const SPECIES_KEYS = ['rabbit', 'dog', 'cat', 'panda', 'platypus'];
+const RECOMMENDED_NAMES = ['모모', '몽글이', '루비', '코코', '나비', '팡팡', '콩이', '두부', '별이', '쿠키'];
+
+// 오프스크린 스프라이트 캐시 (캐릭터/단계 변경 시 단 1회만 생성)
+const spriteCache = document.createElement('canvas');
+spriteCache.width = 24;
+spriteCache.height = 24;
+const sCtx = spriteCache.getContext('2d');
+let cachedKey = '';
+
+function buildPetSprite(speciesKey, stage) {
+  const key = speciesKey + '_' + stage;
+  if (cachedKey === key) return spriteCache;
+  cachedKey = key;
+
+  const sp = SPECIES[speciesKey] || SPECIES.platypus;
+  sCtx.clearRect(0, 0, 24, 24);
+  const px = (x, y, w, h, c) => { sCtx.fillStyle = c; sCtx.fillRect(x, y, w, h); };
+
+  // 0단계: 알
+  if (stage === 0) {
+    px(8, 4, 8, 2, sp.body);
+    px(6, 6, 12, 4, sp.body);
+    px(5, 10, 14, 7, sp.body);
+    px(7, 17, 10, 3, sp.body);
+    // 알 무늬
+    px(8, 9, 3, 3, sp.ear);
+    px(13, 12, 3, 3, sp.accent);
+    px(9, 14, 2, 2, sp.ear);
+    return spriteCache;
+  }
+
+  // 1단계 이상: 귀여운 2등신 SD 동물
+  const isBaby = stage === 1;
+  const isAdult = stage >= 3;
+
+  // 귀 / 머리 장식
+  if (speciesKey === 'rabbit') {
+    px(7, 1, 3, 6, sp.body); px(8, 2, 1, 4, sp.ear);
+    px(14, 1, 3, 6, sp.body); px(15, 2, 1, 4, sp.ear);
+  } else if (speciesKey === 'dog') {
+    px(4, 7, 3, 6, sp.ear);
+    px(17, 7, 3, 6, sp.ear);
+  } else if (speciesKey === 'cat') {
+    px(6, 3, 3, 4, sp.ear);
+    px(15, 3, 3, 4, sp.ear);
+  } else if (speciesKey === 'panda') {
+    px(5, 3, 4, 4, '#334155');
+    px(15, 3, 4, 4, '#334155');
+  } else if (speciesKey === 'platypus') {
+    // 물방울 머리 장식 + 비버 꼬리
+    px(11, 2, 2, 3, '#38bdf8');
+    px(18, 15, 4, 4, '#d97706');
+  }
+
+  // 머리 & 몸통
+  if (isBaby) {
+    px(6, 7, 12, 10, sp.body);
+    px(7, 17, 10, 3, sp.body);
+  } else {
+    px(6, 6, 12, 9, sp.body);
+    px(7, 15, 10, 5, sp.body);
+    // 발
+    px(7, 20, 3, 2, sp.ear);
+    px(14, 20, 3, 2, sp.ear);
+  }
+
+  // 판다 눈 패치
+  if (speciesKey === 'panda') {
+    px(7, 9, 3, 3, '#334155');
+    px(14, 9, 3, 3, '#334155');
+  }
+
+  // 반짝이는 눈
+  px(8, 10, 2, 2, '#1e1b4b');
+  px(14, 10, 2, 2, '#1e1b4b');
+  px(8, 10, 1, 1, '#ffffff');
+  px(14, 10, 1, 1, '#ffffff');
+
+  // 볼터치
+  px(6, 12, 2, 1, '#fda4af');
+  px(16, 12, 2, 1, '#fda4af');
+
+  // 입 / 오리너구리 부리
+  if (speciesKey === 'platypus') {
+    px(10, 12, 4, 2, '#facc15');
+    px(9, 13, 6, 1, '#eab308');
+  } else {
+    px(11, 12, 2, 1, '#f43f5e');
+  }
+
+  // 초등학생(2) 책가방/리본, 성체(3~5) 왕관/별 장식
+  if (stage === 2) {
+    px(8, 4, 8, 2, '#ef4444'); px(14, 3, 2, 1, '#ef4444'); // 화가 베레모
+    px(19, 12, 1, 6, '#a16207'); px(19, 10, 1, 2, '#f472b6'); // 붓
+  } else if (isAdult) {
+    const crownColor = stage === 3 ? '#facc15' : (stage === 4 ? '#f43f5e' : '#38bdf8');
+    px(9, 3, 6, 2, crownColor);
+    px(9, 2, 1, 1, crownColor);
+    px(11, 2, 2, 1, crownColor);
+    px(14, 2, 1, 1, crownColor);
+    // 망토/스카프
+    px(8, 15, 8, 2, crownColor);
+  }
+
+  return spriteCache;
+}
+
+/* =========================================================
+   3. 게임 상태 & 자동 저장 (localStorage)
+========================================================= */
+const SAVE_KEY = 'agjj_tama_v1';
+let state = {
+  mode: 'EGG_SELECT', // EGG_SELECT | PLAY
+  eggCursor: 4,       // 기본 오리너구리 모모 위치
+  species: 'platypus',
+  name: '모모',
+  stage: 0,           // 0:알, 1:아기, 2:초딩, 3:공부성체, 4:운동성체, 5:균형성체
+  ageSec: 0,
+  hunger: 4,          // 0~5
+  happy: 4,           // 0~5
+  clean: 5,           // 0~5
+  energy: 5,          // 0~5
+  study: 0,           // 지능
+  sport: 0,           // 체력
+  coins: 120,
+  poops: 0,
+  sick: false,
+  lightsOff: false,
+  menuIdx: 0,
+  badges: [],
+  poka: [],        // 🖼 모은 JJ 그림 포카 (작품 번호)
+  wall: '',        // 🖼 LCD 벽에 걸린 그림
+  paidDay: '', paidN: 0, artOk: 0
+};
+
+function saveGame() {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+function loadGame() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (raw) Object.assign(state, JSON.parse(raw));
+  } catch (e) {}
+}
+
+/* =========================================================
+   4. UI 업데이트 & 알 선택 / 이름 짓기
+========================================================= */
+const MENU_NAMES = ['상태확인', '편의점/급식', '공부방(6과목)', '미술·예체능 학원', 'JJ 그림 포카 뽑기', '샤워하기', '불끄기/켜기', '치료하기'];
+
+function setTheme(bg, border) {
+  const d = document.getElementById('device');
+  d.style.setProperty('--shell-bg', bg);
+  d.style.setProperty('--shell-border', border);
+  beep(650, 0.05);
+}
+
+function setMsg(text) {
+  document.getElementById('msgBar').textContent = text;
+}
+
+function updateTopUI() {
+  const sp = SPECIES[state.species];
+  const stageLabel = sp ? sp.stages[state.stage] : '알';
+  document.getElementById('topName').textContent =
+    state.mode === 'EGG_SELECT' ? '🥚 알을 골라주세요!' : `${state.name} (${stageLabel})`;
+  document.getElementById('topCoin').textContent = `⭐ ${state.coins}`;
+
+  document.querySelectorAll('.menu-icon').forEach((el, i) => {
+    el.classList.toggle('active', i === state.menuIdx && state.mode === 'PLAY');
+  });
+}
+
+function openEggSelect() {
+  state.mode = 'EGG_SELECT';
+  state.lightsOff = false;
+  closeModal();
+  updateTopUI();
+  setMsg('A:다른 알 보기  B:이 알 선택!');
+  beep(520, 0.07);
+}
+
+let isNewHatch = false;
+function openNamingModal(forNewEgg) {
+  isNewHatch = forNewEgg;
+  const sp = SPECIES[forNewEgg ? SPECIES_KEYS[state.eggCursor] : state.species];
+  const defaultVal = forNewEgg ? sp.defaultName : state.name;
+
+  document.getElementById('modalTitle').textContent = forNewEgg ? '🥚 새 펫 이름 짓기' : '✏️ 펫 이름 변경';
+  document.getElementById('modalBody').innerHTML = `
+    <p style="font-size:13px; text-align:center; margin-bottom:8px; color:#831843;">
+      <b>${sp.label}</b>의 예쁜 이름을 지어주세요! (최대 8글자)
+    </p>
+    <input id="petNameInput" class="name-input" maxlength="8" value="${esc(defaultVal)}" placeholder="이름 입력">
+    <div class="chip-wrap">
+      ${RECOMMENDED_NAMES.map(n => `<span class="chip" onclick="document.getElementById('petNameInput').value='${n}'">${n}</span>`).join('')}
+    </div>
+    <button class="primary-btn" onclick="confirmPetName()">💖 ${forNewEgg ? '이 이름으로 부화하기!' : '이름 저장하기'}</button>
+  `;
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+
+function confirmPetName() {
+  const input = document.getElementById('petNameInput');
+  const cleanName = (input ? input.value.replace(/[<>"'&`\\]/g, '').trim() : '') || '모모';
+
+  if (isNewHatch) {
+    const chosenKey = SPECIES_KEYS[state.eggCursor];
+    state.species = chosenKey;
+    state.name = cleanName;
+    state.stage = 0;
+    state.ageSec = 0;
+    state.hunger = 4;
+    state.happy = 4;
+    state.clean = 5;
+    state.energy = 5;
+    state.study = 0;
+    state.sport = 0;
+    state.poops = 0;
+    state.sick = false;
+    state.lightsOff = false;
+    state.mode = 'PLAY';
+    cachedKey = '';
+    setMsg(`🥚 ${state.name}의 알이 도착했어요! (잠시 후 부화)`);
+  } else {
+    state.name = cleanName;
+    setMsg(`✨ 이름이 '${state.name}'(으)로 바뀌었어요!`);
+  }
+
+  closeModal();
+  updateTopUI();
+  saveGame();
+  beep(880, 0.1);
+}
+
+function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+/* =========================================================
+   5. 물리 버튼 조작 (A / B / C)
+========================================================= */
+function selectMenu(idx) {
+  if (state.mode === 'EGG_SELECT') return;
+  state.menuIdx = idx;
+  updateTopUI();
+  setMsg(`메뉴: ${MENU_NAMES[idx]}`);
+  beep(580, 0.04);
+}
+
+function pressA() {
+  beep(580, 0.04);
+  if (state.mode === 'EGG_SELECT') {
+    state.eggCursor = (state.eggCursor + 1) % SPECIES_KEYS.length;
+    const sp = SPECIES[SPECIES_KEYS[state.eggCursor]];
+    setMsg(`${sp.label} - ${sp.eggName}`);
+    return;
+  }
+  state.menuIdx = (state.menuIdx + 1) % 8;
+  updateTopUI();
+  setMsg(`메뉴: ${MENU_NAMES[state.menuIdx]}`);
+}
+
+function pressB() {
+  beep(760, 0.06);
+  if (state.mode === 'EGG_SELECT') {
+    openNamingModal(true);
+    return;
+  }
+  if (state.stage === 0) {
+    state.ageSec += 5; // 알 쓰다듬기 (부화 단축)
+    setMsg(`🥚 ${state.name}의 알이 따뜻하게 흔들려요!`);
+    checkEvolution();
+    return;
+  }
+  runMenuAction(state.menuIdx);
+}
+
+function pressC() {
+  beep(420, 0.05);
+  closeModal();
+  if (state.mode === 'PLAY') {
+    setMsg(`${state.name}가 방긋 웃고 있어요 ♪`);
+  }
+}
+
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('open');
+}
+
+/* =========================================================
+   6. 8가지 핵심 활동 (상태, 편의점, 공부방, 학원, 놀이, 돌봄)
+========================================================= */
+function runMenuAction(idx) {
+  if (state.lightsOff && idx !== 6 && idx !== 0) {
+    setMsg(`💤 ${state.name}가 자고 있어요! 불을 먼저 켜주세요.`);
+    return;
+  }
+
+  switch (idx) {
+    case 0: showStatusModal(); break;
+    case 1: showFoodModal(); break;
+    case 2: showStudyModal(); break;
+    case 3: showAcademyModal(); break;
+    case 4: showPlayModal(); break;
+    case 5: // 샤워
+      state.poops = 0;
+      state.clean = 5;
+      state.happy = Math.min(5, state.happy + 1);
+      setMsg(`🚿 보글보글 샤워 완료! 반짝반짝해졌어요!`);
+      saveGame();
+      break;
+    case 6: // 불 끄기/켜기
+      state.lightsOff = !state.lightsOff;
+      setMsg(state.lightsOff ? `🌙 불을 껐어요. 잘 자, ${state.name}!` : `☀️ 아침이에요! 불을 켰어요!`);
+      saveGame();
+      break;
+    case 7: // 치료하기
+      if (state.sick) {
+        state.sick = false;
+        state.happy = Math.min(5, state.happy + 1);
+        setMsg(`💉 주사 꾹! ${state.name}가 금방 건강해졌어요!`);
+      } else {
+        setMsg(`😊 ${state.name}는 아주 튼튼해요!`);
+      }
+      saveGame();
+      break;
+  }
+}
+
+/* 0. 상태 확인 */
+function showStatusModal() {
+  const sp = SPECIES[state.species];
+  const hearts = (n) => '❤️'.repeat(n) + '🤍'.repeat(5 - n);
+  document.getElementById('modalTitle').textContent = `📊 ${state.name}의 성장 일기`;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="stat-row"><span>종족 / 단계</span><span>${sp.label} · ${sp.stages[state.stage]}</span></div>
+    <div class="stat-row"><span>배고픔</span><span>${hearts(state.hunger)}</span></div>
+    <div class="stat-row"><span>행복도</span><span>${hearts(state.happy)}</span></div>
+    <div class="stat-row"><span>청결도</span><span>${hearts(state.clean)}</span></div>
+    <div class="stat-row"><span>에너지</span><span>${hearts(state.energy)}</span></div>
+    <div class="stat-row"><span>🧠 공부 / 🏃 실기·체력</span><span>🧠 ${state.study} / 🏃 ${state.sport}</span></div>
+    <p class="reward">🧠 공부를 많이 하면 박사형, 🏃 실기를 많이 하면 아티스트형,<br>골고루 하면 스타형 화가로 자라요!</p>
+    <div class="stat-row"><span>🖼 모은 JJ 그림 포카</span><span>${state.poka.length} / ${WORKS.length || '?'}장</span></div>
+    <button class="primary-btn" style="margin-top:6px" onclick="openNamingModal(false)">✏️ 이름 바꾸기</button>
+  `;
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+
+/* 1. 편의점 & 트렌드 먹거리 */
+const FOODS = [
+  { name: '🍱 학교 급식', cost: 0, hun: 2, hap: 0, desc: '무료 · 배부름+2' },
+  { name: '🍯 요아정 꿀콤보', cost: 30, hun: 1, hap: 2, desc: '⭐30 · 행복+2' },
+  { name: '🍫 두바이 초콜릿', cost: 40, hun: 1, hap: 3, desc: '⭐40 · 행복+3' },
+  { name: '🍓 왕가 탕후루', cost: 20, hun: 1, hap: 2, desc: '⭐20 · 행복+2' },
+  { name: '🍜 마라탕 1단계', cost: 35, hun: 3, hap: 1, desc: '⭐35 · 배부름+3' },
+  { name: '🍙 참치마요 삼각김밥', cost: 15, hun: 2, hap: 1, desc: '⭐15 · 배부름+2' }
+];
+function showFoodModal() {
+  document.getElementById('modalTitle').textContent = `🍙 편의점 & 급식 (⭐${state.coins})`;
+  document.getElementById('modalBody').innerHTML = `<div class="grid-2">` +
+    FOODS.map((f, i) => `
+      <div class="action-card" onclick="eatFood(${i})">
+        ${f.name}
+        <small>${f.desc}</small>
+      </div>
+    `).join('') + `</div>`;
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+function eatFood(i) {
+  const f = FOODS[i];
+  if (state.coins < f.cost) {
+    setMsg('💸 별이 부족해요! 공부방 퀴즈로 ⭐별을 모아 보자!');
+    closeModal();
+    return;
+  }
+  state.coins -= f.cost;
+  state.hunger = Math.min(5, state.hunger + f.hun);
+  state.happy = Math.min(5, state.happy + f.hap);
+  closeModal();
+  updateTopUI();
+  setMsg(`${f.name} 냠냠! ${state.name}가 너무 맛있어해요!`);
+  beep(820, 0.08);
+  saveGame();
+}
+
+/* 2. 초등 5과목 공부방 퀴즈 */
+const QUIZZES = {
+  kor: [
+    { q: '[한글] 올바른 맞춤법은?', opts: ['어의없다', '어이없다', '어희없다'], a: 1 },
+    { q: '[한글] "가는 말이 고와야 ___ 말이 곱다"', opts: ['오는', '가는', '웃는'], a: 0 },
+    { q: '[한글] 바르게 쓴 단어는?', opts: ['금새', '금세', '긍세'], a: 1 }
+  ],
+  eng: [
+    { q: '[영어] "사과"를 영어로 하면?', opts: ['Banana', 'Apple', 'Grape'], a: 1 },
+    { q: '[영어] "도서관"은 영어로?', opts: ['Hospital', 'Library', 'Station'], a: 1 },
+    { q: '[영어] "고마워"의 영어 표현은?', opts: ['Sorry', 'Hello', 'Thank you'], a: 2 }
+  ],
+  math: [
+    { q: '[수학] 7 × 8 = ?', opts: ['54', '56', '64'], a: 1 },
+    { q: '[수학] 100 - 37 = ?', opts: ['63', '73', '67'], a: 0 },
+    { q: '[수학] 삼각형의 내각의 합은?', opts: ['90도', '180도', '360도'], a: 1 }
+  ],
+  sci: [
+    { q: '[과학] 식물이 광합성을 할 때 내뿜는 기체는?', opts: ['산소', '이산화탄소', '질소'], a: 0 },
+    { q: '[과학] 물이 얼음이 되는 온도는?', opts: ['0도', '50도', '100도'], a: 0 },
+    { q: '[과학] 태양계에서 가장 큰 행성은?', opts: ['지구', '화성', '목성'], a: 2 }
+  ],
+  ai: [
+    { q: '[AI·코딩] 컴퓨터가 이해하는 두 가지 숫자는?', opts: ['0과 1', '1과 2', '0과 9'], a: 0 },
+    { q: '[AI·코딩] 같은 동작을 계속 되풀이하는 코딩 블록은?', opts: ['반복하기', '멈추기', '삭제하기'], a: 0 },
+    { q: '[AI·코딩] 프로그램의 오류를 찾아 고치는 일은?', opts: ['디버깅', '로딩', '스트리밍'], a: 0 }
+  ]
+};
+
+function showStudyModal() {
+  if (state.energy <= 0) {
+    setMsg(`😴 졸려요! 불을 끄고 에너지를 충전해 주세요.`);
+    return;
+  }
+  document.getElementById('modalTitle').textContent = '📚 초등 6과목 공부방';
+  document.getElementById('modalBody').innerHTML = `
+    <p style="font-size:12px; text-align:center; margin-bottom:8px;">문제를 맞히면 🧠지능과 ⭐별 30개를 받아요!</p>
+    <div class="grid-2">
+      <div class="action-card" onclick="startQuiz('kor')">🇰🇷 한글 맞춤법<small>국어 퀴즈</small></div>
+      <div class="action-card" onclick="startQuiz('eng')">🔤 초등 영단어<small>영어 퀴즈</small></div>
+      <div class="action-card" onclick="startQuiz('math')">🔢 연산·도형<small>수학 퀴즈</small></div>
+      <div class="action-card" onclick="startQuiz('sci')">🔬 기초 과학<small>과학 퀴즈</small></div>
+      <div class="action-card" onclick="startQuiz('ai')">🤖 AI · 코딩 상식<small>정보 퀴즈</small></div>
+      <div class="action-card" style="background:#fff7ed;border-color:#fdba74" onclick="startArtQuiz()">🖼 JJ 그림 퀴즈<small>미술 · 그림 제목 맞히기</small></div>
+    </div>
+  `;
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+
+function startQuiz(subj) {
+  const list = QUIZZES[subj];
+  const item = list[Math.floor(Math.random() * list.length)];
+  document.getElementById('modalTitle').textContent = '✏️ 퀴즈 도전!';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="quiz-q">${item.q}</div>
+    ${item.opts.map((opt, idx) => `
+      <button class="quiz-opt" onclick="answerQuiz(${idx === item.a})">${idx + 1}. ${opt}</button>
+    `).join('')}
+  `;
+}
+
+// 🖼 JJ 그림 퀴즈: 그림을 보고 제목 맞히기
+function startArtQuiz() {
+  if (WORKS.length < 3) { setMsg('🖼 그림을 불러오는 중이에요. 잠시 뒤 다시!'); return; }
+  const pool = WORKS.slice().sort(() => Math.random() - .5), ans = pool[0], opts = pool.slice(0, 3).sort(() => Math.random() - .5);
+  document.getElementById('modalTitle').textContent = '🖼 JJ 그림 퀴즈';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="art-q"><img src="thumbs/${ans.id}.webp" alt=""></div>
+    <div class="quiz-q">이 그림의 제목은 무엇일까요?</div>
+    ${opts.map((w, i) => `<button class="quiz-opt" onclick="answerQuiz(${w.id === ans.id}, '${ans.id}')">${i + 1}. ${esc(w.title)}</button>`).join('')}`;
+}
+function answerQuiz(correct, artId) {
+  if (artId && correct) { state.artOk = (state.artOk || 0) + 1; state.wall = artId; }
+  closeModal();
+  state.energy = Math.max(0, state.energy - 1);
+  if (correct) {
+    state.study += 2;
+    state.coins += 30;
+    state.happy = Math.min(5, state.happy + 1);
+    setMsg(`🎉 정답! 🧠지능+2, ⭐별+30 획득!`);
+    beep(920, 0.12);
+  } else {
+    state.study += 1;
+    setMsg(`💡 아쉽지만 좋은 복습이었어요! 🧠지능+1`);
+    beep(400, 0.1);
+  }
+  updateTopUI();
+  checkEvolution();
+  saveGame();
+}
+
+/* 3. 방과후 예체능 학원 */
+const ACADEMIES = [
+  { name: '🖌 수채화 실기', sport: 3, study: 0, hap: 1, msg: '물감을 번지게 칠해 하늘을 완성했어요! 🏃실기+3' },
+  { name: '🧱 벽화 · 조각', sport: 3, study: 0, hap: 1, msg: '커다란 벽에 알록달록 벽화를 그렸어요! 🏃실기+3' },
+  { name: '✏️ JJ 그림 따라 그리기', sport: 2, study: 1, hap: 2, wall: 1, msg: 'JJ 그림을 따라 그려서 벽에 걸었어요! 🏃+2 🧠+1' },
+  { name: '📐 미술 이론 (색·원근)', sport: 0, study: 3, hap: 1, msg: '삼원색과 원근법을 배웠어요! 🧠지능+3' },
+  { name: '🤖 코딩로봇 학원', sport: 0, study: 3, hap: 1, msg: '나만의 그림 그리는 로봇 조립 성공! 🧠지능+3' },
+  { name: '🏊 수영 학원', sport: 2, study: 0, hap: 2, msg: '첨벙첨벙 자유형 50m 완주! 🏃체력+2' }
+];
+function showAcademyModal() {
+  if (state.energy <= 0) {
+    setMsg(`😴 에너지가 부족해요! 불을 끄고 자야 해요.`);
+    return;
+  }
+  document.getElementById('modalTitle').textContent = '🎨 방과후 미술 · 예체능 학원';
+  document.getElementById('modalBody').innerHTML = `<div class="grid-2">` +
+    ACADEMIES.map((ac, i) => `
+      <div class="action-card" onclick="goAcademy(${i})">
+        ${ac.name}
+        <small>${ac.wall ? '벽에 그림 걸기' : ac.sport ? '실기·체력 UP' : '지능 UP'}</small>
+      </div>
+    `).join('') + `</div>`;
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+function goAcademy(i) {
+  const ac = ACADEMIES[i];
+  state.energy = Math.max(0, state.energy - 1);
+  state.sport += ac.sport;
+  state.study += ac.study;
+  state.happy = Math.min(5, state.happy + ac.hap);
+  if (ac.wall && WORKS.length) state.wall = WORKS[Math.random() * WORKS.length | 0].id;
+  closeModal();
+  setMsg(ac.msg);
+  beep(840, 0.09);
+  checkEvolution();
+  saveGame();
+}
+
+/* 4. 요즘 놀이 & 포카 뽑기 */
+const BADGE_POOL = ['✨ 홀로그램 포카', '🎀 레진 탑꾸 키링', '🐰 토끼 그립톡', '💎 왕별빛 뱃지', '🎧 미니 헤드폰', '👑 로얄 왕관'];
+function showPlayModal() {
+  const got = state.poka.slice(-12).reverse();
+  document.getElementById('modalTitle').textContent = '🔮 놀이 & JJ 그림 포카 뽑기';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="grid-2">
+      <div class="action-card" onclick="playDance()">📱 숏폼 댄스 챌린지<small>무료 · 행복+2 & ⭐10</small></div>
+      <div class="action-card" style="background:#f5f3ff;border-color:#c4b5fd" onclick="pullGacha()">🔮 JJ 그림 포카 뽑기<small>⭐25 · 럭키볼로 뽑아요</small></div>
+    </div>
+    <div style="margin-top:10px; font-size:12px; background:#fdf2f8; padding:8px; border-radius:10px;">
+      <b>🖼 내 JJ 그림 포카 ${state.poka.length}${WORKS.length ? ' / ' + WORKS.length : ''}장</b> <span style="color:#db2777">(누르면 벽에 걸어요)</span>
+      <div class="poka-grid">${got.length ? got.map(id => `<img src="thumbs/${id}.webp" alt="" onclick="hangWall('${id}')">`).join('') : '<div class="empty">?</div><div class="empty">?</div><div class="empty">?</div><div class="empty">?</div>'}</div>
+    </div>`;
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+function hangWall(id) { state.wall = id; closeModal(); setMsg('🖼 벽에 그림을 걸었어요!'); beep(880, .06); saveGame(); }
+function playDance() {
+  closeModal();
+  state.happy = Math.min(5, state.happy + 2);
+  state.coins += 10;
+  updateTopUI();
+  setMsg(`🎵 숏폼 댄스 조회수 폭발! 행복+2, ⭐+10!`);
+  beep(880, 0.08);
+  saveGame();
+}
+function pullGacha() {
+  if (state.coins < 25) { setMsg('💸 ⭐25개가 필요해요! 공부방 퀴즈로 별을 모아 보자!'); closeModal(); return; }
+  if (!WORKS.length) { setMsg('🖼 그림을 불러오는 중이에요. 잠시 뒤 다시!'); return; }
+  state.coins -= 25; updateTopUI(); saveGame(); closeModal();
+  const pick = () => { const left = WORKS.filter(w => !state.poka.includes(w.id)), from = left.length && Math.random() < .7 ? left : WORKS; return from[Math.random() * from.length | 0]; };
+  const give = w => {
+    const isNew = !state.poka.includes(w.id);
+    if (isNew) state.poka.push(w.id); else state.poka = state.poka.filter(x => x !== w.id).concat(w.id);
+    state.wall = w.id; state.happy = Math.min(5, state.happy + 2);
+    updateTopUI(); setMsg(isNew ? `🎁 새 포카! [${w.title}] 벽에 걸었어요!` : `🖼 [${w.title}] 또 나왔어요! 벽에 다시 걸었어요`);
+    beep(950, 0.12); saveGame();
+  };
+  if (window.JJLucky) JJLucky.open({ title: 'JJ 그림 포카 뽑기', sub: `${state.name}에게 줄 그림 포카를 뽑아요`, balls: 3, goText: '🔮 포카 뽑기!', okText: '포카 받기!',
+    prizes: () => { const w = pick(); return { icon: '🖼', title: w.title, desc: state.poka.includes(w.id) ? '이미 모은 포카예요' : '✨ 새 포카!', art: w.id, label: '럭키볼에서 나온 포카는', say: w.title + '!', data: w }; },
+    onPick: p => give(p.data) });
+  else give(pick());
+}
+
+// 🎨 갤러리 보상: 꼬마화가·작가로 자랄 때 💧 물감 +1 (하루 2번까지, 갤러리로 돌아가면 받아요)
+function paintReward() {
+  const d = new Date(), t = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  if (state.paidDay !== t) { state.paidDay = t; state.paidN = 0; }
+  if (state.paidN >= 2) return; state.paidN++;
+  try { localStorage.setItem('agjj_pending_paint', String((parseInt(localStorage.getItem('agjj_pending_paint') || '0', 10) || 0) + 1)); } catch (e) {}
+  setTimeout(() => setMsg('🎨 갤러리 선물: 💧 물감 +1 (갤러리로 돌아가면 받아요)'), 2600);
+}
+
+/* =========================================================
+   7. 시간 경과 및 스탯 기반 분기 진화
+========================================================= */
+function checkEvolution() {
+  if (state.mode !== 'PLAY') return;
+  let nextStage = state.stage;
+
+  if (state.stage === 0 && state.ageSec >= 15) {
+    nextStage = 1; // 알 -> 아기 (15초)
+  } else if (state.stage === 1 && state.ageSec >= 60) {
+    nextStage = 2; // 아기 -> 초등학생 (60초)
+  } else if (state.stage === 2 && state.ageSec >= 140) {
+    // 공부/운동 스탯에 따른 3갈래 성체 진화
+    if (state.study >= state.sport + 3) nextStage = 3;      // 공부 특화 성체
+    else if (state.sport >= state.study + 3) nextStage = 4; // 운동 특화 성체
+    else nextStage = 5;                                     // 균형 스타 성체
+  }
+
+  if (nextStage !== state.stage) {
+    state.stage = nextStage;
+    cachedKey = ''; // 스프라이트 캐시 갱신
+    const title = SPECIES[state.species].stages[nextStage];
+    setMsg(`🎊 축하해요! ${state.name}가 [${title}](으)로 진화했어요!`);
+    if (nextStage >= 2) paintReward();
+    beep(1040, 0.15);
+    updateTopUI();
+    saveGame();
+  }
+}
+
+// 1초마다 게임 상태 갱신 (가벼운 단일 인터벌)
+setInterval(() => {
+  if (state.mode !== 'PLAY') return;
+  state.ageSec += 1;
+  checkEvolution();
+
+  // 수면 중 에너지 회복
+  if (state.lightsOff && state.ageSec % 8 === 0) {
+    state.energy = Math.min(5, state.energy + 1);
+  }
+  // 주기적 배고픔/청결 변화
+  if (!state.lightsOff && state.ageSec % 25 === 0) {
+    state.hunger = Math.max(0, state.hunger - 1);
+  }
+  if (!state.lightsOff && state.ageSec % 35 === 0 && state.poops < 2) {
+    state.poops += 1;
+    state.clean = Math.max(0, state.clean - 1);
+    setMsg(`💩 응가가 생겼어요! 🚿 샤워로 치워주세요!`);
+  }
+  if (state.clean <= 1 && state.hunger <= 1 && !state.sick) {
+    state.sick = true;
+    setMsg(`🤒 ${state.name}가 아파요! 💉 치료해주세요!`);
+  }
+  saveGame();
+}, 1000);
+
+/* =========================================================
+   8. 12 FPS 경량 파스텔 LCD 렌더링 루프 (멈춤 방지)
+========================================================= */
+const canvas = document.getElementById('lcd');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+let tick = 0;
+let lastFrameTime = 0;
+const FRAME_INTERVAL = 1000 / 12; // 초당 12프레임 고정 (CPU 부하 최소화)
+
+function renderLCD(now) {
+  requestAnimationFrame(renderLCD);
+  if (document.hidden) return; // 비활성 탭일 때 렌더링 정지
+  if (now - lastFrameTime < FRAME_INTERVAL) return;
+  lastFrameTime = now;
+  tick++;
+
+  // 1. 배경 그리기
+  if (state.lightsOff && state.mode === 'PLAY') {
+    ctx.fillStyle = '#1e1b4b';
+    ctx.fillRect(0, 0, 128, 88);
+    // 반짝이는 밤하늘 별 3개
+    ctx.fillStyle = '#fef08a';
+    ctx.fillRect(20, 16, 2, 2);
+    ctx.fillRect(98, 22, 2, 2);
+    ctx.fillRect(62, 12, 2, 2);
+    ctx.fillStyle = '#e0e7ff';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.fillText('Zzz...', 78, 44 - (tick % 4));
+    return;
+  }
+
+  // 낮 파스텔 하늘 + 풀밭
+  ctx.fillStyle = '#fefce8';
+  ctx.fillRect(0, 0, 128, 66);
+  ctx.fillStyle = '#dcfce7';
+  ctx.fillRect(0, 66, 128, 22);
+  ctx.fillStyle = '#86efac';
+  ctx.fillRect(0, 66, 128, 2);
+
+  // 🖼 갤러리 벽에 걸린 JJ 그림 (픽셀로 보여요)
+  const wid = state.wall || state.poka[state.poka.length - 1];
+  const wim = wid && wallImg(wid);
+  ctx.fillStyle = '#a16207'; ctx.fillRect(4, 4, 30, 24);
+  ctx.fillStyle = '#fde68a'; ctx.fillRect(5, 5, 28, 22);
+  if (wim && wim.complete && wim.naturalWidth) ctx.drawImage(wim, 7, 7, 24, 18);
+  else { ctx.fillStyle = '#fbcfe8'; ctx.fillRect(7, 7, 24, 18); ctx.fillStyle = '#db2777'; ctx.font = 'bold 8px sans-serif'; ctx.fillText('JJ', 13, 19); }
+  ctx.fillStyle = '#facc15'; ctx.fillRect(16, 1, 6, 3);
+  // 둥실둥실 구름 (창밖)
+  const cloudX = (tick >> 1) % 100 + 36;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(cloudX, 10, 18, 5);
+  ctx.fillRect(cloudX + 3, 7, 12, 3);
+
+  // 2. 알 고르기 화면 렌더링
+  if (state.mode === 'EGG_SELECT') {
+    const key = SPECIES_KEYS[state.eggCursor];
+    const sp = SPECIES[key];
+    const sprite = buildPetSprite(key, 0);
+    const bounceY = (tick % 6 < 3) ? 0 : -2;
+
+    ctx.drawImage(sprite, 40, 18 + bounceY, 48, 48);
+
+    // 좌우 화살표 & 안내 텍스트
+    ctx.fillStyle = '#db2777';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.fillText('◀', 14, 46);
+    ctx.fillText('▶', 106, 46);
+    ctx.textAlign = 'center';
+    ctx.fillText(`${sp.label} (${state.eggCursor + 1}/5)`, 64, 79);
+    ctx.textAlign = 'left';
+    return;
+  }
+
+  // 3. 플레이 화면: 캐시된 고해상도 스프라이트 고속 복사
+  const sprite = buildPetSprite(state.species, state.stage);
+  const walkX = Math.round(Math.sin(tick * 0.25) * 8);
+  const hopY = (tick % 6 < 3) ? 0 : -2;
+  ctx.drawImage(sprite, 40 + walkX, 20 + hopY, 48, 48);
+
+  // 행복 하트 이펙트
+  if (state.happy >= 4 && tick % 8 < 4) {
+    ctx.fillStyle = '#f43f5e';
+    ctx.fillRect(88 + walkX, 22, 2, 2);
+    ctx.fillRect(92 + walkX, 22, 2, 2);
+    ctx.fillRect(88 + walkX, 24, 6, 2);
+    ctx.fillRect(90 + walkX, 26, 2, 2);
+  }
+
+  // 배설물 표시
+  for (let p = 0; p < state.poops; p++) {
+    const px = 10 + p * 14;
+    ctx.fillStyle = '#92400e';
+    ctx.fillRect(px + 2, 58, 4, 2);
+    ctx.fillRect(px + 1, 60, 6, 2);
+    ctx.fillRect(px, 62, 8, 3);
+  }
+
+  // 아픔 표시
+  if (state.sick) {
+    ctx.fillStyle = '#ef4444';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.fillText('✚ 아파요', 82, 16);
+  }
+}
+
+/* =========================================================
+   9. 초기화 실행 (JJ 그림 목록 · 갤러리 앱 안)
+========================================================= */
+try { if (window.self !== window.top) document.body.classList.add('in-app'); } catch (e) { document.body.classList.add('in-app'); }
+let WORKS = []; const WIMG = {};
+function wallImg(id) { if (!WIMG[id]) { const im = new Image(); im.src = `thumbs/${id}.webp`; WIMG[id] = im; } return WIMG[id]; }
+fetch('thumbs/index.json', { cache: 'no-cache' }).then(r => r.json()).then(j => { WORKS = (j.works || []).map(w => ({ id: w.id, title: w.title || ('JJ의 그림 ' + w.id) })); }).catch(() => {});
+document.querySelectorAll('.hw-btn').forEach(b => b.addEventListener('pointerdown', () => { try { navigator.vibrate && navigator.vibrate(10); } catch (e) {} }));
+loadGame();
+if (state.mode === 'EGG_SELECT') {
+  const sp = SPECIES[SPECIES_KEYS[state.eggCursor]];
+  setMsg(`${sp.label} - ${sp.eggName}`);
+} else {
+  setMsg(`${state.name}가 반갑게 인사해요!`);
+}
+updateTopUI();
+requestAnimationFrame(renderLCD);
+</script>
+<script src="luckyball.js"></script>
+<script src="paint-icon.js"></script>
+</body>
+</html>
