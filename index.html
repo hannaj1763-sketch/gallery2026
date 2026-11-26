@@ -719,6 +719,9 @@
     #songPlayer iframe { flex: 1; width: 100%; border: 0; background: #0d1117; }
     .adb { display: inline-block; background: #fbbf24; color: #111; font: 800 10.5px/1 Arial, sans-serif; letter-spacing: .3px; padding: 3px 4px 2px; border-radius: 3px; vertical-align: 2px; }   /* 유튜브처럼 노란 AD 표시 */
     .tk-btn .adb, .lock-head button .adb { background: #111; color: #fbbf24; }   /* 주황 버튼 위에서는 검은 바탕 */
+    /* 🔖 광고 문구 숨기기: body.no-ad 이면 광고 표시·문구만 안 보여요 (코드는 그대로) */
+    html.no-ad-root .adb, html.no-ad-root .ad-only { display: none !important; }
+    html:not(.no-ad-root) .no-ad-only { display: none !important; }
     .tk-btn { width: 100%; background: #f59e0b; color: #1a1a1a; border: none; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
     .tk-btn.blue { background: #3b82f6; color: #fff; }
     .tk-btn.red { background: #b91c1c; color: #fff; }
@@ -890,6 +893,131 @@
     }
     </style>
   <script src="firebase-config.js"></script>   <!-- 🔑 Firebase 키는 이 파일 하나에만 (키를 바꿀 땐 이 파일만 고쳐요) -->
+  <style id="jx-style">
+    /* ===================== 🎨 팔레트 메뉴 · 오늘 · 나의 기록 · JJ 극장 ===================== */
+    .jx-today { margin-top: 14px; padding: 14px 15px 12px; border-radius: 18px; background: linear-gradient(135deg, #1e1b3a, #241a33); border: 1px solid #3b2f5c; color: #ede9fe; }
+    .jx-today h3 { margin: 0 0 8px; font-size: 15.5px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .jx-today h3 small { font-size: 12px; color: #fbbf24; font-weight: 800; white-space: nowrap; }
+    .jx-ms { display: flex; flex-direction: column; gap: 6px; }
+    .jx-m { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 12px; background: rgba(255,255,255,.05); font-size: 13.5px; cursor: pointer; border: none; color: inherit; text-align: left; font-family: inherit; width: 100%; }
+    .jx-m .ck { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #7c6aa8; flex: none; display: grid; place-items: center; font-size: 12px; }
+    .jx-m.done { background: rgba(134,239,172,.10); color: #bbf7d0; } .jx-m.done .ck { background: #22c55e; border-color: #22c55e; color: #fff; }
+    .jx-m .pg2 { margin-left: auto; font-size: 11.5px; color: #c4b5fd; font-weight: 800; }
+    .jx-rw { margin-top: 8px; font-size: 12px; color: #c4b5fd; display: flex; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+    .jx-cont { margin-top: 8px; width: 100%; border: none; border-radius: 12px; padding: 10px; background: #f5f3ff; color: #4c1d95; font-weight: 800; font-size: 14px; cursor: pointer; font-family: inherit; }
+    .jx-season { margin-top: 10px; padding: 9px 12px; border-radius: 12px; font-size: 13px; font-weight: 700; background: linear-gradient(90deg, #7f1d1d, #14532d); color: #fff; position: relative; overflow: hidden; }
+    .jx-season i { position: absolute; top: -20px; font-style: normal; animation: jxFall linear infinite; opacity: .85; pointer-events: none; }
+    @keyframes jxFall { to { transform: translateY(90px) rotate(200deg); } }
+
+    .pal-wrap { position: relative; width: 100%; max-width: 520px; margin: 16px auto 4px; aspect-ratio: 1.42; user-select: none; }
+    .pal-wrap svg { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 10px 18px rgba(0,0,0,.35)); }
+    .pal-dab { position: absolute; transform: translate(-50%, -50%); width: 21.5%; aspect-ratio: 1; border: none; padding: 0; cursor: pointer; color: #fff; font-family: inherit;
+      border-radius: 47% 53% 44% 56% / 55% 45% 55% 45%;
+      background: radial-gradient(circle at 30% 26%, rgba(255,255,255,.6), rgba(255,255,255,0) 30%), var(--c);
+      box-shadow: inset -5px -7px 12px rgba(0,0,0,.2), 0 4px 10px rgba(60,30,0,.28);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform .18s cubic-bezier(.3,1.6,.5,1); }
+    .pal-dab:nth-of-type(2n) { border-radius: 55% 45% 52% 48% / 46% 56% 44% 54%; }
+    .pal-dab .e { font-size: clamp(22px, 6.4vw, 34px); line-height: 1; }
+    .pal-dab .l { font-size: clamp(10.5px, 2.9vw, 13.5px); font-weight: 800; margin-top: 3px; white-space: nowrap; text-shadow: 0 1px 3px rgba(0,0,0,.4); }
+    .pal-dab .n { position: absolute; top: 4%; right: 6%; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; background: #fff; color: #111; font-size: 10.5px; font-weight: 900; display: grid; place-items: center; }
+    .pal-dab.on { transform: translate(-50%, -50%) scale(1.14); box-shadow: 0 0 0 4px #fffbeb, 0 0 0 7px var(--c), 0 8px 18px rgba(0,0,0,.35); z-index: 2; }
+    .pal-dab:active { transform: translate(-50%, -50%) scale(.94); }
+    .pal-brush { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-28deg); font-size: clamp(30px, 9vw, 46px); pointer-events: none; transition: left .35s, top .35s; filter: drop-shadow(0 3px 4px rgba(0,0,0,.3)); }
+    .pal-tip { text-align: center; font-size: 12px; color: #94a3b8; margin: 2px 0 4px; }
+    .pal-area { margin-top: 10px; padding: 14px 12px 12px; border-radius: 20px; border: 2px solid var(--c); background: color-mix(in srgb, var(--c) 9%, #11151d); animation: jxIn .28s ease; }
+    @keyframes jxIn { from { opacity: 0; transform: translateY(8px); } }
+    .pal-h { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 900; color: #fff; }
+    .pal-h .sw { width: 26px; height: 18px; border-radius: 40% 60% 50% 50%; background: var(--c); }
+    .pal-h small { margin-left: auto; font-size: 11.5px; color: #cbd5e1; font-weight: 700; }
+    .pal-area .pg { margin-top: 10px; }
+    .pt.jx-new::after { content: 'NEW'; position: absolute; top: 8px; left: 9px; font-size: 9.5px; font-weight: 900; background: #f43f5e; color: #fff; border-radius: 6px; padding: 2px 5px; }
+
+    /* 나의 기록 */
+    .jx-rec { margin-top: 18px; }
+    .jx-rec h3 { font-size: 16px; margin: 18px 0 8px; display: flex; align-items: center; gap: 8px; }
+    .jx-big { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+    .jx-big div { background: #161b24; border: 1px solid #262d3a; border-radius: 14px; padding: 12px 6px; text-align: center; }
+    .jx-big b { display: block; font-size: 22px; color: #fbbf24; } .jx-big span { font-size: 11.5px; color: #94a3b8; }
+    .jx-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: #161b24; border: 1px solid #262d3a; border-radius: 14px; padding: 10px; }
+    .jx-cal .w { font-size: 10.5px; color: #64748b; text-align: center; }
+    .jx-cal .d { aspect-ratio: 1; border-radius: 7px; display: grid; place-items: center; font-size: 11px; color: #94a3b8; background: #1e2430; }
+    .jx-cal .d.l1 { background: #3b2f5c; color: #e9d5ff; } .jx-cal .d.l2 { background: #6d28d9; color: #fff; } .jx-cal .d.l3 { background: #a855f7; color: #fff; font-weight: 800; }
+    .jx-cal .d.t { outline: 2px solid #fbbf24; }
+    .jx-bars { background: #161b24; border: 1px solid #262d3a; border-radius: 14px; padding: 10px 12px; }
+    .jx-bar { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 6px 0; }
+    .jx-bar .nm { width: 108px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .jx-bar .tr { flex: 1; height: 10px; border-radius: 6px; background: #1e2430; overflow: hidden; } .jx-bar .tr i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #a855f7, #f472b6); }
+    .jx-bar .v { width: 34px; text-align: right; color: #fbbf24; font-weight: 800; font-size: 12px; }
+    .jx-bdg { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; }
+    .jx-bdg div { background: #161b24; border: 1px solid #262d3a; border-radius: 14px; padding: 10px 4px 8px; text-align: center; }
+    .jx-bdg .i { font-size: 28px; } .jx-bdg .t { font-size: 11px; font-weight: 800; margin-top: 3px; } .jx-bdg .s { font-size: 9.5px; color: #94a3b8; margin-top: 2px; line-height: 1.3; }
+    .jx-bdg .off { opacity: .38; filter: grayscale(1); }
+    .jx-acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .jx-acts button { border: none; border-radius: 14px; padding: 13px 8px; font-weight: 800; font-size: 14px; cursor: pointer; font-family: inherit; color: #fff; background: linear-gradient(135deg, #7c3aed, #db2777); }
+    .jx-acts button.b2 { background: linear-gradient(135deg, #0ea5e9, #6366f1); }
+
+    /* 전체 화면 오버레이 (움직이는 그림 · 리캡 · 그림책 · 카드 · 도안) */
+    .jx-ov { position: fixed; inset: 0; z-index: 9000; background: #0b0d12; color: #fff; display: none; flex-direction: column; }
+    .jx-ov.on { display: flex; }
+    .jx-top { display: flex; align-items: center; gap: 8px; padding: max(10px, env(safe-area-inset-top)) 12px 8px; }
+    .jx-top b { font-size: 16px; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .jx-x { background: rgba(255,255,255,.12); border: none; color: #fff; width: 38px; height: 38px; border-radius: 50%; font-size: 20px; cursor: pointer; flex: none; }
+    .jx-stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .jx-stage canvas { max-width: 100%; max-height: 100%; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+    .jx-chips { display: flex; gap: 6px; overflow-x: auto; padding: 8px 12px; scrollbar-width: none; }
+    .jx-chips::-webkit-scrollbar { display: none; }
+    .jx-chip { flex: none; border: 1px solid #334155; background: #161b24; color: #e2e8f0; border-radius: 20px; padding: 8px 13px; font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .jx-chip.on { background: #f5f3ff; color: #4c1d95; border-color: #f5f3ff; }
+    .jx-bot { display: flex; gap: 8px; padding: 6px 12px max(12px, env(safe-area-inset-bottom)); }
+    .jx-bot button { flex: 1; border: none; border-radius: 14px; padding: 12px 6px; font-weight: 800; font-size: 14px; cursor: pointer; font-family: inherit; background: #f5f3ff; color: #4c1d95; }
+    .jx-bot button.dk { background: #1e2430; color: #e2e8f0; }
+    .jx-note { text-align: center; font-size: 12px; color: #94a3b8; padding: 0 16px 4px; }
+
+    /* 리캡 스토리 */
+    .jx-story { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 22px; text-align: center; }
+    .jx-bars2 { position: absolute; top: 6px; left: 12px; right: 12px; display: flex; gap: 4px; }
+    .jx-bars2 i { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,.25); } .jx-bars2 i.on { background: #fff; }
+    .jx-story h2 { font-size: clamp(24px, 7vw, 38px); margin: 8px 0; line-height: 1.25; }
+    .jx-story p { font-size: 15px; color: #e2e8f0; line-height: 1.6; margin: 6px 0; }
+    .jx-story .huge { font-size: clamp(64px, 22vw, 120px); font-weight: 900; line-height: 1; background: linear-gradient(135deg, #fde68a, #f472b6, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .jx-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; width: min(92vw, 420px); margin: 10px auto; }
+    .jx-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
+    .jx-pair { display: flex; gap: 12px; justify-content: center; margin: 12px 0; }
+    .jx-pair div { width: min(40vw, 180px); } .jx-pair img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; } .jx-pair span { display: block; font-size: 12px; margin-top: 5px; color: #cbd5e1; }
+    .jx-mbar { display: flex; align-items: flex-end; gap: 4px; height: 130px; width: min(92vw, 420px); margin: 14px auto 4px; }
+    .jx-mbar div { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; font-size: 10px; color: #cbd5e1; }
+    .jx-mbar i { width: 100%; border-radius: 5px 5px 2px 2px; background: linear-gradient(180deg, #f472b6, #8b5cf6); min-height: 3px; }
+    .jx-tapl, .jx-tapr { position: absolute; top: 0; bottom: 0; width: 35%; z-index: 1; } .jx-tapl { left: 0; } .jx-tapr { right: 0; width: 65%; }
+
+    /* 그림책 */
+    .jx-book { width: min(94vw, 560px); height: min(72vh, 720px); perspective: 1600px; position: relative; }
+    .jx-page { position: absolute; inset: 0; background: #fffbf2; color: #3b2f2a; border-radius: 8px 16px 16px 8px; box-shadow: 0 14px 40px rgba(0,0,0,.45), inset 10px 0 18px -12px rgba(0,0,0,.35); display: flex; flex-direction: column; padding: 18px 18px 14px; transform-origin: left center; transition: transform .7s ease, opacity .7s; backface-visibility: hidden; }
+    .jx-page.out { transform: rotateY(-100deg); opacity: 0; }
+    .jx-page img { flex: 1; min-height: 0; width: 100%; object-fit: contain; border-radius: 6px; background: #fff; }
+    .jx-page h4 { margin: 12px 0 4px; font-size: 18px; } .jx-page p { margin: 0; font-size: 15px; line-height: 1.6; color: #57483f; }
+    .jx-page .pn { position: absolute; bottom: 8px; right: 14px; font-size: 12px; color: #a1887f; }
+    .jx-cover { justify-content: center; align-items: center; text-align: center; background: linear-gradient(160deg, #fde68a, #f9a8d4 55%, #c4b5fd); }
+    .jx-cover h3 { font-size: clamp(26px, 8vw, 40px); margin: 14px 0 6px; } .jx-cover .cg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 70%; }
+    .jx-cover .cg img { aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 3px solid #fff; }
+    .jx-pick { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; padding: 8px 12px; overflow-y: auto; }
+    .jx-pick button { position: relative; border: 3px solid transparent; border-radius: 10px; padding: 0; overflow: hidden; background: none; cursor: pointer; }
+    .jx-pick button img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+    .jx-pick button.on { border-color: #fbbf24; } .jx-pick button.on::after { content: attr(data-n); position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: #fbbf24; color: #111; font-weight: 900; font-size: 12px; display: grid; place-items: center; }
+    .jx-img { max-width: 94vw; max-height: 100%; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,.5); background: #fff; }
+    #jxPrint { display: none; }
+    @media print {
+      body.jx-printing > *:not(#jxPrint) { display: none !important; }
+      body.jx-printing #jxPrint { display: block !important; }
+      #jxPrint .pp { page-break-after: always; text-align: center; padding: 10mm 6mm; font-family: sans-serif; color: #222; }
+      #jxPrint .pp img { max-width: 100%; max-height: 220mm; }
+      #jxPrint .pp h4 { font-size: 20pt; margin: 8mm 0 3mm; } #jxPrint .pp p { font-size: 13pt; line-height: 1.6; }
+    }
+    .jx-confetti { position: fixed; inset: 0; pointer-events: none; z-index: 9500; overflow: hidden; }
+    .jx-confetti i { position: absolute; top: -20px; font-style: normal; font-size: 22px; animation: jxConf 1.8s ease-in forwards; }
+    @keyframes jxConf { to { transform: translateY(105vh) rotate(540deg); opacity: .2; } }
+    .jx-vbtns { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 0 0 10px; }
+    .jx-vbtns button { border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.1); color: #fff; border-radius: 18px; padding: 7px 12px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  </style>
 </head>
 <body>
 
@@ -995,8 +1123,8 @@
       <div style="font-size:40px; margin-bottom:6px">🖼️</div>
       <div class="tk-title">AGJJ 아그짜에 오신 걸 환영해요</div>
       <div class="tk-sub">Art Gallery of J.J<br>작가 JJ의 그림 갤러리예요.</div>
-      <div class="tk-rules">· 광고 1번을 보면 <b>오늘 하루</b> 갤러리에 자유롭게 들어올 수 있어요.<br>· 특별전은 갤러리 안에서 전시마다 입장권이 따로 필요해요.</div>
-      <button class="tk-btn" id="gateGo" onclick="enterGalleryWithAd()"><span class="adb">AD</span> 시청 후 갤러리 입장</button>
+      <div class="tk-rules"><span class="ad-only">· 광고 1번을 보면 <b>오늘 하루</b> 갤러리에 자유롭게 들어올 수 있어요.<br></span>· 특별전은 갤러리 안에서 전시마다 입장권이 따로 필요해요.</div>
+      <button class="tk-btn" id="gateGo" onclick="enterGalleryWithAd()"><span class="adb">AD</span><span class="ad-only"> 시청 후</span> 갤러리 입장</button>
       <div class="tk-sub" id="gateMsg" style="margin:10px 0 0"></div>
     </div>
   </div>
@@ -1017,7 +1145,7 @@
       <div class="tk-title" id="tkTitle">특별전</div>
       <div class="tk-sub" id="tkSub"></div>
       <div class="tk-rules" id="tkRules"></div>
-      <button class="tk-btn" id="tkGo" onclick="enterWithAd()"><span class="adb">AD</span> 시청 후 입장하기</button>
+      <button class="tk-btn" id="tkGo" onclick="enterWithAd()"><span class="adb">AD</span><span class="ad-only"> 시청 후</span> 입장하기</button>
       <button class="tk-cancel" onclick="closeModal('tkModal')">다음에 볼게요</button>
     </div>
   </div>
@@ -1026,7 +1154,7 @@
   <div id="exitModal" class="tk-modal">
     <div class="tk-box">
       <div class="tk-title">퇴장할까요?</div>
-      <div class="tk-sub">퇴장한 뒤 다시 보려면 <b>입장권(광고 1번)</b>이 또 필요해요.<br>마음에 든 작품은 📥 Add to Collection으로 남겨 두셨나요?</div>
+      <div class="tk-sub">퇴장한 뒤 다시 보려면 <b>입장권<span class="ad-only">(광고 1번)</span></b>이 또 필요해요.<br>마음에 든 작품은 📥 Add to Collection으로 남겨 두셨나요?</div>
       <button class="tk-btn red" onclick="exitExhibition()">퇴장하기</button>
       <button class="tk-cancel" onclick="closeModal('exitModal')">계속 볼게요</button>
     </div>
@@ -1037,7 +1165,7 @@
     <div class="tk-box">
       <div class="tk-title">My Collection이 가득 찼어요</div>
       <div class="tk-sub" id="slotSub"></div>
-      <button class="tk-btn" onclick="addSlotWithAd()"><span class="adb">AD</span> 시청 후 1칸 늘리기</button>
+      <button class="tk-btn" onclick="addSlotWithAd()"><span class="adb">AD</span><span class="ad-only"> 시청 후</span> 1칸 늘리기</button>
       <button class="tk-cancel" onclick="closeModal('slotModal')">닫기</button>
     </div>
   </div>
@@ -1095,7 +1223,7 @@
         <p>· <b>저장 위치:</b> Google Firebase 서버(서울 지역)와 이 휴대폰</p>
         <p>· <b>다른 사람에게 보이는 정보:</b> 내가 정한 <b>닉네임</b>과 아트퐁 점수(순위표)만 보여요. 구글 이름·이메일·사진은 보이지 않아요.</p>
         <p>· <b>쓰는 곳:</b> 앱 기능을 위해서만 쓰고, 다른 곳에 팔거나 넘기지 않아요.</p>
-        <p>· <b>광고:</b> 구글 AdMob 광고가 나와요. 광고 회사의 정보 처리는 구글 정책을 따라요.</p>
+        <p class="ad-only">· <b>광고:</b> 구글 AdMob 광고가 나와요. 광고 회사의 정보 처리는 구글 정책을 따라요.</p>
         <p>· <b>지우기:</b> 내 계정 화면의 [계정 삭제]를 누르면 서버의 내 기록이 모두 지워져요.</p>
       </div>
       <button class="tk-btn" onclick="closeModal('privacyModal')">확인</button>
@@ -1198,12 +1326,12 @@
   <div id="view-word" class="view-container">
     <button class="back-gallery" onclick="openPlay()">← Play</button>
     <h2 style="font-size: 20px; font-weight: 600;">📜 Word Card</h2>
-    <div class="store-note">BBB 주제별 성경암송 말씀 한 구절과 J.J의 그림이 담긴 카드를 뽑아요. 주제를 고르면 그 주제에서만 나와요.<br>카드 1장 = 💧 페인트 1개 · 매일 🎨 오늘의 물감 5개 + 광고 1번에 💧 3개<br>카드 배경은 <span class="easel"></span> My Collection에 담은 작품 중에서 골라져요.</div>
+    <div class="store-note">BBB 주제별 성경암송 말씀 한 구절과 J.J의 그림이 담긴 카드를 뽑아요. 주제를 고르면 그 주제에서만 나와요.<br>카드 1장 = 💧 페인트 1개 · 매일 🎨 오늘의 물감 5개<span class="ad-only"> + 광고 1번에 💧 3개</span><br>카드 배경은 <span class="easel"></span> My Collection에 담은 작품 중에서 골라져요.</div>
     <div class="wc-cats" id="wcCats"></div>
     <div class="wc-top">
       <div class="wc-paint">💧 <span id="paintCnt">0</span></div>
       <button class="wc-btn" id="wcDraw" onclick="drawWordCard()">✨ 오늘의 말씀 뽑기 (💧 1)</button>
-      <button class="wc-btn ad" id="wcAd" onclick="earnPaint()"><span class="adb">AD</span> 시청 💧 +3</button>
+      <button class="wc-btn ad" id="wcAd" onclick="earnPaint()"><span class="adb">AD</span><span class="ad-only"> 시청</span><span class="no-ad-only">🎁 보너스</span> 💧 +3</button>
     </div>
     <h3 style="font-size:16px; margin-top:26px">My Cards <span id="wcCount" style="color:#94a3b8; font-weight:500"></span></h3>
     <div id="wcGrid" class="wc-grid"></div>
@@ -1555,7 +1683,7 @@
     }
 
 
-    const BUILTIN_ARTWORK_NOTES = {"01":{"title":"화가 JJ (Artist JJ)","meta":"아티스트 프로필","notes":{"ko":"안녕하세요! 그림 그리기를 가장 좋아하는 JJ입니다. 새하얀 종이 위에 제가 바라보는 세상과 마음속 상상들을 그려낼 때 가장 행복합니다. 사람들의 마음에 따뜻한 울림을 주는 멋진 화가가 되는 것이 저의 꿈입니다. 제 작은 온라인 전시관에 와주셔서 감사합니다!","en":"Hello! I am JJ, and painting is what I love most. I am happiest when filling blank paper with the world I see and the dreams in my imagination. My dream is to become a wonderful painter who touches people's hearts with warmth. Thank you for visiting my little online gallery!","ja":"こんにちは！絵を描くことが何よりも大好きなJJです。真っ白な紙の上に自分の目に映る世界や心の中の想像を描いている時が一番幸せです。人々の心に温かい響きを届ける素敵な画家になることが私の夢です。私の小さなオンライン展示館へようこそ！","zh":"大家好！我是JJ，画画是我最喜欢的事情。当在白纸上描绘我眼中的世界和心中的想象时，是我最幸福的时刻。我的梦想是成为一名能够温暖人心的优秀画家。感谢大家来到我的小小在线展览馆！","es":"¡Hola! Soy JJ, y pintar es lo que más amo en el mundo. Me siento más feliz cuando lleno el papel en blanco con el mundo que veo y la imaginación en mi corazón. Mi sueño es convertirme en un pintor maravilloso que toque los corazones de las personas con calidez. ¡Gracias por visitar mi pequeña galería virtual!"}},"03":{"title":"오렌지 스니커즈","date":"2026-08","meta":"스케치북위 수채화 | 2026-08","notes":{"ko":"주황색 운동화의 모양과 끈을 유심히 보면서 스케치북에 수채화로 그려봤어요.","en":"Artwork: 오렌지 스니커즈. Created by artist JJ.","ja":"作品：오렌지 스니커즈。作家JJの作品です。","zh":"作品：《오렌지 스니커즈》。JJ艺术家的画作。","es":"Obra: 오렌지 스니커즈. Creada por el artista JJ."},"genre":"수채화"},"04":{"title":"Refreshing Fragments","date":"2026-08","meta":"종이 위 원화 | 2026-08","notes":{"ko":"시원한 조각들이 모여서 답답한 마음까지 뻥 뚫리는 느낌을 주고 싶었어요.","en":"Artwork: Refreshing Fragments. Created by artist JJ.","ja":"作品：Refreshing Fragments。作家JJの作品です。","zh":"作品：《Refreshing Fragments》。JJ艺术家的画作。","es":"Obra: Refreshing Fragments. Creada por el artista JJ."},"genre":"수채화"},"05":{"title":"Beneath the Quiet Afternoon","date":"2026-08","meta":"종이 위 원화 | 2026-08","notes":{"ko":"조용하고 평화로운 오후의 햇살 아래 머무는 기분을 그렸어요.","en":"Artwork: Beneath the Quiet Afternoon. Created by artist JJ.","ja":"作品：Beneath the Quiet Afternoon。作家JJの作品です。","zh":"作品：《Beneath the Quiet Afternoon》。JJ艺术家的画作。","es":"Obra: Beneath the Quiet Afternoon. Creada por el artista JJ."},"genre":"수채화"},"06":{"title":"Rosy Chill","date":"2026-08","meta":"종이 위 원화 | 2026-08","notes":{"ko":"살짝 서늘한 바람 속에 분홍빛 설렘이 섞인 느낌을 담아보았어요.","en":"Artwork: Rosy Chill. Created by artist JJ.","ja":"作品：Rosy Chill。作家JJの作品です。","zh":"作品：《Rosy Chill》。JJ艺术家的画作。","es":"Obra: Rosy Chill. Creada por el artista JJ."},"genre":"수채화"},"07":{"title":"The Sprouting Earth","date":"2026-07","meta":"종이 위 원화 | 2026-07","notes":{"ko":"땅속에서 새싹이 고개를 쏙 내미는 순간이 참 신기해서 그렸어요.","en":"Artwork: The Sprouting Earth. Created by artist JJ.","ja":"作品：The Sprouting Earth。作家JJの作品です。","zh":"作品：《The Sprouting Earth》。JJ艺术家的画作。","es":"Obra: The Sprouting Earth. Creada por el artista JJ."},"genre":"수채화"},"08":{"title":"snowman","date":"2024-12","meta":"종이 위 원화 | 2025-12","notes":{"ko":"동글동글 눈사람을 만들 때의 차갑고 폭신한 느낌을 그렸어요.","en":"Artwork: snowman. Created by artist JJ.","ja":"作品：snowman。作家JJの作品です。","zh":"作品：《snowman》。JJ艺术家的画作。","es":"Obra: snowman. Creada por el artista JJ."},"genre":"자유작"},"09":{"title":"Bridge of yearning Over the Milky Way","date":"2024-12","meta":"종이 위 원화 | 2025-12","notes":{"ko":"은하수 위로 그리운 마음을 건너가는 다리가 있다면 꼭 건너가 보고 싶어요.","en":"Artwork: Bridge of yearning Over the Milky Way. Created by artist JJ.","ja":"作品：Bridge of yearning Over the Milky Way。作家JJの作品です。","zh":"作品：《Bridge of yearning Over the Milky Way》。JJ艺术家的画作。","es":"Obra: Bridge of yearning Over the Milky Way. Creada por el artista JJ."},"genre":"발상과 표현"},"10":{"title":"Cozy Christmas Bite","date":"2024-12","meta":"종이 위 원화 | 2025-12","notes":{"ko":"크리스마스에 한 입 먹으면 기분이 포근해질 것 같은 달콤한 그림이에요.","en":"Artwork: Cozy Christmas Bite. Created by artist JJ.","ja":"作品：Cozy Christmas Bite。作家JJの作品です。","zh":"作品：《Cozy Christmas Bite》。JJ艺术家的画作。","es":"Obra: Cozy Christmas Bite. Creada por el artista JJ."},"genre":"자유작"},"11":{"title":"Prism of Cherries","date":"2024-12","meta":"종이 위 원화 | 2025-12","notes":{"ko":"반짝이는 체리들이 빛을 받아 영롱하게 빛나는 것처럼 그렸어요.","en":"Artwork: Prism of Cherries. Created by artist JJ.","ja":"作品：Prism of Cherries。作家JJの作品です。","zh":"作品：《Prism of Cherries》。JJ艺术家的画作。","es":"Obra: Prism of Cherries. Creada por el artista JJ."},"genre":"자유작"},"12":{"title":"Homage of Matisse (Cat and Goldfish)","date":"2024-12","meta":"종이 위 원화 | 2025-12","notes":{"ko":"마티스 화가님 그림처럼 고양이와 금붕어가 한 화면에서 어울리는 모습을 상상했어요.","en":"Artwork: Homage of Matisse (Cat and Goldfish). Created by artist JJ.","ja":"作品：Homage of Matisse (Cat and Goldfish)。作家JJの作品です。","zh":"作品：《Homage of Matisse (Cat and Goldfish)》。JJ艺术家的画作。","es":"Obra: Homage of Matisse (Cat and Goldfish). Creada por el artista JJ."},"genre":"발상과 표현"},"13":{"title":"Wings in the dark","date":"2025-02","meta":"종이 위 원화 | 2026-02","notes":{"ko":"어두운 밤하늘 속에서도 날개를 펼치면 길을 찾을 수 있을 것 같아서 그렸어요.","en":"Artwork: Wings in the dark. Created by artist JJ.","ja":"作品：Wings in the dark。作家JJの作品です。","zh":"作品：《Wings in the dark》。JJ艺术家的画作。","es":"Obra: Wings in the dark. Creada por el artista JJ."},"genre":"발상과 표현"},"14":{"title":"Slient Symmetry","date":"2025-02","meta":"종이 위 원화 | 2025-02","notes":{"ko":"왼쪽과 오른쪽이 조용히 맞닿아 있는 모습을 맞추는 게 은근히 재미있었어요.","en":"Artwork: Slient Symmetry. Created by artist JJ.","ja":"作品：Slient Symmetry。作家JJの作品です。","zh":"作品：《Slient Symmetry》。JJ艺术家的画作。","es":"Obra: Slient Symmetry. Creada por el artista JJ."},"genre":"소묘"},"15":{"title":"Ink Magpie","date":"2025-02","meta":"종이 위 원화 | 2025-02","notes":{"ko":"까치의 까맣고 하얀 털 느낌이 선으로 잘 살아나도록 조심조심 그렸어요.","en":"Artwork: Ink Magpie. Created by artist JJ.","ja":"作品：Ink Magpie。作家JJの作品です。","zh":"作品：《Ink Magpie》。JJ艺术家的画作。","es":"Obra: Ink Magpie. Creada por el artista JJ."},"genre":"소묘"},"16":{"title":"Yellow Tulips in a Vase","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"꽃병 속 노란 튤립이 봄볕을 받아 환하게 웃는 것처럼 칠했어요.","en":"Artwork: Yellow Tulips in a Vase. Created by artist JJ.","ja":"作品：Yellow Tulips in a Vase。作家JJの作品です。","zh":"作品：《Yellow Tulips in a Vase》。JJ艺术家的画作。","es":"Obra: Yellow Tulips in a Vase. Creada por el artista JJ."},"genre":"수채화"},"17":{"title":"Crispy&Savory","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"바삭하고 고소한 간식이 눈앞에 있는 것처럼 맛있게 그려보았어요.","en":"Artwork: Crispy&Savory. Created by artist JJ.","ja":"作品：Crispy&Savory。作家JJの作品です。","zh":"作品：《Crispy&Savory》。JJ艺术家的画作。","es":"Obra: Crispy&Savory. Creada por el artista JJ."},"genre":"자유작"},"18":{"title":"Autumn over the Stone Wall","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"돌담 너머로 가을빛이 스며드는 풍경을 떠올리며 색을 골랐어요.","en":"Artwork: Autumn over the Stone Wall. Created by artist JJ.","ja":"作品：Autumn over the Stone Wall。作家JJの作品です。","zh":"作品：《Autumn over the Stone Wall》。JJ艺术家的画作。","es":"Obra: Autumn over the Stone Wall. Creada por el artista JJ."},"genre":"수채화"},"19":{"title":"Chasing Cherry Blossoms","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"바람에 흩날리는 벚꽃을 따라가듯 가벼운 마음으로 물감을 얹었어요.","en":"Artwork: Chasing Cherry Blossoms. Created by artist JJ.","ja":"作品：Chasing Cherry Blossoms。作家JJの作品です。","zh":"作品：《Chasing Cherry Blossoms》。JJ艺术家的画作。","es":"Obra: Chasing Cherry Blossoms. Creada por el artista JJ."},"genre":"수채화"},"20":{"title":"Ball","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"통통 튀는 공처럼 마음도 가볍게 뛰는 느낌으로 그렸어요.","en":"Artwork: Ball. Created by artist JJ.","ja":"作品：Ball。作家JJの作品です。","zh":"作品：《Ball》。JJ艺术家的画作。","es":"Obra: Ball. Creada por el artista JJ."},"genre":"자유작"},"21":{"title":"Three Pea Brothers","date":"2025-05","meta":"종이 위 원화 | 2025-05","notes":{"ko":"콩깍지 속 세 형제가 나란히 붙어 있는 모습이 귀엽고 다정했어요.","en":"Artwork: Three Pea Brothers. Created by artist JJ.","ja":"作品：Three Pea Brothers。作家JJの作品です。","zh":"作品：《Three Pea Brothers》。JJ艺术家的画作。","es":"Obra: Three Pea Brothers. Creada por el artista JJ."},"genre":"자유작"},"22":{"title":"choco","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"달콤한 초콜릿처럼 기분을 부드럽게 만들어 주는 그림이에요.","en":"Artwork: choco. Created by artist JJ.","ja":"作品：choco。作家JJの作品です。","zh":"作品：《choco》。JJ艺术家的画作。","es":"Obra: choco. Creada por el artista JJ."},"genre":"자유작"},"23":{"title":"Sea animals","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"바다 속에 사는 여러 친구들을 한자리에 모아 그려보았어요.","en":"Artwork: Sea animals. Created by artist JJ.","ja":"作品：Sea animals。作家JJの作品です。","zh":"作品：《Sea animals》。JJ艺术家的画作。","es":"Obra: Sea animals. Creada por el artista JJ."},"genre":"자유작"},"24":{"title":"The Starfish on the Beach","date":"2025-10","meta":"종이 위 원화 | 2025-10","notes":{"ko":"모래사장 위에 누워 있던 불가사리를 발견했을 때처럼 그렸어요.","en":"Artwork: The Starfish on the Beach. Created by artist JJ.","ja":"作品：The Starfish on the Beach。作家JJの作品です。","zh":"作品：《The Starfish on the Beach》。JJ艺术家的画作。","es":"Obra: The Starfish on the Beach. Creada por el artista JJ."},"genre":"자유작"},"25":{"title":"Robo Bird","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"로봇과 새가 만나면 어떤 모습일까 생각하면서 재미있게 꾸몄어요.","en":"Artwork: Robo Bird. Created by artist JJ.","ja":"作品：Robo Bird。作家JJの作品です。","zh":"作品：《Robo Bird》。JJ艺术家的画作。","es":"Obra: Robo Bird. Creada por el artista JJ."},"genre":"발상과 표현"},"26":{"title":"Hello, New York!","date":"2025-06","meta":"종이 위 원화 | 2025-06","notes":{"ko":"언젠가 가보고 싶은 뉴욕의 활기찬 풍경을 상상하며 반갑게 인사하듯 그렸어요.","en":"Artwork: Hello, New York!. Created by artist JJ.","ja":"作品：Hello, New York!。作家JJの作品です。","zh":"作品：《Hello, New York!》。JJ艺术家的画作。","es":"Obra: Hello, New York!. Creada por el artista JJ."},"genre":"발상과 표현"},"27":{"title":"Rose of Sharon","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"우리나라 무궁화의 꽃잎 결이 예쁘게 보이도록 색을 겹쳐 칠했어요.","en":"Artwork: Rose of Sharon. Created by artist JJ.","ja":"作品：Rose of Sharon。作家JJの作品です。","zh":"作品：《Rose of Sharon》。JJ艺术家的画作。","es":"Obra: Rose of Sharon. Creada por el artista JJ."},"genre":"수채화"},"28":{"title":"Let's Move!","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"가만히 있지 말고 몸을 움직이며 신나게 놀아보자는 마음을 담았어요.","en":"Artwork: Let's Move!. Created by artist JJ.","ja":"作品：Let's Move!。作家JJの作品です。","zh":"作品：《Let's Move!》。JJ艺术家的画作。","es":"Obra: Let's Move!. Creada por el artista JJ."},"genre":"자유작"},"29":{"title":"Yummy Dessert","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"보기만 해도 군침이 도는 맛있는 디저트들을 골라 그렸어요.","en":"Artwork: Yummy Dessert. Created by artist JJ.","ja":"作品：Yummy Dessert。作家JJの作品です。","zh":"作品：《Yummy Dessert》。JJ艺术家的画作。","es":"Obra: Yummy Dessert. Creada por el artista JJ."},"genre":"자유작"},"30":{"title":"Spring Church","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"봄날의 포근한 공기 속에서 반짝이는 교회의 모습을 담았어요.","en":"Artwork: Spring Church. Created by artist JJ.","ja":"作品：Spring Church。作家JJの作品です。","zh":"作品：《Spring Church》。JJ艺术家的画作。","es":"Obra: Spring Church. Creada por el artista JJ."},"genre":"수채화"},"31":{"title":"Bamboo Forest","date":"2025-05","meta":"종이 위 원화 | 2025-05","notes":{"ko":"쭉쭉 뻗은 대나무 숲에 들어가면 바람 소리만 들릴 것 같아서 그렸어요.","en":"Artwork: Bamboo Forest. Created by artist JJ.","ja":"作品：Bamboo Forest。作家JJの作品です。","zh":"作品：《Bamboo Forest》。JJ艺术家的画作。","es":"Obra: Bamboo Forest. Creada por el artista JJ."},"genre":"수채화"},"32":{"title":"One Rose","date":"2025-05","meta":"종이 위 원화 | 2025-05","notes":{"ko":"장미 한 송이가 가진 붉고 깊은 느낌을 한껏 담아보았어요.","en":"Artwork: One Rose. Created by artist JJ.","ja":"作品：One Rose。作家JJの作品です。","zh":"作品：《One Rose》。JJ艺术家的画作。","es":"Obra: One Rose. Creada por el artista JJ."},"genre":"수채화"},"33":{"title":"Magpie and Persimmons","date":"2026-01","meta":"종이 위 원화 | 2026-01","notes":{"ko":"주렁주렁 열린 감과 까치가 함께 있으니 기분 좋은 복이 오는 것 같아요.","en":"Artwork: Magpie and Persimmons. Created by artist JJ.","ja":"作品：Magpie and Persimmons。作家JJの作品です。","zh":"作品：《Magpie and Persimmons》。JJ艺术家的画作。","es":"Obra: Magpie and Persimmons. Creada por el artista JJ."},"genre":"수채화"},"34":{"title":"Winter Fun","date":"2026-01","meta":"종이 위 원화 | 2026-01","notes":{"ko":"추운 겨울날에도 신나게 놀던 기억을 떠올리며 차가운 색과 따뜻한 색을 섞었어요.","en":"Artwork: Winter Fun. Created by artist JJ.","ja":"作品：Winter Fun。作家JJの作品です。","zh":"作品：《Winter Fun》。JJ艺术家的画作。","es":"Obra: Winter Fun. Creada por el artista JJ."},"genre":"수채화"},"35":{"title":"Hiss Hiss!","date":"2026-02","meta":"종이 위 원화 | 2026-02","notes":{"ko":"장난기 가득한 소리와 표정이 살아나게 재미있게 그려보았어요.","en":"Artwork: Hiss Hiss!. Created by artist JJ.","ja":"作品：Hiss Hiss!。作家JJの作品です。","zh":"作品：《Hiss Hiss!》。JJ艺术家的画作。","es":"Obra: Hiss Hiss!. Creada por el artista JJ."},"genre":"자유작"},"36":{"title":"Rainbow Bouquet","date":"2026-02","meta":"종이 위 원화 | 2026-02","notes":{"ko":"무지개처럼 여러 색깔 꽃다발을 묶으면 보는 사람도 기분이 좋아질 것 같았어요.","en":"Artwork: Rainbow Bouquet. Created by artist JJ.","ja":"作品：Rainbow Bouquet。作家JJの作品です。","zh":"作品：《Rainbow Bouquet》。JJ艺术家的画作。","es":"Obra: Rainbow Bouquet. Creada por el artista JJ."},"genre":"수채화"},"37":{"title":"My Kitchen","date":"2026-02","meta":"종이 위 원화 | 2026-02","notes":{"ko":"내가 좋아하는 것들로 가득 채운 나만의 작은 부엌을 상상했어요.","en":"Artwork: My Kitchen. Created by artist JJ.","ja":"作品：My Kitchen。作家JJの作品です。","zh":"作品：《My Kitchen》。JJ艺术家的画作。","es":"Obra: My Kitchen. Creada por el artista JJ."},"genre":"자유작"},"38":{"title":"Red Hat Lady","date":"2026-03","meta":"종이 위 원화 | 2026-03","notes":{"ko":"빨간 모자가 딱 눈에 띄도록 당당하고 멋지게 그려보았어요.","en":"Artwork: Red Hat Lady. Created by artist JJ.","ja":"作品：Red Hat Lady。作家JJの作品です。","zh":"作品：《Red Hat Lady》。JJ艺术家的画作。","es":"Obra: Red Hat Lady. Creada por el artista JJ."},"genre":"자유작"},"39":{"title":"Sail Away!","date":"2026-03","meta":"종이 위 원화 | 2026-03","notes":{"ko":"돛을 달고 새로운 바다로 떠나는 설레는 마음을 담았어요.","en":"Artwork: Sail Away!. Created by artist JJ.","ja":"作品：Sail Away!。作家JJの作品です。","zh":"作品：《Sail Away!》。JJ艺术家的画作。","es":"Obra: Sail Away!. Creada por el artista JJ."},"genre":"자유작"},"40":{"title":"Under the Green Tree","date":"2026-05","meta":"종이 위 원화 | 2026-05","notes":{"ko":"초록빛 나무 아래 앉아 쉬면 금방 시원해질 것 같은 장면을 그렸어요.","en":"Artwork: Under the Green Tree. Created by artist JJ.","ja":"作品：Under the Green Tree。作家JJの作品です。","zh":"作品：《Under the Green Tree》。JJ艺术家的画作。","es":"Obra: Under the Green Tree. Creada por el artista JJ."},"genre":"수채화"},"41":{"title":"A Walk in the Garden","date":"2026-05","meta":"종이 위 원화 | 2026-05","notes":{"ko":"정원을 천천히 산책하면서 만난 작은 풀과 꽃들을 하나씩 담았어요.","en":"Artwork: A Walk in the Garden. Created by artist JJ.","ja":"作品：A Walk in the Garden。作家JJの作品です。","zh":"作品：《A Walk in the Garden》。JJ艺术家的画作。","es":"Obra: A Walk in the Garden. Creada por el artista JJ."},"genre":"수채화"},"42":{"title":"My Rainbow Bird","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"무지개 빛깔 날개를 가진 새가 하늘을 날면 얼마나 예쁠까 상상했어요.","en":"Artwork: My Rainbow Bird. Created by artist JJ.","ja":"作品：My Rainbow Bird。作家JJの作品です。","zh":"作品：《My Rainbow Bird》。JJ艺术家的画作。","es":"Obra: My Rainbow Bird. Creada por el artista JJ."},"genre":"수채화"},"43":{"title":"A Puppy Made of Shapes","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"세모, 네모, 동그라미 같은 도형들을 모으니까 귀여운 강아지가 되었어요.","en":"Artwork: A Puppy Made of Shapes. Created by artist JJ.","ja":"作品：A Puppy Made of Shapes。作家JJの作品です。","zh":"作品：《A Puppy Made of Shapes》。JJ艺术家的画作。","es":"Obra: A Puppy Made of Shapes. Creada por el artista JJ."},"genre":"소묘"},"44":{"title":"Korean Patterns","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"우리나라 전통 문양의 무늬들이 이어지면서 만드는 리듬이 멋있었어요.","en":"Artwork: Korean Patterns. Created by artist JJ.","ja":"作品：Korean Patterns。作家JJの作品です。","zh":"作品：《Korean Patterns》。JJ艺术家的画作。","es":"Obra: Korean Patterns. Creada por el artista JJ."},"genre":"발상과 표현"},"45":{"title":"my home","date":"2022-11","meta":"종이 위 원화 | 2022-11","notes":{"ko":"내가 가장 편하고 안전한 우리 집의 모습을 따뜻하게 그렸어요.","en":"Artwork: my home. Created by artist JJ.","ja":"作品：my home。作家JJの作品です。","zh":"作品：《my home》。JJ艺术家的画作。","es":"Obra: my home. Creada por el artista JJ."},"genre":"자유작"},"46":{"title":"나의 장래희망","date":"2026-11","meta":"종이 위 원화 | 2026-11","notes":{"ko":"앞으로 내가 어떤 사람이 되고 싶은지, 어떤 꿈을 키우고 있는지 담았어요.","en":"Artwork: 나의 장래희망. Created by artist JJ.","ja":"作品：나의 장래희망。作家JJの作品です。","zh":"作品：《나의 장래희망》。JJ艺术家的画作。","es":"Obra: 나의 장래희망. Creada por el artista JJ."},"genre":"발상과 표현"},"47":{"title":"Let's smile!","date":"2025-11","meta":"2025-11","notes":{"ko":"그림을 보는 사람도, 그리는 나도 같이 웃게 되길 바라며 그렸어요.","en":"Artwork: Let's smile!. Created by artist JJ.","ja":"作品：Let's smile!。作家JJの作品です。","zh":"作品：《Let's smile!》。JJ艺术家的画作。","es":"Obra: Let's smile!. Creada por el artista JJ."},"genre":"자유작"},"48":{"title":"Protect Earth!","date":"2025-12","meta":"2025-12","notes":{"ko":"우리가 사는 지구를 소중하게 지키자는 마음을 그림에 꼭 담고 싶었어요.","en":"Artwork: Protect Earth!. Created by artist JJ.","ja":"作品：Protect Earth!。作家JJの作品です。","zh":"作品：《Protect Earth!》。JJ艺术家的画作。","es":"Obra: Protect Earth!. Creada por el artista JJ."},"genre":"발상과 표현"},"49":{"title":"My Autumn Leaves","date":"2025-11","meta":"2025-11","notes":{"ko":"주워 모은 낙엽들처럼 색색깔 가을의 조각들을 모았어요.","en":"Artwork: My Autumn Leaves. Created by artist JJ.","ja":"作品：My Autumn Leaves。作家JJの作品です。","zh":"作品：《My Autumn Leaves》。JJ艺术家的画作。","es":"Obra: My Autumn Leaves. Creada por el artista JJ."},"genre":"자유작"},"50":{"title":"Stripes, Stripes!","date":"2025-11","meta":"2025-11","notes":{"ko":"줄무늬가 가득한 화면을 보면서 리듬감을 느껴보았어요.","en":"Artwork: Stripes, Stripes!. Created by artist JJ.","ja":"作品：Stripes, Stripes!。作家JJの作品です。","zh":"作品：《Stripes, Stripes!》。JJ艺术家的画作。","es":"Obra: Stripes, Stripes!. Creada por el artista JJ."},"genre":"자유작"},"51":{"title":"sun flower","date":"2025-11","meta":"2025-11","notes":{"ko":"해바라기처럼 밝고 환한 에너지를 담아서 그려보았어요.","en":"Artwork: sun flower. Created by artist JJ.","ja":"作品：sun flower。作家JJの作品です。","zh":"作品：《sun flower》。JJ艺术家的画作。","es":"Obra: sun flower. Creada por el artista JJ."},"genre":"자유작"},"52":{"title":"Pine tree","date":"2025-10","meta":"2025-10","notes":{"ko":"사계절 내내 푸른 소나무의 단단한 모습을 담고 싶었어요.","en":"Artwork: Pine tree. Created by artist JJ.","ja":"作品：Pine tree。作家JJの作品です。","zh":"作品：《Pine tree》。JJ艺术家的画作。","es":"Obra: Pine tree. Creada por el artista JJ."},"genre":"자유작"},"53":{"title":"Window Cat","date":"2025-09","meta":"2025-09","notes":{"ko":"창가에 기대어 바깥을 구경하던 고양이의 모습이 조용하고 귀여웠어요.","en":"Artwork: Window Cat. Created by artist JJ.","ja":"作品：Window Cat。作家JJの作品です。","zh":"作品：《Window Cat》。JJ艺术家的画作。","es":"Obra: Window Cat. Creada por el artista JJ."},"genre":"자유작"},"54":{"title":"Shiny Glass","date":"2025-10","meta":"2025-10","notes":{"ko":"유리컵이나 창문에서 반짝이는 빛을 어떻게 표현할지 고민하며 그렸어요.","en":"Artwork: Shiny Glass. Created by artist JJ.","ja":"作品：Shiny Glass。作家JJの作品です。","zh":"作品：《Shiny Glass》。JJ艺术家的画作。","es":"Obra: Shiny Glass. Creada por el artista JJ."},"genre":"소묘"},"55":{"title":"Halloween","date":"2025-10","meta":"2025-10","notes":{"ko":"무섭기보다는 장난기 가득한 할로윈 파티 분위기를 살려보았어요.","en":"Artwork: Halloween. Created by artist JJ.","ja":"作品：Halloween。作家JJの作品です。","zh":"作品：《Halloween》。JJ艺术家的画作。","es":"Obra: Halloween. Creada por el artista JJ."},"genre":"발상과 표현"},"56":{"title":"Milk","date":"2025-07","meta":"2025-07","notes":{"ko":"하얗고 고소한 우유 한 잔처럼 깔끔하고 담백하게 그려보았어요.","en":"Artwork: Milk. Created by artist JJ.","ja":"作品：Milk。作家JJの作品です。","zh":"作品：《Milk》。JJ艺术家的画作。","es":"Obra: Milk. Creada por el artista JJ."},"genre":"자유작"},"57":{"title":"morol","date":"2025-08","meta":"2025-08","notes":{"ko":"그때 떠오른 느낌을 그대로 손끝으로 옮겨 적은 자유로운 그림이에요.","en":"Artwork: morol. Created by artist JJ.","ja":"作品：morol。作家JJの作品です。","zh":"作品：《morol》。JJ艺术家的画作。","es":"Obra: morol. Creada por el artista JJ."},"genre":"자유작"},"58":{"title":"Rabbit","date":"2025-07","meta":"2025-07","notes":{"ko":"긴 귀가 매력적인 토끼의 모습을 편안하게 담아보았어요.","en":"Artwork: Rabbit. Created by artist JJ.","ja":"作品：Rabbit。作家JJの作品です。","zh":"作品：《Rabbit》。JJ艺术家的画作。","es":"Obra: Rabbit. Creada por el artista JJ."},"genre":"자유작"},"59":{"title":"P","date":"2025-08","meta":"2025-08","notes":{"ko":"알파벳 'P' 하나에서도 새로운 모양과 상상을 꺼내 보았어요.","en":"Artwork: P. Created by artist JJ.","ja":"作品：P。作家JJの作品です。","zh":"作品：《P》。JJ艺术家的画作。","es":"Obra: P. Creada por el artista JJ."},"genre":"자유작"},"60":{"title":"My Irworobongdo","date":"2025-07","meta":"2025-07","notes":{"ko":"일월오봉도의 멋진 모습을 나만의 색과 느낌으로 다시 그려보았어요.","en":"Artwork: My Irworobongdo. Created by artist JJ.","ja":"作品：My Irworobongdo。作家JJの作品です。","zh":"作品：《My Irworobongdo》。JJ艺术家的画作。","es":"Obra: My Irworobongdo. Creada por el artista JJ."},"genre":"발상과 표현"},"61":{"title":"watermelon","date":"2025-07","meta":"2025-07","notes":{"ko":"여름에 시원하게 먹던 수박의 빨간 속살과 씨를 떠올리며 그렸어요.","en":"Artwork: watermelon. Created by artist JJ.","ja":"作品：watermelon。作家JJの作品です。","zh":"作品：《watermelon》。JJ艺术家的画作。","es":"Obra: watermelon. Creada por el artista JJ."},"genre":"자유작"},"62":{"title":"The Whale in My Dream","date":"2025-08","meta":"2025-08","notes":{"ko":"꿈속에서 커다란 고래와 함께 헤엄치던 신기한 장면을 떠올렸어요.","en":"Artwork: The Whale in My Dream. Created by artist JJ.","ja":"作品：The Whale in My Dream。作家JJの作品です。","zh":"作品：《The Whale in My Dream》。JJ艺术家的画作。","es":"Obra: The Whale in My Dream. Creada por el artista JJ."},"genre":"발상과 표현"},"63":{"title":"Derpy","date":"2025-08","meta":"2025-08","notes":{"ko":"어딘가 엉뚱하고 귀여운 표정이 살아나도록 재미있게 그렸어요.","en":"Artwork: Derpy. Created by artist JJ.","ja":"作品：Derpy。作家JJの作品です。","zh":"作品：《Derpy》。JJ艺术家的画作。","es":"Obra: Derpy. Creada por el artista JJ."},"genre":"자유작"},"64":{"title":"Zipline","date":"2022-11","meta":"2022-11","notes":{"ko":"짚라인을 타고 휙 날아갈 때의 짜릿한 기분을 그림으로 남겨보았어요.","en":"Artwork: Zipline. Created by artist JJ.","ja":"作品：Zipline。作家JJの作品です。","zh":"作品：《Zipline》。JJ艺术家的画作。","es":"Obra: Zipline. Creada por el artista JJ."},"genre":"자유작"},"65":{"title":"My Unicorn World","date":"2022-06","meta":"2022-06","notes":{"ko":"유니콘이 사는 동화 속 세상이 있다면 꼭 놀러 가고 싶어서 그렸어요.","en":"Artwork: My Unicorn World. Created by artist JJ.","ja":"作品：My Unicorn World。作家JJの作品です。","zh":"作品：《My Unicorn World》。JJ艺术家的画作。","es":"Obra: My Unicorn World. Creada por el artista JJ."},"genre":"자유작"},"66":{"title":"Snack Time with Mom","date":"2022-06","meta":"2022-06","notes":{"ko":"엄마랑 맛있는 간식을 먹으면서 이야기 나누던 시간이 참 좋았어요.","en":"Artwork: Snack Time with Mom. Created by artist JJ.","ja":"作品：Snack Time with Mom。作家JJの作品です。","zh":"作品：《Snack Time with Mom》。JJ艺术家的画作。","es":"Obra: Snack Time with Mom. Creada por el artista JJ."},"genre":"자유작"},"67":{"title":"Bunny Garden","date":"2022-07","meta":"2022-07","notes":{"ko":"토끼들이 모여 노는 정원을 생각하니까 저절로 미소가 나왔어요.","en":"Artwork: Bunny Garden. Created by artist JJ.","ja":"作品：Bunny Garden。作家JJの作品です。","zh":"作品：《Bunny Garden》。JJ艺术家的画作。","es":"Obra: Bunny Garden. Creada por el artista JJ."},"genre":"자유작"},"68":{"title":"Meow Meow, Let's Go!","date":"2022-08","meta":"2022-08","notes":{"ko":"고양이랑 함께 신나게 출발하는 기분으로 씩씩하게 그렸어요.","en":"Artwork: Meow Meow, Let's Go!. Created by artist JJ.","ja":"作品：Meow Meow, Let's Go!。作家JJの作品です。","zh":"作品：《Meow Meow, Let's Go!》。JJ艺术家的画作。","es":"Obra: Meow Meow, Let's Go!. Creada por el artista JJ."},"genre":"자유작"},"69":{"title":"Welcome to the Bee House!","date":"2022-10","meta":"2022-10","notes":{"ko":"꿀벌 친구들의 집에 초대받은 것처럼 아기자기하게 채워 넣었어요.","en":"Artwork: Welcome to the Bee House!. Created by artist JJ.","ja":"作品：Welcome to the Bee House!。作家JJの作品です。","zh":"作品：《Welcome to the Bee House!》。JJ艺术家的画作。","es":"Obra: Welcome to the Bee House!. Creada por el artista JJ."},"genre":"자유작"},"70":{"title":"Dancing on the Music Box","date":"2022-09","meta":"2022-09","notes":{"ko":"오르골 음악에 맞춰 작은 인형이 춤추는 것처럼 그려보았어요.","en":"Artwork: Dancing on the Music Box. Created by artist JJ.","ja":"作品：Dancing on the Music Box。作家JJの作品です。","zh":"作品：《Dancing on the Music Box》。JJ艺术家的画作。","es":"Obra: Dancing on the Music Box. Creada por el artista JJ."},"genre":"자유작"},"71":{"title":"Horse","date":"2026-01","meta":"2026-01","notes":{"ko":"말의 씩씩한 몸짓과 움직임이 느껴지게 선을 써 보았어요.","en":"Artwork: Horse. Created by artist JJ.","ja":"作品：Horse。作家JJの作品です。","zh":"作品：《Horse》。JJ艺术家的画作。","es":"Obra: Horse. Creada por el artista JJ."},"genre":"소묘"},"72":{"title":"Boy","date":"2026-01","meta":"2026-01","notes":{"ko":"한 소년의 표정과 모습을 차분하게 바라보며 완성한 그림이에요.","en":"Artwork: Boy. Created by artist JJ.","ja":"作品：Boy。作家JJの作品です。","zh":"作品：《Boy》。JJ艺术家的画作。","es":"Obra: Boy. Creada por el artista JJ."},"genre":"소묘"},"73":{"title":"Sea city","date":"2026-01","meta":"2026-01","notes":{"ko":"바다 속에 도시가 있다면 물고기들과 어떻게 살아갈지 상상해 보았어요.","en":"Artwork: Sea city. Created by artist JJ.","ja":"作品：Sea city。作家JJの作品です。","zh":"作品：《Sea city》。JJ艺术家的画作。","es":"Obra: Sea city. Creada por el artista JJ."},"genre":"발상과 표현"}};
+    const BUILTIN_ARTWORK_NOTES = {"01":{"title":"화가 JJ (Artist JJ)","meta":"아티스트 프로필","notes":{"ko":"안녕하세요! 그림 그리기를 가장 좋아하는 JJ입니다. 새하얀 종이 위에 제가 바라보는 세상과 마음속 상상들을 그려낼 때 가장 행복합니다. 사람들의 마음에 따뜻한 울림을 주는 멋진 화가가 되는 것이 저의 꿈입니다. 제 작은 온라인 전시관에 와주셔서 감사합니다!","en":"Hello! I am JJ, and painting is what I love most. I am happiest when filling blank paper with the world I see and the dreams in my imagination. My dream is to become a wonderful painter who touches people's hearts with warmth. Thank you for visiting my little online gallery!","ja":"こんにちは！絵を描くことが何よりも大好きなJJです。真っ白な紙の上に自分の目に映る世界や心の中の想像を描いている時が一番幸せです。人々の心に温かい響きを届ける素敵な画家になることが私の夢です。私の小さなオンライン展示館へようこそ！","zh":"大家好！我是JJ，画画是我最喜欢的事情。当在白纸上描绘我眼中的世界和心中的想象时，是我最幸福的时刻。我的梦想是成为一名能够温暖人心的优秀画家。感谢大家来到我的小小在线展览馆！","es":"¡Hola! Soy JJ, y pintar es lo que más amo en el mundo. Me siento más feliz cuando lleno el papel en blanco con el mundo que veo y la imaginación en mi corazón. Mi sueño es convertirme en un pintor maravilloso que toque los corazones de las personas con calidez. ¡Gracias por visitar mi pequeña galería virtual!"}},"03":{"title":"오렌지 스니커즈","date":"2026-08","meta":"스케치북위 수채화 | 2026-08","notes":{"ko":"주황색 운동화의 모양과 끈을 유심히 보면서 스케치북에 수채화로 그려봤어요.","en":"Artwork: 오렌지 스니커즈. Created by artist JJ.","ja":"作品：오렌지 스니커즈。作家JJの作品です。","zh":"作品：《오렌지 스니커즈》。JJ艺术家的画作。","es":"Obra: 오렌지 스니커즈. Creada por el artista JJ."},"genre":"수채화"},"04":{"title":"Refreshing Fragments","date":"2026-08","meta":"종이 위 원화 | 2026-08","notes":{"ko":"시원한 조각들이 모여서 답답한 마음까지 뻥 뚫리는 느낌을 주고 싶었어요.","en":"Artwork: Refreshing Fragments. Created by artist JJ.","ja":"作品：Refreshing Fragments。作家JJの作品です。","zh":"作品：《Refreshing Fragments》。JJ艺术家的画作。","es":"Obra: Refreshing Fragments. Creada por el artista JJ."},"genre":"수채화"},"05":{"title":"Beneath the Quiet Afternoon","date":"2026-08","meta":"종이 위 원화 | 2026-08","notes":{"ko":"조용하고 평화로운 오후의 햇살 아래 머무는 기분을 그렸어요.","en":"Artwork: Beneath the Quiet Afternoon. Created by artist JJ.","ja":"作品：Beneath the Quiet Afternoon。作家JJの作品です。","zh":"作品：《Beneath the Quiet Afternoon》。JJ艺术家的画作。","es":"Obra: Beneath the Quiet Afternoon. Creada por el artista JJ."},"genre":"수채화"},"06":{"title":"Rosy Chill","date":"2026-08","meta":"종이 위 원화 | 2026-08","notes":{"ko":"살짝 서늘한 바람 속에 분홍빛 설렘이 섞인 느낌을 담아보았어요.","en":"Artwork: Rosy Chill. Created by artist JJ.","ja":"作品：Rosy Chill。作家JJの作品です。","zh":"作品：《Rosy Chill》。JJ艺术家的画作。","es":"Obra: Rosy Chill. Creada por el artista JJ."},"genre":"수채화"},"07":{"title":"The Sprouting Earth","date":"2026-07","meta":"종이 위 원화 | 2026-07","notes":{"ko":"땅속에서 새싹이 고개를 쏙 내미는 순간이 참 신기해서 그렸어요.","en":"Artwork: The Sprouting Earth. Created by artist JJ.","ja":"作品：The Sprouting Earth。作家JJの作品です。","zh":"作品：《The Sprouting Earth》。JJ艺术家的画作。","es":"Obra: The Sprouting Earth. Creada por el artista JJ."},"genre":"수채화"},"08":{"title":"snowman","date":"2024-12","meta":"종이 위 원화 | 2024-12","notes":{"ko":"동글동글 눈사람을 만들 때의 차갑고 폭신한 느낌을 그렸어요.","en":"Artwork: snowman. Created by artist JJ.","ja":"作品：snowman。作家JJの作品です。","zh":"作品：《snowman》。JJ艺术家的画作。","es":"Obra: snowman. Creada por el artista JJ."},"genre":"자유작"},"09":{"title":"Bridge of yearning Over the Milky Way","date":"2024-12","meta":"종이 위 원화 | 2024-12","notes":{"ko":"은하수 위로 그리운 마음을 건너가는 다리가 있다면 꼭 건너가 보고 싶어요.","en":"Artwork: Bridge of yearning Over the Milky Way. Created by artist JJ.","ja":"作品：Bridge of yearning Over the Milky Way。作家JJの作品です。","zh":"作品：《Bridge of yearning Over the Milky Way》。JJ艺术家的画作。","es":"Obra: Bridge of yearning Over the Milky Way. Creada por el artista JJ."},"genre":"발상과 표현"},"10":{"title":"Cozy Christmas Bite","date":"2025-01","meta":"종이 위 원화 | 2025-01","notes":{"ko":"크리스마스에 한 입 먹으면 기분이 포근해질 것 같은 달콤한 그림이에요.","en":"Artwork: Cozy Christmas Bite. Created by artist JJ.","ja":"作品：Cozy Christmas Bite。作家JJの作品です。","zh":"作品：《Cozy Christmas Bite》。JJ艺术家的画作。","es":"Obra: Cozy Christmas Bite. Creada por el artista JJ."},"genre":"자유작"},"11":{"title":"Prism of Cherries","date":"2025-02","meta":"종이 위 원화 | 2025-02","notes":{"ko":"반짝이는 체리들이 빛을 받아 영롱하게 빛나는 것처럼 그렸어요.","en":"Artwork: Prism of Cherries. Created by artist JJ.","ja":"作品：Prism of Cherries。作家JJの作品です。","zh":"作品：《Prism of Cherries》。JJ艺术家的画作。","es":"Obra: Prism of Cherries. Creada por el artista JJ."},"genre":"자유작"},"12":{"title":"Homage of Matisse (Cat and Goldfish)","date":"2024-12","meta":"종이 위 원화 | 2024-12","notes":{"ko":"마티스 화가님 그림처럼 고양이와 금붕어가 한 화면에서 어울리는 모습을 상상했어요.","en":"Artwork: Homage of Matisse (Cat and Goldfish). Created by artist JJ.","ja":"作品：Homage of Matisse (Cat and Goldfish)。作家JJの作品です。","zh":"作品：《Homage of Matisse (Cat and Goldfish)》。JJ艺术家的画作。","es":"Obra: Homage of Matisse (Cat and Goldfish). Creada por el artista JJ."},"genre":"발상과 표현"},"13":{"title":"Wings in the dark","date":"2025-02","meta":"종이 위 원화 | 2025-02","notes":{"ko":"어두운 밤하늘 속에서도 날개를 펼치면 길을 찾을 수 있을 것 같아서 그렸어요.","en":"Artwork: Wings in the dark. Created by artist JJ.","ja":"作品：Wings in the dark。作家JJの作品です。","zh":"作品：《Wings in the dark》。JJ艺术家的画作。","es":"Obra: Wings in the dark. Creada por el artista JJ."},"genre":"발상과 표현"},"14":{"title":"Slient Symmetry","date":"2025-02","meta":"종이 위 원화 | 2025-02","notes":{"ko":"왼쪽과 오른쪽이 조용히 맞닿아 있는 모습을 맞추는 게 은근히 재미있었어요.","en":"Artwork: Slient Symmetry. Created by artist JJ.","ja":"作品：Slient Symmetry。作家JJの作品です。","zh":"作品：《Slient Symmetry》。JJ艺术家的画作。","es":"Obra: Slient Symmetry. Creada por el artista JJ."},"genre":"소묘"},"15":{"title":"Ink Magpie","date":"2025-02","meta":"종이 위 원화 | 2025-02","notes":{"ko":"까치의 까맣고 하얀 털 느낌이 선으로 잘 살아나도록 조심조심 그렸어요.","en":"Artwork: Ink Magpie. Created by artist JJ.","ja":"作品：Ink Magpie。作家JJの作品です。","zh":"作品：《Ink Magpie》。JJ艺术家的画作。","es":"Obra: Ink Magpie. Creada por el artista JJ."},"genre":"소묘"},"16":{"title":"Yellow Tulips in a Vase","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"꽃병 속 노란 튤립이 봄볕을 받아 환하게 웃는 것처럼 칠했어요.","en":"Artwork: Yellow Tulips in a Vase. Created by artist JJ.","ja":"作品：Yellow Tulips in a Vase。作家JJの作品です。","zh":"作品：《Yellow Tulips in a Vase》。JJ艺术家的画作。","es":"Obra: Yellow Tulips in a Vase. Creada por el artista JJ."},"genre":"수채화"},"17":{"title":"Crispy&Savory","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"바삭하고 고소한 간식이 눈앞에 있는 것처럼 맛있게 그려보았어요.","en":"Artwork: Crispy&Savory. Created by artist JJ.","ja":"作品：Crispy&Savory。作家JJの作品です。","zh":"作品：《Crispy&Savory》。JJ艺术家的画作。","es":"Obra: Crispy&Savory. Creada por el artista JJ."},"genre":"자유작"},"18":{"title":"Autumn over the Stone Wall","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"돌담 너머로 가을빛이 스며드는 풍경을 떠올리며 색을 골랐어요.","en":"Artwork: Autumn over the Stone Wall. Created by artist JJ.","ja":"作品：Autumn over the Stone Wall。作家JJの作品です。","zh":"作品：《Autumn over the Stone Wall》。JJ艺术家的画作。","es":"Obra: Autumn over the Stone Wall. Creada por el artista JJ."},"genre":"수채화"},"19":{"title":"Chasing Cherry Blossoms","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"바람에 흩날리는 벚꽃을 따라가듯 가벼운 마음으로 물감을 얹었어요.","en":"Artwork: Chasing Cherry Blossoms. Created by artist JJ.","ja":"作品：Chasing Cherry Blossoms。作家JJの作品です。","zh":"作品：《Chasing Cherry Blossoms》。JJ艺术家的画作。","es":"Obra: Chasing Cherry Blossoms. Creada por el artista JJ."},"genre":"수채화"},"20":{"title":"Ball","date":"2025-04","meta":"종이 위 원화 | 2025-04","notes":{"ko":"통통 튀는 공처럼 마음도 가볍게 뛰는 느낌으로 그렸어요.","en":"Artwork: Ball. Created by artist JJ.","ja":"作品：Ball。作家JJの作品です。","zh":"作品：《Ball》。JJ艺术家的画作。","es":"Obra: Ball. Creada por el artista JJ."},"genre":"자유작"},"21":{"title":"Three Pea Brothers","date":"2025-05","meta":"종이 위 원화 | 2025-05","notes":{"ko":"콩깍지 속 세 형제가 나란히 붙어 있는 모습이 귀엽고 다정했어요.","en":"Artwork: Three Pea Brothers. Created by artist JJ.","ja":"作品：Three Pea Brothers。作家JJの作品です。","zh":"作品：《Three Pea Brothers》。JJ艺术家的画作。","es":"Obra: Three Pea Brothers. Creada por el artista JJ."},"genre":"자유작"},"22":{"title":"choco","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"달콤한 초콜릿처럼 기분을 부드럽게 만들어 주는 그림이에요.","en":"Artwork: choco. Created by artist JJ.","ja":"作品：choco。作家JJの作品です。","zh":"作品：《choco》。JJ艺术家的画作。","es":"Obra: choco. Creada por el artista JJ."},"genre":"자유작"},"23":{"title":"Sea animals","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"바다 속에 사는 여러 친구들을 한자리에 모아 그려보았어요.","en":"Artwork: Sea animals. Created by artist JJ.","ja":"作品：Sea animals。作家JJの作品です。","zh":"作品：《Sea animals》。JJ艺术家的画作。","es":"Obra: Sea animals. Creada por el artista JJ."},"genre":"자유작"},"24":{"title":"The Starfish on the Beach","date":"2025-06","meta":"종이 위 원화 | 2025-06","notes":{"ko":"모래사장 위에 누워 있던 불가사리를 발견했을 때처럼 그렸어요.","en":"Artwork: The Starfish on the Beach. Created by artist JJ.","ja":"作品：The Starfish on the Beach。作家JJの作品です。","zh":"作品：《The Starfish on the Beach》。JJ艺术家的画作。","es":"Obra: The Starfish on the Beach. Creada por el artista JJ."},"genre":"자유작"},"25":{"title":"Robo Bird","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"로봇과 새가 만나면 어떤 모습일까 생각하면서 재미있게 꾸몄어요.","en":"Artwork: Robo Bird. Created by artist JJ.","ja":"作品：Robo Bird。作家JJの作品です。","zh":"作品：《Robo Bird》。JJ艺术家的画作。","es":"Obra: Robo Bird. Creada por el artista JJ."},"genre":"발상과 표현"},"26":{"title":"Hello, New York!","date":"2025-06","meta":"종이 위 원화 | 2025-06","notes":{"ko":"언젠가 가보고 싶은 뉴욕의 활기찬 풍경을 상상하며 반갑게 인사하듯 그렸어요.","en":"Artwork: Hello, New York!. Created by artist JJ.","ja":"作品：Hello, New York!。作家JJの作品です。","zh":"作品：《Hello, New York!》。JJ艺术家的画作。","es":"Obra: Hello, New York!. Creada por el artista JJ."},"genre":"발상과 표현"},"27":{"title":"Rose of Sharon","date":"2025-06","meta":"종이 위 원화 | 2025-06","notes":{"ko":"우리나라 무궁화의 꽃잎 결이 예쁘게 보이도록 색을 겹쳐 칠했어요.","en":"Artwork: Rose of Sharon. Created by artist JJ.","ja":"作品：Rose of Sharon。作家JJの作品です。","zh":"作品：《Rose of Sharon》。JJ艺术家的画作。","es":"Obra: Rose of Sharon. Creada por el artista JJ."},"genre":"수채화"},"28":{"title":"Let's Move!","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"가만히 있지 말고 몸을 움직이며 신나게 놀아보자는 마음을 담았어요.","en":"Artwork: Let's Move!. Created by artist JJ.","ja":"作品：Let's Move!。作家JJの作品です。","zh":"作品：《Let's Move!》。JJ艺术家的画作。","es":"Obra: Let's Move!. Creada por el artista JJ."},"genre":"자유작"},"29":{"title":"Yummy Dessert","date":"2025-05","meta":"종이 위 원화 | 2025-05","notes":{"ko":"보기만 해도 군침이 도는 맛있는 디저트들을 골라 그렸어요.","en":"Artwork: Yummy Dessert. Created by artist JJ.","ja":"作品：Yummy Dessert。作家JJの作品です。","zh":"作品：《Yummy Dessert》。JJ艺术家的画作。","es":"Obra: Yummy Dessert. Creada por el artista JJ."},"genre":"자유작"},"30":{"title":"Spring Church","date":"2025-03","meta":"종이 위 원화 | 2025-03","notes":{"ko":"봄날의 포근한 공기 속에서 반짝이는 교회의 모습을 담았어요.","en":"Artwork: Spring Church. Created by artist JJ.","ja":"作品：Spring Church。作家JJの作品です。","zh":"作品：《Spring Church》。JJ艺术家的画作。","es":"Obra: Spring Church. Creada por el artista JJ."},"genre":"수채화"},"31":{"title":"Bamboo Forest","date":"2025-05","meta":"종이 위 원화 | 2025-05","notes":{"ko":"쭉쭉 뻗은 대나무 숲에 들어가면 바람 소리만 들릴 것 같아서 그렸어요.","en":"Artwork: Bamboo Forest. Created by artist JJ.","ja":"作品：Bamboo Forest。作家JJの作品です。","zh":"作品：《Bamboo Forest》。JJ艺术家的画作。","es":"Obra: Bamboo Forest. Creada por el artista JJ."},"genre":"수채화"},"32":{"title":"One Rose","date":"2025-05","meta":"종이 위 원화 | 2025-05","notes":{"ko":"장미 한 송이가 가진 붉고 깊은 느낌을 한껏 담아보았어요.","en":"Artwork: One Rose. Created by artist JJ.","ja":"作品：One Rose。作家JJの作品です。","zh":"作品：《One Rose》。JJ艺术家的画作。","es":"Obra: One Rose. Creada por el artista JJ."},"genre":"수채화"},"33":{"title":"Magpie and Persimmons","date":"2026-01","meta":"종이 위 원화 | 2026-01","notes":{"ko":"주렁주렁 열린 감과 까치가 함께 있으니 기분 좋은 복이 오는 것 같아요.","en":"Artwork: Magpie and Persimmons. Created by artist JJ.","ja":"作品：Magpie and Persimmons。作家JJの作品です。","zh":"作品：《Magpie and Persimmons》。JJ艺术家的画作。","es":"Obra: Magpie and Persimmons. Creada por el artista JJ."},"genre":"수채화"},"34":{"title":"Winter Fun","date":"2026-01","meta":"종이 위 원화 | 2026-01","notes":{"ko":"추운 겨울날에도 신나게 놀던 기억을 떠올리며 차가운 색과 따뜻한 색을 섞었어요.","en":"Artwork: Winter Fun. Created by artist JJ.","ja":"作品：Winter Fun。作家JJの作品です。","zh":"作品：《Winter Fun》。JJ艺术家的画作。","es":"Obra: Winter Fun. Creada por el artista JJ."},"genre":"수채화"},"35":{"title":"Hiss Hiss!","date":"2026-02","meta":"종이 위 원화 | 2026-02","notes":{"ko":"장난기 가득한 소리와 표정이 살아나게 재미있게 그려보았어요.","en":"Artwork: Hiss Hiss!. Created by artist JJ.","ja":"作品：Hiss Hiss!。作家JJの作品です。","zh":"作品：《Hiss Hiss!》。JJ艺术家的画作。","es":"Obra: Hiss Hiss!. Creada por el artista JJ."},"genre":"자유작"},"36":{"title":"Rainbow Bouquet","date":"2026-02","meta":"종이 위 원화 | 2026-02","notes":{"ko":"무지개처럼 여러 색깔 꽃다발을 묶으면 보는 사람도 기분이 좋아질 것 같았어요.","en":"Artwork: Rainbow Bouquet. Created by artist JJ.","ja":"作品：Rainbow Bouquet。作家JJの作品です。","zh":"作品：《Rainbow Bouquet》。JJ艺术家的画作。","es":"Obra: Rainbow Bouquet. Creada por el artista JJ."},"genre":"수채화"},"37":{"title":"My Kitchen","date":"2026-02","meta":"종이 위 원화 | 2026-02","notes":{"ko":"내가 좋아하는 것들로 가득 채운 나만의 작은 부엌을 상상했어요.","en":"Artwork: My Kitchen. Created by artist JJ.","ja":"作品：My Kitchen。作家JJの作品です。","zh":"作品：《My Kitchen》。JJ艺术家的画作。","es":"Obra: My Kitchen. Creada por el artista JJ."},"genre":"자유작"},"38":{"title":"Red Hat Lady","date":"2026-03","meta":"종이 위 원화 | 2026-03","notes":{"ko":"빨간 모자가 딱 눈에 띄도록 당당하고 멋지게 그려보았어요.","en":"Artwork: Red Hat Lady. Created by artist JJ.","ja":"作品：Red Hat Lady。作家JJの作品です。","zh":"作品：《Red Hat Lady》。JJ艺术家的画作。","es":"Obra: Red Hat Lady. Creada por el artista JJ."},"genre":"자유작"},"39":{"title":"Sail Away!","date":"2026-03","meta":"종이 위 원화 | 2026-03","notes":{"ko":"돛을 달고 새로운 바다로 떠나는 설레는 마음을 담았어요.","en":"Artwork: Sail Away!. Created by artist JJ.","ja":"作品：Sail Away!。作家JJの作品です。","zh":"作品：《Sail Away!》。JJ艺术家的画作。","es":"Obra: Sail Away!. Creada por el artista JJ."},"genre":"자유작"},"40":{"title":"Under the Green Tree","date":"2026-05","meta":"종이 위 원화 | 2026-05","notes":{"ko":"초록빛 나무 아래 앉아 쉬면 금방 시원해질 것 같은 장면을 그렸어요.","en":"Artwork: Under the Green Tree. Created by artist JJ.","ja":"作品：Under the Green Tree。作家JJの作品です。","zh":"作品：《Under the Green Tree》。JJ艺术家的画作。","es":"Obra: Under the Green Tree. Creada por el artista JJ."},"genre":"수채화"},"41":{"title":"A Walk in the Garden","date":"2026-05","meta":"종이 위 원화 | 2026-05","notes":{"ko":"정원을 천천히 산책하면서 만난 작은 풀과 꽃들을 하나씩 담았어요.","en":"Artwork: A Walk in the Garden. Created by artist JJ.","ja":"作品：A Walk in the Garden。作家JJの作品です。","zh":"作品：《A Walk in the Garden》。JJ艺术家的画作。","es":"Obra: A Walk in the Garden. Creada por el artista JJ."},"genre":"수채화"},"42":{"title":"My Rainbow Bird","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"무지개 빛깔 날개를 가진 새가 하늘을 날면 얼마나 예쁠까 상상했어요.","en":"Artwork: My Rainbow Bird. Created by artist JJ.","ja":"作品：My Rainbow Bird。作家JJの作品です。","zh":"作品：《My Rainbow Bird》。JJ艺术家的画作。","es":"Obra: My Rainbow Bird. Creada por el artista JJ."},"genre":"수채화"},"43":{"title":"A Puppy Made of Shapes","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"세모, 네모, 동그라미 같은 도형들을 모으니까 귀여운 강아지가 되었어요.","en":"Artwork: A Puppy Made of Shapes. Created by artist JJ.","ja":"作品：A Puppy Made of Shapes。作家JJの作品です。","zh":"作品：《A Puppy Made of Shapes》。JJ艺术家的画作。","es":"Obra: A Puppy Made of Shapes. Creada por el artista JJ."},"genre":"소묘"},"44":{"title":"Korean Patterns","date":"2026-10","meta":"종이 위 원화 | 2026-10","notes":{"ko":"우리나라 전통 문양의 무늬들이 이어지면서 만드는 리듬이 멋있었어요.","en":"Artwork: Korean Patterns. Created by artist JJ.","ja":"作品：Korean Patterns。作家JJの作品です。","zh":"作品：《Korean Patterns》。JJ艺术家的画作。","es":"Obra: Korean Patterns. Creada por el artista JJ."},"genre":"발상과 표현"},"45":{"title":"my home","date":"2022-11","meta":"종이 위 원화 | 2022-11","notes":{"ko":"내가 가장 편하고 안전한 우리 집의 모습을 따뜻하게 그렸어요.","en":"Artwork: my home. Created by artist JJ.","ja":"作品：my home。作家JJの作品です。","zh":"作品：《my home》。JJ艺术家的画作。","es":"Obra: my home. Creada por el artista JJ."},"genre":"자유작"},"46":{"title":"나의 장래희망","date":"2026-11","meta":"종이 위 원화 | 2026-11","notes":{"ko":"앞으로 내가 어떤 사람이 되고 싶은지, 어떤 꿈을 키우고 있는지 담았어요.","en":"Artwork: 나의 장래희망. Created by artist JJ.","ja":"作品：나의 장래희망。作家JJの作品です。","zh":"作品：《나의 장래희망》。JJ艺术家的画作。","es":"Obra: 나의 장래희망. Creada por el artista JJ."},"genre":"발상과 표현"},"47":{"title":"Let's smile!","date":"2025-11","meta":"2025-11","notes":{"ko":"그림을 보는 사람도, 그리는 나도 같이 웃게 되길 바라며 그렸어요.","en":"Artwork: Let's smile!. Created by artist JJ.","ja":"作品：Let's smile!。作家JJの作品です。","zh":"作品：《Let's smile!》。JJ艺术家的画作。","es":"Obra: Let's smile!. Creada por el artista JJ."},"genre":"자유작"},"48":{"title":"Protect Earth!","date":"2025-12","meta":"2025-12","notes":{"ko":"우리가 사는 지구를 소중하게 지키자는 마음을 그림에 꼭 담고 싶었어요.","en":"Artwork: Protect Earth!. Created by artist JJ.","ja":"作品：Protect Earth!。作家JJの作品です。","zh":"作品：《Protect Earth!》。JJ艺术家的画作。","es":"Obra: Protect Earth!. Creada por el artista JJ."},"genre":"발상과 표현"},"49":{"title":"My Autumn Leaves","date":"2025-11","meta":"2025-11","notes":{"ko":"주워 모은 낙엽들처럼 색색깔 가을의 조각들을 모았어요.","en":"Artwork: My Autumn Leaves. Created by artist JJ.","ja":"作品：My Autumn Leaves。作家JJの作品です。","zh":"作品：《My Autumn Leaves》。JJ艺术家的画作。","es":"Obra: My Autumn Leaves. Creada por el artista JJ."},"genre":"자유작"},"50":{"title":"Stripes, Stripes!","date":"2025-11","meta":"2025-11","notes":{"ko":"줄무늬가 가득한 화면을 보면서 리듬감을 느껴보았어요.","en":"Artwork: Stripes, Stripes!. Created by artist JJ.","ja":"作品：Stripes, Stripes!。作家JJの作品です。","zh":"作品：《Stripes, Stripes!》。JJ艺术家的画作。","es":"Obra: Stripes, Stripes!. Creada por el artista JJ."},"genre":"자유작"},"51":{"title":"sun flower","date":"2025-11","meta":"2025-11","notes":{"ko":"해바라기처럼 밝고 환한 에너지를 담아서 그려보았어요.","en":"Artwork: sun flower. Created by artist JJ.","ja":"作品：sun flower。作家JJの作品です。","zh":"作品：《sun flower》。JJ艺术家的画作。","es":"Obra: sun flower. Creada por el artista JJ."},"genre":"자유작"},"52":{"title":"Pine tree","date":"2025-10","meta":"2025-10","notes":{"ko":"사계절 내내 푸른 소나무의 단단한 모습을 담고 싶었어요.","en":"Artwork: Pine tree. Created by artist JJ.","ja":"作品：Pine tree。作家JJの作品です。","zh":"作品：《Pine tree》。JJ艺术家的画作。","es":"Obra: Pine tree. Creada por el artista JJ."},"genre":"자유작"},"53":{"title":"Window Cat","date":"2025-09","meta":"2025-09","notes":{"ko":"창가에 기대어 바깥을 구경하던 고양이의 모습이 조용하고 귀여웠어요.","en":"Artwork: Window Cat. Created by artist JJ.","ja":"作品：Window Cat。作家JJの作品です。","zh":"作品：《Window Cat》。JJ艺术家的画作。","es":"Obra: Window Cat. Creada por el artista JJ."},"genre":"자유작"},"54":{"title":"Shiny Glass","date":"2025-10","meta":"2025-10","notes":{"ko":"유리컵이나 창문에서 반짝이는 빛을 어떻게 표현할지 고민하며 그렸어요.","en":"Artwork: Shiny Glass. Created by artist JJ.","ja":"作品：Shiny Glass。作家JJの作品です。","zh":"作品：《Shiny Glass》。JJ艺术家的画作。","es":"Obra: Shiny Glass. Creada por el artista JJ."},"genre":"소묘"},"55":{"title":"Halloween","date":"2025-10","meta":"2025-10","notes":{"ko":"무섭기보다는 장난기 가득한 할로윈 파티 분위기를 살려보았어요.","en":"Artwork: Halloween. Created by artist JJ.","ja":"作品：Halloween。作家JJの作品です。","zh":"作品：《Halloween》。JJ艺术家的画作。","es":"Obra: Halloween. Creada por el artista JJ."},"genre":"발상과 표현"},"56":{"title":"Milk","date":"2025-07","meta":"2025-07","notes":{"ko":"하얗고 고소한 우유 한 잔처럼 깔끔하고 담백하게 그려보았어요.","en":"Artwork: Milk. Created by artist JJ.","ja":"作品：Milk。作家JJの作品です。","zh":"作品：《Milk》。JJ艺术家的画作。","es":"Obra: Milk. Creada por el artista JJ."},"genre":"자유작"},"57":{"title":"morol","date":"2025-08","meta":"2025-08","notes":{"ko":"그때 떠오른 느낌을 그대로 손끝으로 옮겨 적은 자유로운 그림이에요.","en":"Artwork: morol. Created by artist JJ.","ja":"作品：morol。作家JJの作品です。","zh":"作品：《morol》。JJ艺术家的画作。","es":"Obra: morol. Creada por el artista JJ."},"genre":"자유작"},"58":{"title":"Rabbit","date":"2025-07","meta":"2025-07","notes":{"ko":"긴 귀가 매력적인 토끼의 모습을 편안하게 담아보았어요.","en":"Artwork: Rabbit. Created by artist JJ.","ja":"作品：Rabbit。作家JJの作品です。","zh":"作品：《Rabbit》。JJ艺术家的画作。","es":"Obra: Rabbit. Creada por el artista JJ."},"genre":"자유작"},"59":{"title":"P","date":"2025-08","meta":"2025-08","notes":{"ko":"알파벳 'P' 하나에서도 새로운 모양과 상상을 꺼내 보았어요.","en":"Artwork: P. Created by artist JJ.","ja":"作品：P。作家JJの作品です。","zh":"作品：《P》。JJ艺术家的画作。","es":"Obra: P. Creada por el artista JJ."},"genre":"자유작"},"60":{"title":"My Irworobongdo","date":"2025-07","meta":"2025-07","notes":{"ko":"일월오봉도의 멋진 모습을 나만의 색과 느낌으로 다시 그려보았어요.","en":"Artwork: My Irworobongdo. Created by artist JJ.","ja":"作品：My Irworobongdo。作家JJの作品です。","zh":"作品：《My Irworobongdo》。JJ艺术家的画作。","es":"Obra: My Irworobongdo. Creada por el artista JJ."},"genre":"발상과 표현"},"61":{"title":"watermelon","date":"2025-07","meta":"2025-07","notes":{"ko":"여름에 시원하게 먹던 수박의 빨간 속살과 씨를 떠올리며 그렸어요.","en":"Artwork: watermelon. Created by artist JJ.","ja":"作品：watermelon。作家JJの作品です。","zh":"作品：《watermelon》。JJ艺术家的画作。","es":"Obra: watermelon. Creada por el artista JJ."},"genre":"자유작"},"62":{"title":"The Whale in My Dream","date":"2025-08","meta":"2025-08","notes":{"ko":"꿈속에서 커다란 고래와 함께 헤엄치던 신기한 장면을 떠올렸어요.","en":"Artwork: The Whale in My Dream. Created by artist JJ.","ja":"作品：The Whale in My Dream。作家JJの作品です。","zh":"作品：《The Whale in My Dream》。JJ艺术家的画作。","es":"Obra: The Whale in My Dream. Creada por el artista JJ."},"genre":"발상과 표현"},"63":{"title":"Derpy","date":"2025-08","meta":"2025-08","notes":{"ko":"어딘가 엉뚱하고 귀여운 표정이 살아나도록 재미있게 그렸어요.","en":"Artwork: Derpy. Created by artist JJ.","ja":"作品：Derpy。作家JJの作品です。","zh":"作品：《Derpy》。JJ艺术家的画作。","es":"Obra: Derpy. Creada por el artista JJ."},"genre":"자유작"},"64":{"title":"Zipline","date":"2022-11","meta":"2022-11","notes":{"ko":"짚라인을 타고 휙 날아갈 때의 짜릿한 기분을 그림으로 남겨보았어요.","en":"Artwork: Zipline. Created by artist JJ.","ja":"作品：Zipline。作家JJの作品です。","zh":"作品：《Zipline》。JJ艺术家的画作。","es":"Obra: Zipline. Creada por el artista JJ."},"genre":"자유작"},"65":{"title":"My Unicorn World","date":"2022-06","meta":"2022-06","notes":{"ko":"유니콘이 사는 동화 속 세상이 있다면 꼭 놀러 가고 싶어서 그렸어요.","en":"Artwork: My Unicorn World. Created by artist JJ.","ja":"作品：My Unicorn World。作家JJの作品です。","zh":"作品：《My Unicorn World》。JJ艺术家的画作。","es":"Obra: My Unicorn World. Creada por el artista JJ."},"genre":"자유작"},"66":{"title":"Snack Time with Mom","date":"2022-06","meta":"2022-06","notes":{"ko":"엄마랑 맛있는 간식을 먹으면서 이야기 나누던 시간이 참 좋았어요.","en":"Artwork: Snack Time with Mom. Created by artist JJ.","ja":"作品：Snack Time with Mom。作家JJの作品です。","zh":"作品：《Snack Time with Mom》。JJ艺术家的画作。","es":"Obra: Snack Time with Mom. Creada por el artista JJ."},"genre":"자유작"},"67":{"title":"Bunny Garden","date":"2022-07","meta":"2022-07","notes":{"ko":"토끼들이 모여 노는 정원을 생각하니까 저절로 미소가 나왔어요.","en":"Artwork: Bunny Garden. Created by artist JJ.","ja":"作品：Bunny Garden。作家JJの作品です。","zh":"作品：《Bunny Garden》。JJ艺术家的画作。","es":"Obra: Bunny Garden. Creada por el artista JJ."},"genre":"자유작"},"68":{"title":"Meow Meow, Let's Go!","date":"2022-08","meta":"2022-08","notes":{"ko":"고양이랑 함께 신나게 출발하는 기분으로 씩씩하게 그렸어요.","en":"Artwork: Meow Meow, Let's Go!. Created by artist JJ.","ja":"作品：Meow Meow, Let's Go!。作家JJの作品です。","zh":"作品：《Meow Meow, Let's Go!》。JJ艺术家的画作。","es":"Obra: Meow Meow, Let's Go!. Creada por el artista JJ."},"genre":"자유작"},"69":{"title":"Welcome to the Bee House!","date":"2022-10","meta":"2022-10","notes":{"ko":"꿀벌 친구들의 집에 초대받은 것처럼 아기자기하게 채워 넣었어요.","en":"Artwork: Welcome to the Bee House!. Created by artist JJ.","ja":"作品：Welcome to the Bee House!。作家JJの作品です。","zh":"作品：《Welcome to the Bee House!》。JJ艺术家的画作。","es":"Obra: Welcome to the Bee House!. Creada por el artista JJ."},"genre":"자유작"},"70":{"title":"Dancing on the Music Box","date":"2022-09","meta":"2022-09","notes":{"ko":"오르골 음악에 맞춰 작은 인형이 춤추는 것처럼 그려보았어요.","en":"Artwork: Dancing on the Music Box. Created by artist JJ.","ja":"作品：Dancing on the Music Box。作家JJの作品です。","zh":"作品：《Dancing on the Music Box》。JJ艺术家的画作。","es":"Obra: Dancing on the Music Box. Creada por el artista JJ."},"genre":"자유작"},"71":{"title":"Horse","date":"2026-01","meta":"2026-01","notes":{"ko":"말의 씩씩한 몸짓과 움직임이 느껴지게 선을 써 보았어요.","en":"Artwork: Horse. Created by artist JJ.","ja":"作品：Horse。作家JJの作品です。","zh":"作品：《Horse》。JJ艺术家的画作。","es":"Obra: Horse. Creada por el artista JJ."},"genre":"소묘"},"72":{"title":"Boy","date":"2026-01","meta":"2026-01","notes":{"ko":"한 소년의 표정과 모습을 차분하게 바라보며 완성한 그림이에요.","en":"Artwork: Boy. Created by artist JJ.","ja":"作品：Boy。作家JJの作品です。","zh":"作品：《Boy》。JJ艺术家的画作。","es":"Obra: Boy. Creada por el artista JJ."},"genre":"소묘"},"73":{"title":"Sea city","date":"2026-01","meta":"2026-01","notes":{"ko":"바다 속에 도시가 있다면 물고기들과 어떻게 살아갈지 상상해 보았어요.","en":"Artwork: Sea city. Created by artist JJ.","ja":"作品：Sea city。作家JJの作品です。","zh":"作品：《Sea city》。JJ艺术家的画作。","es":"Obra: Sea city. Creada por el artista JJ."},"genre":"발상과 표현"}};
     function applyBuiltinNote(id, noteData) {
       const b = BUILTIN_ARTWORK_NOTES[id];
       if (!b) return noteData;
@@ -1779,12 +1907,12 @@
       const seen = visitCount(ex.id);
       if (seen) document.getElementById('tkSub').innerHTML += ` · <span style="color:#6ee7b7">✔ 지금까지 ${seen}회 관람</span>`;
       document.getElementById('tkRules').innerHTML =
-        '· 광고 1번을 보면 입장권 1장을 받아요.<br>' +
+        (HIDE_AD_UI ? '· 입장하기를 누르면 입장권 1장을 받아요.<br>' : '· 광고 1번을 보면 입장권 1장을 받아요.<br>') +
         '· 입장 후 <b>2시간</b> 동안 볼 수 있어요.<br>' +
         '· 퇴장한 뒤 다시 보고 싶으면 <b>입장권을 다시 받으면 돼요.</b> 볼 때마다 관람 횟수가 쌓여요.<br>' +
         '· 앱이 꺼져도 10분 안에 다시 열면 이어서 볼 수 있어요.<br>' +
         '· 마음에 드는 작품은 📥 Add to Collection으로 남겨 두세요.';
-      go.disabled = false; go.innerHTML = seen ? `<span class="adb">AD</span> 시청 후 다시 입장하기 (${seen + 1}회째)` : '<span class="adb">AD</span> 시청 후 입장하기';
+      go.disabled = false; go.innerHTML = HIDE_AD_UI ? (seen ? `다시 입장하기 (${seen + 1}회째)` : '입장하기') : seen ? `<span class="adb">AD</span> 시청 후 다시 입장하기 (${seen + 1}회째)` : '<span class="adb">AD</span> 시청 후 입장하기';
       openModal('tkModal');
     }
 
@@ -1794,6 +1922,10 @@
     // 아래 `const SKIP_ADS_FOR_TEST = true;` 를 `false` 로만 바꾸세요!
     // =========================================================================
     const SKIP_ADS_FOR_TEST = true;
+    // 🔖 [BOOKMARK: 광고 문구 숨기기] true 이면 화면에서 광고 버튼·문구가 안 보여요. 다시 보이게 하려면 false 로.
+    const HIDE_AD_UI = true;
+    const AD_LOADING = HIDE_AD_UI ? '잠깐만요…' : '광고 불러오는 중…';
+    if (HIDE_AD_UI) document.documentElement.classList.add('no-ad-root');
 
     // 광고 보여 주기 → 결과는 window.onAtelierAd(tag, result) 로 돌아와요
     const adWaiters = {}; 
@@ -1816,14 +1948,14 @@
     async function enterWithAd() {
       if (!pickedEx) return;
       const go = document.getElementById('tkGo');
-      go.disabled = true; go.innerText = '광고 불러오는 중…';
+      go.disabled = true; go.innerText = AD_LOADING;
       const r = await showAd('enter');
       // 광고를 끝까지 보든 중간에 닫든(closed), 못 불러오든(error) 입장 — 끝까지 보기는 강제하지 않아요
       const now = Date.now();
       lsSet(K_TICKET, { exId: pickedEx.id, enteredAt: now, lastSeen: now });
       const vc = lsGet(K_VCOUNT, {}); vc[pickedEx.id] = visitCount(pickedEx.id) + 1; lsSet(K_VCOUNT, vc);   // 관람 횟수 +1
       closeModal('tkModal');
-      showMsg('입장했어요 🎟', `${pickedEx.title}${vc[pickedEx.id] > 1 ? ` (${vc[pickedEx.id]}회째 관람)` : ''}<br>2시간 동안 천천히 둘러보세요.` + (r === 'reward' || r === 'closed' ? '' : '<br><span style="color:#64748b">(광고를 불러오지 못해 바로 입장했어요)</span>'), saveThenReload);
+      showMsg('입장했어요 🎟', `${pickedEx.title}${vc[pickedEx.id] > 1 ? ` (${vc[pickedEx.id]}회째 관람)` : ''}<br>2시간 동안 천천히 둘러보세요.` + (r === 'reward' || r === 'closed' || HIDE_AD_UI ? '' : '<br><span style="color:#64748b">(광고를 불러오지 못해 바로 입장했어요)</span>'), saveThenReload);
     }
 
     function exitExhibition() {
@@ -1850,11 +1982,12 @@
     function checkGalleryGate() {
       if (!IS_APP || !EXCFG) return;
       if (hasGalleryPass() || lsGet(K_TICKET, null)) return;   // 특별전 관람 중이면 그대로
+      if (HIDE_AD_UI) { lsSet(K_PASS, todayStr()); return; }   // 광고 문구 숨김 중: 입장 안내 없이 바로 통과
       openModal('gateModal');
     }
     async function enterGalleryWithAd() {
       const go = document.getElementById('gateGo');
-      go.disabled = true; go.innerText = '광고 불러오는 중…';
+      go.disabled = true; go.innerText = AD_LOADING;
       const r = await showAd('gallery');
       lsSet(K_PASS, todayStr());
       closeModal('gateModal');
@@ -2164,7 +2297,7 @@
       document.getElementById('playBody').innerHTML = `
         <div class="pl-paint"><div><div style="font-size:12px; color:#ddd6fe">${t('myPaint')}</div><b>💧 ${getPaint()}</b>
             <div style="font-size:11.5px; color:#c4b5fd; margin-top:2px">${t('paintSub', { a: freeLeft(), b: savedPaint() })}</div></div>
-          <button onclick="earnPaintPlay()" ${adLeftToday() ? '' : 'disabled'}><span class="adb">AD</span> 시청 💧 +${AD_PAINT}<br><small>오늘 ${adLeftToday()}번 남음</small></button></div>
+          <button onclick="earnPaintPlay()" ${adLeftToday() ? '' : 'disabled'}>${HIDE_AD_UI ? '🎁 보너스' : '<span class="adb">AD</span> 시청'} 💧 +${AD_PAINT}<br><small>오늘 ${adLeftToday()}번 남음</small></button></div>
         <details class="pl-how"><summary>${t('howPaint')}</summary>🎨 매일 오늘의 물감 ${FREE_DAILY}개 (안 쓰면 사라져요) · 🔥 7일 연속 출석 +5 · 🎟 특별전 관람 완료 +2 · 💌 아트빔 링크로 친구 입장 +3 (하루 3명) · 💎 아트퐁 목표 달성 · 🧠 아트메모리게임 성공 +1 · 📒 첫 관람 기록</details>
 
         <div class="pl-cat">${t('catGame')}</div>
@@ -2175,7 +2308,7 @@
           ${T('openColorMerge()', '🎨', t('cmT'), t('cmD'), free)}
           ${T("openExtGame('https://hannaj1763-sketch.github.io/k-snack-combo-tycoon/', '🍢 ' + t('kscT'))", '🍢', t('kscT'), t('kscD'), free)}
           ${T("openExtGame('puzzle.html', '🧩 ' + t('pzT'))", '🧩', t('pzT'), t('pzD'), free)}
-          ${T("openExtGame('cube.html', '🎲 ' + t('cbT'))", '🎲', t('cbT'), t('cbD'), free)}
+          ${T("openExtGame('cube.html', '🧊 ' + t('cbT'))", '🧊', t('cbT'), t('cbD'), free)}
           ${T("openExtGame('balance.html', '⚖️ ' + t('blT'))", '⚖️', t('blT'), t('blD'), free)}
           ${T("openExtGame('nunchi.html', '👀 ' + t('ncT'))", '👀', t('ncT'), t('ncD'), free)}
           ${T("openExtGame('hidden.html', '🔍 ' + t('hdT'))", '🔍', t('hdT'), t('hdD'), free)}
@@ -2755,8 +2888,8 @@
         ${mine ? `<div class="tk-sub">✓ ${esc(mine.date)}에 다녀왔어요 ${'★'.repeat(mine.stars || 0)}</div>` : ''}
         <button class="tk-btn" onclick="closeModal('outModal'); openLogForm(${esc(JSON.stringify(x))})">${mine ? '✍ 관람 기록 고치기' : '✍ 다녀왔어요 · 기록 남기기'}</button>
         ${!mine && IS_APP && !lsGet(K_EMO, []).includes('log:' + (x.seq || x.title)) ? '<div class="tk-sub" style="margin:6px 0 12px; color:#a78bfa">🎁 처음 기록을 남기면 💧 페인트 1개를 드려요</div>' : ''}
-        <button class="tk-btn blue" onclick="openMapWithAd('${encodeURIComponent(x.place || x.title)}', ${x.gpsY ? +x.gpsY : 'null'}, ${x.gpsX ? +x.gpsX : 'null'})">${IS_APP ? '🗺 지도에서 보기 <span class="adb">AD</span>' : '🗺 지도에서 보기'}</button>
-        ${x.gpsX && x.gpsY ? `<button class="tk-btn" style="background:#0f766e" onclick="openTransitWithAd('${encodeURIComponent(x.place || x.title)}', ${+x.gpsY}, ${+x.gpsX})">${IS_APP ? '🚇 대중교통 길찾기 <span class="adb">AD</span>' : '🚇 대중교통 길찾기'}</button>
+        <button class="tk-btn blue" onclick="openMapWithAd('${encodeURIComponent(x.place || x.title)}', ${x.gpsY ? +x.gpsY : 'null'}, ${x.gpsX ? +x.gpsX : 'null'})">🗺 지도에서 보기${IS_APP ? ' <span class="adb">AD</span>' : ''}</button>
+        ${x.gpsX && x.gpsY ? `<button class="tk-btn" style="background:#0f766e" onclick="openTransitWithAd('${encodeURIComponent(x.place || x.title)}', ${+x.gpsY}, ${+x.gpsX})">🚇 대중교통 길찾기${IS_APP ? ' <span class="adb">AD</span>' : ''}</button>
           <div class="tk-sub" style="margin:-2px 0 10px">지금 있는 곳에서 지하철·버스 경로를 카카오맵으로 보여 줘요</div>` : ''}
         <button class="tk-cancel" onclick="window.open('https://search.naver.com/search.naver?query=${q}', '_blank')">🔎 전시 자세히 찾아보기</button>`;
       openModal('outModal');
@@ -3050,12 +3183,12 @@
     function setPaint(n) { addPaint(n - getPaint()); }     // (예전 코드용) 늘리기만 써요
     function adLeftToday() { const b = lsGet(K_BONUS, {}); return b.adDay === todayStr() ? Math.max(0, AD_DAY_MAX - (b.adCount || 0)) : AD_DAY_MAX; }
     async function earnPaint() {
-      if (IS_APP && adLeftToday() <= 0) { showMsg('📺 오늘 광고 보상은 다 받았어요', `광고 보상은 하루 ${AD_DAY_MAX}번까지예요.<br>내일 🎨 오늘의 물감 ${FREE_DAILY}개가 다시 채워져요.`); return false; }
-      const b = document.getElementById('wcAd'); if (b) { b.disabled = true; b.innerText = '광고 불러오는 중…'; }
+      if (IS_APP && adLeftToday() <= 0) { showMsg(HIDE_AD_UI ? '🎁 오늘 보너스는 다 받았어요' : '📺 오늘 광고 보상은 다 받았어요', `${HIDE_AD_UI ? '보너스' : '광고 보상'}은 하루 ${AD_DAY_MAX}번까지예요.<br>내일 🎨 오늘의 물감 ${FREE_DAILY}개가 다시 채워져요.`); return false; }
+      const b = document.getElementById('wcAd'); if (b) { b.disabled = true; b.innerText = AD_LOADING; }
       await showAd('paint');
       const bn = lsGet(K_BONUS, {}); if (bn.adDay !== todayStr()) { bn.adDay = todayStr(); bn.adCount = 0; } bn.adCount++; lsSet(K_BONUS, bn);
-      addPaint(AD_PAINT); toast(`<span class="adb">AD</span> 광고 보상 💧 +${AD_PAINT}`);
-      if (b) { b.disabled = false; b.innerHTML = `<span class="adb">AD</span> 시청 💧 +${AD_PAINT}`; }
+      addPaint(AD_PAINT); toast(HIDE_AD_UI ? `🎁 보너스 💧 +${AD_PAINT}` : `<span class="adb">AD</span> 광고 보상 💧 +${AD_PAINT}`);
+      if (b) { b.disabled = false; b.innerHTML = HIDE_AD_UI ? `🎁 보너스 💧 +${AD_PAINT}` : `<span class="adb">AD</span> 시청 💧 +${AD_PAINT}`; }
       return true;
     }
     // 작은 알림 (화면 아래에 잠깐)
@@ -3104,9 +3237,9 @@
         const done = () => { spendPaint(1); if (key) lsSet(K_EMO, [...owned, key]); resolve(true); };
         if (getPaint() >= 1) { done(); return; }
         document.getElementById('msgTitle').innerText = '💧 페인트가 없어요';
-        document.getElementById('msgSub').innerHTML = `${what}에는 페인트 1개가 필요해요.<br>광고 1번을 보면 페인트 ${AD_PAINT}개를 받아요. (오늘 ${adLeftToday()}번 남음)<br>🎨 오늘의 물감 ${FREE_DAILY}개는 내일 다시 채워져요.`;
+        document.getElementById('msgSub').innerHTML = `${what}에는 페인트 1개가 필요해요.<br>${HIDE_AD_UI ? '🎁 보너스' : '광고 1번'}을 받으면 페인트 ${AD_PAINT}개를 받아요. (오늘 ${adLeftToday()}번 남음)<br>🎨 오늘의 물감 ${FREE_DAILY}개는 내일 다시 채워져요.`;
         const btn = document.getElementById('msgBtn');
-        btn.innerHTML = adLeftToday() ? '<span class="adb">AD</span> 시청 후 받기' : '확인';
+        btn.innerHTML = adLeftToday() ? (HIDE_AD_UI ? '🎁 보너스 받기' : '<span class="adb">AD</span> 시청 후 받기') : '확인';
         btn.onclick = async () => { closeModal('msgModal'); btn.innerText = '확인'; if (await earnPaint()) done(); else resolve(false); };
         openModal('msgModal');
       });
@@ -3456,7 +3589,7 @@
       const box = getBox();
       if (box.ids.includes(art.id)) { openBox(); closeViewer(); return; }
       if (box.ids.length >= box.slots) {
-        document.getElementById('slotSub').innerHTML = `지금 ${box.slots}칸이 모두 찼어요.<br>광고를 1번 보면 1칸이 늘어나요.`;
+        document.getElementById('slotSub').innerHTML = `지금 ${box.slots}칸이 모두 찼어요.<br>${HIDE_AD_UI ? '버튼을 누르면' : '광고를 1번 보면'} 1칸이 늘어나요.`;
         openModal('slotModal');
         return;
       }
@@ -3561,7 +3694,7 @@
         if (!items.length) return;
         const seen = visitCount(ex.id);
         html += `<div class="lock-head">${tk && tk.exId === ex.id ? '🎟' : '🔒'} 제${i + 1}회 「${esc(ex.short || ex.title)}」 <span>${(ex.works || []).length}점${seen ? ` · ✔ ${seen}회 관람` : ''}</span>
-          <button onclick="${IS_APP ? `openTicket('${ex.id}')` : `showMsg('📱 앱에서 열려요', '특별전은 AGJJ 앱에서 광고 1번으로 입장해요.')`}">${IS_APP ? '입장하기 <span class="adb">AD</span>' : '앱에서 보기'}</button></div>`;
+          <button onclick="${IS_APP ? `openTicket('${ex.id}')` : `showMsg('📱 앱에서 열려요', HIDE_AD_UI ? '특별전은 AGJJ 앱에서 입장해요.' : '특별전은 AGJJ 앱에서 광고 1번으로 입장해요.')`}">${IS_APP ? '입장하기 <span class="adb">AD</span>' : '앱에서 보기'}</button></div>`;
         html += `<div class="gallery-grid lock-grid">` + items.map(a => {
           const own = mine.has(a.id); if (!own) nLocked++;
           return `<div class="art-card ${own ? '' : 'locked'}" onclick="${own ? `openBoxItem('${a.id}')` : (IS_APP ? `openTicket('${ex.id}')` : `showMsg('📱 앱에서 열려요', '이 작품은 특별전 「${esc(ex.short || ex.title)}」에 있어요. AGJJ 앱에서 입장하면 볼 수 있어요.')`)}">
@@ -4363,7 +4496,7 @@
       stT: ['JJ 공부방', 'JJ Study Room', 'JJ 学习室', 'JJ 勉強部屋'], stD: ['오늘의 공부 · 학년별 학습자료', 'Daily pick · lessons by grade', '今日学习 · 分年级资料', '今日の勉強・学年別資料'],
       hdT: ['JJ 숨은그림찾기', 'JJ Hidden Pictures', 'JJ 找找看', 'JJ かくれんぼ絵'], hdD: ['그림 속 아이콘 15개 찾기', 'Find 15 hidden icons', '找出15个隐藏图标', '15個のアイコンを探そう'],
       pzT: ['JJ 그림 퍼즐', 'JJ Art Puzzle', 'JJ 拼图', 'JJ 絵パズル'], pzD: ['9조각을 바꿔 그림 완성', 'Swap 9 pieces to finish the art', '交换9块拼出画作', '9ピースを入れ替えて完成'],
-      cbT: ['JJ 그림 주사위', 'JJ Art Dice', 'JJ 画作骰子', 'JJ 絵サイコロ'], cbD: ['굴려서 오늘의 그림 뽑기', 'Roll to pick today’s art', '掷出今日画作', '転がして今日の絵'],
+      cbT: ['JJ 그림 큐브', 'JJ Art Cube', 'JJ 画作魔方', 'JJ 絵キューブ'], cbD: ['돌려서 그림 6개 맞추기', 'Twist to match 6 artworks', '转动拼出6幅画', '回して6枚の絵をそろえる'],
       blT: ['JJ 밸런스 게임', 'JJ Would You Rather', 'JJ 二选一', 'JJ バランスゲーム'], blD: ['둘 중 하나! 친구와 궁합도', 'Pick one! Match with a friend', '二选一！测默契', 'どっち？友だちと相性も'],
       ncT: ['JJ 눈치게임', 'JJ Nunchi Game', 'JJ 眼力游戏', 'JJ 空気読みゲーム'], ncD: ['1·2·3 동시에 외치면 탈락!', 'Say 1·2·3 — don’t clash!', '1·2·3别同时喊！', '1·2·3 同時はアウト！'],
       kscT: ['K-간식 콤보 타이쿤', 'K-Snack Combo Tycoon', '韩式小吃大亨', 'K-おやつコンボタイクーン'], kscD: ['맛있는 분식 콤보 만들기', 'Make Korean snack combos', '制作美味韩式小吃组合', '韓国おやつコンボ作り'],
@@ -5403,6 +5536,639 @@
     }
     addEventListener('resize', () => { helpSig = ''; drawHelp(); });
     document.addEventListener('scroll', () => { if (helpOn()) { helpSig = ''; requestAnimationFrame(drawHelp); } }, true);
+  </script>
+  <script id="jx-script">
+    // =====================================================================
+    // 🎨 AGJJ 플러스 (2026-11)
+    //  · 팔레트 메뉴: 레벨1 = 영역(물감 동그라미) → 레벨2 = 그 영역의 메뉴
+    //  · ☀️ 오늘의 미션 3개 · 🔥 연속 기록 · 🏅 배지 · 📊 나의 기록(마이페이지)
+    //  · 🎬 JJ 극장: 움직이는 그림 · 움직이는 갤러리 · 올해의 JJ · JJ 그림책 · 작품 카드 · 색칠 도안
+    //  · 🎄 계절 이벤트 · 📶 오프라인(서비스 워커)
+    //  기록은 이 기기의 localStorage 'agjj_stats_v1' 에 쌓여요 (같은 주소의 게임들과 함께 써요)
+    // =====================================================================
+    (function () {
+      const K_ST = 'agjj_stats_v1', K_AREA = 'agjj_pal_area', K_SEEN = 'agjj_seen_menu_v1';
+      const pad = n => String(n).padStart(2, '0');
+      const dstr = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      const today = () => dstr(new Date());
+      const H = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const tt = (k, fb) => { try { const v = t(k); return v && v !== k ? v : fb; } catch (e) { return fb; } };
+      const get = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
+      const put = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+      const thumb = id => `thumbs/${id}.webp`, mid = id => `thumbs/m/${id}.webp`;
+      const visibleArts = () => (typeof artworks !== 'undefined' ? artworks : []).filter(a => a && !a.isProfile);
+      const allArts = () => (typeof allArtworks !== 'undefined' ? allArtworks : []).filter(a => a && !a.isProfile);
+
+      // ---------------- 기록 ----------------
+      function st() {
+        const s = get(K_ST, null) || {};
+        s.first = s.first || today(); s.days = s.days || {}; s.plays = s.plays || {}; s.views = s.views || {};
+        s.badges = s.badges || {}; s.mdone = s.mdone || {}; s.last = s.last || '';
+        return s;
+      }
+      function save(s) {
+        const keys = Object.keys(s.days).sort(); if (keys.length > 420) keys.slice(0, keys.length - 420).forEach(k => delete s.days[k]);
+        put(K_ST, s);
+      }
+      const PLAYKEYS = new Set(['pang', 'mem', 'throw', 'cm', 'ksc', 'puzzle', 'cube', 'balance', 'nunchi', 'hidden', 'drive', 'kwc', 'study', 'af', 'shop', 'song', 'coloring', 'word', 'beam', 'emo', 'anim', 'show', 'recap', 'story', 'card', 'sheet']);
+      function track(key, n = 1) {
+        const s = st(), d = today();
+        const day = s.days[d] = s.days[d] || {};
+        day[key] = (day[key] || 0) + n; s.plays[key] = (s.plays[key] || 0) + n;
+        if (PLAYKEYS.has(key)) s.last = key;
+        save(s);
+        try { afterTrack(key); } catch (e) { console.log(e); }
+      }
+      window.jxTrack = track;
+      function streak(s) {
+        let n = 0; const d = new Date();
+        if (!s.days[dstr(d)]) d.setDate(d.getDate() - 1);
+        while (s.days[dstr(d)]) { n++; d.setDate(d.getDate() - 1); }
+        return n;
+      }
+      function bestStreak(s) {
+        const ks = Object.keys(s.days).sort(); let best = 0, cur = 0, prev = null;
+        ks.forEach(k => { const d = new Date(k + 'T00:00:00'); if (prev && (d - prev) / 864e5 === 1) cur++; else cur = 1; best = Math.max(best, cur); prev = d; });
+        return best;
+      }
+
+      // ---------------- 메뉴 목록 (레벨2) ----------------
+      const EXT = {
+        kwc: 'https://hannaj1763-sketch.github.io/korean-word-chain/', af: 'https://hannaj1763-sketch.github.io/art-flight/',
+        shop: 'https://hannaj1763-sketch.github.io/k-snack-combo-tycoon/?mode=shop', ksc: 'https://hannaj1763-sketch.github.io/k-snack-combo-tycoon/'
+      };
+      const M = {
+        pang: { i: '💎', t: () => tt('pongT', '아트퐁'), d: () => tt('pongD', ''), go: 'openPang()' },
+        mem: { i: '🧠', t: () => tt('memT', '아트메모리'), d: () => tt('memD', ''), go: 'openMem()' },
+        throw: { i: '🎯', t: () => tt('thrT', '물감볼'), d: () => tt('thrD', ''), go: 'openThrow()' },
+        cm: { i: '🎨', t: () => tt('cmT', '컬러머지'), d: () => tt('cmD', ''), go: 'openColorMerge()' },
+        ksc: { i: '🍢', t: () => tt('kscT', 'K-간식 타이쿤'), d: () => tt('kscD', ''), go: `openExtGame('${EXT.ksc}', '🍢 ' + t('kscT'))` },
+        puzzle: { i: '🧩', t: () => tt('pzT', '그림 퍼즐'), d: () => tt('pzD', ''), go: "openExtGame('puzzle.html', '🧩 ' + t('pzT'))" },
+        cube: { i: '🧊', t: () => tt('cbT', '그림 큐브'), d: () => tt('cbD', ''), go: "openExtGame('cube.html', '🧊 ' + t('cbT'))" },
+        balance: { i: '⚖️', t: () => tt('blT', '밸런스'), d: () => tt('blD', ''), go: "openExtGame('balance.html', '⚖️ ' + t('blT'))" },
+        nunchi: { i: '👀', t: () => tt('ncT', '눈치 게임'), d: () => tt('ncD', ''), go: "openExtGame('nunchi.html', '👀 ' + t('ncT'))" },
+        hidden: { i: '🔍', t: () => tt('hdT', '숨은그림찾기'), d: () => tt('hdD', ''), go: "openExtGame('hidden.html', '🔍 ' + t('hdT'))" },
+        drive: { i: '🛴', t: () => tt('driveT', '네온 킥보드 3D'), d: () => tt('driveD', ''), go: 'openDrive()' },
+        kwc: { i: '🔤', t: () => tt('kwcT', '끝말잇기'), d: () => tt('kwcD', ''), go: `openExtGame('${EXT.kwc}', '🔤 ' + t('kwcT'))` },
+        study: { i: '📚', t: () => tt('stT', 'JJ 공부방'), d: () => tt('stD', ''), go: "openExtGame('study.html', '📚 ' + t('stT'))" },
+        af: { i: '✈️', t: () => tt('afT', '아트 플라이트'), d: () => tt('afD', ''), go: `openExtGame('${EXT.af}', '✈️ ' + t('afT'))` },
+        shop: { i: '🛒', t: () => tt('shopT', 'JJ 간식가게'), d: () => tt('shopD', ''), go: `openExtGame('${EXT.shop}', '🛒 ' + t('shopT'))` },
+        song: { i: '🎶', t: () => tt('songT', '아트쏭'), d: () => tt('songD', ''), go: 'openSong()' },
+        coloring: { i: '🖍', t: () => tt('colorT', '아트컬러링'), d: () => tt('colorD', ''), go: 'openColoring()' },
+        word: { i: '📜', t: () => tt('wordT', '말씀카드'), d: () => tt('wordD', ''), go: 'openWord()' },
+        beam: { i: '📽️', t: () => tt('beamT', '아트빔'), d: () => tt('beamD', ''), go: 'openArtCards()' },
+        emo: { i: '🎨', t: () => tt('emoT', '이모티콘 공방'), d: () => tt('emoD', ''), go: "jxTrack('emo'); location.href='emoticon.html'" },
+        store: { i: '📦', t: () => tt('storeT', '스토어'), d: () => tt('storeD', ''), go: "switchView('store')" },
+        anim: { i: '✨', t: () => '움직이는 그림', d: () => 'JJ 그림이 살랑살랑 움직여요', go: 'jxAnimPick()', nw: 1 },
+        show: { i: '🎞️', t: () => '움직이는 갤러리', d: () => '작품이 차례로 살아나는 상영관', go: 'jxAnimShow()', nw: 1 },
+        recap: { i: '🎉', t: () => '올해의 JJ', d: () => '한 해 작품을 한눈에 돌아봐요', go: 'jxRecap()', nw: 1 },
+        story: { i: '📖', t: () => 'JJ 그림책', d: () => '작품으로 만드는 읽어 주는 그림책', go: 'jxStory()', nw: 1 },
+        card: { i: '💌', t: () => '작품 카드 보내기', d: () => '할머니·할아버지께 그림 카드를', go: 'jxCardPick()', nw: 1 },
+        sheet: { i: '🖨', t: () => '색칠 도안 인쇄', d: () => 'JJ 그림을 선으로 바꿔 색칠해요', go: 'jxSheetPick()', nw: 1 },
+        rec: { i: '📊', t: () => '나의 기록', d: () => '함께한 날·많이 한 놀이·달력', go: 'jxMyRecord()', nw: 1 },
+        badge: { i: '🏅', t: () => '배지 도감', d: () => '모은 배지를 확인해요', go: "jxMyRecord('jxBadges')", nw: 1 }
+      };
+      const AREAS = [
+        { id: 'game', e: '🎮', l: '게임', c: '#ef4444', x: 21, y: 38, keys: ['pang', 'mem', 'throw', 'cm', 'ksc', 'puzzle', 'cube', 'balance', 'nunchi', 'hidden', 'drive'] },
+        { id: 'smart', e: '🧠', l: '똑똑해지기', c: '#f59e0b', x: 44, y: 24, keys: ['kwc', 'study', 'af', 'shop'] },
+        { id: 'theater', e: '🎬', l: 'JJ 극장', c: '#a855f7', x: 67, y: 27, keys: ['anim', 'show', 'recap', 'story', 'card', 'sheet'] },
+        { id: 'music', e: '🎵', l: '그림×음악', c: '#3b82f6', x: 23, y: 71, keys: ['song', 'coloring'] },
+        { id: 'make', e: '✂️', l: '만들기', c: '#22c55e', x: 45, y: 76, keys: ['word', 'beam', 'emo', 'store'] },
+        { id: 'me', e: '🙋', l: '나의 기록', c: '#ec4899', x: 66, y: 72, keys: ['rec', 'badge'] }
+      ];
+
+      function extKey(url) {
+        const u = String(url || '');
+        if (u.includes('korean-word-chain')) return 'kwc'; if (u.includes('art-flight')) return 'af';
+        if (u.includes('mode=shop')) return 'shop'; if (u.includes('k-snack')) return 'ksc';
+        if (u.includes('Drive-3D')) return 'drive'; if (u.includes('color-merge')) return 'cm';
+        const m = u.match(/(puzzle|cube|balance|nunchi|hidden|study)\.html/); return m ? m[1] : '';
+      }
+
+      // ---------------- 🎄 계절 ----------------
+      function season() {
+        const m = new Date().getMonth() + 1;
+        if (m === 12) return { id: 'xmas', i: '🎄', n: '크리스마스 시즌', fx: ['❄️', '⛄', '✨'], bg: 'linear-gradient(90deg,#7f1d1d,#14532d)' };
+        if (m === 1 || m === 2) return { id: 'newyear', i: '🧧', n: '새해 복 시즌', fx: ['🧧', '🪙', '✨'], bg: 'linear-gradient(90deg,#9f1239,#b45309)' };
+        if (m === 3 || m === 4) return { id: 'spring', i: '🌸', n: '봄꽃 시즌', fx: ['🌸', '🌷', '🦋'], bg: 'linear-gradient(90deg,#be185d,#65a30d)' };
+        if (m === 5) return { id: 'kids', i: '🎈', n: '어린이날 시즌', fx: ['🎈', '🎁', '⭐'], bg: 'linear-gradient(90deg,#2563eb,#db2777)' };
+        if (m === 7 || m === 8) return { id: 'summer', i: '🍉', n: '여름 방학 시즌', fx: ['🍉', '🫧', '🐚'], bg: 'linear-gradient(90deg,#0369a1,#0f766e)' };
+        if (m === 10) return { id: 'halloween', i: '🎃', n: '할로윈 시즌', fx: ['🎃', '👻', '🍬'], bg: 'linear-gradient(90deg,#7c2d12,#4c1d95)' };
+        return null;
+      }
+
+      // ---------------- ☀️ 오늘의 미션 ----------------
+      const MS = {
+        view: { i: '🖼', tx: '작품 3점 감상하기', n: 3 }, cheer: { i: '❤️', tx: '작품에 응원 2번 보내기', n: 2 },
+        kwc: { i: '🔤', tx: '끝말잇기 한 판', n: 1 }, study: { i: '📚', tx: '공부방 자료 보기', n: 1 }, af: { i: '✈️', tx: '아트 플라이트 속담 맞히기', n: 1 }, shop: { i: '🛒', tx: 'JJ 간식가게 손님 받기', n: 1 },
+        hidden: { i: '🔍', tx: '숨은그림찾기 한 판', n: 1 }, puzzle: { i: '🧩', tx: '그림 퍼즐 맞추기', n: 1 }, cube: { i: '🧊', tx: '그림 큐브 돌리기', n: 1 }, balance: { i: '⚖️', tx: '밸런스 게임 하기', n: 1 },
+        nunchi: { i: '👀', tx: '눈치 게임 하기', n: 1 }, mem: { i: '🧠', tx: '아트메모리 도전', n: 1 }, anim: { i: '✨', tx: '그림 움직여 보기', n: 1 }, story: { i: '📖', tx: 'JJ 그림책 읽기', n: 1 },
+        drive: { i: '🛴', tx: '킥보드 3D 타기', n: 1 }, sheet: { i: '🖨', tx: '색칠 도안 만들기', n: 1 }
+      };
+      function seedRand(str) { let h = 2166136261; for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 10000) / 10000; }; }
+      function missions(d = today()) {
+        const r = seedRand('agjj' + d), pick = a => a[Math.floor(r() * a.length)];
+        return [pick(['view', 'cheer']), pick(['kwc', 'study', 'af', 'shop']), pick(['hidden', 'puzzle', 'cube', 'balance', 'nunchi', 'mem', 'anim', 'story', 'drive', 'sheet'])];
+      }
+      function mprog(s, k) { const day = s.days[today()] || {}; return Math.min(MS[k].n, day[k] || 0); }
+      function afterTrack(key) {
+        const s = st(), ms = missions();
+        if (ms.includes(key) && mprog(s, key) === MS[key].n && (s.days[today()][key] === MS[key].n)) toastSafe(`✅ 미션 완료! ${MS[key].i} ${MS[key].tx}`);
+        if (!s.mdone[today()] && ms.every(k => mprog(s, k) >= MS[k].n)) {
+          s.mdone[today()] = 1; save(s);
+          const bonus = 2 + (season() ? 1 : 0);
+          try { addPaint(bonus); } catch (e) {}
+          setTimeout(() => { toastSafe(`🎉 오늘의 미션 3개 완료! 💧 +${bonus}`); confetti(); }, 900);
+        }
+        checkBadges();
+        if (document.getElementById('view-play') && document.getElementById('view-play').classList.contains('active')) renderToday();
+      }
+      function toastSafe(m) { try { toast(m); } catch (e) { console.log(m); } }
+      function confetti(set) {
+        const box = document.createElement('div'); box.className = 'jx-confetti';
+        const em = set || ['🎉', '✨', '💧', '⭐', '🎨', '💜'];
+        for (let i = 0; i < 28; i++) { const e = document.createElement('i'); e.textContent = em[i % em.length]; e.style.left = Math.random() * 100 + 'vw'; e.style.animationDelay = Math.random() * .6 + 's'; box.appendChild(e); }
+        document.body.appendChild(box); setTimeout(() => box.remove(), 2800);
+      }
+
+      // ---------------- 🏅 배지 ----------------
+      const BADGES = [
+        { id: 'first', i: '🌱', t: '첫 발걸음', s: '처음 들어왔어요', ok: s => Object.keys(s.days).length >= 1 },
+        { id: 'st3', i: '🔥', t: '3일 연속', s: '3일 연속 방문', ok: s => bestStreak(s) >= 3 },
+        { id: 'st7', i: '🌟', t: '7일 연속', s: '일주일 개근', ok: s => bestStreak(s) >= 7 },
+        { id: 'st30', i: '👑', t: '30일 연속', s: '한 달 개근', ok: s => bestStreak(s) >= 30 },
+        { id: 'd30', i: '📅', t: '함께한 30일', s: '모두 30일 방문', ok: s => Object.keys(s.days).length >= 30 },
+        { id: 'view10', i: '🖼', t: '감상가', s: '작품 10점 감상', ok: s => Object.keys(s.views).length >= 10 },
+        { id: 'viewall', i: '🏛', t: '전시관 마스터', s: '보이는 작품 모두 감상', ok: s => { const v = visibleArts(); return v.length > 5 && v.every(a => s.views[a.id]); } },
+        { id: 'm1', i: '✅', t: '미션 시작', s: '하루 미션 3개 완료', ok: s => Object.keys(s.mdone).length >= 1 },
+        { id: 'm10', i: '🏆', t: '미션 마스터', s: '미션 완료 10일', ok: s => Object.keys(s.mdone).length >= 10 },
+        { id: 'cheer', i: '📣', t: '응원단장', s: '응원 20번', ok: s => (s.plays.cheer || 0) >= 20 },
+        { id: 'puzzle', i: '🧩', t: '퍼즐 왕', s: '퍼즐 5번', ok: s => (s.plays.puzzle || 0) >= 5 },
+        { id: 'cube', i: '🧊', t: '큐브 박사', s: '큐브 5번', ok: s => (s.plays.cube || 0) >= 5 },
+        { id: 'hidden', i: '🕵️', t: '숨은그림 탐정', s: '숨은그림 5번', ok: s => (s.plays.hidden || 0) >= 5 },
+        { id: 'kwc', i: '🔤', t: '말놀이 달인', s: '끝말잇기 5번', ok: s => (s.plays.kwc || 0) >= 5 },
+        { id: 'study', i: '📚', t: '공부벌레', s: '공부방 5번', ok: s => (s.plays.study || 0) >= 5 },
+        { id: 'shop', i: '🧑‍🍳', t: '꼬마 사장님', s: '간식가게 5번', ok: s => (s.plays.shop || 0) >= 5 },
+        { id: 'af', i: '✈️', t: '속담 파일럿', s: '아트 플라이트 5번', ok: s => (s.plays.af || 0) >= 5 },
+        { id: 'anim', i: '🎬', t: '애니메이터', s: '그림 움직이기 3번', ok: s => (s.plays.anim || 0) + (s.plays.show || 0) >= 3 },
+        { id: 'story', i: '📖', t: '그림책 작가', s: '그림책 읽기 3번', ok: s => (s.plays.story || 0) >= 3 },
+        { id: 'explorer', i: '🧭', t: '탐험가', s: '놀이 10가지 해 보기', ok: s => Object.keys(s.plays).filter(k => PLAYKEYS.has(k)).length >= 10 }
+      ];
+      function checkBadges(silent) {
+        const s = st(); let got = [];
+        BADGES.forEach(b => { if (!s.badges[b.id] && b.ok(s)) { s.badges[b.id] = today(); got.push(b); } });
+        if (got.length) { save(s); if (!silent) setTimeout(() => toastSafe(got.map(b => `🏅 새 배지! ${b.i} ${b.t}`).join('<br>')), 1600); }
+      }
+
+      // ---------------- ✨ Play: 팔레트 ----------------
+      function tileBadge(k) {
+        const free = `<em class="free">${H(tt('free', '무료'))}</em>`, p1 = '<em>💧 1</em>';
+        try {
+          if (k === 'pang') { const b = Math.max(0, ...[1, 2, 3, 4].map(n => lsGet('agjj_pang_best_' + n, 0))); return b ? '🏆 ' + b.toLocaleString() : p1; }
+          if (k === 'mem') { const b = (lsGet(K_MEM, {}).best || 0); return b ? '🏆 ' + b.toLocaleString() : free; }
+          if (k === 'throw') { const n = Object.keys(lsGet('agjj_throw_v1', {}).done || {}).length; return n ? '🖼 ' + n : free; }
+          if (k === 'song') { const n = lsGet(K_EMO, []).filter(x => x.startsWith('song:')).length; return n ? '🎵 ' + n : free; }
+          if (k === 'word') { const n = lsGet(K_CARDS, []).length; return n ? '📜 ' + n : p1; }
+          if (k === 'beam') { const n = lsGet(K_EMO, []).filter(x => x.startsWith('card:')).length; return n ? '📽️ ' + n : p1; }
+        } catch (e) {}
+        const n = st().plays[k] || 0; return n ? `<em>▶ ${n}</em>` : free;
+      }
+      function tile(k) {
+        const m = M[k]; if (!m) return '';
+        const seen = get(K_SEEN, {}), nw = m.nw && !seen[k];
+        return `<button class="pt ${k === 'drive' ? 'drive-tile' : ''} ${nw ? 'jx-new' : ''}" onclick="jxSeen('${k}'); ${m.go.replace(/"/g, '&quot;')}"><span class="pt-b">${tileBadge(k)}</span><div class="pt-i">${m.i}</div><div class="pt-t">${H(m.t())}</div><div class="pt-d">${H(m.d())}</div></button>`;
+      }
+      window.jxSeen = k => { const s = get(K_SEEN, {}); if (!s[k]) { s[k] = 1; put(K_SEEN, s); } };
+      function paletteSvg() {
+        return `<svg viewBox="0 0 142 100" preserveAspectRatio="none" aria-hidden="true"><defs>
+          <radialGradient id="jxWood" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#f6dfb0"/><stop offset=".7" stop-color="#e6bf80"/><stop offset="1" stop-color="#c99556"/></radialGradient>
+          <mask id="jxHole"><rect width="142" height="100" fill="#fff"/><ellipse cx="112" cy="52" rx="8.5" ry="10" fill="#000"/></mask></defs>
+          <path mask="url(#jxHole)" fill="url(#jxWood)" stroke="#b07a3c" stroke-width="1.4" d="M70 4 C112 2 140 22 138 46 C137 58 128 60 122 58 C114 56 108 66 116 76 C122 86 108 97 78 97 C36 98 4 82 4 52 C4 22 32 5 70 4 Z"/>
+          <path fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1" d="M30 18 C45 10 70 8 92 11"/></svg>`;
+      }
+      function renderPlayNew() {
+        const body = document.getElementById('playBody'); if (!body) return;
+        let paintBar = '';
+        try {
+          paintBar = `<div class="pl-paint"><div><div style="font-size:12px; color:#ddd6fe">${t('myPaint')}</div><b>💧 ${getPaint()}</b>
+            <div style="font-size:11.5px; color:#c4b5fd; margin-top:2px">${t('paintSub', { a: freeLeft(), b: savedPaint() })}</div></div>
+            <button onclick="earnPaintPlay()" ${adLeftToday() ? '' : 'disabled'}>${typeof HIDE_AD_UI !== 'undefined' && HIDE_AD_UI ? '🎁 보너스' : '<span class="adb">AD</span> 시청'} 💧 +${AD_PAINT}<br><small>오늘 ${adLeftToday()}번 남음</small></button></div>`;
+        } catch (e) {}
+        const cur = get(K_AREA, 'game');
+        body.innerHTML = `${paintBar}
+          <div id="jxToday"></div>
+          <div class="pal-wrap" id="jxPal">${paletteSvg()}
+            ${AREAS.map(a => `<button class="pal-dab ${a.id === cur ? 'on' : ''}" style="--c:${a.c}; left:${a.x}%; top:${a.y}%" onclick="jxArea('${a.id}')"><span class="e">${a.e}</span><span class="l">${a.l}</span><span class="n">${a.keys.length}</span></button>`).join('')}
+</div>
+          <div class="pal-tip">물감을 눌러 영역을 골라요</div>
+          <div id="jxArea"></div>`;
+        renderToday(); jxArea(cur, true);
+      }
+      window.jxArea = function (id, quiet) {
+        const a = AREAS.find(x => x.id === id) || AREAS[0]; put(K_AREA, a.id);
+        document.querySelectorAll('#jxPal .pal-dab').forEach(b => b.classList.toggle('on', b.getAttribute('onclick').includes(`'${a.id}'`)));
+        const br = document.getElementById('jxBrush'); if (br) { br.style.left = (a.x + 9) + '%'; br.style.top = (a.y - 12) + '%'; }
+        const box = document.getElementById('jxArea'); if (!box) return;
+        box.innerHTML = `<div class="pal-area" style="--c:${a.c}"><div class="pal-h"><span class="sw"></span>${a.e} ${a.l}<small>레벨 2 · ${a.keys.length}개</small></div>
+          ${a.id === 'me' ? miniRecord() : ''}<div class="pg">${a.keys.map(tile).join('')}</div></div>`;
+        if (!quiet) box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      };
+      function renderToday() {
+        const el = document.getElementById('jxToday'); if (!el) return;
+        const s = st(), ms = missions(), sea = season(), all = ms.every(k => mprog(s, k) >= MS[k].n);
+        const lastM = s.last && M[s.last];
+        el.innerHTML = `<div class="jx-today"><h3>☀️ 오늘의 미션 <small>🔥 ${streak(s)}일 연속</small></h3>
+          <div class="jx-ms">${ms.map(k => { const p = mprog(s, k), d = p >= MS[k].n, go = M[k] ? M[k].go : (k === 'view' || k === 'cheer' ? "switchView('3d')" : ''); return `<button class="jx-m ${d ? 'done' : ''}" onclick="${go.replace(/"/g, '&quot;')}"><span class="ck">${d ? '✓' : ''}</span>${MS[k].i} ${MS[k].tx}<span class="pg2">${p}/${MS[k].n}</span></button>`; }).join('')}</div>
+          <div class="jx-rw"><span>${all ? '🎉 오늘 미션 완료! 내일 또 만나요' : `3개 모두 하면 💧 +${2 + (sea ? 1 : 0)}`}</span><span>🏅 배지 ${Object.keys(s.badges).length}/${BADGES.length}</span></div>
+          ${lastM ? `<button class="jx-cont" onclick="${lastM.go.replace(/"/g, '&quot;')}">▶ 이어하기 · ${lastM.i} ${H(lastM.t())}</button>` : ''}
+          ${sea ? `<div class="jx-season" style="background:${sea.bg}">${sea.i} ${sea.n} · 미션 보너스 💧 +1${sea.fx.map((f, i) => `<i style="left:${8 + i * 30 + Math.random() * 10}%; animation-duration:${3 + i}s; animation-delay:${i * .7}s">${f}</i>`).join('')}</div>` : ''}</div>`;
+      }
+      function miniRecord() {
+        const s = st();
+        return `<div class="jx-big" style="margin-top:10px"><div><b>${Object.keys(s.days).length}</b><span>함께한 날</span></div><div><b>${streak(s)}</b><span>연속 🔥</span></div><div><b>${Object.keys(s.badges).length}</b><span>배지 🏅</span></div></div>`;
+      }
+
+      // ---------------- 📊 나의 기록 (My 화면 아래) ----------------
+      const NAMES = k => (M[k] ? M[k].i + ' ' + M[k].t() : k);
+      function recordHtml() {
+        const s = st(), now = new Date(), y = now.getFullYear(), mo = now.getMonth();
+        const first = new Date(y, mo, 1), dim = new Date(y, mo + 1, 0).getDate();
+        let cal = ['일', '월', '화', '수', '목', '금', '토'].map(w => `<div class="w">${w}</div>`).join('') + '<div></div>'.repeat(first.getDay());
+        for (let d = 1; d <= dim; d++) {
+          const k = `${y}-${pad(mo + 1)}-${pad(d)}`, day = s.days[k], n = day ? Object.entries(day).reduce((a, [kk, v]) => a + (kk === 'open' ? 0 : v), 0) : -1;
+          const lv = n < 0 ? '' : n === 0 ? 'l1' : n < 6 ? 'l2' : 'l3';
+          cal += `<div class="d ${lv} ${k === today() ? 't' : ''}">${d}</div>`;
+        }
+        const top = Object.entries(s.plays).filter(([k]) => PLAYKEYS.has(k)).sort((a, b) => b[1] - a[1]).slice(0, 6), mx = top.length ? top[0][1] : 1;
+        const bars = top.length ? top.map(([k, v]) => `<div class="jx-bar"><span class="nm">${H(NAMES(k))}</span><span class="tr"><i style="width:${Math.max(6, v / mx * 100)}%"></i></span><span class="v">${v}</span></div>`).join('') : '<div style="font-size:13px;color:#94a3b8;padding:6px 0">아직 기록이 없어요. Play에서 놀이를 시작해 보세요!</div>';
+        const viewed = Object.keys(s.views).length, vis = visibleArts().length;
+        return `<div class="jx-rec" id="jxRec">
+          <h3>📊 나의 기록 <small style="font-size:11.5px;color:#94a3b8;font-weight:600">${s.first.replace(/-/g, '.')}부터</small></h3>
+          <div class="jx-big"><div><b>${Object.keys(s.days).length}</b><span>함께한 날</span></div><div><b>${streak(s)}</b><span>지금 연속 🔥</span></div><div><b>${bestStreak(s)}</b><span>최고 연속</span></div>
+            <div><b>${viewed}${vis ? '/' + vis : ''}</b><span>감상한 작품</span></div><div><b>${Object.keys(s.mdone).length}</b><span>미션 완료한 날</span></div><div><b>${s.plays.cheer || 0}</b><span>보낸 응원</span></div></div>
+          <h3>🗓 ${mo + 1}월 달력</h3><div class="jx-cal">${cal}</div>
+          <h3>🎮 많이 한 놀이</h3><div class="jx-bars">${bars}</div>
+          <h3 id="jxBadges">🏅 배지 도감 <small style="font-size:12px;color:#fbbf24">${Object.keys(s.badges).length}/${BADGES.length}</small></h3>
+          <div class="jx-bdg">${BADGES.map(b => `<div class="${s.badges[b.id] ? '' : 'off'}"><div class="i">${b.i}</div><div class="t">${b.t}</div><div class="s">${s.badges[b.id] ? s.badges[b.id].slice(5).replace('-', '/') + ' 획득' : b.s}</div></div>`).join('')}</div>
+          <div class="jx-acts"><button onclick="jxRecap()">🎉 올해의 JJ</button><button class="b2" onclick="jxStory()">📖 JJ 그림책</button></div>
+        </div>`;
+      }
+      window.jxMyRecord = function (anchor) {
+        try { openAccount(); } catch (e) {}
+        setTimeout(() => { const el = document.getElementById(anchor || 'jxRec'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 250);
+      };
+
+      // ---------------- 전체 화면 오버레이 도우미 ----------------
+      function ov(id, title, inner) {
+        let el = document.getElementById(id);
+        if (!el) { el = document.createElement('div'); el.id = id; el.className = 'jx-ov'; document.body.appendChild(el); }
+        el.innerHTML = `<div class="jx-top"><b>${title}</b><button class="jx-x" onclick="jxClose('${id}')">✕</button></div>${inner}`;
+        el.classList.add('on'); document.body.style.overflow = 'hidden';
+        return el;
+      }
+      window.jxClose = function (id) {
+        const el = document.getElementById(id); if (el) el.classList.remove('on');
+        if (id === 'jxAnim') animStop();
+        if (id === 'jxStoryOv') { try { speechSynthesis.cancel(); } catch (e) {} try { NativeApp && NativeApp.stopSpeak && NativeApp.stopSpeak(); } catch (e) {} }
+        if (!document.querySelector('.jx-ov.on')) document.body.style.overflow = '';
+      };
+      function loadImg(srcs) {
+        return new Promise((res, rej) => {
+          const list = srcs.filter(Boolean); let i = 0;
+          const tryNext = () => {
+            if (i >= list.length) return rej(new Error('no image'));
+            const im = new Image(), src = list[i++];
+            if (/^https?:/.test(src) && !src.startsWith(location.origin)) im.crossOrigin = 'anonymous';
+            im.onload = () => res(im); im.onerror = tryNext; im.src = src;
+          };
+          tryNext();
+        });
+      }
+      function pickGrid(title, onPick, sub) {
+        const list = visibleArts();
+        ov('jxPickOv', title, `<div class="jx-note">${sub || '작품을 골라요'}</div><div class="jx-pick">${list.map(a => `<button onclick="jxPicked('${a.id}')"><img src="${thumb(a.id)}" loading="lazy" alt=""></button>`).join('')}</div>`);
+        window.jxPicked = id => { jxClose('jxPickOv'); onPick(list.find(a => a.id === id)); };
+      }
+
+      // ---------------- ✨ 움직이는 그림 ----------------
+      const MOTIONS = [['wave', '🌊 살랑살랑'], ['float', '🎈 둥실둥실'], ['bounce', '🐰 통통'], ['zoom', '🔍 다가가기'], ['rainbow', '🌈 무지개빛'], ['still', '⏸ 그대로']];
+      const PARTS = [['sparkle', '✨ 반짝반짝'], ['snow', '❄️ 눈송이'], ['petal', '🌸 꽃잎'], ['bubble', '🫧 비눗방울'], ['heart', '💗 하트'], ['star', '⭐ 별똥별'], ['none', '없음']];
+      let AN = null;
+      function animStop() { if (AN) { cancelAnimationFrame(AN.raf); clearInterval(AN.showT); if (AN.rec && AN.rec.state === 'recording') AN.rec.stop(); } AN = null; }
+      window.jxAnimPick = () => pickGrid('✨ 움직일 그림 고르기', a => jxAnim(a));
+      window.jxAnim = function (art, opts = {}) {
+        if (!art) return;
+        animStop();
+        const el = ov('jxAnim', (opts.show ? '🎞️ 움직이는 갤러리 · ' : '✨ ') + H(art.title || ''),
+          `<div class="jx-stage" id="jxStage"><canvas id="jxCv"></canvas></div>
+           <div class="jx-chips" id="jxMo">${MOTIONS.map(([k, l]) => `<button class="jx-chip" data-k="${k}" onclick="jxSet('mo','${k}')">${l}</button>`).join('')}</div>
+           <div class="jx-chips" id="jxPa" style="padding-top:0">${PARTS.map(([k, l]) => `<button class="jx-chip" data-k="${k}" onclick="jxSet('pa','${k}')">${l}</button>`).join('')}</div>
+           <div class="jx-bot">${opts.show ? '<button class="dk" onclick="jxShowNext()">⏭ 다음 작품</button>' : '<button class="dk" onclick="jxAnimPick()">🖼 다른 그림</button>'}<button id="jxRecBtn" onclick="jxRecord()">🎥 영상으로 저장</button></div>`);
+        AN = { art, mo: opts.mo || 'wave', pa: opts.pa || 'sparkle', t0: performance.now(), ps: [], show: !!opts.show };
+        track(opts.show ? 'show' : 'anim');
+        loadImg([art.src, mid(art.id), thumb(art.id)]).then(img => { if (!AN || AN.art !== art) return; AN.img = img; setupCanvas(); loop(); }).catch(() => toastSafe('그림을 불러오지 못했어요'));
+        markChips();
+      };
+      window.jxSet = (w, k) => { if (!AN) return; AN[w] = k; AN.ps = []; markChips(); };
+      function markChips() {
+        if (!AN) return;
+        document.querySelectorAll('#jxMo .jx-chip').forEach(b => b.classList.toggle('on', b.dataset.k === AN.mo));
+        document.querySelectorAll('#jxPa .jx-chip').forEach(b => b.classList.toggle('on', b.dataset.k === AN.pa));
+      }
+      function setupCanvas() {
+        const cv = document.getElementById('jxCv'), stg = document.getElementById('jxStage'); if (!cv || !stg) return;
+        const im = AN.img, maxW = stg.clientWidth - 16, maxH = stg.clientHeight - 16, sc = Math.min(maxW / im.width, maxH / im.height, 2);
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        AN.W = Math.round(im.width * sc); AN.H = Math.round(im.height * sc);
+        cv.width = Math.round(AN.W * dpr); cv.height = Math.round(AN.H * dpr); cv.style.width = AN.W + 'px'; cv.style.height = AN.H + 'px';
+        AN.ctx = cv.getContext('2d'); AN.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); AN.cv = cv;
+      }
+      function spawn(kind, W, H) {
+        const r = Math.random;
+        if (kind === 'sparkle') return { k: kind, x: r() * W, y: r() * H, life: 0, max: 40 + r() * 50, s: 6 + r() * 12 };
+        if (kind === 'snow') return { k: kind, x: r() * W, y: -10, vx: (r() - .5) * .6, vy: .6 + r() * 1.2, s: 2 + r() * 4 };
+        if (kind === 'petal') return { k: kind, x: r() * W, y: -10, vx: .4 + r() * .8, vy: .7 + r(), s: 5 + r() * 6, a: r() * 6, va: (r() - .5) * .1 };
+        if (kind === 'bubble') return { k: kind, x: r() * W, y: H + 10, vx: (r() - .5) * .5, vy: -(.6 + r()), s: 6 + r() * 14 };
+        if (kind === 'heart') return { k: kind, x: r() * W, y: H + 10, vx: (r() - .5) * .4, vy: -(.8 + r()), s: 10 + r() * 10, life: 0 };
+        if (kind === 'star') return { k: kind, x: r() * W * .8, y: -10, vx: 3 + r() * 2, vy: 2 + r() * 1.5, s: 2, life: 0 };
+      }
+      function drawP(c, p) {
+        c.save();
+        if (p.k === 'sparkle') {
+          const a = Math.sin(p.life / p.max * Math.PI); c.globalAlpha = a; c.fillStyle = '#fff'; c.shadowColor = '#fde68a'; c.shadowBlur = 10;
+          c.translate(p.x, p.y); c.rotate(p.life * .05); const s = p.s * a;
+          c.beginPath(); for (let i = 0; i < 4; i++) { c.rotate(Math.PI / 2); c.moveTo(0, 0); c.quadraticCurveTo(s * .15, s * .15, 0, s); c.quadraticCurveTo(-s * .15, s * .15, 0, 0); } c.fill();
+        } else if (p.k === 'snow') { c.globalAlpha = .9; c.fillStyle = '#fff'; c.shadowColor = 'rgba(0,0,0,.25)'; c.shadowBlur = 3; c.beginPath(); c.arc(p.x, p.y, p.s, 0, 7); c.fill(); }
+        else if (p.k === 'petal') { c.translate(p.x, p.y); c.rotate(p.a); c.fillStyle = 'rgba(249,168,212,.92)'; c.beginPath(); c.ellipse(0, 0, p.s, p.s * .55, 0, 0, 7); c.fill(); }
+        else if (p.k === 'bubble') { c.strokeStyle = 'rgba(255,255,255,.85)'; c.lineWidth = 1.5; c.fillStyle = 'rgba(186,230,253,.18)'; c.beginPath(); c.arc(p.x, p.y, p.s, 0, 7); c.fill(); c.stroke(); c.fillStyle = 'rgba(255,255,255,.8)'; c.beginPath(); c.arc(p.x - p.s * .35, p.y - p.s * .35, p.s * .2, 0, 7); c.fill(); }
+        else if (p.k === 'heart') { c.globalAlpha = Math.max(0, 1 - p.life / 220); c.font = p.s + 'px serif'; c.fillText('💗', p.x, p.y); }
+        else if (p.k === 'star') { c.globalAlpha = Math.max(0, 1 - p.life / 60); const g = c.createLinearGradient(p.x - p.vx * 12, p.y - p.vy * 12, p.x, p.y); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(1, '#fff'); c.strokeStyle = g; c.lineWidth = 2.5; c.beginPath(); c.moveTo(p.x - p.vx * 12, p.y - p.vy * 12); c.lineTo(p.x, p.y); c.stroke(); }
+        c.restore();
+      }
+      function loop() {
+        if (!AN || !AN.ctx) return;
+        const c = AN.ctx, W = AN.W, Hh = AN.H, im = AN.img, tm = (performance.now() - AN.t0) / 1000;
+        c.clearRect(0, 0, W, Hh); c.save();
+        const mo = AN.mo;
+        if (mo === 'wave') {
+          const step = 3, amp = W * .012;
+          for (let y = 0; y < Hh; y += step) { const off = Math.sin(y / Hh * 6 + tm * 2.2) * amp * (0.4 + y / Hh * .8); c.drawImage(im, 0, y / Hh * im.height, im.width, step / Hh * im.height + 1, off, y, W, step + .6); }
+        } else if (mo === 'float' || mo === 'bounce' || mo === 'zoom') {
+          let sc = 1, dx = 0, dy = 0, rot = 0;
+          if (mo === 'float') { sc = 1.04 + Math.sin(tm * 1.2) * .025; dy = Math.sin(tm * 1.4) * Hh * .015; rot = Math.sin(tm * .9) * .012; }
+          if (mo === 'bounce') { const b = Math.abs(Math.sin(tm * 3)); dy = -b * Hh * .03; sc = 1.03; c.translate(W / 2, Hh); c.scale(1 + (1 - b) * .03, 1 - (1 - b) * .03); c.translate(-W / 2, -Hh); }
+          if (mo === 'zoom') { sc = 1.02 + ((tm % 10) / 10) * .22; dx = Math.sin(tm * .3) * W * .04; }
+          c.translate(W / 2 + dx, Hh / 2 + dy); c.rotate(rot); c.scale(sc, sc); c.drawImage(im, -W / 2, -Hh / 2, W, Hh);
+        } else if (mo === 'rainbow') { c.filter = `hue-rotate(${(tm * 40) % 360}deg) saturate(1.3)`; c.drawImage(im, 0, 0, W, Hh); c.filter = 'none'; }
+        else c.drawImage(im, 0, 0, W, Hh);
+        c.restore();
+        if (AN.pa !== 'none') {
+          const rate = { sparkle: .35, snow: .6, petal: .25, bubble: .18, heart: .12, star: .03 }[AN.pa] || .2;
+          if (Math.random() < rate && AN.ps.length < 90) AN.ps.push(spawn(AN.pa, W, Hh));
+          AN.ps = AN.ps.filter(p => {
+            p.life = (p.life || 0) + 1;
+            if (p.vx !== undefined) { p.x += p.vx + (p.k === 'snow' || p.k === 'petal' ? Math.sin(tm * 2 + p.y * .02) * .4 : 0); p.y += p.vy; }
+            if (p.va) p.a += p.va;
+            drawP(c, p);
+            if (p.k === 'sparkle') return p.life < p.max;
+            if (p.k === 'heart') return p.life < 220;
+            if (p.k === 'star') return p.life < 60;
+            return p.y > -30 && p.y < Hh + 30;
+          });
+        }
+        c.save(); c.globalAlpha = .55; c.fillStyle = '#fff'; c.font = `700 ${Math.max(10, W * .028)}px sans-serif`; c.textAlign = 'right'; c.shadowColor = 'rgba(0,0,0,.5)'; c.shadowBlur = 3; c.fillText('J.J', W - 8, Hh - 8); c.restore();
+        AN.raf = requestAnimationFrame(loop);
+      }
+      window.jxRecord = function () {
+        if (!AN || !AN.cv) return;
+        const btn = document.getElementById('jxRecBtn');
+        if (!AN.cv.captureStream || typeof MediaRecorder === 'undefined') { toastSafe('이 기기에서는 영상 저장이 안 돼요. 화면 녹화를 써 주세요'); return; }
+        let stream; try { stream = AN.cv.captureStream(30); } catch (e) { toastSafe('영상 저장을 할 수 없는 그림이에요'); return; }
+        const type = ['video/mp4', 'video/webm;codecs=vp9', 'video/webm'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
+        const rec = new MediaRecorder(stream, type ? { mimeType: type, videoBitsPerSecond: 4e6 } : undefined), chunks = [];
+        rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+        rec.onstop = () => {
+          const blob = new Blob(chunks, { type: rec.mimeType || 'video/webm' }), ext = (rec.mimeType || '').includes('mp4') ? 'mp4' : 'webm';
+          const file = new File([blob], `JJ_${AN ? AN.art.id : 'art'}.${ext}`, { type: blob.type });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file], title: 'JJ 움직이는 그림' }).catch(() => {});
+          else { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); }
+          if (btn) { btn.disabled = false; btn.textContent = '🎥 영상으로 저장'; }
+        };
+        AN.rec = rec; rec.start(); if (btn) { btn.disabled = true; btn.textContent = '🔴 녹화 중… 6초'; }
+        let n = 6; const iv = setInterval(() => { n--; if (btn && n > 0) btn.textContent = `🔴 녹화 중… ${n}초`; if (n <= 0) { clearInterval(iv); if (rec.state === 'recording') rec.stop(); } }, 1000);
+      };
+      window.jxAnimShow = function () {
+        const list = visibleArts(); if (!list.length) return toastSafe('작품을 불러오는 중이에요');
+        let order = list.slice().sort(() => Math.random() - .5), i = 0;
+        const go = () => { const a = order[i++ % order.length]; const mo = MOTIONS[Math.floor(Math.random() * 4)][0], pa = PARTS[Math.floor(Math.random() * 6)][0]; jxAnim(a, { show: 1, mo, pa }); if (AN) AN.showT = setInterval(window.jxShowNext, 8000); };
+        window.jxShowNext = () => { if (AN) clearInterval(AN.showT); go(); };
+        go();
+      };
+
+      // ---------------- 🎉 올해의 JJ ----------------
+      window.jxRecap = function (year) {
+        const all = allArts(), vis = new Set(visibleArts().map(a => a.id));
+        const years = [...new Set(all.map(a => String(a.date || '').slice(0, 4)).filter(y => /^\d{4}$/.test(y)))].sort();
+        if (!years.length) return toastSafe('작품을 불러오는 중이에요');
+        const y = year || (years.includes(String(new Date().getFullYear())) ? String(new Date().getFullYear()) : years[years.length - 1]);
+        const works = all.filter(a => String(a.date || '').startsWith(y)).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+        const shown = works.filter(a => vis.has(a.id));
+        const byM = Array.from({ length: 12 }, (_, i) => works.filter(a => +String(a.date).slice(5, 7) === i + 1).length), mx = Math.max(1, ...byM);
+        const gen = {}; works.forEach(a => { if (a.genre) gen[a.genre] = (gen[a.genre] || 0) + 1; });
+        const topG = Object.entries(gen).sort((a, b) => b[1] - a[1]);
+        const bestM = byM.indexOf(Math.max(...byM)) + 1;
+        let yNote = ''; try { yNote = loc((CATALOG.years || {})[y]); } catch (e) {}
+        const s = st(), yDays = Object.keys(s.days).filter(k => k.startsWith(y)).length;
+        const topPlay = Object.entries(s.plays).filter(([k]) => PLAYKEYS.has(k)).sort((a, b) => b[1] - a[1])[0];
+        const pics = works.slice(0, 12);
+        const firstW = works[0], lastW = works[works.length - 1];
+        const slides = [
+          `<div style="font-size:15px;color:#fde68a;font-weight:800">${y}년</div><h2>올해의 JJ</h2><div class="jx-grid">${pics.map(a => `<img src="${thumb(a.id)}" alt="">`).join('')}</div><p>탭해서 넘겨 보세요 ▶</p>`,
+          `<p>올해 JJ가 그린 작품은</p><div class="huge">${works.length}</div><h2>점이에요!</h2><div class="jx-mbar">${byM.map((v, i) => `<div><i style="height:${v / mx * 100}%"></i>${i + 1}</div>`).join('')}</div><p>가장 바빴던 달은 <b>${bestM}월</b> (${byM[bestM - 1]}점)</p>`,
+          topG.length ? `<p>가장 많이 그린 장르</p><h2>🎨 ${H(topG[0][0])}</h2><p>${topG.map(([g, n]) => `${H(g)} ${n}점`).join(' · ')}</p>${CATALOG.genres && CATALOG.genres[topG[0][0]] ? `<p style="color:#c4b5fd">“${H(loc(CATALOG.genres[topG[0][0]]))}”</p>` : ''}` : `<h2>🎨 다양한 그림</h2><p>여러 가지 재료로 마음껏 그렸어요</p>`,
+          firstW && lastW ? `<p>올해의 첫 작품과 마지막 작품</p><div class="jx-pair"><div><img src="${thumb(firstW.id)}" alt=""><span>${H(firstW.title)}<br>${H(firstW.date)}</span></div><div><img src="${thumb(lastW.id)}" alt=""><span>${H(lastW.title)}<br>${H(lastW.date)}</span></div></div><p>한 해 동안 이만큼 자랐어요 🌱</p>` : `<h2>🌱 쑥쑥</h2>`,
+          `<p>✏️ 작가 JJ의 한 줄</p><h2 style="font-size:clamp(20px,5.6vw,28px)">“${H(yNote || '그리고 싶은 걸 마음껏 그린 한 해였어요')}”</h2>`,
+          `<p>갤러리에서 함께한 기록</p><h2>📅 ${yDays}일 · 🏅 ${Object.keys(s.badges).length}개</h2>${topPlay ? `<p>가장 많이 한 놀이는 <b>${H(NAMES(topPlay[0]))}</b> (${topPlay[1]}번)</p>` : ''}<p>🔥 최고 연속 ${bestStreak(s)}일</p>`,
+          `<h2>내년에도<br>함께 그려요 💜</h2><p>— JJ 갤러리</p><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px;position:relative;z-index:3">${years.map(yy => `<button class="jx-chip ${yy === y ? 'on' : ''}" onclick="event.stopPropagation(); jxRecap('${yy}')">${yy}</button>`).join('')}<button class="jx-chip" onclick="event.stopPropagation(); jxRecapShare('${y}')">📤 카드로 공유</button></div>`
+        ];
+        let i = 0;
+        ov('jxRecapOv', `🎉 올해의 JJ · ${y}`, `<div class="jx-stage" id="jxRecapSt" style="background:radial-gradient(circle at 30% 20%,#3b1d5c,#0b0d12 70%)"></div>`);
+        const stg = document.getElementById('jxRecapSt');
+        const show = () => {
+          stg.innerHTML = `<div class="jx-bars2">${slides.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</div><div class="jx-story">${slides[i]}</div><div class="jx-tapl" onclick="jxRecapGo(-1)"></div><div class="jx-tapr" onclick="jxRecapGo(1)"></div>`;
+          if (i === slides.length - 1) { stg.querySelector('.jx-tapr').style.display = 'none'; stg.querySelector('.jx-tapl').style.width = '20%'; confetti(['🎉', '💜', '🎨', '✨']); }
+        };
+        window.jxRecapGo = d => { i = Math.max(0, Math.min(slides.length - 1, i + d)); show(); };
+        show(); track('recap');
+      };
+      window.jxRecapShare = async function (y) {
+        const works = allArts().filter(a => String(a.date || '').startsWith(y)), vis = new Set(visibleArts().map(a => a.id));
+        const pics = works.slice(0, 9);
+        const cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1350; const c = cv.getContext('2d');
+        const g = c.createLinearGradient(0, 0, 1080, 1350); g.addColorStop(0, '#fde68a'); g.addColorStop(.55, '#f9a8d4'); g.addColorStop(1, '#c4b5fd'); c.fillStyle = g; c.fillRect(0, 0, 1080, 1350);
+        c.fillStyle = '#3b2f2a'; c.textAlign = 'center'; c.font = '900 92px sans-serif'; c.fillText(`올해의 JJ ${y}`, 540, 150);
+        c.font = '700 46px sans-serif'; c.fillText(`작품 ${works.length}점`, 540, 225);
+        for (let k = 0; k < pics.length; k++) { try { const im = await loadImg([thumb(pics[k].id)]); const x = 90 + (k % 3) * 310, yy = 290 + Math.floor(k / 3) * 310; c.save(); c.beginPath(); c.roundRect ? c.roundRect(x, yy, 290, 290, 22) : c.rect(x, yy, 290, 290); c.clip(); c.drawImage(im, x, yy, 290, 290); c.restore(); } catch (e) {} }
+        c.font = '700 40px sans-serif'; c.fillText('JJ 갤러리 · AGJJ', 540, 1290);
+        shareCanvas(cv, `JJ_${y}.png`, '올해의 JJ');
+      };
+
+      // ---------------- 📖 JJ 그림책 ----------------
+      window.jxStory = function () {
+        const list = visibleArts(); if (!list.length) return toastSafe('작품을 불러오는 중이에요');
+        let sel = [];
+        ov('jxStoryOv', '📖 JJ 그림책 만들기', `<div class="jx-note">그림책에 넣을 작품을 순서대로 골라요 (최대 8점)</div>
+          <div class="jx-pick" id="jxSPick">${list.map(a => `<button data-id="${a.id}" onclick="jxSTog('${a.id}')"><img src="${thumb(a.id)}" loading="lazy" alt=""></button>`).join('')}</div>
+          <div class="jx-bot"><button class="dk" onclick="jxSAuto()">🎲 알아서 골라 줘</button><button id="jxSGo" onclick="jxSMake()">📖 만들기 (0)</button></div>`);
+        const mark = () => { document.querySelectorAll('#jxSPick button').forEach(b => { const k = sel.indexOf(b.dataset.id); b.classList.toggle('on', k >= 0); b.dataset.n = k + 1; }); const g = document.getElementById('jxSGo'); if (g) g.textContent = `📖 만들기 (${sel.length})`; };
+        window.jxSTog = id => { const k = sel.indexOf(id); if (k >= 0) sel.splice(k, 1); else if (sel.length < 8) sel.push(id); mark(); };
+        window.jxSAuto = () => { const g = {}; list.forEach(a => { (g[a.genre || '-'] = g[a.genre || '-'] || []).push(a); }); sel = []; const pools = Object.values(g); let k = 0; while (sel.length < Math.min(6, list.length) && k < 60) { const p = pools[k % pools.length]; const a = p[Math.floor(Math.random() * p.length)]; if (!sel.includes(a.id)) sel.push(a.id); k++; } mark(); };
+        window.jxSMake = () => { if (!sel.length) return toastSafe('작품을 1점 이상 골라 주세요'); bookOpen(sel.map(id => list.find(a => a.id === id))); };
+      };
+      function pageText(a) {
+        let tx = ''; try { tx = jjNoteText(a); } catch (e) {}
+        if (!tx) { const n = a.notes || {}; tx = (typeof appLang !== 'undefined' && n[appLang]) || n.ko || ''; }
+        return String(tx).replace(/\s+/g, ' ').trim();
+      }
+      function bookOpen(items) {
+        const pages = [{ cover: 1 }, ...items, { end: 1 }];
+        let i = 0, reading = false;
+        ov('jxStoryOv', '📖 JJ 그림책', `<div class="jx-stage"><div class="jx-book" id="jxBook"></div></div>
+          <div class="jx-bot"><button class="dk" onclick="jxBk(-1)">◀ 앞</button><button id="jxRead" onclick="jxRead()">🔊 읽어 주기</button><button class="dk" onclick="jxBk(1)">뒤 ▶</button></div>
+          <div class="jx-bot" style="padding-top:0"><button class="dk" onclick="jxStory()">✏️ 다시 고르기</button><button class="dk" onclick="jxBookPrint()">🖨 인쇄·PDF</button></div>`);
+        const html = p => p.cover ? `<div class="jx-page jx-cover"><div class="cg">${items.slice(0, 6).map(a => `<img src="${thumb(a.id)}" alt="">`).join('')}</div><h3>JJ의 그림 이야기</h3><p style="color:#57483f">글·그림 JJ</p></div>`
+          : p.end ? `<div class="jx-page jx-cover"><h3>끝 💜</h3><p style="color:#57483f">읽어 줘서 고마워요!<br>— JJ</p></div>`
+          : `<div class="jx-page"><img src="${mid(p.id)}" alt=""><h4>${H(p.title)}</h4><p>${H(pageText(p))}</p><span class="pn">${i} / ${items.length}</span></div>`;
+        const say = p => p.cover ? 'JJ의 그림 이야기. 글, 그림, JJ.' : p.end ? '끝. 읽어 줘서 고마워요!' : `${p.title}. ${pageText(p)}`;
+        const show = (dir) => {
+          const bk = document.getElementById('jxBook'); if (!bk) return;
+          const old = bk.firstElementChild; bk.insertAdjacentHTML('beforeend', html(pages[i]));
+          if (old) { if (dir > 0) { old.style.zIndex = 2; requestAnimationFrame(() => old.classList.add('out')); setTimeout(() => old.remove(), 720); } else old.remove(); }
+          if (reading) speakIt(say(pages[i]), () => { if (reading && i < pages.length - 1) { i++; show(1); } else { reading = false; setRB(); } });
+        };
+        const setRB = () => { const b = document.getElementById('jxRead'); if (b) b.textContent = reading ? '⏸ 멈추기' : '🔊 읽어 주기'; };
+        window.jxBk = d => { const n = i + d; if (n < 0 || n >= pages.length) return; i = n; stopSpeak(); show(d); };
+        window.jxRead = () => { reading = !reading; setRB(); if (reading) speakIt(say(pages[i]), () => { if (reading && i < pages.length - 1) { i++; show(1); } else { reading = false; setRB(); } }); else stopSpeak(); };
+        window.jxBookPrint = () => {
+          let pr = document.getElementById('jxPrint'); if (!pr) { pr = document.createElement('div'); pr.id = 'jxPrint'; document.body.appendChild(pr); }
+          pr.innerHTML = `<div class="pp"><h4>JJ의 그림 이야기</h4><p>글·그림 JJ</p></div>` + items.map((a, k) => `<div class="pp"><img src="${mid(a.id)}"><h4>${H(a.title)}</h4><p>${H(pageText(a))}</p><p style="color:#999">${k + 1}</p></div>`).join('');
+          document.body.classList.add('jx-printing'); setTimeout(() => { try { window.print(); } catch (e) {} setTimeout(() => document.body.classList.remove('jx-printing'), 800); }, 400);
+        };
+        show(0); track('story');
+      }
+      let spTimer = null;
+      function stopSpeak() { clearTimeout(spTimer); try { speechSynthesis.cancel(); } catch (e) {} try { NativeApp && NativeApp.stopSpeak && NativeApp.stopSpeak(); } catch (e) {} }
+      function speakIt(text, done) {
+        stopSpeak();
+        try {
+          if (typeof NativeApp !== 'undefined' && NativeApp && typeof NativeApp.speak === 'function' && NativeApp.speak(text, .9) === 'ok') { spTimer = setTimeout(done, 1200 + text.length * 170); return; }
+        } catch (e) {}
+        if (!window.speechSynthesis) { spTimer = setTimeout(done, 1500 + text.length * 120); return; }
+        const u = new SpeechSynthesisUtterance(text); u.lang = 'ko-KR'; u.rate = .9; u.onend = () => { spTimer = setTimeout(done, 700); }; u.onerror = () => {}; speechSynthesis.speak(u);
+      }
+
+      // ---------------- 💌 작품 카드 ----------------
+      function shareCanvas(cv, name, title) {
+        cv.toBlob(blob => {
+          if (!blob) return toastSafe('카드를 만들지 못했어요');
+          const file = new File([blob], name, { type: 'image/png' }), url = URL.createObjectURL(blob);
+          const sh = () => navigator.share({ files: [file], title }).catch(() => {});
+          ov('jxCardOv', '💌 ' + H(title), `<div class="jx-stage"><img class="jx-img" src="${url}" alt=""></div><div class="jx-note">사진을 길게 누르면 저장할 수도 있어요</div>
+            <div class="jx-bot"><button class="dk" id="jxDl">⬇️ 저장</button>${navigator.canShare && navigator.canShare({ files: [file] }) ? '<button id="jxSh">📤 보내기</button>' : ''}</div>`);
+          const dl = document.getElementById('jxDl'); if (dl) dl.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); };
+          const sb = document.getElementById('jxSh'); if (sb) sb.onclick = sh;
+        }, 'image/png');
+      }
+      window.jxCardPick = () => pickGrid('💌 카드로 보낼 작품', a => jxCard(a));
+      window.jxCard = async function (a) {
+        if (!a) return;
+        let im; try { im = await loadImg([a.src, mid(a.id)]); } catch (e) { return toastSafe('그림을 불러오지 못했어요'); }
+        const cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1350; const c = cv.getContext('2d');
+        c.fillStyle = '#fffaf0'; c.fillRect(0, 0, 1080, 1350);
+        c.fillStyle = '#f5e6c8'; for (let k = 0; k < 40; k++) { c.globalAlpha = .25; c.beginPath(); c.arc(Math.random() * 1080, Math.random() * 1350, 2 + Math.random() * 5, 0, 7); c.fill(); } c.globalAlpha = 1;
+        const bw = 900, bh = 820, sc = Math.min(bw / im.width, bh / im.height), w = im.width * sc, h = im.height * sc, x = (1080 - w) / 2, y = 90 + (bh - h) / 2;
+        c.save(); c.shadowColor = 'rgba(80,50,20,.3)'; c.shadowBlur = 30; c.shadowOffsetY = 10; c.fillStyle = '#fff'; c.fillRect(x - 18, y - 18, w + 36, h + 36); c.restore();
+        try { c.drawImage(im, x, y, w, h); } catch (e) {}
+        c.fillStyle = '#3b2f2a'; c.textAlign = 'center'; c.font = '800 50px sans-serif'; c.fillText(String(a.title || '').slice(0, 30), 540, 1010);
+        c.font = '500 34px sans-serif'; c.fillStyle = '#6b5a4f';
+        const tx = pageText(a), lines = []; let line = '';
+        for (const ch of tx) { if (c.measureText(line + ch).width > 900) { lines.push(line); line = ch; if (lines.length >= 3) break; } else line += ch; }
+        if (lines.length < 3 && line) lines.push(line);
+        lines.slice(0, 3).forEach((l, k) => c.fillText(l + (k === 2 && tx.length > 90 ? '…' : ''), 540, 1075 + k * 50));
+        c.font = '700 30px sans-serif'; c.fillStyle = '#a855f7'; c.fillText(`🎨 JJ 갤러리 · ${a.date ? String(a.date).replace('-', '.') : ''}`, 540, 1290);
+        shareCanvas(cv, `JJ_${a.id}.png`, a.title || 'JJ 작품 카드'); track('card');
+      };
+
+      // ---------------- 🖨 색칠 도안 ----------------
+      window.jxSheetPick = () => pickGrid('🖨 도안으로 만들 작품', a => jxSheet(a));
+      window.jxSheet = async function (a, level) {
+        if (!a) return; level = level || 2;
+        let im; try { im = await loadImg([mid(a.id), a.src]); } catch (e) { return toastSafe('그림을 불러오지 못했어요'); }
+        const W = Math.min(1100, im.width * 1.6), sc = W / im.width, Hh = Math.round(im.height * sc);
+        const cv = document.createElement('canvas'); cv.width = W; cv.height = Hh; const c = cv.getContext('2d', { willReadFrequently: true });
+        c.filter = 'blur(1.6px)'; c.drawImage(im, 0, 0, W, Hh); c.filter = 'none';
+        const d = c.getImageData(0, 0, W, Hh), px = d.data, g = new Float32Array(W * Hh);
+        for (let k = 0; k < W * Hh; k++) g[k] = px[k * 4] * .3 + px[k * 4 + 1] * .59 + px[k * 4 + 2] * .11;
+        const mag = new Float32Array(W * Hh); let sum = 0, sum2 = 0;
+        for (let y = 1; y < Hh - 1; y++) for (let x = 1; x < W - 1; x++) {
+          const i = y * W + x;
+          const gx = -g[i - W - 1] - 2 * g[i - 1] - g[i + W - 1] + g[i - W + 1] + 2 * g[i + 1] + g[i + W + 1];
+          const gy = -g[i - W - 1] - 2 * g[i - W] - g[i - W + 1] + g[i + W - 1] + 2 * g[i + W] + g[i + W + 1];
+          const m = Math.hypot(gx, gy); mag[i] = m; sum += m; sum2 += m * m;
+        }
+        const n = W * Hh, mean = sum / n, sd = Math.sqrt(Math.max(0, sum2 / n - mean * mean)), th = mean + sd * [1.6, 1.15, .8][level - 1];
+        for (let k = 0; k < n; k++) { const on = mag[k] > th; const v = on ? Math.max(0, 255 - (mag[k] - th) * 3) : 255; px[k * 4] = px[k * 4 + 1] = px[k * 4 + 2] = v < 200 ? Math.min(v, 70) : 255; px[k * 4 + 3] = 255; }
+        c.putImageData(d, 0, 0);
+        c.fillStyle = '#999'; c.font = `${Math.round(W * .022)}px sans-serif`; c.textAlign = 'right'; c.fillText(`JJ 갤러리 색칠 도안 · ${a.title || ''}`, W - 12, Hh - 12);
+        const url = cv.toDataURL('image/png');
+        ov('jxSheetOv', '🖨 색칠 도안 · ' + H(a.title || ''), `<div class="jx-stage"><img class="jx-img" src="${url}" alt=""></div>
+          <div class="jx-chips" style="justify-content:center">${[[1, '선 적게'], [2, '보통'], [3, '선 많이']].map(([l, tx]) => `<button class="jx-chip ${l === level ? 'on' : ''}" onclick="jxSheetLv(${l})">${tx}</button>`).join('')}</div>
+          <div class="jx-bot"><button class="dk" onclick="jxSheetPick()">🖼 다른 그림</button><button class="dk" id="jxSDl">⬇️ 저장</button><button onclick="jxSheetPrint()">🖨 인쇄</button></div>`);
+        window.jxSheetLv = l => jxSheet(a, l);
+        document.getElementById('jxSDl').onclick = () => { const x = document.createElement('a'); x.href = url; x.download = `JJ_coloring_${a.id}.png`; document.body.appendChild(x); x.click(); x.remove(); };
+        window.jxSheetPrint = () => {
+          let pr = document.getElementById('jxPrint'); if (!pr) { pr = document.createElement('div'); pr.id = 'jxPrint'; document.body.appendChild(pr); }
+          pr.innerHTML = `<div class="pp"><img src="${url}" style="max-height:260mm"></div>`;
+          document.body.classList.add('jx-printing'); setTimeout(() => { try { window.print(); } catch (e) {} setTimeout(() => document.body.classList.remove('jx-printing'), 800); }, 300);
+        };
+        if (level === 2) track('sheet');
+      };
+
+      // ---------------- 기존 기능에 연결 ----------------
+      function wrap(name, fn) { const f = window[name]; if (typeof f !== 'function') return; window[name] = function () { try { fn.apply(this, arguments); } catch (e) { console.log(e); } return f.apply(this, arguments); }; }
+      const KEYMAP = { openPang: 'pang', openMem: 'mem', openThrow: 'throw', openColorMerge: 'cm', openDrive: 'drive', openSong: 'song', openColoring: 'coloring', openWord: 'word', openArtCards: 'beam' };
+      Object.entries(KEYMAP).forEach(([n, k]) => wrap(n, () => track(k)));
+      wrap('openExtGame', url => { const k = extKey(url); if (k) track(k); });
+      wrap('addReaction', () => track('cheer'));
+      const gb = window.goBack;
+      window.goBack = function () { const o = [...document.querySelectorAll('.jx-ov.on')].pop(); if (o) { jxClose(o.id); return; } return gb.apply(this, arguments); };
+      if (typeof window.updateViewerContent === 'function') {
+        const u = window.updateViewerContent;
+        window.updateViewerContent = function () { const r = u.apply(this, arguments); try { const a = artworks[currentIndex]; if (a) { const s = st(); if (!s.views[a.id]) { s.views[a.id] = today(); save(s); } track('view'); } } catch (e) {} return r; };
+      }
+      if (typeof window.renderPlay === 'function') window.renderPlay = renderPlayNew;
+      if (typeof window.renderAccount === 'function') {
+        const ra = window.renderAccount;
+        window.renderAccount = function () { const r = ra.apply(this, arguments); try { const b = document.getElementById('accBody'); if (b && !b.querySelector('#jxRec')) { const at = b.querySelector('.acc-list'); at ? at.insertAdjacentHTML('beforebegin', recordHtml()) : b.insertAdjacentHTML('beforeend', recordHtml()); } } catch (e) { console.log(e); } return r; };
+      }
+      // 작품 보기 화면에 [✨ 움직이기] [💌 카드] 버튼
+      (function addViewerBtns() {
+        const ft = document.querySelector('#viewerModal .viewer-footer'), rb = ft && ft.querySelector('.reaction-bar');
+        if (!ft || document.getElementById('jxVB')) return;
+        const box = document.createElement('div'); box.id = 'jxVB'; box.className = 'jx-vbtns';
+        box.innerHTML = `<button onclick="jxAnim(artworks[currentIndex])">✨ 움직이기</button><button onclick="jxCard(artworks[currentIndex])">💌 카드</button><button onclick="jxSheet(artworks[currentIndex])">🖨 색칠 도안</button>`;
+        rb ? ft.insertBefore(box, rb) : ft.prepend(box);
+      })();
+
+      // 앱을 연 날 기록 + 배지 확인
+      track('open'); checkBadges(true);
+
+      // ---------------- 📶 오프라인 (서비스 워커) ----------------
+      try {
+        if ('serviceWorker' in navigator && /^https:/.test(location.protocol) && /github\.io$/.test(location.hostname))
+          window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(e => console.log('SW 등록 실패', e)));
+      } catch (e) {}
+    })();
   </script>
 </body>
 </html>

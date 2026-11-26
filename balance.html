@@ -68,6 +68,29 @@
   .tag { padding: 4px 10px; border-radius: 99px; color: #fff; font-size: 13px; }
   .tag.a { background: var(--a); } .tag.b { background: var(--b); }
 
+  /* 둘이서: 한 화면에서 왼쪽·오른쪽 동시에 */
+  #sDuo .dq { text-align: center; margin-bottom: 8px; }
+  #sDuo .dq .vs2 { font-size: clamp(16px, 4.6vw, 21px); font-weight: 900; line-height: 1.35; word-break: keep-all; }
+  #sDuo .dq .vs2 .a { color: var(--a); } #sDuo .dq .vs2 .b { color: var(--b); }
+  .duo { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .side { display: flex; flex-direction: column; gap: 8px; border-radius: 20px; padding: 8px; position: relative; }
+  .side.p1 { background: #ffe4ec; } .side.p2 { background: #e0ecff; }
+  .side .who { text-align: center; font-weight: 1000; font-size: 15px; }
+  .side.p1 .who { color: #d6336c; } .side.p2 .who { color: #2b5fcc; }
+  .side .pb { flex: 1; min-height: 70px; border: none; border-radius: 16px; color: #fff; font-weight: 900; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px;
+    font-size: clamp(13px, 3.8vw, 17px); line-height: 1.25; word-break: keep-all; text-align: center; touch-action: manipulation; }
+  .side .pb .e { font-size: clamp(28px, 8vw, 40px); }
+  .side .pb.A { background: linear-gradient(135deg, var(--a), var(--a2)); }
+  .side .pb.B { background: linear-gradient(135deg, var(--b), var(--b2)); }
+  .side .lock { position: absolute; inset: 34px 8px 8px; border-radius: 16px; background: rgba(255,255,255,.97); display: none;
+    align-items: center; justify-content: center; flex-direction: column; font-weight: 1000; font-size: 18px; text-align: center; gap: 4px; }
+  .side.locked .lock { display: flex; }
+  .side.reveal .lock { display: none; }
+  .side.reveal .pb { opacity: .3; }
+  .side.reveal .pb.chosen { opacity: 1; box-shadow: 0 0 0 4px #fff, 0 0 0 8px #ffd166; transform: scale(1.03); }
+  .duo-res { text-align: center; min-height: 40px; font-weight: 1000; font-size: 18px; margin-top: 8px; }
+
   /* 가림막 (둘이서 모드) */
   .cover { position: fixed; inset: 0; background: linear-gradient(135deg, #4f8cff, #59d6c4); color: #fff; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 14px; z-index: 30; text-align: center; padding: 24px; }
   .cover.on { display: flex; }
@@ -110,7 +133,7 @@
       <p>둘 중에 하나만 골라야 한다면? 정답은 없어요.<br>마음 가는 쪽을 골라 보세요!</p>
       <div class="modes">
         <button class="btn" id="soloBtn"><span>🙋</span><div>혼자 하기<small>10문제 · 내 선택을 모아 봐요</small></div></button>
-        <button class="btn" id="duoBtn" style="background:linear-gradient(135deg,#4f8cff,#59d6c4)"><span>👫</span><div>둘이서 하기<small>친구·엄마랑 몰래 고르고 · 찰떡궁합 확인!</small></div></button>
+        <button class="btn" id="duoBtn" style="background:linear-gradient(135deg,#4f8cff,#59d6c4)"><span>👫</span><div>둘이서 하기<small>한 화면에서 왼쪽·오른쪽 동시에 · 찰떡궁합 확인!</small></div></button>
       </div>
     </div>
   </section>
@@ -128,6 +151,27 @@
   </section>
 
   <section class="scr" id="sRes"><div class="res" id="res"></div></section>
+
+  <section class="scr" id="sDuo">
+    <div class="meta"><span id="dNum">1 / 10</span><span class="turn" style="background:#a66bff">👫 둘이서 동시에!</span></div>
+    <div class="prog"><i id="dProg"></i></div>
+    <div class="dq"><div class="q">각자 몰래 골라요! 둘 다 고르면 공개 🎉</div><div class="vs2" id="dVs"></div></div>
+    <div class="duo">
+      <div class="side p1" id="side1">
+        <div class="who">🙋 왼쪽 친구</div>
+        <button class="pb A" data-p="1" data-c="A"><span class="e"></span><span class="t"></span></button>
+        <button class="pb B" data-p="1" data-c="B"><span class="e"></span><span class="t"></span></button>
+        <div class="lock">🔒<span>골랐어요!</span><small style="font-size:12px;color:#8b7aa3">친구를 기다려요</small></div>
+      </div>
+      <div class="side p2" id="side2">
+        <div class="who">🙋‍♀️ 오른쪽 친구</div>
+        <button class="pb A" data-p="2" data-c="A"><span class="e"></span><span class="t"></span></button>
+        <button class="pb B" data-p="2" data-c="B"><span class="e"></span><span class="t"></span></button>
+        <div class="lock">🔒<span>골랐어요!</span><small style="font-size:12px;color:#8b7aa3">친구를 기다려요</small></div>
+      </div>
+    </div>
+    <div class="duo-res" id="dRes"></div>
+  </section>
 
   <div class="cover" id="cover">
     <div class="e" id="cvE">🙈</div>
@@ -200,9 +244,8 @@
     const pool = Q.slice();
     for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
     set = pool.slice(0, N).map(q => Math.random() < .5 ? q : [q[2], q[3], q[0], q[1], q[4]]);
-    show('sQ');
-    if (mode === 'duo') cover('🙋', '첫 번째 사람 차례!', '친구는 화면을 보지 말아요 🙈', ask);
-    else ask();
+    if (mode === 'duo') { show('sDuo'); askDuo(); }
+    else { show('sQ'); ask(); }
   }
 
   function ask() {
@@ -259,6 +302,44 @@
     $('cvBtn').onclick = () => { $('cover').classList.remove('on'); after(); };
   }
 
+  // ---------- 둘이서: 한 화면 동시 선택 ----------
+  let dPick = { 1: null, 2: null };
+  function askDuo() {
+    const q = set[idx];
+    dPick = { 1: null, 2: null };
+    $('dNum').textContent = `${idx + 1} / ${N}`;
+    $('dProg').style.width = (idx / N * 100) + '%';
+    $('dVs').innerHTML = `<span class="a">${q[0]} ${q[1]}</span> <span style="color:#8b7aa3">vs</span> <span class="b">${q[2]} ${q[3]}</span>`;
+    $('dRes').textContent = '';
+    [1, 2].forEach(p => {
+      const side = $('side' + p);
+      side.className = 'side p' + p;
+      side.querySelectorAll('.pb').forEach(b => {
+        b.classList.remove('chosen');
+        const isA = b.dataset.c === 'A';
+        b.querySelector('.e').textContent = isA ? q[0] : q[2];
+        b.querySelector('.t').textContent = isA ? q[1] : q[3];
+      });
+    });
+  }
+  function duoPick(p, c) {
+    if (dPick[p] || (dPick[1] && dPick[2])) return;
+    dPick[p] = c;
+    $('side' + p).classList.add('locked');
+    beep(p === 1 ? 620 : 520, .07);
+    if (dPick[1] && dPick[2]) setTimeout(revealDuo, 450);
+  }
+  function revealDuo() {
+    picks1.push(dPick[1]); picks2.push(dPick[2]);
+    [1, 2].forEach(p => $('side' + p).querySelector(`.pb.${dPick[p]}`).classList.add('chosen'));
+    $('side1').classList.add('reveal'); $('side2').classList.add('reveal');
+    const same = dPick[1] === dPick[2];
+    $('dRes').innerHTML = same ? '💞 찰떡! 둘 다 같은 걸 골랐어요' : '🙃 서로 달라요! 왜 골랐는지 말해 봐요';
+    if (same) [780, 1040].forEach((f, i) => setTimeout(() => beep(f, .1), i * 110)); else beep(330, .12);
+    setTimeout(() => { if (idx + 1 < N) { idx++; askDuo(); } else result(); }, 2300);
+  }
+  document.querySelectorAll('#sDuo .pb').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); duoPick(+b.dataset.p, b.dataset.c); }));
+
   function result() {
     $('prog').style.width = '100%';
     show('sRes');
@@ -281,7 +362,7 @@
         <h2>${msg[1]} ${pct}%</h2>
         <div class="meter"><i id="mt"></i></div>
         <p>${N}문제 중 ${same}문제 같은 걸 골랐어요.<br>${msg[2]}</p>
-        <div class="list">${set.map((q, i) => `<div>${i + 1}. ${picks1[i] === picks2[i] ? nm(q, picks1[i]) : `1번 ${q[picks1[i] === 'A' ? 0 : 2]} · 2번 ${q[picks2[i] === 'A' ? 0 : 2]}`}<span class="m">${picks1[i] === picks2[i] ? '💞' : '🙃'}</span></div>`).join('')}</div>
+        <div class="list">${set.map((q, i) => `<div>${i + 1}. ${picks1[i] === picks2[i] ? nm(q, picks1[i]) : `왼쪽 ${q[picks1[i] === 'A' ? 0 : 2]} · 오른쪽 ${q[picks2[i] === 'A' ? 0 : 2]}`}<span class="m">${picks1[i] === picks2[i] ? '💞' : '🙃'}</span></div>`).join('')}</div>
         <div class="row"><button class="btn" onclick="begin('duo')">🔁 둘이서 다시</button><button class="btn ghost" onclick="show('sIntro')">처음으로</button></div>`;
       setTimeout(() => { const m = $('mt'); if (m) m.style.width = pct + '%'; }, 50);
     }

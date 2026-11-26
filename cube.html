@@ -3,234 +3,369 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>JJ 그림 주사위</title>
+<title>JJ 그림 큐브</title>
 <style>
-  :root { --bg1: #2b1d52; --bg2: #6b3fa0; --ink: #fff; --sub: #d9ccff; --pri: #ffcf5a; }
+  :root { --bg1: #241a46; --bg2: #4b2d83; --ink: #fff; --sub: #d6ccff; --pri: #ffcf5a; }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
   html, body { height: 100%; overflow: hidden; }
   body {
-    background: radial-gradient(circle at 50% 35%, rgba(107,63,160,.82), rgba(43,29,82,.95) 70%), url('thumbs/mosaic.webp') center / cover, var(--bg1);
+    background: radial-gradient(circle at 50% 38%, rgba(107,63,160,.85), rgba(36,26,70,.97) 72%), url('thumbs/mosaic.webp') center / cover, var(--bg1);
     color: var(--ink);
     font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-    height: 100vh; height: 100dvh;
-    display: flex; flex-direction: column;
-    padding: max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
-    touch-action: none;
+    height: 100vh; height: 100dvh; display: flex; flex-direction: column;
+    padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   }
-  .top { display: flex; align-items: center; gap: 10px; }
-  .top h1 { font-size: clamp(18px, 5vw, 22px); font-weight: 900; flex: 1; }
-  .back { text-decoration: none; color: var(--sub); font-size: 14px; font-weight: 700; padding: 6px 10px; border-radius: 99px; background: rgba(255,255,255,.1); }
+  .top { display: flex; align-items: center; gap: 8px; }
+  .top h1 { font-size: clamp(17px, 4.8vw, 21px); font-weight: 900; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .back { text-decoration: none; color: var(--sub); font-size: 13px; font-weight: 700; padding: 5px 10px; border-radius: 99px; background: rgba(255,255,255,.1); white-space: nowrap; }
   body.in-app .back { display: none; }
-  .hint { color: var(--sub); font-size: 13px; margin-top: 6px; text-align: center; }
-
-  .stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; perspective: 1000px; position: relative; }
-  .cube {
-    --s: min(58vw, 38dvh, 300px);
-    width: var(--s); height: var(--s); position: relative; transform-style: preserve-3d; cursor: grab;
-  }
-  @supports not (height: 1dvh) { .cube { --s: min(58vw, 38vh, 300px); } }
-  .face {
-    position: absolute; inset: 0; border-radius: 14px; overflow: hidden; background: #fff;
-    border: 5px solid #fff; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
-    backface-visibility: hidden; -webkit-backface-visibility: hidden;
-  }
-  .face img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; border-radius: 9px; }
-  .face .dot {
-    position: absolute; left: 6px; top: 6px; background: rgba(43, 29, 82, .78); color: #fff;
-    font-size: 12px; font-weight: 900; border-radius: 99px; padding: 2px 8px;
-  }
-  .f0 { transform: rotateY(0deg) translateZ(calc(var(--s) / 2)); }
-  .f1 { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); }
-  .f2 { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); }
-  .f3 { transform: rotateY(-90deg) translateZ(calc(var(--s) / 2)); }
-  .f4 { transform: rotateX(90deg) translateZ(calc(var(--s) / 2)); }
-  .f5 { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); }
-  .shadow {
-    position: absolute; bottom: 8%; left: 50%; width: min(48vw, 240px); height: 26px; transform: translateX(-50%);
-    background: radial-gradient(ellipse, rgba(0,0,0,.45), transparent 70%); pointer-events: none;
-  }
-
-  .result { text-align: center; min-height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .result .k { font-size: 12px; color: var(--sub); letter-spacing: 1px; }
-  .result .t { font-size: clamp(18px, 5.5vw, 24px); font-weight: 900; margin-top: 2px; text-shadow: 0 2px 10px rgba(0,0,0,.3); }
-  .result .t.pop { animation: pop .5s; }
-  @keyframes pop { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); } }
-
-  .row { display: flex; gap: 10px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
-  .btn {
-    border: none; border-radius: 16px; padding: 13px 20px; font-size: 16px; font-weight: 900; cursor: pointer;
-    background: linear-gradient(135deg, #ffcf5a, #ff8f5a); color: #3b1d00; box-shadow: 0 5px 16px rgba(255, 160, 80, .4);
-  }
+  .chip { background: rgba(255,255,255,.12); border-radius: 99px; padding: 4px 10px; font-size: 13px; font-weight: 900; white-space: nowrap; }
+  .chip b { color: var(--pri); }
+  .hint { color: var(--sub); font-size: 12.5px; text-align: center; margin: 6px 0 2px; line-height: 1.45; }
+  .stage { position: relative; flex: 1; min-height: 0; touch-action: none; }
+  .stage canvas { display: block; width: 100%; height: 100%; }
+  .peek { position: absolute; left: 6px; top: 6px; display: none; grid-template-columns: repeat(3, 1fr); gap: 4px; background: rgba(20,12,40,.75); padding: 6px; border-radius: 12px; z-index: 3; }
+  .peek.on { display: grid; }
+  .peek img { width: min(16vw, 64px); aspect-ratio: 1; object-fit: cover; border-radius: 6px; border: 2px solid #fff; }
+  .row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 6px; }
+  .btn { border: none; border-radius: 14px; padding: 11px 14px; font-size: 14.5px; font-weight: 900; cursor: pointer;
+    background: linear-gradient(135deg, #ffcf5a, #ff8f5a); color: #3b1d00; box-shadow: 0 4px 0 #b45309; }
+  .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #b45309; }
   .btn.ghost { background: rgba(255,255,255,.12); color: #fff; box-shadow: none; border: 1.5px solid rgba(255,255,255,.25); }
-  .btn:active { transform: scale(.95); }
-  .count { font-size: 12px; color: var(--sub); text-align: center; margin-top: 8px; }
-
-  .big { position: fixed; inset: 0; background: rgba(20, 12, 40, .85); display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 30; padding: 20px; }
-  .big.on { display: flex; }
-  .big img { width: min(88vw, 70dvh, 460px); aspect-ratio: 1; object-fit: cover; border-radius: 18px; border: 6px solid #fff; }
-  .big p { margin-top: 12px; font-weight: 800; font-size: 17px; text-align: center; }
-  .big small { color: var(--sub); margin-top: 6px; }
-
-  @media (orientation: landscape) and (max-height: 500px) {
-    body { flex-direction: row; flex-wrap: wrap; align-content: flex-start; }
+  .btn[disabled] { opacity: .4; }
+  .seg { display: flex; background: rgba(255,255,255,.1); border-radius: 99px; padding: 3px; }
+  .seg button { border: none; background: transparent; color: var(--sub); font-weight: 900; font-size: 13px; padding: 7px 11px; border-radius: 99px; cursor: pointer; }
+  .seg button.on { background: #fff; color: #3b1d6b; }
+  .load { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--sub); pointer-events: none; }
+  .win { position: fixed; inset: 0; background: rgba(15, 8, 30, .7); display: none; align-items: center; justify-content: center; z-index: 20; padding: 20px; }
+  .win.on { display: flex; }
+  .card { background: #fff; color: #2a1d48; border-radius: 22px; padding: 20px 18px; width: min(360px, 100%); text-align: center; }
+  .card h2 { font-size: 22px; }
+  .card .stars { font-size: 32px; color: #ffb703; letter-spacing: 4px; margin: 4px 0; }
+  .card p { color: #6b5f8a; font-size: 14px; line-height: 1.55; margin: 6px 0 12px; }
+  .card .grid6 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 8px 0; }
+  .card .grid6 img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
+  .confetti { position: fixed; top: -12px; width: 9px; height: 14px; z-index: 30; pointer-events: none; animation: fall linear forwards; }
+  @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+  @media (max-width: 360px) { .btn { padding: 9px 10px; font-size: 13px; } .seg button { padding: 6px 8px; font-size: 12px; } }
+  @media (orientation: landscape) and (max-height: 520px) {
+    body { flex-direction: row; flex-wrap: wrap; align-content: stretch; }
     .top { width: 100%; }
     .hint { display: none; }
-    .stage { flex: 1 1 55%; height: calc(100dvh - 60px); }
-    .cube { --s: min(56dvh, 40vw, 260px); }
-    .panel { flex: 1 1 40%; display: flex; flex-direction: column; justify-content: center; }
+    .stage { flex: 1 1 60%; height: calc(100dvh - 54px); }
+    .panel { flex: 1 1 36%; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
   }
 </style>
 </head>
 <body>
   <div class="top">
     <a class="back" href="index.html?open=play">← 갤러리</a>
-    <h1>🎲 JJ 그림 주사위</h1>
+    <h1>🧊 JJ 그림 큐브</h1>
+    <span class="chip">🔁 <b id="moves">0</b></span>
+    <span class="chip">⏱ <b id="time">0:00</b></span>
   </div>
-  <div class="hint">손가락으로 큐브를 돌려 보세요 · 그림을 톡 누르면 크게 보여요</div>
+  <div class="hint" id="hint">그림을 <b>밀어서</b> 줄을 돌려요 · 빈 곳을 끌면 큐브 전체가 돌아요<br>여섯 면의 JJ 그림을 모두 맞춰 보세요!</div>
 
   <div class="stage" id="stage">
-    <div class="cube" id="cube"></div>
-    <div class="shadow"></div>
+    <div class="peek" id="peek"></div>
+    <div class="load" id="load">그림을 불러오는 중…</div>
   </div>
 
   <div class="panel">
-    <div class="result"><div class="k" id="rk">주사위를 굴려 봐요!</div><div class="t" id="rt"></div></div>
     <div class="row">
-      <button class="btn" id="rollBtn">🎲 굴리기</button>
-      <button class="btn ghost" id="newBtn">🔄 그림 바꾸기</button>
+      <div class="seg" id="sizeSeg">
+        <button data-n="2" data-mix="5" class="on">🌱 2×2</button>
+        <button data-n="3" data-mix="6">🧩 3×3</button>
+        <button data-n="3" data-mix="16">🦉 3×3 어려움</button>
+      </div>
     </div>
-    <div class="count" id="count"></div>
+    <div class="row">
+      <button class="btn" id="mixBtn">🔀 섞기</button>
+      <button class="btn ghost" id="undoBtn">↩ 되돌리기</button>
+      <button class="btn ghost" id="peekBtn">👀 정답</button>
+      <button class="btn ghost" id="newBtn">🖼 다른 그림</button>
+    </div>
   </div>
 
-  <div class="big" id="big"><img id="bigImg" alt=""><p id="bigT"></p><small>아무 곳이나 누르면 닫혀요</small></div>
+  <div class="win" id="win">
+    <div class="card">
+      <h2>🎉 큐브 완성!</h2>
+      <div class="stars" id="stars">★★★</div>
+      <div class="grid6" id="winImgs"></div>
+      <p id="winMsg"></p>
+      <div class="row">
+        <button class="btn" id="againBtn">다시 섞기</button>
+        <button class="btn ghost" id="viewBtn" style="color:#3b1d6b;border-color:#ddd">큐브 보기</button>
+      </div>
+    </div>
+  </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
   try { if (window.self !== window.top) document.body.classList.add('in-app'); } catch (e) { document.body.classList.add('in-app'); }
   const $ = id => document.getElementById(id);
-  const KEY = 'agjj_cube_v1';
-  let works = [], faces = [], rx = -18, ry = 28, vx = 0, vy = 0, rolling = false, idle = true;
-  // 면 번호 → 그 면을 정면으로 보는 각도
-  const VIEW = [[0, 0], [0, 180], [0, -90], [0, 90], [-90, 0], [90, 0]];
+  const KEY = 'agjj_cube_v2';
 
-  async function boot() {
+  // ---------- 기본 장면 ----------
+  const stage = $('stage');
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  stage.appendChild(renderer.domElement);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
+  const world = new THREE.Group();
+  scene.add(world);
+
+  let N = 2, MIX = 5, works = [], faceImgs = [], textures = [], cubies = [], moveStack = [], moves = 0, t0 = 0, timer = null;
+  let animating = false, solvedShown = false, scrambling = false;
+
+  // 면마다 그림의 오른쪽(R)·위쪽(U) 방향 (바깥에서 볼 때 똑바로 보이게)
+  const FACES = [
+    { n: new THREE.Vector3(0, 0, 1), R: new THREE.Vector3(1, 0, 0), U: new THREE.Vector3(0, 1, 0) },
+    { n: new THREE.Vector3(0, 0, -1), R: new THREE.Vector3(-1, 0, 0), U: new THREE.Vector3(0, 1, 0) },
+    { n: new THREE.Vector3(1, 0, 0), R: new THREE.Vector3(0, 0, -1), U: new THREE.Vector3(0, 1, 0) },
+    { n: new THREE.Vector3(-1, 0, 0), R: new THREE.Vector3(0, 0, 1), U: new THREE.Vector3(0, 1, 0) },
+    { n: new THREE.Vector3(0, 1, 0), R: new THREE.Vector3(1, 0, 0), U: new THREE.Vector3(0, 0, -1) },
+    { n: new THREE.Vector3(0, -1, 0), R: new THREE.Vector3(1, 0, 0), U: new THREE.Vector3(0, 0, 1) }
+  ];
+
+  function resize() {
+    const r = stage.getBoundingClientRect();
+    renderer.setSize(r.width, r.height, false);
+    camera.aspect = r.width / Math.max(1, r.height);
+    const fit = N * 2.35;
+    const dist = fit / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) / Math.min(1, camera.aspect);
+    camera.position.set(0, 0, dist);
+    camera.lookAt(0, 0, 0);
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resize);
+
+  // ---------- 그림 불러오기 ----------
+  async function loadWorks() {
     try { works = (await (await fetch('thumbs/index.json?v=1')).json()).works || []; } catch (e) { works = []; }
-    newFaces();
-    loop();
+  }
+  function pickImages() {
+    const pool = works.slice().sort(() => Math.random() - .5).slice(0, 6);
+    faceImgs = pool;
+    const loader = new THREE.TextureLoader();
+    textures.forEach(t => t.dispose());
+    textures = pool.map(w => {
+      const t = loader.load(`thumbs/${w.id}.webp`, () => { $('load').style.display = 'none'; });
+      t.encoding = THREE.sRGBEncoding; t.anisotropy = 4;
+      return t;
+    });
+    $('peek').innerHTML = pool.map(w => `<img src="thumbs/${w.id}.webp" alt="">`).join('');
   }
 
-  function newFaces() {
-    const pool = works.slice();
-    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
-    faces = pool.slice(0, 6);
-    $('cube').innerHTML = faces.map((w, i) => `
-      <div class="face f${i}" data-i="${i}"><img src="thumbs/${w.id}.webp" alt=""><span class="dot">${i + 1}</span></div>`).join('');
-    $('rk').textContent = '주사위를 굴려 봐요!'; $('rt').textContent = '';
-    showCount();
+  // ---------- 큐브 만들기 ----------
+  const bodyMat = new THREE.MeshBasicMaterial({ color: 0x14101f });
+  function build() {
+    cubies.forEach(c => world.remove(c));
+    cubies = [];
+    const h = (N - 1) / 2;
+    const bodyGeo = new THREE.BoxGeometry(0.98, 0.98, 0.98);
+    for (let x = 0; x < N; x++) for (let y = 0; y < N; y++) for (let z = 0; z < N; z++) {
+      const p = new THREE.Vector3(x - h, y - h, z - h);
+      if (N === 3 && x === 1 && y === 1 && z === 1) continue;
+      const c = new THREE.Group();
+      c.position.copy(p);
+      c.userData.home = p.clone();
+      c.add(new THREE.Mesh(bodyGeo, bodyMat));
+      FACES.forEach((f, fi) => {
+        if (Math.abs(p.dot(f.n) - h) > 0.01) return;            // 바깥 면에만 그림 조각
+        const u = Math.round(p.dot(f.R) + h), v = Math.round(p.dot(f.U) + h);
+        const g = new THREE.PlaneGeometry(0.9, 0.9);
+        const uv = g.attributes.uv;
+        for (let i = 0; i < uv.count; i++) uv.setXY(i, (u + uv.getX(i)) / N, (v + uv.getY(i)) / N);
+        uv.needsUpdate = true;
+        const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ map: textures[fi] }));
+        const basis = new THREE.Matrix4().makeBasis(f.R, f.U, f.n);
+        m.quaternion.setFromRotationMatrix(basis);
+        m.position.copy(f.n).multiplyScalar(0.495);
+        m.userData.sticker = true;
+        c.add(m);
+      });
+      world.add(c);
+      cubies.push(c);
+    }
+    world.quaternion.setFromEuler(new THREE.Euler(0.5, -0.65, 0));
+    resize();
   }
 
-  function apply() { $('cube').style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`; }
+  // ---------- 줄 돌리기 ----------
+  const AX = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)];
+  function snapAxis(v) {
+    const a = [Math.abs(v.x), Math.abs(v.y), Math.abs(v.z)];
+    const i = a.indexOf(Math.max(...a));
+    const out = new THREE.Vector3(); out.setComponent(i, Math.sign(v.getComponent(i)) || 1);
+    return out;
+  }
+  function axisIndex(v) { return Math.abs(v.x) > .5 ? 0 : Math.abs(v.y) > .5 ? 1 : 2; }
 
-  // 드래그로 돌리기 (+관성)
-  let drag = null, moved = 0;
-  $('stage').addEventListener('pointerdown', e => {
-    if (rolling) return;
-    drag = { x: e.clientX, y: e.clientY, t: performance.now() }; moved = 0; idle = false;
-    $('cube').style.cursor = 'grabbing';
+  // move = { axis: 0|1|2, layer: 좌표값, dir: +1|-1 }
+  function turn(move, dur, record) {
+    return new Promise(res => {
+      const ax = AX[move.axis];
+      const layer = cubies.filter(c => Math.abs(c.position.getComponent(move.axis) - move.layer) < 0.1);
+      const pivot = new THREE.Group();
+      world.add(pivot);
+      layer.forEach(c => pivot.attach(c));
+      const target = move.dir * Math.PI / 2;
+      const start = performance.now();
+      animating = true;
+      const step = now => {
+        const k = dur ? Math.min(1, (now - start) / dur) : 1;
+        const e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        pivot.setRotationFromAxisAngle(ax, target * e);
+        if (k < 1) { requestAnimationFrame(step); return; }
+        pivot.updateMatrixWorld();
+        layer.forEach(c => {
+          world.attach(c);
+          c.position.set(Math.round(c.position.x * 2) / 2, Math.round(c.position.y * 2) / 2, Math.round(c.position.z * 2) / 2);
+          const m = new THREE.Matrix4().makeRotationFromQuaternion(c.quaternion);
+          const e2 = m.elements;
+          for (const i of [0, 1, 2, 4, 5, 6, 8, 9, 10]) e2[i] = Math.round(e2[i]);
+          c.quaternion.setFromRotationMatrix(m);
+        });
+        world.remove(pivot);
+        animating = false;
+        if (record) { moveStack.push(move); moves++; $('moves').textContent = moves; if (!t0) startTimer(); checkSolved(); }
+        res();
+      };
+      requestAnimationFrame(step);
+    });
+  }
+
+  function isSolved() {
+    const q0 = cubies[0].quaternion;
+    return cubies.every(c => {
+      if (Math.abs(Math.abs(c.quaternion.dot(q0)) - 1) > 1e-3) return false;
+      const hp = c.userData.home.clone().applyQuaternion(q0);
+      return hp.distanceTo(c.position) < 0.05;
+    });
+  }
+  function checkSolved() {
+    if (!scrambling && !solvedShown && isSolved()) { solvedShown = true; setTimeout(win, 350); }
+  }
+
+  async function scramble() {
+    if (animating) return;
+    $('win').classList.remove('on');
+    scrambling = true; solvedShown = false;
+    moveStack = []; moves = 0; $('moves').textContent = 0; stopTimer(); $('time').textContent = '0:00';
+    const h = (N - 1) / 2;
+    const layers = []; for (let i = 0; i < N; i++) layers.push(i - h);
+    let last = null;
+    for (let i = 0; i < MIX; i++) {
+      let mv;
+      do { mv = { axis: Math.floor(Math.random() * 3), layer: layers[Math.floor(Math.random() * N)], dir: Math.random() < .5 ? 1 : -1 }; }
+      while (last && mv.axis === last.axis && mv.layer === last.layer && mv.dir === -last.dir);
+      last = mv;
+      await turn(mv, 110, false);
+    }
+    if (isSolved()) { await turn({ axis: 0, layer: layers[0], dir: 1 }, 110, false); }
+    scrambling = false;
+  }
+
+  // ---------- 손가락 조작 ----------
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  let drag = null;
+  function hitAt(x, y) {
+    const r = renderer.domElement.getBoundingClientRect();
+    ndc.set(((x - r.left) / r.width) * 2 - 1, -((y - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    const objs = []; cubies.forEach(c => c.children.forEach(m => objs.push(m)));
+    return ray.intersectObjects(objs, false)[0] || null;
+  }
+  function toScreen(vWorld) {
+    const r = renderer.domElement.getBoundingClientRect();
+    const p = vWorld.clone().project(camera);
+    return new THREE.Vector2((p.x + 1) / 2 * r.width, (1 - p.y) / 2 * r.height);
+  }
+  stage.addEventListener('pointerdown', e => {
+    if (animating || scrambling) return;
+    stage.setPointerCapture(e.pointerId);
+    const hit = hitAt(e.clientX, e.clientY);
+    if (hit && hit.object.userData.sticker) {
+      const cubie = hit.object.parent;
+      const qInv = world.quaternion.clone().invert();
+      const nWorld = new THREE.Vector3(0, 0, 1).applyQuaternion(hit.object.getWorldQuaternion(new THREE.Quaternion()));
+      const nLocal = snapAxis(nWorld.clone().applyQuaternion(qInv));
+      drag = { type: 'turn', x: e.clientX, y: e.clientY, cubie, nLocal, point: hit.point.clone() };
+    } else {
+      drag = { type: 'view', x: e.clientX, y: e.clientY };
+    }
   });
-  window.addEventListener('pointermove', e => {
+  stage.addEventListener('pointermove', e => {
     if (!drag) return;
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    moved += Math.abs(dx) + Math.abs(dy);
-    ry += dx * 0.5; rx -= dy * 0.5;
-    vx = -dy * 0.5; vy = dx * 0.5;
-    drag.x = e.clientX; drag.y = e.clientY;
-    apply();
-  });
-  window.addEventListener('pointerup', e => {
-    if (!drag) return;
-    const wasTap = moved < 8;
-    drag = null; $('cube').style.cursor = 'grab';
-    if (wasTap) {
-      const el = document.elementFromPoint(e.clientX, e.clientY);
-      const f = el && el.closest && el.closest('.face');
-      if (f) openBig(+f.dataset.i);
+    if (drag.type === 'view') {
+      const q = new THREE.Quaternion();
+      q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), dx * 0.008); world.quaternion.premultiply(q);
+      q.setFromAxisAngle(new THREE.Vector3(1, 0, 0), dy * 0.008); world.quaternion.premultiply(q);
+      drag.x = e.clientX; drag.y = e.clientY;
+      return;
     }
-    clearTimeout(window._idleT); window._idleT = setTimeout(() => { idle = true; }, 3500);
+    if (drag.done || Math.hypot(dx, dy) < 14) return;
+    drag.done = true;
+    // 밀어낸 방향과 가장 잘 맞는 면 위의 방향 찾기
+    const d2 = new THREE.Vector2(dx, dy).normalize();
+    const p0 = toScreen(drag.point);
+    let best = null;
+    AX.forEach(a => {
+      if (Math.abs(a.dot(drag.nLocal)) > .5) return;
+      const aw = a.clone().applyQuaternion(world.quaternion);
+      const s = toScreen(drag.point.clone().add(aw)).sub(p0).normalize();
+      const dot = s.dot(d2);
+      if (!best || Math.abs(dot) > Math.abs(best.dot)) best = { a, dot };
+    });
+    if (!best) return;
+    const dirLocal = best.a.clone().multiplyScalar(Math.sign(best.dot));
+    const k = new THREE.Vector3().crossVectors(drag.nLocal, dirLocal);
+    const axis = axisIndex(k);
+    const sign = Math.sign(k.getComponent(axis));
+    const layer = Math.round(drag.cubie.position.getComponent(axis) * 2) / 2;
+    turn({ axis, layer, dir: sign }, 220, true);
   });
+  const end = () => { drag = null; };
+  stage.addEventListener('pointerup', end);
+  stage.addEventListener('pointercancel', end);
 
-  function loop() {
-    requestAnimationFrame(loop);
-    if (rolling || drag) return;
-    if (Math.abs(vx) > 0.05 || Math.abs(vy) > 0.05) {
-      rx += vx; ry += vy; vx *= 0.94; vy *= 0.94; apply();
-    } else if (idle) {
-      ry += 0.25; apply();
-    }
-  }
-
-  const ease = t => 1 - Math.pow(1 - t, 4);
-  function roll() {
-    if (rolling || !faces.length) return;
-    rolling = true; idle = false; vx = vy = 0;
-    $('rk').textContent = '데구르르...'; $('rt').textContent = '';
-    const k = Math.floor(Math.random() * 6);
-    const [tx, ty] = VIEW[k];
-    // 현재 각도에서 여러 바퀴 돈 뒤 목표 면에서 멈추기
-    const norm = (a, target, spins) => {
-      const base = Math.round((a - target) / 360) * 360 + target;
-      return base + spins * 360;
-    };
-    const sx = rx, sy = ry;
-    const ex = norm(rx, tx, 2 + Math.floor(Math.random() * 2));
-    const ey = norm(ry, ty, (Math.random() < 0.5 ? -1 : 1) * (2 + Math.floor(Math.random() * 2)));
-    const dur = 1700, t0 = performance.now();
-    let lastTick = 0;
-    const step = now => {
-      const p = Math.min(1, (now - t0) / dur), e = ease(p);
-      rx = sx + (ex - sx) * e; ry = sy + (ey - sy) * e;
-      const bounce = Math.sin(p * Math.PI) * 60;
-      $('cube').style.transform = `translateY(${-bounce}px) rotateX(${rx}deg) rotateY(${ry}deg)`;
-      if (p < 0.85 && now - lastTick > 90 + p * 220) { lastTick = now; tick(); }
-      if (p < 1) requestAnimationFrame(step);
-      else {
-        rx = tx + Math.round((ex - tx) / 360) * 360; ry = ey; apply();
-        rolling = false;
-        land(k);
-      }
-    };
-    requestAnimationFrame(step);
-  }
-
-  function land(k) {
-    const w = faces[k];
-    $('rk').textContent = `${k + 1}번 면 · 오늘의 그림`;
-    const el = $('rt');
-    el.textContent = '「' + (w.title || 'JJ의 그림') + '」';
-    el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
-    [700, 940].forEach((f, i) => setTimeout(() => beep(f, .12), i * 110));
+  // ---------- 시간 · 완성 ----------
+  const fmt = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  function startTimer() { t0 = Date.now(); clearInterval(timer); timer = setInterval(() => $('time').textContent = fmt(Math.floor((Date.now() - t0) / 1000)), 500); }
+  function stopTimer() { clearInterval(timer); t0 = 0; }
+  function win() {
+    const secs = t0 ? Math.floor((Date.now() - t0) / 1000) : 0;
+    clearInterval(timer);
+    const par = MIX;
+    const s = moves <= par + 2 ? 3 : moves <= par * 2 + 4 ? 2 : 1;
+    $('stars').textContent = '★'.repeat(s) + '☆'.repeat(3 - s);
+    $('winImgs').innerHTML = faceImgs.map(w => `<img src="thumbs/${w.id}.webp" alt="">`).join('');
+    const key = `${N}x${N}_${MIX}`;
+    let first = false;
     try {
       const st = JSON.parse(localStorage.getItem(KEY) || '{}');
-      st.seen = st.seen || {}; st.seen[w.id] = (st.seen[w.id] || 0) + 1;
+      first = !st[key];
+      if (!st[key] || moves < st[key]) st[key] = moves;
       localStorage.setItem(KEY, JSON.stringify(st));
+      if (first) localStorage.setItem('agjj_pending_paint', String((parseInt(localStorage.getItem('agjj_pending_paint') || '0', 10) || 0) + 1));
     } catch (e) {}
-    showCount();
-    clearTimeout(window._idleT); window._idleT = setTimeout(() => { idle = true; }, 5000);
+    $('winMsg').innerHTML = `${N}×${N} 큐브를 ${moves}번 돌려서 ${fmt(secs)} 만에 맞췄어요!` + (first ? '<br>🎁 처음 완성 보상 💧+1' : '');
+    $('win').classList.add('on');
+    confetti();
+    [660, 880, 1100, 1320].forEach((f, i) => setTimeout(() => beep(f, .12), i * 110));
   }
-
-  function showCount() {
-    let n = 0;
-    try { n = Object.keys((JSON.parse(localStorage.getItem(KEY) || '{}').seen) || {}).length; } catch (e) {}
-    $('count').textContent = works.length ? `주사위로 만난 그림 ${n} / ${works.length}점` : '';
+  function confetti() {
+    const cs = ['#ffcf5a', '#ff8f5a', '#7c3aed', '#38bdf8', '#22c55e', '#f472b6'];
+    for (let i = 0; i < 40; i++) {
+      const c = document.createElement('div'); c.className = 'confetti';
+      c.style.left = Math.random() * 100 + 'vw'; c.style.background = cs[i % cs.length];
+      c.style.animationDuration = (1.6 + Math.random() * 1.6) + 's'; c.style.animationDelay = (Math.random() * .4) + 's';
+      document.body.appendChild(c); setTimeout(() => c.remove(), 3800);
+    }
   }
-
-  function openBig(i) {
-    const w = faces[i];
-    $('bigImg').src = `thumbs/${w.id}.webp`;
-    $('bigT').textContent = '「' + (w.title || 'JJ의 그림') + '」';
-    $('big').classList.add('on');
-  }
-  $('big').onclick = () => $('big').classList.remove('on');
-
   let ac = null;
   function beep(f, d) {
     try {
@@ -241,12 +376,39 @@
       o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + d + .08);
     } catch (e) {}
   }
-  const tick = () => beep(300 + Math.random() * 120, .03);
 
-  $('rollBtn').onclick = roll;
-  $('newBtn').onclick = () => { if (!rolling) newFaces(); };
-  apply();
-  boot();
+  // ---------- 버튼 ----------
+  async function newGame(newImages) {
+    if (animating) return;
+    if (newImages || !textures.length) pickImages();
+    build();
+    await new Promise(r => setTimeout(r, 300));
+    scramble();
+  }
+  $('sizeSeg').querySelectorAll('button').forEach(b => b.onclick = () => {
+    if (animating || scrambling) return;
+    $('sizeSeg').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+    N = +b.dataset.n; MIX = +b.dataset.mix;
+    newGame(false);
+  });
+  $('mixBtn').onclick = () => { if (!scrambling) { build(); setTimeout(scramble, 200); } };
+  $('newBtn').onclick = () => { if (!scrambling) newGame(true); };
+  $('undoBtn').onclick = () => {
+    if (animating || scrambling || !moveStack.length) return;
+    const m = moveStack.pop();
+    turn({ axis: m.axis, layer: m.layer, dir: -m.dir }, 200, false).then(() => { moves++; $('moves').textContent = moves; checkSolved(); });
+  };
+  $('peekBtn').onclick = () => $('peek').classList.toggle('on');
+  $('againBtn').onclick = () => { $('win').classList.remove('on'); build(); setTimeout(scramble, 200); };
+  $('viewBtn').onclick = () => $('win').classList.remove('on');
+
+  function loop() { requestAnimationFrame(loop); renderer.render(scene, camera); }
+  (async () => {
+    await loadWorks();
+    if (!works.length) { $('load').textContent = '그림을 불러오지 못했어요'; return; }
+    loop();
+    newGame(true);
+  })();
 </script>
 </body>
 </html>
