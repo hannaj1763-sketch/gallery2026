@@ -1017,6 +1017,62 @@
     @keyframes jxConf { to { transform: translateY(105vh) rotate(540deg); opacity: .2; } }
     .jx-vbtns { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 0 0 10px; }
     .jx-vbtns button { border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.1); color: #fff; border-radius: 18px; padding: 7px 12px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+    /* ===================== ✨ 라인업 전시 (아이돌 라인업 포스터 느낌) ===================== */
+    #view-lineup { max-width: 860px; margin: 0 auto; padding: 32px 12px 48px; }
+    body.has-visit #view-lineup { padding-top: var(--vb, 96px); }
+    .lu { position: relative; overflow: hidden; border-radius: 28px; padding: 18px 14px 20px; color: #1e1b4b; isolation: isolate;
+      background: linear-gradient(135deg, #ff9ac8 0%, #b8f3ff 30%, #7ef0e3 48%, #c9b6ff 70%, #ffa7cf 100%); background-size: 220% 220%; animation: luBg 14s ease-in-out infinite; box-shadow: 0 18px 50px rgba(255,105,180,.25); }
+    @keyframes luBg { 50% { background-position: 100% 100%; } }
+    .lu::before { content: ''; position: absolute; inset: 0; z-index: -1; opacity: .5;
+      background: radial-gradient(circle at 12% 18%, rgba(255,255,255,.9) 0 2px, transparent 3px) 0 0 / 46px 46px,
+                  radial-gradient(circle at 70% 60%, rgba(255,255,255,.7) 0 1.5px, transparent 2.5px) 0 0 / 34px 34px; }
+    .lu-bokeh { position: absolute; border-radius: 50%; filter: blur(2px); z-index: -1; animation: luFloat 9s ease-in-out infinite; }
+    @keyframes luFloat { 50% { transform: translateY(-18px) scale(1.08); } }
+    .lu-tri { position: absolute; width: 0; height: 0; border-left: 34px solid rgba(255,255,255,.55); border-top: 22px solid transparent; border-bottom: 22px solid transparent; z-index: -1; filter: drop-shadow(0 0 8px rgba(255,255,255,.8)); animation: luFloat 7s ease-in-out infinite; }
+    .lu-spark { position: absolute; color: #fff; z-index: 1; pointer-events: none; text-shadow: 0 0 8px #fff, 0 0 18px #ff8fd0; animation: luTw 2.4s ease-in-out infinite; }
+    @keyframes luTw { 0%, 100% { transform: scale(.6) rotate(0); opacity: .3; } 50% { transform: scale(1.25) rotate(40deg); opacity: 1; } }
+    .lu-head { display: flex; align-items: center; gap: 12px; }
+    .lu-logo { width: clamp(70px, 19vw, 108px); aspect-ratio: 1; flex: none; position: relative; filter: drop-shadow(0 4px 10px rgba(0,0,0,.15)); }
+    .lu-logo .hx { position: absolute; inset: 0; clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%); background: conic-gradient(from 210deg, #ffd1e6, #fff7b0, #b4f5e8, #ffc4dc, #fde68a, #ffd1e6); }
+    .lu-logo .hx2 { position: absolute; inset: 9%; clip-path: inherit; background: linear-gradient(160deg, #fff, #ffe4f1); clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%); display: grid; place-items: center; }
+    .lu-logo b { font: 900 clamp(26px, 7.4vw, 42px)/1 'Arial Black', Arial, sans-serif; background: linear-gradient(180deg, #ff4fa3, #8b5cf6); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -2px; }
+    .lu-logo small { position: absolute; left: 50%; bottom: 17%; transform: translateX(-50%); font: 800 clamp(7px, 1.9vw, 10px)/1 Arial, sans-serif; letter-spacing: 2px; color: #ec4899; }
+    .lu-tt { min-width: 0; flex: 1; }
+    .lu-tt .k { font: 900 clamp(12px, 3.4vw, 18px)/1.1 Arial, sans-serif; color: #fff; letter-spacing: .5px; text-shadow: 0 2px 6px rgba(190,24,93,.35); font-style: italic; }
+    .lu-tt h2 { font: 900 clamp(40px, 13vw, 78px)/.95 'Arial Black', Arial, sans-serif; font-style: italic; color: #fff; letter-spacing: -1px; margin: 2px 0;
+      text-shadow: 0 3px 0 #f472b6, 0 6px 18px rgba(219,39,119,.35); position: relative; }
+    .lu-tt h2 span { background: linear-gradient(100deg, #fff 40%, #fff7fb 46%, #ffd6ec 50%, #fff 54%); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: luShine 3.5s linear infinite; }
+    @keyframes luShine { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+    .lu-tt .d { font: 900 clamp(13px, 3.8vw, 21px)/1.2 Arial, sans-serif; font-style: italic; color: #fff; text-shadow: 0 2px 0 #c084fc, 0 4px 10px rgba(124,58,237,.3); }
+    .lu-sp { position: relative; margin: 12px 0 4px auto; width: fit-content; max-width: 100%; background: rgba(255,255,255,.88); border: 3px solid #f0abfc; border-radius: 16px; padding: 14px 14px 8px; box-shadow: 0 0 0 3px #fff, 0 0 22px rgba(240,171,252,.9); display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .lu-sp .lb { position: absolute; top: -13px; left: 50%; transform: translateX(-50%) rotate(-3deg); white-space: nowrap; font: 900 15px/1 'Arial Black', Arial, sans-serif; font-style: italic; color: #fde047; -webkit-text-stroke: 1.4px #be185d; text-shadow: 0 2px 0 #be185d, 0 0 10px #fff; }
+    .lu-sp img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; box-shadow: 0 0 0 2px #f472b6; }
+    .lu-sp div { font-size: 14px; font-weight: 800; color: #3b0764; } .lu-sp div small { display: block; font-size: 11px; color: #9d174d; font-weight: 700; }
+    .lu-chips { display: flex; gap: 6px; overflow-x: auto; padding: 10px 2px 4px; scrollbar-width: none; }
+    .lu-chips::-webkit-scrollbar { display: none; }
+    .lu-chips button { flex: none; border: 2px solid #fff; background: rgba(255,255,255,.55); color: #831843; border-radius: 99px; padding: 6px 12px; font-size: 13px; font-weight: 800; cursor: pointer; font-family: inherit; backdrop-filter: blur(4px); }
+    .lu-chips button.on { background: #fff; color: #db2777; box-shadow: 0 0 0 2px #f9a8d4, 0 0 14px rgba(255,255,255,.9); }
+    .lu-board { margin-top: 10px; background: linear-gradient(160deg, rgba(255,255,255,.86), rgba(240,253,255,.78) 50%, rgba(255,240,247,.86)); border: 3px solid rgba(255,255,255,.95); border-radius: 22px; padding: 18px 8px 12px;
+      box-shadow: inset 0 0 0 2px rgba(125,211,252,.55), 0 10px 30px rgba(219,39,119,.15); display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px 6px; }
+    @media (min-width: 620px) { .lu-board { grid-template-columns: repeat(6, minmax(0,1fr)); } }
+    .lu-it { text-align: center; cursor: pointer; border: none; background: none; padding: 0; font-family: inherit; color: #111827; animation: luPop .5s cubic-bezier(.3,1.5,.5,1) both; }
+    @keyframes luPop { from { transform: scale(.4); opacity: 0; } }
+    .lu-ph { position: relative; width: 88%; margin: 0 auto; aspect-ratio: 1; border-radius: 50%; padding: 4px;
+      background: conic-gradient(from var(--a, 0deg), #ff8fd0, #fde68a, #7ef0e3, #a5b4fc, #ff8fd0); animation: luRing 6s linear infinite; box-shadow: 0 6px 16px rgba(236,72,153,.25); }
+    @property --a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+    @keyframes luRing { to { --a: 360deg; } }
+    .lu-ph img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; border: 3px solid #fff; background: #fff; }
+    .lu-ph::after { content: ''; position: absolute; inset: 7px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,0) 40%); pointer-events: none; }
+    .lu-it:active .lu-ph { transform: scale(.94); }
+    .lu-it .nm { margin-top: 7px; font-size: clamp(12px, 3.3vw, 14.5px); font-weight: 900; line-height: 1.2; word-break: keep-all; letter-spacing: -.3px; padding: 0 2px; }
+    .lu-it .sb { font-size: clamp(10.5px, 2.8vw, 12px); font-weight: 800; color: #374151; }
+    .lu-it.lock .lu-ph img { filter: blur(1.2px) saturate(.85); }
+    .lu-it.lock .lu-ph::before { content: '🔒'; position: absolute; right: 2px; bottom: 2px; width: 26px; height: 26px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-size: 13px; z-index: 2; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+    .lu-it .nw { position: absolute; top: -2px; right: -4px; z-index: 3; background: #f43f5e; color: #fff; font: 900 10px/1 Arial, sans-serif; padding: 3px 6px; border-radius: 99px; border: 2px solid #fff; }
+    .lu-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .lu-note { background: rgba(255,255,255,.85); border-radius: 99px; padding: 6px 12px; font-size: 12px; font-weight: 800; color: #1f2937; }
+    .lu-btn { border: none; border-radius: 99px; padding: 9px 14px; font-size: 13.5px; font-weight: 900; cursor: pointer; font-family: inherit; color: #fff; background: linear-gradient(135deg, #ec4899, #8b5cf6); box-shadow: 0 4px 14px rgba(236,72,153,.4); }
   </style>
 </head>
 <body>
@@ -5570,7 +5626,7 @@
         const keys = Object.keys(s.days).sort(); if (keys.length > 420) keys.slice(0, keys.length - 420).forEach(k => delete s.days[k]);
         put(K_ST, s);
       }
-      const PLAYKEYS = new Set(['pang', 'mem', 'throw', 'cm', 'ksc', 'puzzle', 'cube', 'balance', 'nunchi', 'hidden', 'drive', 'kwc', 'study', 'af', 'shop', 'song', 'coloring', 'word', 'beam', 'emo', 'anim', 'show', 'recap', 'story', 'card', 'sheet']);
+      const PLAYKEYS = new Set(['lineup', 'catch', 'pang', 'mem', 'throw', 'cm', 'ksc', 'puzzle', 'cube', 'balance', 'nunchi', 'hidden', 'drive', 'kwc', 'study', 'af', 'shop', 'song', 'coloring', 'word', 'beam', 'emo', 'anim', 'show', 'recap', 'story', 'card', 'sheet']);
       function track(key, n = 1) {
         const s = st(), d = today();
         const day = s.days[d] = s.days[d] || {};
@@ -5608,6 +5664,7 @@
         balance: { i: '⚖️', t: () => tt('blT', '밸런스'), d: () => tt('blD', ''), go: "openExtGame('balance.html', '⚖️ ' + t('blT'))" },
         nunchi: { i: '👀', t: () => tt('ncT', '눈치 게임'), d: () => tt('ncD', ''), go: "openExtGame('nunchi.html', '👀 ' + t('ncT'))" },
         hidden: { i: '🔍', t: () => tt('hdT', '숨은그림찾기'), d: () => tt('hdD', ''), go: "openExtGame('hidden.html', '🔍 ' + t('hdT'))" },
+        catch: { i: '🎒', t: () => 'JJ 그림 뽑기', d: () => '집게로 그림 키링을 뽑아 도감 채우기', go: "openExtGame('catch.html', '🎒 JJ 그림 뽑기')", nw: 1 },
         drive: { i: '🛴', t: () => tt('driveT', '네온 킥보드 3D'), d: () => tt('driveD', ''), go: 'openDrive()' },
         kwc: { i: '🔤', t: () => tt('kwcT', '끝말잇기'), d: () => tt('kwcD', ''), go: `openExtGame('${EXT.kwc}', '🔤 ' + t('kwcT'))` },
         study: { i: '📚', t: () => tt('stT', 'JJ 공부방'), d: () => tt('stD', ''), go: "openExtGame('study.html', '📚 ' + t('stT'))" },
@@ -5629,7 +5686,7 @@
         badge: { i: '🏅', t: () => '배지 도감', d: () => '모은 배지를 확인해요', go: "jxMyRecord('jxBadges')", nw: 1 }
       };
       const AREAS = [
-        { id: 'game', e: '🎮', l: '게임', c: '#ef4444', x: 21, y: 38, keys: ['pang', 'mem', 'throw', 'cm', 'ksc', 'puzzle', 'cube', 'balance', 'nunchi', 'hidden', 'drive'] },
+        { id: 'game', e: '🎮', l: '게임', c: '#ef4444', x: 21, y: 38, keys: ['catch', 'pang', 'mem', 'throw', 'cm', 'ksc', 'puzzle', 'cube', 'balance', 'nunchi', 'hidden', 'drive'] },
         { id: 'smart', e: '🧠', l: '똑똑해지기', c: '#f59e0b', x: 44, y: 24, keys: ['kwc', 'study', 'af', 'shop'] },
         { id: 'theater', e: '🎬', l: 'JJ 극장', c: '#a855f7', x: 67, y: 27, keys: ['anim', 'show', 'recap', 'story', 'card', 'sheet'] },
         { id: 'music', e: '🎵', l: '그림×음악', c: '#3b82f6', x: 23, y: 71, keys: ['song', 'coloring'] },
@@ -5642,7 +5699,7 @@
         if (u.includes('korean-word-chain')) return 'kwc'; if (u.includes('art-flight')) return 'af';
         if (u.includes('mode=shop')) return 'shop'; if (u.includes('k-snack')) return 'ksc';
         if (u.includes('Drive-3D')) return 'drive'; if (u.includes('color-merge')) return 'cm';
-        const m = u.match(/(puzzle|cube|balance|nunchi|hidden|study)\.html/); return m ? m[1] : '';
+        const m = u.match(/(puzzle|cube|balance|nunchi|hidden|study|catch)\.html/); return m ? m[1] : '';
       }
 
       // ---------------- 🎄 계절 ----------------
@@ -5663,12 +5720,12 @@
         kwc: { i: '🔤', tx: '끝말잇기 한 판', n: 1 }, study: { i: '📚', tx: '공부방 자료 보기', n: 1 }, af: { i: '✈️', tx: '아트 플라이트 속담 맞히기', n: 1 }, shop: { i: '🛒', tx: 'JJ 간식가게 손님 받기', n: 1 },
         hidden: { i: '🔍', tx: '숨은그림찾기 한 판', n: 1 }, puzzle: { i: '🧩', tx: '그림 퍼즐 맞추기', n: 1 }, cube: { i: '🧊', tx: '그림 큐브 돌리기', n: 1 }, balance: { i: '⚖️', tx: '밸런스 게임 하기', n: 1 },
         nunchi: { i: '👀', tx: '눈치 게임 하기', n: 1 }, mem: { i: '🧠', tx: '아트메모리 도전', n: 1 }, anim: { i: '✨', tx: '그림 움직여 보기', n: 1 }, story: { i: '📖', tx: 'JJ 그림책 읽기', n: 1 },
-        drive: { i: '🛴', tx: '킥보드 3D 타기', n: 1 }, sheet: { i: '🖨', tx: '색칠 도안 만들기', n: 1 }
+        drive: { i: '🛴', tx: '킥보드 3D 타기', n: 1 }, sheet: { i: '🖨', tx: '색칠 도안 만들기', n: 1 }, catch: { i: '🎒', tx: 'JJ 그림 뽑기 한 판', n: 1 }
       };
       function seedRand(str) { let h = 2166136261; for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 10000) / 10000; }; }
       function missions(d = today()) {
         const r = seedRand('agjj' + d), pick = a => a[Math.floor(r() * a.length)];
-        return [pick(['view', 'cheer']), pick(['kwc', 'study', 'af', 'shop']), pick(['hidden', 'puzzle', 'cube', 'balance', 'nunchi', 'mem', 'anim', 'story', 'drive', 'sheet'])];
+        return [pick(['view', 'cheer']), pick(['kwc', 'study', 'af', 'shop']), pick(['hidden', 'puzzle', 'cube', 'balance', 'nunchi', 'mem', 'anim', 'story', 'drive', 'sheet', 'catch'])];
       }
       function mprog(s, k) { const day = s.days[today()] || {}; return Math.min(MS[k].n, day[k] || 0); }
       function afterTrack(key) {
@@ -5712,6 +5769,7 @@
         { id: 'af', i: '✈️', t: '속담 파일럿', s: '아트 플라이트 5번', ok: s => (s.plays.af || 0) >= 5 },
         { id: 'anim', i: '🎬', t: '애니메이터', s: '그림 움직이기 3번', ok: s => (s.plays.anim || 0) + (s.plays.show || 0) >= 3 },
         { id: 'story', i: '📖', t: '그림책 작가', s: '그림책 읽기 3번', ok: s => (s.plays.story || 0) >= 3 },
+        { id: 'catch', i: '🎒', t: '키링 수집가', s: '그림 뽑기 도감 20점', ok: () => { try { return Object.keys((JSON.parse(localStorage.getItem('agjj_catch_v1')) || {}).got || {}).length >= 20; } catch (e) { return false; } } },
         { id: 'explorer', i: '🧭', t: '탐험가', s: '놀이 10가지 해 보기', ok: s => Object.keys(s.plays).filter(k => PLAYKEYS.has(k)).length >= 10 }
       ];
       function checkBadges(silent) {
@@ -6160,6 +6218,110 @@
         rb ? ft.insertBefore(box, rb) : ft.prepend(box);
       })();
 
+
+      // ---------------- ✨ 라인업 전시 (아이돌 라인업 포스터처럼) ----------------
+      let LU = { f: 'all' };
+      const WD = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+      function luList() {
+        const all = allArts().slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+        const f = LU.f;
+        if (f === 'all') return all;
+        if (f === 'new') return all.slice(0, 18);
+        if (/^\d{4}$/.test(f)) return all.filter(a => String(a.date || '').startsWith(f));
+        return all.filter(a => a.genre === f);
+      }
+      function luDate(a) { const d = String(a.date || ''); return /^\d{4}-\d{2}/.test(d) ? d.slice(0, 7).replace('-', '.') : ''; }
+      function ensureLuView() {
+        let v = document.getElementById('view-lineup');
+        if (!v) {
+          v = document.createElement('div'); v.id = 'view-lineup'; v.className = 'view-container';
+          const ar = document.getElementById('view-archive'); ar.parentNode.insertBefore(v, ar.nextSibling);
+        }
+        return v;
+      }
+      function renderLineup() {
+        const v = ensureLuView(), all = allArts(), vis = new Set(visibleArts().map(a => a.id)), list = luList();
+        const now = new Date(), latest = all.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))[0];
+        const years = [...new Set(all.map(a => String(a.date || '').slice(0, 4)).filter(y => /^\d{4}$/.test(y)))].sort().reverse();
+        const genres = [...new Set(all.map(a => a.genre).filter(Boolean))];
+        const chips = [['all', '🌈 전체'], ['new', '🆕 최신 18'], ...years.map(y => [y, y]), ...genres.map(g => [g, '🎨 ' + g])];
+        const recent = new Set(all.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || ''))).slice(0, 4).map(a => a.id));
+        const spark = Array.from({ length: 9 }, (_, i) => `<i class="lu-spark" style="left:${(i * 37 + 7) % 96}%; top:${(i * 53 + 11) % 92}%; font-size:${12 + (i % 3) * 7}px; animation-delay:${(i * .37) % 2.4}s">✦</i>`).join('');
+        v.innerHTML = `<div class="lu" id="luPoster">
+          <span class="lu-bokeh" style="width:120px;height:120px;left:-30px;top:40%;background:rgba(255,255,255,.35)"></span>
+          <span class="lu-bokeh" style="width:90px;height:90px;right:-20px;bottom:6%;background:rgba(253,230,138,.45);animation-delay:-3s"></span>
+          <span class="lu-tri" style="right:8%; bottom:22%"></span><span class="lu-tri" style="left:4%; top:30%; transform:scale(.6) rotate(180deg); animation-delay:-2s"></span>
+          ${spark}
+          <div class="lu-head">
+            <div class="lu-logo"><div class="hx"></div><div class="hx2"><b>JJ</b></div><small>GALLERY</small></div>
+            <div class="lu-tt"><div class="k">JJ GALLERY ART SHOW!</div><h2><span>LINE-UP</span></h2>
+              <div class="d">${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())}(${WD[now.getDay()]}) EP.${all.length}</div></div>
+          </div>
+          ${latest ? `<div class="lu-sp" onclick="jxLuOpen('${latest.id}')"><span class="lb">✨ Special ✨</span><img src="${thumb(latest.id)}" alt=""><div>${H(latest.title)}<small>이달의 신작 · ${luDate(latest)}</small></div></div>` : ''}
+          <div class="lu-chips">${chips.map(([k, l]) => `<button class="${k === LU.f ? 'on' : ''}" onclick="jxLuF('${H(k)}')">${H(l)}</button>`).join('')}</div>
+          <div class="lu-board">${list.map((a, i) => `<button class="lu-it ${vis.has(a.id) ? '' : 'lock'}" style="animation-delay:${Math.min(i, 24) * .035}s" onclick="jxLuOpen('${a.id}')">
+              <div class="lu-ph">${recent.has(a.id) ? '<span class="nw">NEW</span>' : ''}<img src="${thumb(a.id)}" loading="lazy" alt=""></div>
+              <div class="nm">${H(a.title)}</div><div class="sb">(${H(luDate(a) || 'JJ')})</div></button>`).join('') || '<div style="grid-column:1/-1;text-align:center;font-weight:800;color:#9d174d">작품을 불러오는 중이에요…</div>'}</div>
+          <div class="lu-foot"><span class="lu-note">*전시 작품은 특별전에 따라 바뀔 수 있어요 · ${list.length}점</span><button class="lu-btn" onclick="jxLuPoster()">📸 포스터로 저장</button></div>
+        </div>`;
+      }
+      window.jxLuF = f => { LU.f = f; renderLineup(); };
+      window.jxLuOpen = id => {
+        const i = (typeof artworks !== 'undefined' ? artworks : []).findIndex(a => a.id === id);
+        if (i >= 0) { openViewerByIndex(i); return; }
+        toastSafe('🔒 이 작품은 특별전에서 만나요!');
+      };
+      function openLineup() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+        try { lsSet('agjj_galmode', 'lineup', true); navPush('v:lineup'); setNav('gallery', 'lineup'); stopShorts(); } catch (e) {}
+        ensureLuView().classList.add('active'); renderLineup(); window.scrollTo(0, 0); track('lineup');
+      }
+      if (typeof window.switchView === 'function') {
+        const sv = window.switchView;
+        window.switchView = function (mode) {
+          if (mode === 'lineup' || (mode === 'gallery' && (typeof lsGet === 'function' ? lsGet('agjj_galmode', '3d') : '') === 'lineup')) return openLineup();
+          return sv.apply(this, arguments);
+        };
+      }
+      (function addSeg() {
+        const seg = document.getElementById('galSeg'); if (!seg || seg.querySelector('[data-g="lineup"]')) return;
+        const b = document.createElement('button'); b.dataset.g = 'lineup'; b.textContent = '✨ 라인업'; b.onclick = () => switchView('lineup');
+        seg.appendChild(b);
+      })();
+      window.jxLuPoster = async function () {
+        const list = luList().slice(0, 18), vis = new Set(visibleArts().map(a => a.id));
+        const W = 1080, cols = 3, rows = Math.ceil(list.length / cols) || 1, Hh = Math.max(1350, 520 + rows * 300);
+        const cv = document.createElement('canvas'); cv.width = W; cv.height = Hh; const c = cv.getContext('2d');
+        const g = c.createLinearGradient(0, 0, W, Hh); g.addColorStop(0, '#ff9ac8'); g.addColorStop(.3, '#b8f3ff'); g.addColorStop(.5, '#7ef0e3'); g.addColorStop(.75, '#c9b6ff'); g.addColorStop(1, '#ffa7cf');
+        c.fillStyle = g; c.fillRect(0, 0, W, Hh);
+        for (let i = 0; i < 60; i++) { c.fillStyle = `rgba(255,255,255,${.25 + Math.random() * .5})`; c.beginPath(); c.arc(Math.random() * W, Math.random() * Hh, 1 + Math.random() * 3, 0, 7); c.fill(); }
+        // 육각 로고
+        const hex = (cx, cy, r) => { c.beginPath(); for (let k = 0; k < 6; k++) { const a = Math.PI / 3 * k; c.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a)); } c.closePath(); };
+        hex(150, 150, 105); const lg = c.createLinearGradient(50, 50, 250, 250); lg.addColorStop(0, '#ffd1e6'); lg.addColorStop(.5, '#fff7b0'); lg.addColorStop(1, '#b4f5e8'); c.fillStyle = lg; c.fill();
+        hex(150, 150, 86); c.fillStyle = '#fff'; c.fill();
+        c.textAlign = 'center'; c.fillStyle = '#ec4899'; c.font = '900 88px "Arial Black", Arial, sans-serif'; c.fillText('JJ', 150, 172); c.font = '800 20px Arial'; c.fillText('GALLERY', 150, 210);
+        c.textAlign = 'left'; c.fillStyle = '#fff'; c.shadowColor = 'rgba(219,39,119,.5)'; c.shadowBlur = 12;
+        c.font = 'italic 900 38px Arial, sans-serif'; c.fillText('JJ GALLERY ART SHOW!', 285, 88);
+        c.font = 'italic 900 150px "Arial Black", Arial, sans-serif'; c.fillText('LINE-UP', 270, 230);
+        const now = new Date(); c.font = 'italic 900 44px Arial, sans-serif'; c.fillText(`${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())}(${WD[now.getDay()]}) EP.${allArts().length}`, 290, 300);
+        c.shadowBlur = 0;
+        // 보드
+        const bx = 40, by = 350, bw = W - 80, bh = Hh - by - 90;
+        c.fillStyle = 'rgba(255,255,255,.85)'; c.strokeStyle = '#fff'; c.lineWidth = 6; c.beginPath(); c.roundRect ? c.roundRect(bx, by, bw, bh, 40) : c.rect(bx, by, bw, bh); c.fill(); c.stroke();
+        const cw = bw / cols;
+        for (let i = 0; i < list.length; i++) {
+          const a = list[i], cx = bx + cw * (i % cols) + cw / 2, cy = by + 150 + Math.floor(i / cols) * 300, r = 105;
+          const rg = c.createLinearGradient(cx - r, cy - r, cx + r, cy + r); rg.addColorStop(0, '#ff8fd0'); rg.addColorStop(.5, '#fde68a'); rg.addColorStop(1, '#7ef0e3');
+          c.fillStyle = rg; c.beginPath(); c.arc(cx, cy, r + 8, 0, 7); c.fill(); c.fillStyle = '#fff'; c.beginPath(); c.arc(cx, cy, r + 2, 0, 7); c.fill();
+          try { const im = await loadImg([thumb(a.id)]); c.save(); c.beginPath(); c.arc(cx, cy, r - 2, 0, 7); c.clip(); if (!vis.has(a.id)) c.filter = 'blur(6px)'; c.drawImage(im, cx - r, cy - r, r * 2, r * 2); c.restore(); } catch (e) {}
+          c.fillStyle = '#111827'; c.textAlign = 'center'; c.font = '900 34px sans-serif'; c.fillText(String(a.title || '').slice(0, 16), cx, cy + r + 50);
+          c.font = '800 26px sans-serif'; c.fillStyle = '#374151'; c.fillText(`(${luDate(a)})`, cx, cy + r + 84);
+        }
+        c.fillStyle = 'rgba(255,255,255,.9)'; c.textAlign = 'left'; c.font = '800 28px sans-serif'; c.fillStyle = '#1f2937'; c.fillText('*전시 작품은 특별전에 따라 바뀔 수 있어요', 60, Hh - 36);
+        c.fillStyle = '#fff'; c.font = '40px serif'; ['✦', '✧', '✦'].forEach((s, k) => c.fillText(s, 900 + k * 50, 80 + k * 30));
+        shareCanvas(cv, `JJ_LINEUP_${now.getFullYear()}${pad(now.getMonth() + 1)}.png`, 'JJ 갤러리 라인업');
+      };
       // 앱을 연 날 기록 + 배지 확인
       track('open'); checkBadges(true);
 
