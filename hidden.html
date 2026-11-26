@@ -86,6 +86,7 @@
     .msg { grid-column: 2; grid-row: 3; }
   }
 </style>
+<script src="luckyball.js"></script>
 </head>
 <body>
   <div class="top">
@@ -104,7 +105,7 @@
         <button data-lv="1" class="on">🔍 보통</button>
         <button data-lv="2">🦉 어려움</button>
       </div>
-      <button class="btn" id="randBtn">🎲 아무 그림으로 시작</button>
+      <button class="btn" id="randBtn">🔮 럭키볼로 그림 뽑기</button>
     </div>
     <div class="grid" id="grid"></div>
   </section>
@@ -460,7 +461,18 @@
     level = +b.dataset.lv;
     $('lvSeg').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
   });
-  $('randBtn').onclick = () => works.length && start(works[Math.floor(Math.random() * works.length)]);
+  // 🔮 JJ 럭키볼: 캡슐 속 그림이 그대로 이번 판 그림이 돼요 (아직 안 한 그림이 더 잘 나와요)
+  function luckyWork() {
+    const st = load(), left = works.filter(w => !st.done[w.id]), from = left.length && Math.random() < .75 ? left : works;
+    return from[Math.floor(Math.random() * from.length)];
+  }
+  $('randBtn').onclick = () => {
+    if (!works.length) return;
+    if (!window.JJLucky) return start(luckyWork());
+    JJLucky.open({ title: '숨은그림찾기 그림 뽑기', sub: '캡슐 속 그림으로 바로 시작해요', balls: 3, goText: '🔮 그림 뽑기!', okText: '이 그림으로 시작!',
+      prizes: () => { const w = luckyWork(); return { icon: '🖼', title: w.title || 'JJ의 그림', desc: '이 그림 속에서 작은 그림 15개를 찾아요!', art: w.id, label: '럭키볼에서 나온 그림은', say: (w.title || 'JJ의 그림') + '!', data: w }; },
+      onPick: p => start(p.data) });
+  };
   $('homeBtn').onclick = goHome;
   $('viewBtn').onclick = () => $('win').classList.remove('on');
   $('nextBtn').onclick = () => {
