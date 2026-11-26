@@ -894,6 +894,9 @@
     </style>
   <script src="firebase-config.js"></script>   <!-- 🔑 Firebase 키는 이 파일 하나에만 (키를 바꿀 땐 이 파일만 고쳐요) -->
   <script src="luckyball.js"></script>
+  <script src="luckyball.js"></script>
+  <script src="luckyball.js"></script>
+  <script src="luckyball.js"></script>
   <style id="jx-style">
     /* ===================== 🎨 팔레트 메뉴 · 오늘 · 나의 기록 · JJ 극장 ===================== */
     .jx-today { margin-top: 14px; padding: 14px 15px 12px; border-radius: 18px; background: linear-gradient(135deg, #1e1b3a, #241a33); border: 1px solid #3b2f5c; color: #ede9fe; }
@@ -1074,6 +1077,10 @@
     .lu-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
     .lu-note { background: rgba(255,255,255,.85); border-radius: 99px; padding: 6px 12px; font-size: 12px; font-weight: 800; color: #1f2937; }
     .lu-btn { border: none; border-radius: 99px; padding: 9px 14px; font-size: 13.5px; font-weight: 900; cursor: pointer; font-family: inherit; color: #fff; background: linear-gradient(135deg, #ec4899, #8b5cf6); box-shadow: 0 4px 14px rgba(236,72,153,.4); }
+    .jx-sea-fx { position: fixed; inset: 0; pointer-events: none; z-index: 40; overflow: hidden; }
+    .jx-sea-fx i { position: absolute; top: -40px; font-style: normal; opacity: .6; animation: jxSeaFall linear infinite; filter: drop-shadow(0 2px 3px rgba(0,0,0,.2)); }
+    @keyframes jxSeaFall { 0% { transform: translate(0, -40px) rotate(0); } 50% { transform: translate(18px, 52vh) rotate(160deg); } 100% { transform: translate(-10px, 108vh) rotate(320deg); } }
+    .lu-sea { display: inline-block; font-style: normal; font-size: 11px; background: #fff; color: #be185d; border-radius: 99px; padding: 2px 8px; margin-left: 4px; vertical-align: middle; text-shadow: none; }
   </style>
 </head>
 <body>
@@ -1918,6 +1925,13 @@
       const anyActive = !!document.querySelector('.tk-modal.active') || !!document.getElementById('songPlayer')?.classList.contains('on');
       document.body.style.overflow = anyActive ? 'hidden' : '';
     }
+    // 🔙 iframe 주소를 바꿔도 '뒤로 가기' 기록이 쌓이지 않게 (갤럭시 뒤로 버튼이 게임 속 이전 화면으로 가지 않도록)
+    function setFrameSrc(el, url) {
+      if (!el) return;
+      // 같은 자리에 새 iframe 을 끼워 넣으면 첫 이동이라 기록이 남지 않아요
+      if (el.isConnected) { const n = el.cloneNode(false); n.removeAttribute('data-on'); if (el.dataset.on) n.dataset.on = el.dataset.on; n.src = url; el.replaceWith(n); return; }
+      el.src = url;
+    }
     function openModal(id) {
       const el = document.getElementById(id);
       if (!el) return;
@@ -2461,7 +2475,7 @@
       const lob = (EXCFG && EXCFG.lobby) || []; if (!lob.length) return;
       const d = new Date(), n = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5), id = lob[n % lob.length], a = allArtworks.find(x => x.id === id);
       document.getElementById('songTitle').innerText = '🖍 아트컬러링' + (a ? ' · ' + a.title : '');
-      document.getElementById('songFrame').src = `${SONG_URL}?art=${encodeURIComponent(id)}&embed=1&color=1&big=1`;
+      setFrameSrc(document.getElementById('songFrame'), `${SONG_URL}?art=${encodeURIComponent(id)}&embed=1&color=1&big=1`);
       document.getElementById('songPlayer').classList.add('on');
       snDone('paint');
     }
@@ -2531,7 +2545,7 @@
     function openSong() {
       const lobby = ((EXCFG && EXCFG.lobby) || []).map(id => allArtworks.find(a => a.id === id)).filter(Boolean);
       const mine = (getBox().ids || []).map(id => allArtworks.find(a => a.id === id)).filter(a => a && !lobby.includes(a));
-      const tile = (a, free) => `<button class="song-it" onclick="playSong('${a.id}')"><img src="${a.src}" alt="" loading="lazy">
+      const tile = (a, free) => `<button class="song-it" onclick="playSong('${a.id}')"><img src="${artThumb(a)}" ${thErr(a)} alt="" loading="lazy">
           <span class="bd ${free ? 'free' : songOpen(a.id) ? 'open' : ''}">${free ? '무료' : songOpen(a.id) ? '🎶 열림' : '💧 1'}</span><div class="c">${esc(a.title)}</div></button>`;
       document.getElementById('songList').innerHTML =
         `<div class="song-sec">🎁 무료 체험 · 로비 대표작</div><div class="song-grid">${lobby.map(a => tile(a, true)).join('')}</div>
@@ -2545,7 +2559,7 @@
       const lob = (EXCFG && EXCFG.lobby) || []; if (!lob.length) return;
       const d = new Date(), n = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5), id = lob[n % lob.length], a = allArtworks.find(x => x.id === id);
       document.getElementById('songTitle').innerText = '🖍 아트컬러링' + (a ? ' · ' + a.title : '');
-      document.getElementById('songFrame').src = `${SONG_URL}?art=${encodeURIComponent(id)}&embed=1&color=1&big=1`;
+      setFrameSrc(document.getElementById('songFrame'), `${SONG_URL}?art=${encodeURIComponent(id)}&embed=1&color=1&big=1`);
       document.getElementById('songPlayer').classList.add('on');
     }
     async function playSong(id) {
@@ -2553,13 +2567,13 @@
       if (!songOpen(id) && !await payPaintFor('song:' + id, '아트쏭 열기')) return;
       closeModal('songModal');
       document.getElementById('songTitle').innerText = '🎶 ' + a.title;
-      document.getElementById('songFrame').src = `${SONG_URL}?art=${encodeURIComponent(id)}&embed=1`;
+      setFrameSrc(document.getElementById('songFrame'), `${SONG_URL}?art=${encodeURIComponent(id)}&embed=1`);
       document.getElementById('songPlayer').classList.add('on');
       if (NativeApp && NativeApp.setSecure) NativeApp.setSecure(true);
     }
     function closeSong() {
       document.getElementById('songPlayer').classList.remove('on');
-      document.getElementById('songFrame').src = 'about:blank';           // 소리 멈추기
+      setFrameSrc(document.getElementById('songFrame'), 'about:blank');           // 소리 멈추기
       if (NativeApp && NativeApp.setSecure) NativeApp.setSecure(!!activeTicket());
       try { collectPendingPaint(); } catch (e) {}                          // 퍼즐 등 게임 보상 💧 받기
       if (document.getElementById('view-play').classList.contains('active')) renderPlay();
@@ -3357,7 +3371,7 @@
       document.getElementById('wcCount').innerText = cards.length ? `(${cards.length})` : '';
       document.getElementById('wcGrid').innerHTML = cards.length ? cards.map((c, i) => {
         const a = byId[c.art];
-        return `<div class="wc-item" onclick="showWordCard(${i})">${a ? `<img src="${a.src}" alt="" loading="lazy">` : ''}<div>${c.title ? esc(c.title) + '<br>' : ''}${esc(c.ref)}</div></div>`;
+        return `<div class="wc-item" onclick="showWordCard(${i})">${a ? `<img src="${artThumb(a)}" ${thErr(a)} alt="" loading="lazy">` : ''}<div>${c.title ? esc(c.title) + '<br>' : ''}${esc(c.ref)}</div></div>`;
       }).join('') : '<div class="store-note">아직 뽑은 카드가 없어요.</div>';
     }
 
@@ -3570,7 +3584,7 @@
       const a = allArtworks.find(x => x.id === c.art);
       closeModal('wcModal');
       document.getElementById('songTitle').innerText = '🎬 말씀 쇼츠 · ' + c.ref;
-      document.getElementById('songFrame').src = `${SONG_URL}?art=${encodeURIComponent(c.art)}&embed=1&style=ballad&verse=${encodeURIComponent(c.text)}&ref=${encodeURIComponent(c.ref)}`;
+      setFrameSrc(document.getElementById('songFrame'), `${SONG_URL}?art=${encodeURIComponent(c.art)}&embed=1&style=ballad&verse=${encodeURIComponent(c.text)}&ref=${encodeURIComponent(c.ref)}`);
       document.getElementById('songPlayer').classList.add('on');
     }
     async function showWordCard(i, fresh) {
@@ -3674,7 +3688,7 @@
       document.getElementById('boxNote').innerHTML = `${box.ids.length} / ${box.slots}칸 · 담아 둔 작품은 전시가 끝나도 언제든 다시 볼 수 있어요. 감상용이며 복제·상업적 이용은 할 수 없어요. © J.J`;
       let html = box.ids.map(id => byId[id]).filter(Boolean).map(a => `
         <div class="box-card" onclick="openBoxItem('${a.id}')">
-          <div class="thumb"><img src="${a.src}" alt="${a.title}" loading="lazy"><div class="thumb-watermark">J.J</div></div>
+          <div class="thumb"><img src="${artThumb(a)}" ${thErr(a)} alt="${a.title}" loading="lazy"><div class="thumb-watermark">J.J</div></div>
           <div class="t">${a.title}</div>
         </div>`).join('');
       for (let i = box.ids.length; i < box.slots; i++) html += `<div class="box-card empty">빈 칸</div>`;
@@ -3755,7 +3769,7 @@
         html += `<div class="gallery-grid lock-grid">` + items.map(a => {
           const own = mine.has(a.id); if (!own) nLocked++;
           return `<div class="art-card ${own ? '' : 'locked'}" onclick="${own ? `openBoxItem('${a.id}')` : (IS_APP ? `openTicket('${ex.id}')` : `showMsg('📱 앱에서 열려요', '이 작품은 특별전 「${esc(ex.short || ex.title)}」에 있어요. AGJJ 앱에서 입장하면 볼 수 있어요.')`)}">
-            <div class="thumb-wrapper"><img src="${a.src}" class="art-thumb" alt="" loading="lazy" decoding="async">${own ? '<div class="thumb-watermark">J.J</div><span class="own-badge"><span class="easel"></span> 내 컬렉션</span>' : '<div class="jjwm"></div><div class="lock-mark">🔒</div>'}</div>
+            <div class="thumb-wrapper"><img src="${artThumb(a)}" ${thErr(a)} class="art-thumb" alt="" loading="lazy" decoding="async">${own ? '<div class="thumb-watermark">J.J</div><span class="own-badge"><span class="easel"></span> 내 컬렉션</span>' : '<div class="jjwm"></div><div class="lock-mark">🔒</div>'}</div>
             <div class="art-info"><div class="art-title">${esc(a.title)}</div><div class="art-meta">${own ? esc(a.meta || '') : '🔒 특별전에서 만나요'}</div></div></div>`;
         }).join('') + `</div>`;
       });
@@ -3785,7 +3799,7 @@
     function miniCard(a) {
       const idx = artworks.indexOf(a), [y, mo] = (a.date || '').split('-');
       const when = mo && mo !== '99' ? (isKo() ? `${y}년 ${+mo}월` : `${y}.${mo}`) : '';
-      return `<button class="tl-card" onclick="openViewerByIndex(${idx})"><img src="${a.src}" alt="" loading="lazy" decoding="async">
+      return `<button class="tl-card" onclick="openViewerByIndex(${idx})"><img src="${artThumb(a)}" ${thErr(a)} alt="" loading="lazy" decoding="async">
         <div><div class="m">${when}</div><div class="t">${esc(a.title)}</div>${gTag(a.genre)}</div></button>`;
     }
     function renderTimeline(list) {
@@ -3818,7 +3832,7 @@
       grid.innerHTML = artworks.map((art, idx) => `
         <div class="art-card" onclick="openViewerByIndex(${idx})">
           <div class="thumb-wrapper">
-            <img src="${art.src}" class="art-thumb" alt="${art.title}" loading="lazy" decoding="async">
+            <img src="${artThumb(art, true)}" ${thErr(art)} class="art-thumb" alt="${art.title}" loading="lazy" decoding="async">
             <div class="thumb-watermark">J.J</div>
           </div>
           <div class="art-info">
@@ -3861,7 +3875,7 @@
     }
     // 📖 BBB: JJ 갤러리 밖, 작가 목록에서 들어가는 별도 공간
     function enterBBB(card) {
-      const f = document.getElementById('bbbFrame2'); if (!f.src) f.src = BBB_SITE;
+      const f = document.getElementById('bbbFrame2'); if (!f.dataset.on) { f.dataset.on = 1; setFrameSrc(f, BBB_SITE); }
       enterArtist(card, true);
       setTimeout(() => document.getElementById('bbbFull').classList.add('on'), 600); navPush('bbb');
     }
@@ -4373,10 +4387,10 @@
     }
     function talkBody(m) {
       const a = m.art ? allArtworks.find(x => x.id === m.art) : null, aid = sid(m.art);
-      if (m.k === 'art' && a) return `<img class="tlk-img" src="${a.src}" alt="" loading="lazy" onclick="event.stopPropagation(); talkViewArt('${aid}')"><div class="tlk-cap">🖼 ${esc(a.title)}</div>`;
-      if (m.k === 'song' && a) return `<div class="tlk-card"><img src="${a.src}" alt="" loading="lazy"><div><b>🎶 아트쏭</b><br>${esc(a.title)}</div></div>
+      if (m.k === 'art' && a) return `<img class="tlk-img" src="${artThumb(a, true)}" ${thErr(a)} alt="" loading="lazy" onclick="event.stopPropagation(); talkViewArt('${aid}')"><div class="tlk-cap">🖼 ${esc(a.title)}</div>`;
+      if (m.k === 'song' && a) return `<div class="tlk-card"><img src="${artThumb(a)}" ${thErr(a)} alt="" loading="lazy"><div><b>🎶 아트쏭</b><br>${esc(a.title)}</div></div>
         <button class="tlk-play" onclick="event.stopPropagation(); talkPlaySong('${aid}')">▶ 들어보기</button>`;
-      if (m.k === 'word') return `<div class="tlk-word">${a ? `<img src="${a.src}" alt="" loading="lazy">` : ''}<div><p>${esc(m.text)}</p><b>${esc(m.ref)}</b></div></div>`;
+      if (m.k === 'word') return `<div class="tlk-word">${a ? `<img src="${artThumb(a)}" ${thErr(a)} alt="" loading="lazy">` : ''}<div><p>${esc(m.text)}</p><b>${esc(m.ref)}</b></div></div>`;
       return esc(m.text).replace(/\n/g, '<br>');
     }
     function renderMsgs() {
@@ -4421,8 +4435,8 @@
       const cards = lsGet(K_CARDS, []), byId = Object.fromEntries(allArtworks.map(a => [a.id, a]));
       const tabs = [['art', '🖼 내 그림'], ['song', '🎶 아트쏭'], ['word', '📜 말씀카드']];
       let body = '';
-      if (tab === 'art') body = `<div class="tlk-grid">${arts.map(a => `<button onclick="talkSendRich('art','${sid(a.id)}')"><img src="${a.src}" alt="" loading="lazy"><small>${esc(a.title)}</small></button>`).join('')}</div>`;
-      if (tab === 'song') { const ok = arts.filter(a => songOpen(a.id)); body = ok.length ? `<div class="tlk-grid">${ok.map(a => `<button onclick="talkSendRich('song','${sid(a.id)}')"><img src="${a.src}" alt="" loading="lazy"><small>🎶 ${esc(a.title)}</small></button>`).join('')}</div>` : '<div class="tlk-none">열린 아트쏭이 없어요.</div>'; }
+      if (tab === 'art') body = `<div class="tlk-grid">${arts.map(a => `<button onclick="talkSendRich('art','${sid(a.id)}')"><img src="${artThumb(a)}" ${thErr(a)} alt="" loading="lazy"><small>${esc(a.title)}</small></button>`).join('')}</div>`;
+      if (tab === 'song') { const ok = arts.filter(a => songOpen(a.id)); body = ok.length ? `<div class="tlk-grid">${ok.map(a => `<button onclick="talkSendRich('song','${sid(a.id)}')"><img src="${artThumb(a)}" ${thErr(a)} alt="" loading="lazy"><small>🎶 ${esc(a.title)}</small></button>`).join('')}</div>` : '<div class="tlk-none">열린 아트쏭이 없어요.</div>'; }
       if (tab === 'word') body = cards.length ? `<div class="tlk-list">${cards.slice(0, 40).map((c, i) => `<button onclick="talkSendRich('word', ${i})">${byId[c.art] ? `<img src="${byId[c.art].src}" alt="">` : ''}<span><b>${esc(c.ref)}</b><small>${esc(String(c.text || '').slice(0, 40))}…</small></span></button>`).join('')}</div>`
         : '<div class="tlk-none">아직 뽑은 말씀카드가 없어요. ✨ Play → 📜 말씀카드에서 뽑아 보세요.</div>';
       talkSheet(`<div class="tk-title">＋ 보내기</div><div class="tlk-tabs">${tabs.map(([k, t]) => `<button class="${k === tab ? 'on' : ''}" onclick="talkShare('${k}')">${t}</button>`).join('')}</div>
@@ -4435,13 +4449,13 @@
     }
     function talkViewArt(id) {
       const a = allArtworks.find(x => x.id === id); if (!a) return;
-      talkSheet(`<img src="${a.src}" alt="" style="width:100%;border-radius:12px;max-height:60vh;object-fit:contain;background:#000"><div class="tk-title" style="margin-top:10px">${esc(a.title)}</div>
+      talkSheet(`<img src="${artThumb(a, true)}" ${thErr(a)} alt="" style="width:100%;border-radius:12px;max-height:60vh;object-fit:contain;background:#000"><div class="tk-title" style="margin-top:10px">${esc(a.title)}</div>
         <div class="tk-sub">© JJ</div><button class="tk-cancel" onclick="closeModal('talkSheet')">닫기</button>`);
     }
     function talkPlaySong(id) {            // 친구가 보낸 아트쏭은 선물: 물감 없이 들어요
       const a = allArtworks.find(x => x.id === id); if (!a) return;
       document.getElementById('songTitle').innerText = '🎶 ' + a.title;
-      document.getElementById('songFrame').src = `${SONG_URL}?art=${encodeURIComponent(id)}&embed=1&autoplay=1`;
+      setFrameSrc(document.getElementById('songFrame'), `${SONG_URL}?art=${encodeURIComponent(id)}&embed=1&autoplay=1`);
       document.getElementById('songPlayer').classList.add('on');
     }
     // 메시지 누르기: 반응 · 지우기 · 신고 · 차단
@@ -4576,7 +4590,7 @@
       const playerEl = document.getElementById('songPlayer');
       if (playerEl && frameEl) {
         if (titleEl) titleEl.innerText = '🛴 ' + t('driveT');
-        frameEl.src = DRIVE_URL;
+        setFrameSrc(frameEl, DRIVE_URL);
         playerEl.classList.add('on');
         document.body.style.overflow = 'hidden';
       } else {
@@ -4595,7 +4609,7 @@
       const playerEl = document.getElementById('songPlayer');
       if (playerEl && frameEl) {
         if (titleEl) titleEl.innerText = '🎨 ' + t('cmT');
-        frameEl.src = targetUrl;
+        setFrameSrc(frameEl, targetUrl);
         playerEl.classList.add('on');
         document.body.style.overflow = 'hidden';
       } else {
@@ -4608,7 +4622,7 @@
       const playerEl = document.getElementById('songPlayer');
       if (playerEl && frameEl) {
         if (titleEl) titleEl.innerText = title;
-        frameEl.src = url;
+        setFrameSrc(frameEl, url);
         playerEl.classList.add('on');
         document.body.style.overflow = 'hidden';
       } else {
@@ -4696,7 +4710,7 @@
       setNav(['3d', 'archive', 'shorts'].includes(mode) ? 'gallery' : mode === 'store' ? 'play' : mode === 'senior' || mode === 'talk' ? 'c:' + mode : '', mode);
       if (mode === '3d') document.getElementById('view-3d').classList.add('active');
       else if (mode === 'shorts') document.getElementById('view-shorts').classList.add('active');
-      else if (mode === 'bbb') { document.getElementById('view-3d').classList.add('active'); const f = document.getElementById('bbbFrame2'); if (!f.src) f.src = BBB_SITE; document.getElementById('bbbFull').classList.add('on'); }   // BBB는 작가 목록의 별도 공간
+      else if (mode === 'bbb') { document.getElementById('view-3d').classList.add('active'); const f = document.getElementById('bbbFrame2'); if (!f.dataset.on) { f.dataset.on = 1; setFrameSrc(f, BBB_SITE); } document.getElementById('bbbFull').classList.add('on'); }   // BBB는 작가 목록의 별도 공간
       else if (mode === 'senior') { document.getElementById('view-senior').classList.add('active'); renderSenior(); }
       else if (mode === 'talk') { document.getElementById('view-talk').classList.add('active'); renderTalk(); talkOnline(); }
       else if (mode === 'store') { document.getElementById('view-store').classList.add('active'); loadStore(); }
@@ -4711,11 +4725,18 @@
       document.getElementById('viewerModal').classList.add('active');
     }
 
+    // ⚡ [속도개선] 목록·3D 에는 가벼운 썸네일(thumbs/), 크게 볼 때만 원본. 썸네일이 없으면 원본으로 자동 대체
+    function artThumb(a, big) { return a && a.id && !a.isProfile && /^\d{2,3}$/.test(a.id) ? `thumbs/${big ? 'm/' : ''}${a.id}.webp` : (a ? a.src : ''); }
+    function thErr(a) { return a && a.src ? `onerror="this.onerror=null;this.src='${String(a.src).replace(/'/g, '%27')}'"` : ''; }
+
     function updateViewerContent() {
       const art = artworks[currentIndex];
       if (!art) return;
 
-      document.getElementById('viewerImg').src = art.src;
+      { const vi = document.getElementById('viewerImg'), full = art.src, md = artThumb(art, true);
+        vi.onerror = () => { vi.onerror = null; if (vi.src.indexOf(full) < 0) vi.src = full; };
+        if (md !== full) { vi.src = md; const pre = new Image(); pre.onload = () => { if (artworks[currentIndex] === art) { vi.onerror = null; vi.src = full; } }; pre.src = full; }
+        else vi.src = full; }
       document.getElementById('viewerTitle').innerText = art.title;
       document.getElementById('viewerMeta').innerText = art.meta;
       document.getElementById('viewerCounter').innerText = `(${currentIndex + 1} / ${artworks.length})`;
@@ -4895,7 +4916,7 @@
         slot.loaded = true;
         activeLoads--;
       };
-      img.onerror = () => { slot.failed = true; activeLoads--; };
+      img.onerror = () => { if (slot.full && img.src.indexOf(slot.full) < 0) { img.crossOrigin = 'anonymous'; img.src = slot.full; return; } slot.failed = true; activeLoads--; };
       img.src = slot.src;
     }
 
@@ -4972,7 +4993,7 @@
         frameClickTargets.push(canvasMesh);
         scene.add(canvasMesh);
 
-        slots.push({ index, src: art.src, frameMesh, canvasMesh, loading: false, loaded: false, failed: false });
+        slots.push({ index, src: artThumb(art, true), full: art.src, frameMesh, canvasMesh, loading: false, loaded: false, failed: false });
       });
 
       // 작품이 2점 이상이면 위아래 끝이 없는 무한 반복, 1점이면 고정
@@ -5706,12 +5727,12 @@
       // ---------------- 🎄 계절 ----------------
       function season() {
         const m = new Date().getMonth() + 1;
-        if (m === 12) return { id: 'xmas', i: '🎄', n: '크리스마스 시즌', fx: ['❄️', '⛄', '✨'], bg: 'linear-gradient(90deg,#7f1d1d,#14532d)' };
-        if (m === 1 || m === 2) return { id: 'newyear', i: '🧧', n: '새해 복 시즌', fx: ['🧧', '🪙', '✨'], bg: 'linear-gradient(90deg,#9f1239,#b45309)' };
-        if (m === 3 || m === 4) return { id: 'spring', i: '🌸', n: '봄꽃 시즌', fx: ['🌸', '🌷', '🦋'], bg: 'linear-gradient(90deg,#be185d,#65a30d)' };
-        if (m === 5) return { id: 'kids', i: '🎈', n: '어린이날 시즌', fx: ['🎈', '🎁', '⭐'], bg: 'linear-gradient(90deg,#2563eb,#db2777)' };
-        if (m === 7 || m === 8) return { id: 'summer', i: '🍉', n: '여름 방학 시즌', fx: ['🍉', '🫧', '🐚'], bg: 'linear-gradient(90deg,#0369a1,#0f766e)' };
-        if (m === 10) return { id: 'halloween', i: '🎃', n: '할로윈 시즌', fx: ['🎃', '👻', '🍬'], bg: 'linear-gradient(90deg,#7c2d12,#4c1d95)' };
+        if (m === 12) return { id: 'xmas', i: '🎄', n: '크리스마스 시즌', fx: ['❄️', '⛄', '✨'], bg: 'linear-gradient(90deg,#7f1d1d,#14532d)', mk: 'card', mtx: '🎄 크리스마스 그림 카드 보내기' };
+        if (m === 1 || m === 2) return { id: 'newyear', i: '🧧', n: '새해 복 시즌', fx: ['🧧', '🪙', '✨'], bg: 'linear-gradient(90deg,#9f1239,#b45309)', mk: 'story', mtx: '🧧 새해 그림책 읽기' };
+        if (m === 3 || m === 4) return { id: 'spring', i: '🌸', n: '봄꽃 시즌', fx: ['🌸', '🌷', '🦋'], bg: 'linear-gradient(90deg,#be185d,#65a30d)', mk: 'anim', mtx: '🌸 그림에 꽃잎 날리기' };
+        if (m === 5) return { id: 'kids', i: '🎈', n: '어린이날 시즌', fx: ['🎈', '🎁', '⭐'], bg: 'linear-gradient(90deg,#2563eb,#db2777)', mk: 'catch', mtx: '🎈 어린이날 그림 뽑기' };
+        if (m === 7 || m === 8) return { id: 'summer', i: '🍉', n: '여름 방학 시즌', fx: ['🍉', '🫧', '🐚'], bg: 'linear-gradient(90deg,#0369a1,#0f766e)', mk: 'drive', mtx: '🍉 킥보드로 여름 여행' };
+        if (m === 10) return { id: 'halloween', i: '🎃', n: '할로윈 시즌', fx: ['🎃', '👻', '🍬'], bg: 'linear-gradient(90deg,#7c2d12,#4c1d95)', mk: 'sheet', mtx: '🎃 할로윈 색칠 도안 만들기' };
         return null;
       }
 
@@ -5739,7 +5760,7 @@
         if (!window.JJLucky) { s0.mpick = s0.mpick || {}; s0.mpick[today()] = missions(); save(s0); renderToday(); return; }
         let k = (s0.mpick && s0.mpick[today()] || []).length;
         JJLucky.open({ title: '오늘의 미션 뽑기', sub: '럭키볼 3개에서 오늘 할 미션이 하나씩 나와요', balls: 3 - k, goText: '🔮 미션 뽑기!', againText: '🔮 다음 미션', okText: '미션 시작!', label: '오늘의 미션은',
-          prizes: () => { const pool = MPOOLS[Math.min(k, 2)], key = pool[Math.floor(Math.random() * pool.length)]; return { icon: MS[key].i, title: MS[key].tx, desc: `${k + 1}번째 미션 · 다 하면 보너스 럭키볼!`, key }; },
+          prizes: () => { const pool = MPOOLS[Math.min(k, 2)], key = (k === 2 && MS.sea) ? 'sea' : pool[Math.floor(Math.random() * pool.length)]; return { icon: MS[key].sea ? season().i : MS[key].i, title: MS[key].tx, desc: MS[key].sea ? `${season().n} 한정 미션! · 다 하면 보너스 럭키볼` : `${k + 1}번째 미션 · 다 하면 보너스 럭키볼!`, label: MS[key].sea ? '🎁 계절 한정 미션' : undefined, key }; },
           onResult: p => { const s = st(); s.mpick = s.mpick || {}; const arr = s.mpick[today()] = s.mpick[today()] || []; arr.push(p.key); k = arr.length; Object.keys(s.mpick).sort().slice(0, -14).forEach(x => delete s.mpick[x]); save(s); },
           onPick: () => { fillMissions(); renderToday(); }, onClose: () => { fillMissions(); renderToday(); } });
       };
@@ -5755,11 +5776,14 @@
           prizes: [{ icon: '💧', title: `물감 +${n}`, desc: n >= 5 ? '대박! 황금 럭키볼이에요 👑' : '내일도 미션을 뽑아 봐요!', say: `물감 ${n}개!` }],
           onPick: () => give(n) });
       };
-      function mprog(s, k) { const day = s.days[today()] || {}; return Math.min(MS[k].n, day[k] || 0); }
+      // 🎄 계절 한정 미션: 'sea' 는 그 계절의 놀이(mk)를 하면 채워져요
+      (function () { const sea = season(); if (sea) MS.sea = { i: '', tx: sea.mtx, n: 1, key: sea.mk, sea: 1 }; })();
+      const mkey = k => (MS[k] && MS[k].key) || k;
+      function mprog(s, k) { if (!MS[k]) return 0; const day = s.days[today()] || {}; return Math.min(MS[k].n, day[mkey(k)] || 0); }
       function afterTrack(key) {
         const s = st(), ms = missions();
-        if (mPicked(s) && ms.includes(key) && mprog(s, key) === MS[key].n && (s.days[today()][key] === MS[key].n)) toastSafe(`✅ 미션 완료! ${MS[key].i} ${MS[key].tx}`);
-        if (mPicked(s) && !s.mdone[today()] && ms.every(k => mprog(s, k) >= MS[k].n)) {
+        ms.forEach(k => { if (mPicked(s) && MS[k] && mkey(k) === key && mprog(s, k) === MS[k].n && (s.days[today()][key] === MS[k].n)) toastSafe(`✅ 미션 완료! ${MS[k].i} ${MS[k].tx}`); });
+        if (mPicked(s) && !s.mdone[today()] && ms.every(k => !MS[k] || mprog(s, k) >= MS[k].n)) {
           s.mdone[today()] = 1; save(s);
           setTimeout(() => { toastSafe('🎉 오늘의 미션 3개 완료! 🎁 보너스 럭키볼이 생겼어요 (Play)'); confetti(); }, 900);
         }
@@ -5859,10 +5883,10 @@
       };
       function renderToday() {
         const el = document.getElementById('jxToday'); if (!el) return;
-        const s = st(), ms = missions(), sea = season(), all = ms.every(k => mprog(s, k) >= MS[k].n), picked = mPicked(s), bonus = s.mdone[today()];
+        const s = st(), ms = missions(), sea = season(), all = ms.every(k => !MS[k] || mprog(s, k) >= MS[k].n), picked = mPicked(s), bonus = s.mdone[today()];
         const lastM = s.last && M[s.last];
         const list = picked
-          ? ms.map(k => { const p = mprog(s, k), d = p >= MS[k].n, go = M[k] ? M[k].go : (k === 'view' || k === 'cheer' ? "switchView('3d')" : ''); return `<button class="jx-m ${d ? 'done' : ''}" onclick="${go.replace(/"/g, '&quot;')}"><span class="ck">${d ? '✓' : ''}</span>${MS[k].i} ${MS[k].tx}<span class="pg2">${p}/${MS[k].n}</span></button>`; }).join('')
+          ? ms.filter(k => MS[k]).map(k => { const p = mprog(s, k), d = p >= MS[k].n, mk = mkey(k), go = M[mk] ? M[mk].go : (mk === 'view' || mk === 'cheer' ? "switchView('3d')" : ''); return `<button class="jx-m ${d ? 'done' : ''}" onclick="${go.replace(/"/g, '&quot;')}"><span class="ck">${d ? '✓' : ''}</span>${MS[k].i} ${MS[k].tx}<span class="pg2">${p}/${MS[k].n}</span></button>`; }).join('')
           : `<button class="jx-cont" style="margin-top:0;background:linear-gradient(135deg,#fde047,#ff8fd0);color:#3b0764;font-size:16px;padding:14px" onclick="jxMissionDraw()">🔮 럭키볼로 오늘의 미션 뽑기!</button>`;
         el.innerHTML = `<div class="jx-today"><h3>☀️ 오늘의 미션 <small>🔥 ${streak(s)}일 연속</small></h3>
           <div class="jx-ms">${list}</div>
@@ -6284,7 +6308,7 @@
           ${spark}
           <div class="lu-head">
             <div class="lu-logo"><div class="hx"></div><div class="hx2"><b>JJ</b></div><small>GALLERY</small></div>
-            <div class="lu-tt"><div class="k">JJ GALLERY ART SHOW!</div><h2><span>LINE-UP</span></h2>
+            <div class="lu-tt"><div class="k">JJ GALLERY ART SHOW!${season() ? ` <span class="lu-sea">${season().i} ${season().n.replace(' 시즌', '')} 에디션</span>` : ''}</div><h2><span>LINE-UP</span></h2>
               <div class="d">${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())}(${WD[now.getDay()]}) EP.${all.length}</div></div>
           </div>
           ${latest ? `<div class="lu-sp" onclick="jxLuOpen('${latest.id}')"><span class="lb">✨ Special ✨</span><img src="${thumb(latest.id)}" alt=""><div>${H(latest.title)}<small>이달의 신작 · ${luDate(latest)}</small></div></div>` : ''}
@@ -6352,6 +6376,50 @@
         c.fillStyle = '#fff'; c.font = '40px serif'; ['✦', '✧', '✦'].forEach((s, k) => c.fillText(s, 900 + k * 50, 80 + k * 30));
         shareCanvas(cv, `JJ_LINEUP_${now.getFullYear()}${pad(now.getMonth() + 1)}.png`, 'JJ 갤러리 라인업');
       };
+      // ---------------- 🎄 계절 장식: 갤러리 화면에 계절 소품이 살살 내려와요 ----------------
+      (function seasonDeco() {
+        const sea = season(); if (!sea || document.getElementById('jxSeaFx')) return;
+        try { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
+        const box = document.createElement('div'); box.id = 'jxSeaFx'; box.className = 'jx-sea-fx'; box.setAttribute('aria-hidden', 'true');
+        box.innerHTML = Array.from({ length: 12 }, (_, i) => `<i style="left:${(i * 8.3 + Math.random() * 6) % 100}%; font-size:${12 + Math.random() * 12}px; animation-duration:${9 + Math.random() * 9}s; animation-delay:${-Math.random() * 18}s">${sea.fx[i % sea.fx.length]}</i>`).join('');
+        document.body.appendChild(box); document.documentElement.classList.add('sea-' + sea.id);
+      })();
+
+      // ---------------- 🔙 휴대폰 '뒤로 가기' 버튼 = 화면 왼쪽 위 ← 와 똑같이 ----------------
+      //  갤럭시 아래쪽 ◁ 버튼(또는 뒤로 가기 제스처)을 누르면: 열린 창 닫기 → 게임 닫기 → 앞 화면으로
+      //  첫 화면에서 누르면 '한 번 더 누르면 나가요' 안내 후, 한 번 더 누르면 앱을 나가요
+      function backOnce() {
+        const jl = document.querySelector('.jl-ov'); if (jl) { const x = jl.querySelector('.jl-x'); if (x) x.click(); else if (window.JJLucky) JJLucky.close(); return true; }
+        const o = [...document.querySelectorAll('.jx-ov.on')].pop(); if (o) { jxClose(o.id); return true; }
+        const m = [...document.querySelectorAll('[id$="Modal"].active, #talkSheet.active, #talkSheet.on')].filter(e => e.id !== 'viewerModal').pop();
+        if (m) { try { closeModal(m.id); } catch (e) { m.classList.remove('active', 'on'); } return true; }
+        const sp = document.getElementById('songPlayer');
+        if (sp && sp.classList.contains('on')) {          // 게임 안의 럭키볼·게임 자체 '뒤로'가 먼저
+          try { const fw = document.getElementById('songFrame').contentWindow;
+            if (fw.agjjBack && fw.agjjBack()) return true;
+            const jo = fw.document.querySelector('.jl-ov'); if (jo) { const x = jo.querySelector('.jl-x'); if (x) x.click(); else fw.JJLucky.close(); return true; } } catch (e) {}
+        }
+        if (sp && sp.classList.contains('on')) { try { closeSong(); } catch (e) { sp.classList.remove('on'); } return true; }
+        const vm = document.getElementById('viewerModal'); if (vm && vm.classList.contains('active')) { try { closeViewer(); } catch (e) {} return true; }
+        const hub = document.getElementById('artistHub');
+        const atHome = hub && hub.style.display !== 'none' && getComputedStyle(hub).display !== 'none';
+        if (atHome) return false;
+        try { gb(); return true; } catch (e) { return false; }
+      }
+      window.agjjBack = backOnce;
+      (function backTrap() {
+        let armed = false, warnAt = 0;
+        const arm = () => { if (armed) return; try { history.pushState({ agjj: Date.now() }, ''); armed = true; } catch (e) {} };
+        addEventListener('popstate', () => {
+          armed = false;
+          if (backOnce()) { arm(); return; }
+          if (Date.now() - warnAt < 2500) { try { history.back(); } catch (e) {} return; }      // 두 번째: 나가기
+          warnAt = Date.now(); toastSafe('🔙 한 번 더 누르면 앱을 나가요');                      // 이때는 다시 걸지 않아요 → 다음 뒤로 가기로 나가요
+        });
+        addEventListener('pointerdown', arm, true);   // 화면을 다시 만지면 뒤로 가기 다시 준비
+        arm();
+      })();
+
       // 앱을 연 날 기록 + 배지 확인
       track('open'); checkBadges(true);
 
