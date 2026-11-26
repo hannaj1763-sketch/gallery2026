@@ -1,7 +1,7 @@
 /* =====================================================================
  * 🔮 JJ 럭키볼 (다른 게임에 얹어 쓰는 뽑기 부품)
  *  - 기계 = 팔레트 뚜껑을 덮은 'JJ 물감병', 공 = JJ 작품 썸네일(thumbs/NN.webp)이 든 캡슐
- *  - 붓 레버를 누르면 → 병 속 공이 물감처럼 소용돌이치고 → 캡슐이 열리며 '상품'이 나와요
+ *  - 붓 레버를 누르면 → 병이 덜덜 흔들리고 → 공이 물감처럼 소용돌이치고 → 캡슐이 열리며 '상품'이 나와요
  *
  *  쓰는 법 (같은 주소 hannaj1763-sketch.github.io 의 어느 게임에서나):
  *    <script src="https://hannaj1763-sketch.github.io/gallery2026/luckyball.js"></script>
@@ -87,6 +87,10 @@
   .jl-base::before{content:'';width:58px;height:22px;border-radius:0 0 30px 30px;background:#2a1640;box-shadow:inset 0 4px 8px rgba(0,0,0,.6)}
   .jl-dial{position:absolute;right:-6px;bottom:24px;width:22px;height:150px;transform-origin:50% 90%;transform:rotate(18deg);transition:transform .7s cubic-bezier(.34,1.56,.64,1);pointer-events:none;
     background:linear-gradient(180deg,#ff5fa2 0 16%,#fff7fb 16% 22%,#e5e7eb 22% 34%,#9ca3af 34% 36%,#f59e0b 36% 100%);border-radius:40% 40% 10px 10px/30% 30% 10px 10px;box-shadow:inset -4px 0 0 rgba(0,0,0,.15),0 4px 8px rgba(0,0,0,.35)}
+  .jl-stage.shake{animation:jlShake .42s ease-in-out infinite}
+  .jl-stage.shake .jl-lid{animation:jlLid .21s ease-in-out infinite}
+  @keyframes jlShake{0%,100%{transform:translate(0,0) rotate(0)}15%{transform:translate(-6px,-3px) rotate(-2deg)}30%{transform:translate(6px,2px) rotate(2deg)}45%{transform:translate(-5px,3px) rotate(-1.4deg)}60%{transform:translate(5px,-2px) rotate(1.4deg)}75%{transform:translate(-3px,-1px) rotate(-.7deg)}}
+  @keyframes jlLid{50%{transform:translateY(-4px) rotate(2deg)}}
   .jl-cnt{position:absolute;bottom:7%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:5px 13px;font-size:13px;font-weight:800;white-space:nowrap;z-index:2}
   .jl-cnt b{color:#7ef0e3}
   .jl-go{margin-top:16px;width:min(86vw,360px);border:none;border-radius:99px;padding:15px;font-size:20px;font-weight:900;cursor:pointer;color:#3b0764;background:linear-gradient(135deg,#fde047,#ff8fd0);box-shadow:0 8px 25px rgba(255,143,208,.45);font-family:inherit}
@@ -181,7 +185,9 @@
     st.busy = true; st.left--; render();
     const dial = st.el.querySelector('.jl-dial'); dial.style.transform = 'rotate(-38deg)'; setTimeout(() => { if (st) dial.style.transform = 'rotate(30deg)'; }, 260); setTimeout(() => { if (st) dial.style.transform = 'rotate(18deg)'; }, 600);
     st.shake = 5; sMix();
-    setTimeout(() => mix(1400, () => { const p = pickPrize(); st.last = p; st.ballId = p.art || IDS[Math.floor(Math.random() * IDS.length)] || '02'; result(p); st.busy = false; render(); }), 320);
+    const stg = st.el.querySelector('.jl-stage'); stg.classList.add('shake'); try { navigator.vibrate && navigator.vibrate([60, 40, 60, 40, 80]); } catch (e) {}
+    setTimeout(() => { if (st) stg.classList.remove('shake'); }, 900);
+    setTimeout(() => mix(1400, () => { const p = pickPrize(); st.last = p; st.ballId = p.art || IDS[Math.floor(Math.random() * IDS.length)] || '02'; result(p); st.busy = false; render(); }), 900);
   }
   function mix(ms, done) {
     const box = st.el.querySelector('.jl-mix'); box.classList.add('on');
