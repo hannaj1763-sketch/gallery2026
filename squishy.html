@@ -56,6 +56,8 @@
     text-shadow: -2px -2px 0 #3b2a45, 2px -2px 0 #3b2a45, -2px 2px 0 #3b2a45, 2px 2px 0 #3b2a45, 0 5px 0 #3b2a45;
     transition: transform .18s cubic-bezier(.18,.89,.32,1.28), opacity .25s; }
   #combo.pop { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  /* 앱 안에서는 휴대폰 아래쪽 버튼(뒤로·홈) 위로 올려요 */
+  body.in-app #tool { bottom: calc(max(14px, env(safe-area-inset-bottom)) + 44px); }
 </style>
 </head>
 <body>

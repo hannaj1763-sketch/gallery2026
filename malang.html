@@ -22,7 +22,7 @@
   h1 b { color: #f9a8d4; font-weight: inherit; }
   .sub { text-align: center; font-size: 13px; color: #6b5876; margin-top: 2px; min-height: 18px; }
   #cv { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
-  #keys { position: fixed; left: 50%; top: 52%; transform: translate(-50%, -50%); width: min(92vw, 420px); display: none; grid-template-columns: repeat(3, 1fr); gap: 12px; z-index: 3; }
+  #keys { position: fixed; left: 50%; top: calc(50% + 40px); transform: translate(-50%, -50%); width: min(92vw, 420px, calc((100vh - 330px) / 1.42)); display: none; grid-template-columns: repeat(3, 1fr); gap: 12px; z-index: 3; }
   body.m-key #keys { display: grid; }
   .kc { position: relative; aspect-ratio: 1; border: none; background: none; padding: 0; cursor: pointer; touch-action: none; }
   .kc .cap { position: absolute; inset: 0 0 10px 0; border-radius: 18px; background: linear-gradient(#fff, #f1ecf7); border: 2px solid #3b2a45;
@@ -33,13 +33,15 @@
   .kc.down .cap { transform: translateY(9px); box-shadow: 0 1px 0 var(--sd, #b9a6d6), 0 3px 0 #3b2a45, inset 0 -3px 0 rgba(0,0,0,.06); }
   .pop { position: fixed; z-index: 6; pointer-events: none; font-size: 26px; animation: pop .7s ease-out forwards; }
   @keyframes pop { to { transform: translateY(-70px) scale(1.4); opacity: 0; } }
-  #tabs { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(14px, env(safe-area-inset-bottom)); z-index: 5; width: min(94vw, 430px);
+  /* 메뉴는 위쪽에: 휴대폰 아래쪽 버튼(뒤로·홈)과 겹치지 않게 */
+  #tabs { position: fixed; left: 50%; transform: translateX(-50%); top: calc(max(10px, env(safe-area-inset-top)) + 100px); z-index: 5; width: min(94vw, 430px);
     display: flex; gap: 6px; padding: 7px; border-radius: 22px; background: rgba(255,255,255,.92); border: 2px solid #3b2a45; box-shadow: 0 10px 30px rgba(74,59,71,.15); }
-  #tabs button { flex: 1; border: 2px solid transparent; border-radius: 16px; padding: 8px 0 6px; background: none; font-family: inherit; font-size: 13px; color: #6b5876; cursor: pointer; line-height: 1.2; }
-  #tabs button i { display: block; font-style: normal; font-size: 22px; }
+  #tabs button { flex: 1; border: 2px solid transparent; border-radius: 16px; padding: 5px 0 4px; background: none; font-family: inherit; font-size: 13px; color: #6b5876; cursor: pointer; line-height: 1.2; }
+  #tabs button i { display: block; font-style: normal; font-size: 19px; }
   #tabs button { font-size: 12px !important; letter-spacing: -.3px; }
   #tabs button.on { background: #fde7f3; border-color: #3b2a45; color: #3b2a45; }
-  .tools { position: fixed; left: 50%; transform: translateX(-50%); z-index: 5; bottom: calc(max(14px, env(safe-area-inset-bottom)) + 84px); display: flex; gap: 6px; }
+  .tools { position: fixed; left: 50%; transform: translateX(-50%); z-index: 5; bottom: calc(max(14px, env(safe-area-inset-bottom)) + 16px); display: flex; gap: 6px; }
+  body.in-app .tools { bottom: calc(max(14px, env(safe-area-inset-bottom)) + 48px); }
   .tools .pill { font-size: 13px; padding: 6px 12px; box-shadow: 0 3px 0 #3b2a45; }
   .tools .pill:active { transform: translateY(3px); box-shadow: none; }
   #toast { position: fixed; left: 50%; top: 30%; transform: translate(-50%, -50%); z-index: 9; opacity: 0; transition: .25s; pointer-events: none;
@@ -132,7 +134,7 @@ let mode = 'blob';
 const BN = 44; let B = null;
 function blobReset() {
   const R = Math.min(W * .34, H * .2, 170);
-  const c = { x: W / 2, y: H * .5 };
+  const c = { x: W / 2, y: (190 + H - 120) / 2 };
   const pts = []; for (let i = 0; i < BN; i++) { const a = i / BN * Math.PI * 2; pts.push({ a, x: c.x + Math.cos(a) * R, y: c.y + Math.sin(a) * R * .9, vx: 0, vy: 0 }); }
   B = { c, R, pts, art: B ? B.art : null, grabs: new Map(), lastK: 0, face: 0 };
 }
@@ -223,7 +225,7 @@ function blobUp(e) {
 let balls = [], shards = [], flashes = [], shake = 0;
 const BALLC = ['#f472b6', '#a78bfa', '#38bdf8', '#facc15', '#34d399', '#fb923c'];
 function layoutBalls() {
-  const cols = 3, rows = 4, top = 150, bot = H - 150, cw = W / cols, ch = (bot - top) / rows;
+  const cols = 3, rows = 4, top = 185, bot = H - (document.body.classList.contains('in-app') ? 115 : 80), cw = W / cols, ch = (bot - top) / rows;
   const r = Math.min(cw, ch) * .38; const old = balls; balls = [];
   for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
     const k = j * cols + i, o = old[k];
@@ -303,7 +305,7 @@ function slimeSwirl(x, y, power = 1) {
   if (bubbleTarget >= BIG) {   // 바풍 팡!
     SND.boing(1); SND.crunch(); buzz([40, 20, 60]); count(3);
     pop('🫧 팡!!', W / 2 - 30, H * .45);
-    for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2; slimeRipples.push({ x: W / 2 + Math.cos(a) * 60, y: H * .48 + Math.sin(a) * 60, r: 10, maxR: 140, life: 1 }); }
+    for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2; slimeRipples.push({ x: W / 2 + Math.cos(a) * 60, y: ((190 + H - 120) / 2) + Math.sin(a) * 60, r: 10, maxR: 140, life: 1 }); }
     bubbleR = bubbleTarget = 0;
   } else {
     const now = Date.now(); if (now - slimeLast > 70) { slimeLast = now; SND.stretch(Math.min(1, power * .6)); buzz(12); }
@@ -315,7 +317,7 @@ function slimeDraw() {
   const im = slimeArt && img(slimeArt.id);
   if (im && im.complete && im.naturalWidth) {
     cx.save(); cx.globalAlpha = .38; const s = Math.max(W, H) * .85;
-    cx.translate(W / 2 + Math.sin(t) * 12, H * .48 + Math.cos(t * .8) * 12); cx.rotate(Math.sin(t * .4) * .08);
+    cx.translate(W / 2 + Math.sin(t) * 12, ((190 + H - 120) / 2) + Math.cos(t * .8) * 12); cx.rotate(Math.sin(t * .4) * .08);
     cx.drawImage(im, -s / 2, -s / 2, s, s); cx.restore();
   }
   // 2) 손가락 결 (물결)
@@ -338,7 +340,7 @@ function slimeDraw() {
   // 4) 가운데 바풍 (슬라임 버블)
   bubbleTarget *= .992; bubbleR += (bubbleTarget - bubbleR) * .15;
   if (bubbleR > 8) {
-    const bx = W / 2, by = H * .48; cx.save();
+    const bx = W / 2, by = ((190 + H - 120) / 2); cx.save();
     const bg = cx.createRadialGradient(bx - bubbleR * .3, by - bubbleR * .3, bubbleR * .1, bx, by, bubbleR);
     bg.addColorStop(0, 'rgba(255,255,255,.85)'); bg.addColorStop(.6, 'rgba(244,114,182,.28)'); bg.addColorStop(1, 'rgba(255,255,255,.75)');
     cx.fillStyle = bg; cx.beginPath(); cx.arc(bx, by, bubbleR, 0, 7); cx.fill();
