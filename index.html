@@ -6393,14 +6393,14 @@
       if (typeof window.switchView === 'function') {
         const sv = window.switchView;
         window.switchView = function (mode) {
-          if (mode === 'lineup' || (mode === 'gallery' && (typeof lsGet === 'function' ? lsGet('agjj_galmode', '3d') : '') === 'lineup')) return openLineup();
+          if (mode === 'lineup' || mode === 'gallery') return openLineup();   // 🖼 갤러리에 들어오면 언제나 ✨ 라인업부터
           return sv.apply(this, arguments);
         };
       }
       (function addSeg() {
         const seg = document.getElementById('galSeg'); if (!seg || seg.querySelector('[data-g="lineup"]')) return;
         const b = document.createElement('button'); b.dataset.g = 'lineup'; b.textContent = '✨ 라인업'; b.onclick = () => switchView('lineup');
-        seg.appendChild(b);
+        seg.insertBefore(b, seg.firstChild);   // ✨ 라인업을 맨 앞에
       })();
       window.jxLuPoster = async function () {
         const list = luList().slice(0, 18), vis = new Set(visibleArts().map(a => a.id));
@@ -6466,6 +6466,26 @@
         try { gb(); return true; } catch (e) { return false; }
       }
       window.agjjBack = backOnce;
+      // ↕ 게임을 닫고 돌아오면, 게임을 열기 전에 보던 그 자리로 (빈 화면으로 튀지 않게)
+      try { history.scrollRestoration = 'manual'; } catch (e) {}
+      (function keepScroll() {
+        let y0 = 0;
+        if (typeof window.openExtGame === 'function') {
+          const og = window.openExtGame;
+          window.openExtGame = function () { y0 = window.scrollY || 0; return og.apply(this, arguments); };
+        }
+        if (typeof window.closeSong === 'function') {
+          const cs = window.closeSong;
+          window.closeSong = function () {
+            const r = cs.apply(this, arguments);
+            const fix = () => { const max = Math.max(0, document.documentElement.scrollHeight - innerHeight); window.scrollTo(0, Math.min(y0, max)); };
+            fix(); requestAnimationFrame(fix); setTimeout(fix, 250);
+            return r;
+          };
+        }
+        // 어떤 화면이든 내용보다 아래로 내려가 있으면 끌어올려요
+        addEventListener('popstate', () => setTimeout(() => { const max = Math.max(0, document.documentElement.scrollHeight - innerHeight); if (scrollY > max) window.scrollTo(0, max); }, 300));
+      })();
       (function backTrap() {
         let armed = false, warnAt = 0;
         const arm = () => { if (armed) return; try { history.pushState({ agjj: Date.now() }, ''); armed = true; } catch (e) {} };

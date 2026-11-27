@@ -1,7 +1,7 @@
 // 📶 JJ 갤러리 오프라인 도우미 (서비스 워커)
 //  - 화면(html)·데이터(json): 인터넷 먼저 → 안 되면 저장해 둔 것
 //  - 그림·썸네일·글씨체: 저장해 둔 것 먼저 (뒤에서 새로 받아 두기)
-const V = 'agjj-v6', IMG = 'agjj-img-v1', MAX_IMG = 260;
+const V = 'agjj-v7', IMG = 'agjj-img-v1', MAX_IMG = 260;
 const CORE = ['./', 'index.html', 'thumbs/index.json', 'thumbs/mosaic.webp', 'puzzle.html', 'cube.html', 'balance.html', 'nunchi.html', 'hidden.html', 'study.html', 'catch.html', 'squishy.html', 'malang.html', 'paint-icon.js', 'luckyball.js', 'tama.html', 'yut.html', 'yut-board.webp'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => Promise.all(CORE.map(u => c.add(u).catch(() => {})))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V && k !== IMG).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
@@ -10,6 +10,11 @@ self.addEventListener('fetch', e => {
   const r = e.request; if (r.method !== 'GET') return;
   const u = new URL(r.url);
   if (u.hostname.includes('firebase') || u.hostname.includes('googleapis') || u.hostname.includes('gstatic') || u.pathname.includes('/api/')) return;
+  // 3D 말랑이에 쓰는 three.js (unpkg): 한 번 받으면 저장해 두고 인터넷 없이도 써요
+  if (u.hostname === 'unpkg.com') {
+    e.respondWith(caches.open(V).then(async c => { const hit = await c.match(r); if (hit) return hit; const res = await fetch(r); if (res && res.ok) c.put(r, res.clone()); return res; }));
+    return;
+  }
   const isImg = /\.(webp|jpe?g|png|gif|woff2?|ttf)$/i.test(u.pathname) || (u.hostname === 'raw.githubusercontent.com' && /\.(jpe?g|png|webp)$/i.test(u.pathname));
   if (isImg) {
     e.respondWith(caches.open(IMG).then(async c => {
