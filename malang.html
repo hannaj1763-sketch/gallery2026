@@ -10,6 +10,7 @@
   body { font-family: 'Jua', -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; color: #3b2a45; touch-action: none;
     background: radial-gradient(circle at 50% 35%, #fff7fb 0%, #fde7f3 45%, #e7e2ff 100%); transition: background .4s; }
   body.m-ball { background: radial-gradient(circle at 50% 35%, #fffbea 0%, #fde2c7 50%, #fbcfe8 100%); }
+  body.m-slime { background: radial-gradient(circle at 50% 45%, #fff1f2 0%, #ffe4e6 50%, #fecdd3 100%); }
   body.m-key { background: radial-gradient(circle at 50% 35%, #f0fdfa 0%, #dbeafe 50%, #e9d5ff 100%); }
   #top { position: fixed; top: max(10px, env(safe-area-inset-top)); left: 10px; right: 10px; z-index: 5; }
   .bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
@@ -35,7 +36,8 @@
   #tabs { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(14px, env(safe-area-inset-bottom)); z-index: 5; width: min(94vw, 430px);
     display: flex; gap: 6px; padding: 7px; border-radius: 22px; background: rgba(255,255,255,.92); border: 2px solid #3b2a45; box-shadow: 0 10px 30px rgba(74,59,71,.15); }
   #tabs button { flex: 1; border: 2px solid transparent; border-radius: 16px; padding: 8px 0 6px; background: none; font-family: inherit; font-size: 13px; color: #6b5876; cursor: pointer; line-height: 1.2; }
-  #tabs button i { display: block; font-style: normal; font-size: 24px; }
+  #tabs button i { display: block; font-style: normal; font-size: 22px; }
+  #tabs button { font-size: 12px !important; letter-spacing: -.3px; }
   #tabs button.on { background: #fde7f3; border-color: #3b2a45; color: #3b2a45; }
   .tools { position: fixed; left: 50%; transform: translateX(-50%); z-index: 5; bottom: calc(max(14px, env(safe-area-inset-bottom)) + 84px); display: flex; gap: 6px; }
   .tools .pill { font-size: 13px; padding: 6px 12px; box-shadow: 0 3px 0 #3b2a45; }
@@ -58,6 +60,7 @@
   <button class="on" data-m="blob"><i>🍡</i>말랑이</button>
   <button data-m="ball"><i>🔮</i>왁뿌 볼</button>
   <button data-m="key"><i>⌨️</i>도파민 키캡</button>
+  <button data-m="slime"><i>🌀</i>그림 슬라임</button>
 </div>
 <div id="toast"></div>
 <script src="luckyball.js"></script>
@@ -288,6 +291,64 @@ let ballDrag = false;
 function ballAt(x, y) { for (const b of balls) if (!b.dead && Math.hypot(x - b.x, y - b.y) < b.r) return b; return null; }
 
 // =====================================================================
+// 🌀 그림 슬라임 — 문지르면 찰방찰방 결이 생기고, 계속 문지르면 바풍이 부풀다가 팡!
+// =====================================================================
+let slimeRipples = [], slimeSeeds = [], bubbleR = 0, bubbleTarget = 0, slimeArt = null, slimeLast = 0;
+for (let i = 0; i < 18; i++) slimeSeeds.push({ x: Math.random(), y: .18 + Math.random() * .6, r: 5 + Math.random() * 5, a: Math.random() * 6.28, c: ['#3b2a45', '#f472b6', '#facc15', '#38bdf8'][i % 4] });
+function slimeSwirl(x, y, power = 1) {
+  slimeRipples.push({ x, y, r: 12, maxR: 110 + power * 60, life: 1 });
+  if (slimeRipples.length > 24) slimeRipples.shift();
+  const BIG = Math.min(W, H) * .36;
+  bubbleTarget = Math.min(BIG * 1.06, bubbleTarget + 14 * power);
+  if (bubbleTarget >= BIG) {   // 바풍 팡!
+    SND.boing(1); SND.crunch(); buzz([40, 20, 60]); count(3);
+    pop('🫧 팡!!', W / 2 - 30, H * .45);
+    for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2; slimeRipples.push({ x: W / 2 + Math.cos(a) * 60, y: H * .48 + Math.sin(a) * 60, r: 10, maxR: 140, life: 1 }); }
+    bubbleR = bubbleTarget = 0;
+  } else {
+    const now = Date.now(); if (now - slimeLast > 70) { slimeLast = now; SND.stretch(Math.min(1, power * .6)); buzz(12); }
+  }
+}
+function slimeDraw() {
+  const t = Date.now() * .002;
+  // 1) 슬라임 + JJ 그림 마블링 (천천히 일렁여요)
+  const im = slimeArt && img(slimeArt.id);
+  if (im && im.complete && im.naturalWidth) {
+    cx.save(); cx.globalAlpha = .38; const s = Math.max(W, H) * .85;
+    cx.translate(W / 2 + Math.sin(t) * 12, H * .48 + Math.cos(t * .8) * 12); cx.rotate(Math.sin(t * .4) * .08);
+    cx.drawImage(im, -s / 2, -s / 2, s, s); cx.restore();
+  }
+  // 2) 손가락 결 (물결)
+  for (let i = slimeRipples.length - 1; i >= 0; i--) {
+    const rp = slimeRipples[i]; rp.r += (rp.maxR - rp.r) * .12; rp.life -= .022;
+    if (rp.life <= 0) { slimeRipples.splice(i, 1); continue; }
+    cx.save();
+    cx.strokeStyle = `rgba(255,255,255,${rp.life * .75})`; cx.lineWidth = 14 * rp.life; cx.beginPath(); cx.arc(rp.x, rp.y, rp.r, 0, 7); cx.stroke();
+    cx.strokeStyle = `rgba(244,114,182,${rp.life * .25})`; cx.lineWidth = 24 * rp.life; cx.beginPath(); cx.arc(rp.x + 6, rp.y + 6, rp.r * .85, 0, 7); cx.stroke();
+    cx.restore();
+  }
+  // 3) 슬라임 속 파츠 (수박씨·글리터)
+  for (const sd of slimeSeeds) {
+    const sx = (sd.x + Math.sin(t + sd.a) * .03) * W, sy = (sd.y + Math.cos(t * .9 + sd.a) * .03) * H;
+    cx.save(); cx.translate(sx, sy); cx.rotate(sd.a + Math.sin(t) * .3);
+    cx.fillStyle = sd.c; cx.beginPath(); cx.ellipse(0, 0, sd.r, sd.r * .55, 0, 0, 7); cx.fill();
+    cx.fillStyle = 'rgba(255,255,255,.6)'; cx.beginPath(); cx.arc(-sd.r * .3, -sd.r * .15, 1.8, 0, 7); cx.fill();
+    cx.restore();
+  }
+  // 4) 가운데 바풍 (슬라임 버블)
+  bubbleTarget *= .992; bubbleR += (bubbleTarget - bubbleR) * .15;
+  if (bubbleR > 8) {
+    const bx = W / 2, by = H * .48; cx.save();
+    const bg = cx.createRadialGradient(bx - bubbleR * .3, by - bubbleR * .3, bubbleR * .1, bx, by, bubbleR);
+    bg.addColorStop(0, 'rgba(255,255,255,.85)'); bg.addColorStop(.6, 'rgba(244,114,182,.28)'); bg.addColorStop(1, 'rgba(255,255,255,.75)');
+    cx.fillStyle = bg; cx.beginPath(); cx.arc(bx, by, bubbleR, 0, 7); cx.fill();
+    cx.lineWidth = 3; cx.strokeStyle = 'rgba(255,255,255,.9)'; cx.stroke();
+    cx.fillStyle = 'rgba(255,255,255,.8)'; cx.beginPath(); cx.ellipse(bx - bubbleR * .35, by - bubbleR * .38, bubbleR * .24, bubbleR * .11, -.6, 0, 7); cx.fill();
+    cx.restore();
+  }
+}
+
+// =====================================================================
 // ⌨️ 도파민 키캡 — 딸깍딸깍! 그림 키캡 12개
 // =====================================================================
 const KEYC = ['#b9a6d6', '#f9a8d4', '#93c5fd', '#fcd34d', '#86efac', '#fdba74'];
@@ -307,7 +368,7 @@ function buildKeys() {
 function pop(t, x, y) { const d = document.createElement('div'); d.className = 'pop'; d.textContent = t; d.style.left = (x - 14) + 'px'; d.style.top = y + 'px'; document.body.appendChild(d); setTimeout(() => d.remove(), 750); }
 
 // ---------------- 모드 · 도구 ----------------
-const SUBS = { blob: '말랑이를 양옆으로 쭉~ 늘려 보세요 (두 손가락도 돼요)', ball: '톡! 치면 와작 · 쓱 문질러도 부서져요', key: '딸깍딸깍 눌러 보세요 · 여러 개 동시에도!' };
+const SUBS = { blob: '말랑이를 양옆으로 쭉~ 늘려 보세요 (두 손가락도 돼요)', ball: '톡! 치면 와작 · 쓱 문질러도 부서져요', key: '딸깍딸깍 눌러 보세요 · 여러 개 동시에도!', slime: '손가락으로 쓱쓱 문지르면 바풍이 부풀다가 팡!' };
 function setMode(m) {
   mode = m; S.mode = m; save();
   document.body.className = 'm-' + m + (document.body.classList.contains('in-app') ? ' in-app' : '');
@@ -316,7 +377,9 @@ function setMode(m) {
   const t = $('tools');
   if (m === 'blob') t.innerHTML = '<button class="pill" id="tLucky">🔮 그림 뽑기</button><a class="pill" href="squishy.html">🫧 3D 말랑이</a>';
   else if (m === 'ball') t.innerHTML = '<button class="pill" id="tAll">💥 한꺼번에 와작</button>';
-  else t.innerHTML = '<button class="pill" id="tKeys">🎲 키캡 그림 바꾸기</button>';
+  else if (m === 'key') t.innerHTML = '<button class="pill" id="tKeys">🎲 키캡 그림 바꾸기</button>';
+  else t.innerHTML = '<button class="pill" id="tSlimeArt">🔮 슬라임 그림 바꾸기</button>';
+  const SA = $('tSlimeArt'); if (SA) SA.onclick = () => { if (WORKS.length) { slimeArt = rndW(); slimeSwirl(W / 2, H / 2, 1.2); } };
   const L = $('tLucky'); if (L) L.onclick = luckyBlob;
   const A = $('tAll'); if (A) A.onclick = () => balls.forEach((b, i) => setTimeout(() => smash(b), i * 45));
   const K = $('tKeys'); if (K) K.onclick = () => { S.kseed = (S.kseed || 0) + 1 + (Math.random() * 20 | 0); save(); buildKeys(); SND.clack(3); };
@@ -335,10 +398,12 @@ cv.addEventListener('pointerdown', e => {
   try { ac(); } catch (er) {} try { cv.setPointerCapture(e.pointerId); } catch (er) {}
   if (mode === 'blob') blobDown(e);
   else if (mode === 'ball') { ballDrag = true; const b = ballAt(e.clientX, e.clientY); if (b) smash(b); }
+  else if (mode === 'slime') { ballDrag = true; slimeSwirl(e.clientX, e.clientY, 1); count(); }
 });
 cv.addEventListener('pointermove', e => {
   if (mode === 'blob') blobMove(e);
   else if (mode === 'ball' && ballDrag) { const b = ballAt(e.clientX, e.clientY); if (b) smash(b); }
+  else if (mode === 'slime' && ballDrag) { if (Math.random() < .45) slimeSwirl(e.clientX, e.clientY, .55); }
 });
 const upAll = e => { if (mode === 'blob') blobUp(e); ballDrag = false; };
 cv.addEventListener('pointerup', upAll); cv.addEventListener('pointercancel', upAll);
@@ -348,6 +413,7 @@ function loop() {
   cx.clearRect(0, 0, W, H);
   if (mode === 'blob') { blobStep(); blobDraw(); }
   else if (mode === 'ball') ballDraw();
+  else if (mode === 'slime') slimeDraw();
   requestAnimationFrame(loop);
 }
 addEventListener('resize', resize);
@@ -355,7 +421,7 @@ resize(); setMode(S.mode || 'blob'); loop();
 (async () => {
   try { const r = await fetch('thumbs/index.json', { cache: 'no-cache' }); const j = await r.json(); WORKS = (j.works || []).map(w => ({ id: w.id, title: w.title || ('JJ의 그림 ' + w.id) })); } catch (e) {}
   if (!WORKS.length) return;
-  B.art = WORKS.find(w => w.id === S.art) || rndW(); ballArt(); buildKeys();
+  B.art = WORKS.find(w => w.id === S.art) || rndW(); slimeArt = rndW(); ballArt(); buildKeys();
 })();
 addEventListener('pagehide', save); document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 </script>
